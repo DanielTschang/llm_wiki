@@ -17,6 +17,7 @@
  * from any environment without crashing at module load.
  */
 
+import { createHttpFetch } from "@/platform"
 import { useWikiStore } from "@/stores/wiki-store"
 import { isProxyActive, type ProxyConfig } from "@/lib/proxy-config"
 
@@ -54,9 +55,10 @@ export function withProxyTlsSettings(
 }
 
 /**
- * Returns a fetch function that routes through Tauri's HTTP plugin in
- * production, falling back to the platform's native fetch in non-Tauri
- * environments (tests / SSR / storybook). Call this once per request:
+ * Returns a fetch function that routes through Tauri's HTTP plugin on
+ * desktop (or the server's `/proxy` in the web build), falling back to
+ * the platform's native fetch in Node environments (tests / SSR /
+ * storybook). Call this once per request:
  *
  *   const httpFetch = await getHttpFetch()
  *   const response = await httpFetch(url, opts)
@@ -69,9 +71,8 @@ export function getHttpFetch(): Promise<typeof globalThis.fetch> {
       // Bind so `this === globalThis` — Node's fetch requires it.
       pluginFetchPromise = Promise.resolve(globalThis.fetch.bind(globalThis))
     } else {
-      pluginFetchPromise = import("@tauri-apps/plugin-http")
-        .then((m) => {
-          const pluginFetch = m.fetch
+      pluginFetchPromise = createHttpFetch()
+        .then((pluginFetch) => {
           const configuredFetch: typeof globalThis.fetch = (input, init) => {
             // Read at request time so changing Network settings takes effect
             // immediately. The option is deliberately scoped to the proxy

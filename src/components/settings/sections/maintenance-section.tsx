@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppDialog } from "@/stores/app-dialog-store"
-import { invoke } from "@tauri-apps/api/core"
-import { open, save } from "@tauri-apps/plugin-dialog"
+import { invoke, openDialog, saveDialog } from "@/platform"
 import {
   Wrench,
   Loader2,
@@ -206,7 +205,7 @@ export function MaintenanceSection() {
 
   const handleExportProject = useCallback(async () => {
     if (!project) return
-    const destination = await save({ defaultPath: `${project.name}.llmwiki.zip`, filters: [{ name: "LLM Wiki project", extensions: ["zip"] }] })
+    const destination = await saveDialog({ defaultPath: `${project.name}.llmwiki.zip`, filters: [{ name: "LLM Wiki project", extensions: ["zip"] }] })
     if (!destination) return
     setProjectToolBusy(true)
     try {
@@ -216,9 +215,9 @@ export function MaintenanceSection() {
   }, [project, t])
 
   const handleImportProject = useCallback(async () => {
-    const archive = await open({ multiple: false, filters: [{ name: "LLM Wiki project", extensions: ["zip"] }] })
+    const archive = await openDialog({ multiple: false, filters: [{ name: "LLM Wiki project", extensions: ["zip"] }] })
     if (!archive || Array.isArray(archive)) return
-    const destination = await open({ directory: true, multiple: false, createDirectories: true })
+    const destination = await openDialog({ directory: true, multiple: false, createDirectories: true })
     if (!destination || Array.isArray(destination)) return
     setProjectToolBusy(true)
     try {

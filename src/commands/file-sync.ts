@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core"
+import { invoke } from "@/platform"
 import type { SourceWatchConfig } from "@/stores/wiki-store"
 import { normalizeSourceWatchConfig } from "@/lib/source-watch-config"
 

@@ -1,7 +1,5 @@
 import { useState, useEffect } from "react"
-import { open } from "@tauri-apps/plugin-dialog"
-import { invoke } from "@tauri-apps/api/core"
-import { disable as disableAutostart, enable as enableAutostart, isEnabled as isAutostartEnabled } from "@tauri-apps/plugin-autostart"
+import { invoke, isAutostartEnabled, openDialog, setAutostart } from "@/platform"
 import i18n from "@/i18n"
 import { useWikiStore } from "@/stores/wiki-store"
 import { useReviewStore } from "@/stores/review-store"
@@ -400,10 +398,8 @@ function App() {
         }
         try {
           const currentAutostart = await isAutostartEnabled()
-          if (savedGeneral.autostart && !currentAutostart) {
-            await enableAutostart()
-          } else if (!savedGeneral.autostart && currentAutostart) {
-            await disableAutostart()
+          if (Boolean(savedGeneral.autostart) !== currentAutostart) {
+            await setAutostart(Boolean(savedGeneral.autostart))
           }
         } catch (err) {
           console.warn("[general] failed to sync autostart:", err)
@@ -599,7 +595,7 @@ function App() {
   }
 
   async function handleOpenProject() {
-    const selected = await open({
+    const selected = await openDialog({
       directory: true,
       multiple: false,
       title: "Open Wiki Project",

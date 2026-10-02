@@ -17,8 +17,7 @@ import {
   FileText,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { invoke } from "@tauri-apps/api/core"
-import { disable as disableAutostart, enable as enableAutostart } from "@tauri-apps/plugin-autostart"
+import { invoke, setAutostart } from "@/platform"
 import i18n from "@/i18n"
 import { Button } from "@/components/ui/button"
 import { useWikiStore } from "@/stores/wiki-store"
@@ -541,11 +540,7 @@ export function SettingsView() {
 
       await saveGeneralConfig(newGeneralConfig)
       try {
-        if (newGeneralConfig.autostart) {
-          await enableAutostart()
-        } else {
-          await disableAutostart()
-        }
+        await setAutostart(newGeneralConfig.autostart)
       } catch (err) {
         console.warn("[general] failed to update autostart:", err)
       }

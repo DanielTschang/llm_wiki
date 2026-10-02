@@ -1,4 +1,4 @@
-import { listen, type UnlistenFn } from "@tauri-apps/api/event"
+import { listen, type UnlistenFn } from "@/platform"
 import { readFile } from "@/commands/fs"
 import {
   invalidateProjectFileSnapshotPaths,

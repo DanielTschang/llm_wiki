@@ -1,0 +1,174 @@
+# Web server mode: self-hosted backend + browser frontend
+
+**Status:** Phase 1 done (uncommitted on `DanielTschang/second`, based on `b6e8dc1`). Phases 2–5 not started.
+
+**Goal:** Run LLM Wiki as a headless server (NAS / VPS / Docker, no
+desktop session) and use the existing React UI from any browser. The
+desktop Tauri app keeps working unchanged; both shells share one Rust
+core and one frontend build.
+
+**Non-goals (this round):**
+- Multi-user accounts / per-user permissions. One server = one owner,
+  protected by a single bearer token (same model as the existing
+  `api_server.rs` token).
+- Pure static hosting (Vercel etc.). LLM CORS, LanceDB, pdfium and the
+  agent shell tool all need a backend.
+- Rewriting the ingest pipeline in Rust. See Phase 4 for how headless
+  ingest is handled without a rewrite.
+
+---
+
+## Current state (audit, not assumption)
+
+### Frontend → Tauri coupling
+
+| Surface | Where | Count |
+|---|---|---|
+| `invoke(...)` | mostly via `src/commands/fs.ts` (33 exports) + 17 other files | ~68 distinct commands |
+| `listen(...)` events | `chat-panel.tsx` (`agent-event`), `project-file-sync.ts` (`file-sync://*`), `claude-cli-transport.ts`, `codex-cli-transport.ts` | 4 files |
+| `@tauri-apps/plugin-http` | only through `src/lib/tauri-fetch.ts::getHttpFetch()` | 1 seam |
+| `plugin-store` (`app-state.json`) | `src/lib/project-store.ts`, `src/lib/project-identity.ts` | 2 files |
+| `plugin-dialog` (`open`/`save`/`message`) | App, sources-view, create-project, maintenance, scheduled-import, file-tree | 6 files |
+| `plugin-opener` (`openUrl`/`openPath`) | about, api-server, chat-message, update-banner, file-preview, frontmatter-panel | 6 files |
+| `convertFileSrc` (asset protocol) | file-preview, chat-panel, chat-message | 3 files |
+| `plugin-autostart`, `api/window` (theme) | App, settings-view, theme.ts | desktop-only |
+
+**Critical:** ingest queue, two-step ingest, LLM calls, graph/relevance,
+lint and deep research all run **in the frontend** (`src/lib/ingest-queue.ts`
+etc.), using `getHttpFetch()` to bypass CORS. In a browser they must go
+through a server-side proxy, and they stop when the tab is closed.
+
+### Rust → Tauri coupling
+
+- `commands/fs.rs`, `vectorstore.rs`, `file_history.rs`, `search.rs`,
+  `project_maintenance.rs`, `external_search.rs`, `extract_images.rs`:
+  **only the `#[tauri::command]` attribute**, function bodies are plain.
+- Real `AppHandle` / `State` / `Emitter` use:
+  - `file_sync.rs` (watcher state + emits `file-sync://queue-updated`, `file-sync://changed`)
+  - `claude_cli.rs`, `codex_cli.rs` (child-process state + per-stream emits)
+  - `lib.rs` agent commands (`agent-event` emits, `AgentSessionStore`, `AgentCancellationRegistry`)
+  - `api_server.rs` (`app.path().app_data_dir()` for `app-state.json`, `app.state::<…>()`)
+  - `project.rs::open_project_folder` / `open_path_in_project` (OS file manager — desktop only)
+  - `tray.rs`, autostart, close behavior — desktop only
+- `api_server.rs` is `tiny_http`, 4k lines, exposes a narrow `/api/v1`
+  surface (search, chat, pages read/write/embed). Not enough to drive the UI.
+
+---
+
+## Target architecture
+
+```
+                 ┌──────────── frontend (one Vite build) ────────────┐
+                 │  src/platform/  ← the only place that knows the shell │
+                 │    invoke · listen · httpFetch · store · dialogs     │
+                 │    opener · fileSrc                                  │
+                 └───────┬───────────────────────────┬─────────────────┘
+              Tauri IPC  │                           │ HTTP + SSE
+        ┌────────────────▼──────┐        ┌───────────▼────────────────┐
+        │ src-tauri (desktop)   │        │ server/ (axum binary)      │
+        │ thin #[tauri::command]│        │ POST /rpc/:command         │
+        │ wrappers, tray, etc.  │        │ GET  /events (SSE)         │
+        └────────────┬──────────┘        │ POST /proxy (LLM fetch)    │
+                     │                   │ GET  /files/*  (fileSrc)   │
+                     │                   │ static frontend, auth      │
+                     │                   └───────────┬────────────────┘
+                     └────────────┬──────────────────┘
+                         ┌────────▼─────────┐
+                         │ core/ (no tauri) │  commands, agent, vectorstore,
+                         │ EventSink trait  │  file_sync, cli transports,
+                         │ AppConfigStore   │  api_server routes
+                         └──────────────────┘
+```
+
+Key decisions:
+1. **RPC mirrors `invoke` 1:1.** `POST /rpc/<command>` with the same
+   camelCase JSON args. The frontend change becomes a transport swap,
+   not 68 call-site rewrites; new commands work in both shells for free.
+2. **Events → one SSE stream** (`GET /events`), each message
+   `{ event, payload }`. `platform.listen(name, cb)` filters client-side.
+3. **`app-state.json` moves server-side** behind `get/set` RPCs
+   (`AppConfigStore` trait in core; desktop impl keeps plugin-store's file
+   so existing installs are not migrated).
+4. **Paths are server paths.** Projects live under a configured
+   `--data-dir`; dialogs become an in-app server directory browser plus
+   browser upload for importing sources.
+
+---
+
+## Phases
+
+Each phase ends green on `npm test` + `cargo test` and keeps the desktop
+app shippable.
+
+### Phase 1 — Frontend platform seam (desktop behavior unchanged) ✅
+- `src/platform/{types,tauri,web,index}.ts` expose `invoke`, `listen`,
+  `convertFileSrc`, `createHttpFetch`, `loadStore`, `openDialog` /
+  `saveDialog` / `messageDialog`, `openUrl`, `openPath`,
+  `isAutostartEnabled` / `setAutostart`, `setWindowTheme`, `isDesktop`.
+- Every direct `@tauri-apps/*` import moved behind `@/platform`.
+  The repo has no ESLint, so `src/platform/no-direct-tauri-imports.test.ts`
+  enforces it instead.
+- Desktop is the default implementation (also under vitest, so existing
+  `vi.mock("@tauri-apps/...")` mocks still apply). `npm run build:web`
+  (`vite build --mode web`, reads `.env.web`) selects the web
+  implementation; the Tauri plugins are tree-shaken out of that bundle.
+- `web.ts` already implements the HTTP contract the Phase 3 server must
+  serve (`/rpc`, `/events`, `/files`, `/proxy`, `app_store_*`), covered
+  by `web.test.ts`.
+- Desktop-only capabilities degrade to no-ops in web (autostart, window
+  theme) or browser equivalents (`openUrl` → new tab, `openPath` → open
+  the file via `/files`, dialogs → `window.prompt` for a server path).
+  **Deferred to Phase 5:** hiding desktop-only UI (autostart toggle,
+  reveal-in-folder, Claude/Codex CLI providers) when `!isDesktop`.
+
+### Phase 2 — Rust core crate
+- Cargo workspace: `core/` (lib, no tauri), `src-tauri/` (desktop shell),
+  `server/` (Phase 3).
+- Move commands into `core`; `#[cfg_attr(feature = "tauri", tauri::command)]`
+  or thin wrappers in `src-tauri`.
+- Introduce `EventSink` (replaces `app.emit`) and pass plain state
+  structs instead of `State<…>`; `AppConfigStore` replaces
+  `app.path().app_data_dir()` in `api_server.rs`.
+
+### Phase 3 — `server` binary
+- axum + tokio. Routes: `/rpc/:command` (generated dispatch table from a
+  single command list shared with `generate_handler!`), `/events` (SSE
+  via `EventSink` broadcast), `/proxy` (streams request through reqwest,
+  honors proxy config; allow-list = configured provider/search hosts),
+  `/files/*` (serves files inside known project roots only), `/upload`,
+  static `dist/`.
+- Auth: bearer token from `--token`/env, cookie after first login page;
+  bind `127.0.0.1` by default, expose via reverse proxy for TLS.
+- Existing `/api/v1` + MCP server mounted on the same listener.
+- `Dockerfile` (pdfium shared lib included) + `docker-compose.yml`
+  with a `/data` volume.
+
+### Phase 4 — Headless ingest
+Problem: ingest runs in the tab. Options, in order of preference:
+- **A. Node worker (recommended).** `src/lib/ingest-*` already runs in
+  Node under vitest (`isNodeEnv` paths in `tauri-fetch.ts`). Bundle a
+  `worker/` entry that runs the persisted ingest queue against the
+  server's `/rpc`, launched as a sidecar by `server`. Browser UI becomes
+  a viewer of queue state via SSE. No logic rewrite.
+- B. Keep ingest in the browser; the persisted queue already resumes on
+  reopen. Acceptable stopgap, poor for large batches.
+- C. Port ingest to Rust. Most robust long-term, largest cost.
+
+### Phase 5 — Web UX polish
+- Server directory picker + drag-and-drop upload into `raw/sources/`.
+- Export downloads the ZIP; import uploads it.
+- PWA manifest; "open in system browser" links instead of `openUrl`.
+
+---
+
+## Risks
+
+- **Path-traversal / arbitrary FS access.** Desktop commands accept
+  absolute paths by design. Server must confine every path argument to
+  registered project roots (central check in the RPC dispatcher).
+- **Agent shell tool** becomes remote code execution on the server for
+  anyone with the token. Off by default in server mode.
+- **Concurrency:** two browser tabs = two ingest runners in Phase 1–3.
+  Needs a server-side lease on the queue (`project-mutex.ts` is per-tab).
+- **Big payloads:** `read_file_as_base64` / image extraction over HTTP;
+  prefer `/files/*` streaming.

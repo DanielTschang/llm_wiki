@@ -14,7 +14,7 @@ import {
   Calendar,
   Tag as TagIcon,
 } from "lucide-react"
-import { openUrl } from "@tauri-apps/plugin-opener"
+import { openUrl } from "@/platform"
 import type { FrontmatterValue } from "@/lib/frontmatter"
 import { getWikiTypeStyle } from "@/lib/wiki-type-style"
 import {

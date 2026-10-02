@@ -1,4 +1,4 @@
-import { invoke } from "@tauri-apps/api/core"
+import { invoke } from "@/platform"
 import { normalizePath } from "@/lib/path-utils"
 import { useWikiStore } from "@/stores/wiki-store"
 
