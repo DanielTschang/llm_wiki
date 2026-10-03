@@ -20,10 +20,10 @@ name = "llm-wiki"
 path = "src/main.rs"
 
 [workspace]
-members = ["crates/core"]
+members = ["crates/core", "crates/server"]
 # `cargo test` / `cargo build` in src-tauri (CI, contributors) cover the
 # core crate too, not just the desktop shell.
-default-members = [".", "crates/core"]
+default-members = [".", "crates/core", "crates/server"]
 resolver = "2"
 
 [build-dependencies]

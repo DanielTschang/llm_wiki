@@ -1,6 +1,6 @@
 # Web server mode: self-hosted backend + browser frontend
 
-**Status:** Phases 1–2 done on `DanielTschang/second`. Phases 3–5 not started.
+**Status:** Phases 1–3 done on `DanielTschang/second` (Phase 3 without Docker). Phases 4–5 not started.
 
 **Goal:** Run LLM Wiki as a headless server (NAS / VPS / Docker, no
 desktop session) and use the existing React UI from any browser. The
@@ -149,20 +149,45 @@ app shippable.
   autostart/dialog/opener plugins, `mcp_server_entry_path` (resolves
   bundle resources), `open_project_folder`, `open_path_in_project`.
 
-### Phase 3 — `server` binary
-- New workspace member `src-tauri/crates/server`, building on `CoreContext`
-  with an `EventSink` that fans out to SSE clients.
-- axum + tokio. Routes: `/rpc/:command` (dispatch table mirroring
-  `src-tauri/src/commands.rs`; consider one macro that generates both), `/events` (SSE
-  via `EventSink` broadcast), `/proxy` (streams request through reqwest,
-  honors proxy config; allow-list = configured provider/search hosts),
-  `/files/*` (serves files inside known project roots only), `/upload`,
-  static `dist/`.
-- Auth: bearer token from `--token`/env, cookie after first login page;
-  bind `127.0.0.1` by default, expose via reverse proxy for TLS.
-- Existing `/api/v1` + MCP server mounted on the same listener.
-- `Dockerfile` (pdfium shared lib included) + `docker-compose.yml`
-  with a `/data` volume.
+### Phase 3 — `server` binary ✅ (Docker pending)
+- `src-tauri/crates/server` (`llm-wiki-server`): axum on `127.0.0.1:19830`
+  by default. Run: `npm run build:web`, then
+  `cargo run -p llm-wiki-server -- --web-dir ../dist-web` from `src-tauri`
+  (`--help` lists `--data-dir`, `--allow-root`, `--token`, `--bind`,
+  `--allow-shell`, `--secure-cookie`; each has an `LLM_WIKI_*` env var).
+- Routes: `/rpc/{command}` (`dispatch.rs`, one arm per core command;
+  `dispatches_every_desktop_command` fails if it drifts from the desktop
+  handler list), `/events` (SSE from an `EventSink` broadcast), `/files`
+  (`ServeFile`, range requests), `/proxy` (reqwest via
+  `core::proxy::configure_http_client`, streamed both ways), static
+  `dist-web` with SPA fallback, `/login`, `/logout`, `/healthz`.
+- `app_store_get/set/delete` keep `app-state.json` in the data dir in
+  plugin-store's format, so core code that reads it directly works.
+- Security:
+  - Token auth: generated on first start into `<data-dir>/server-token`
+    (0600) unless `--token`; browsers get an `HttpOnly; SameSite=Strict`
+    session cookie, scripts use `Authorization: Bearer`.
+  - CSRF: cookie-authenticated `/rpc`, `/proxy` and non-GET requests must
+    send `X-LLM-Wiki-Client` (no CORS preflight is ever approved).
+  - Every path argument (`path`, `projectPath`, `filePath`, `source`,
+    `destination`, …, `paths[]`) and every project path written to the
+    project registry must resolve (symlinks followed) inside
+    `<data-dir>/projects` or an `--allow-root`. The token file and
+    `app-state.json` are outside those roots.
+  - `/files` sends `nosniff`, and `CSP: sandbox` for HTML/SVG/XML so
+    agent-generated pages cannot act with the owner's session.
+  - Agent `approvedShellCommands` are cleared unless `--allow-shell`.
+  - Claude Code / Codex CLI commands are disabled in server mode.
+- Frontend: `X-LLM-Wiki-Client` on RPC/proxy calls, 401 → `/login`;
+  desktop-only startup calls (`set_close_behavior`, clip server
+  notifications/polling) skipped when `!isDesktop`. `npm run dev:web`
+  serves the web build on :1430 proxying to a local server.
+- Verified end to end: 21 curl checks (auth, CSRF, confinement, store,
+  `/files` headers, proxy) plus a browser run (login → open project →
+  preview page; SSE connected, file watcher events delivered).
+- **Not done yet:** Dockerfile (needs a Linux pdfium build), running the
+  tiny_http API/MCP and clip servers inside the server process, and
+  serving the server behind `--secure-cookie` HTTPS in a documented setup.
 
 ### Phase 4 — Headless ingest
 Problem: ingest runs in the tab. Options, in order of preference:
@@ -179,6 +204,9 @@ Problem: ingest runs in the tab. Options, in order of preference:
 - Server directory picker + drag-and-drop upload into `raw/sources/`.
 - Export downloads the ZIP; import uploads it.
 - PWA manifest; "open in system browser" links instead of `openUrl`.
+- Surface file-tree load failures instead of keeping an empty path
+  index: a tab opened while the server could not read the project kept
+  every Sources/Related link marked missing until a manual reload.
 
 ---
 

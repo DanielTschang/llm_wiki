@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { invoke, isAutostartEnabled, openDialog, setAutostart } from "@/platform"
+import { invoke, isAutostartEnabled, isDesktop, openDialog, setAutostart } from "@/platform"
 import i18n from "@/i18n"
 import { useWikiStore } from "@/stores/wiki-store"
 import { useReviewStore } from "@/stores/review-store"
@@ -138,7 +138,7 @@ function App() {
   // Set up auto-save and clip watcher once on mount
   useEffect(() => {
     setupAutoSave()
-    startClipWatcher()
+    if (isDesktop) startClipWatcher()
   }, [])
 
   // Register global keyboard shortcuts
@@ -391,10 +391,12 @@ function App() {
         }
         const savedGeneral = await loadGeneralConfig()
         useWikiStore.getState().setGeneralConfig(savedGeneral)
-        try {
-          await invoke<string>("set_close_behavior", { value: savedGeneral.closeBehavior })
-        } catch (err) {
-          console.warn("[general] failed to hydrate close behavior:", err)
+        if (isDesktop) {
+          try {
+            await invoke<string>("set_close_behavior", { value: savedGeneral.closeBehavior })
+          } catch (err) {
+            console.warn("[general] failed to hydrate close behavior:", err)
+          }
         }
         try {
           const currentAutostart = await isAutostartEnabled()
@@ -537,22 +539,25 @@ function App() {
           stopAllProjectFileSync()
         }
       }).catch((err) => console.error("Failed to configure project file sync:", err))
-      // Notify local clip server of the current project + all recent projects
-      fetch("http://127.0.0.1:19827/project", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ path: proj.path }),
-      }).catch(() => {})
-
-      // Send all recent projects to clip server for extension project picker
-      getRecentProjects().then((recents) => {
-        const projects = recents.map((p) => ({ name: p.name, path: p.path }))
-        fetch("http://127.0.0.1:19827/projects", {
+      // The Web Clipper's local server runs inside the desktop app only.
+      if (isDesktop) {
+        // Notify local clip server of the current project + all recent projects
+        fetch("http://127.0.0.1:19827/project", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ projects }),
+          body: JSON.stringify({ path: proj.path }),
         }).catch(() => {})
-      }).catch(() => {})
+
+        // Send all recent projects to clip server for extension project picker
+        getRecentProjects().then((recents) => {
+          const projects = recents.map((p) => ({ name: p.name, path: p.path }))
+          fetch("http://127.0.0.1:19827/projects", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ projects }),
+          }).catch(() => {})
+        }).catch(() => {})
+      }
       // Load lightweight chat preferences before first paint so the chat
       // controls reflect the user's saved tool toggles. The heavier per-
       // conversation history load is deferred below.

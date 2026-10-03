@@ -44,6 +44,26 @@ describe("web platform", () => {
     }))
   })
 
+  it("marks RPC calls with the client header the server requires", async () => {
+    const { platform, fetch } = setup([{ status: 200, body: "null" }])
+    await platform.invoke("file_exists", { path: "/p" })
+    const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
+    expect(init.headers).toMatchObject({ "X-LLM-Wiki-Client": "web" })
+  })
+
+  it("reports an expired session before rejecting", async () => {
+    const onUnauthorized = vi.fn()
+    const fetch = vi.fn(async () => new Response(JSON.stringify({ error: "Not signed in" }), { status: 401 }))
+    const platform = createWebPlatform({
+      baseUrl: "",
+      fetch: fetch as unknown as typeof globalThis.fetch,
+      createEventSource: () => ({}) as EventSource,
+      onUnauthorized,
+    })
+    await expect(platform.invoke("file_exists")).rejects.toBe("Not signed in")
+    expect(onUnauthorized).toHaveBeenCalledOnce()
+  })
+
   it("resolves undefined for an empty success body", async () => {
     const { platform } = setup([{ status: 204, body: "" }])
     await expect(platform.invoke("write_file", {})).resolves.toBeUndefined()
@@ -92,10 +112,13 @@ describe("web platform", () => {
       danger: { acceptInvalidCerts: true },
     } as RequestInit)
 
-    expect(fetch).toHaveBeenCalledWith(
-      "https://wiki.example/proxy?url=https%3A%2F%2Fapi.example%2Fv1%2Fchat",
-      { method: "POST", headers: { Authorization: "Bearer k" }, credentials: "include" },
-    )
+    const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
+    expect(url).toBe("https://wiki.example/proxy?url=https%3A%2F%2Fapi.example%2Fv1%2Fchat")
+    expect(init).toMatchObject({ method: "POST", credentials: "include" })
+    expect(init).not.toHaveProperty("danger")
+    const headers = new Headers(init.headers)
+    expect(headers.get("Authorization")).toBe("Bearer k")
+    expect(headers.get("X-LLM-Wiki-Client")).toBe("web")
   })
 
   it("keeps app settings on the server via app_store_* commands", async () => {

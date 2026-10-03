@@ -17,7 +17,7 @@ import {
   FileText,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { invoke, setAutostart } from "@/platform"
+import { invoke, isDesktop, setAutostart } from "@/platform"
 import i18n from "@/i18n"
 import { Button } from "@/components/ui/button"
 import { useWikiStore } from "@/stores/wiki-store"
@@ -544,10 +544,12 @@ export function SettingsView() {
       } catch (err) {
         console.warn("[general] failed to update autostart:", err)
       }
-      try {
-        await invoke<string>("set_close_behavior", { value: newGeneralConfig.closeBehavior })
-      } catch (err) {
-        console.warn("[general] failed to update close behavior:", err)
+      if (isDesktop) {
+        try {
+          await invoke<string>("set_close_behavior", { value: newGeneralConfig.closeBehavior })
+        } catch (err) {
+          console.warn("[general] failed to update close behavior:", err)
+        }
       }
 
       if (draft.uiLanguage !== i18n.language) {

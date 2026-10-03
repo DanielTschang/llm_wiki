@@ -29,6 +29,9 @@ const platform: Platform =
         baseUrl: import.meta.env.VITE_LLM_WIKI_SERVER_URL ?? "",
         fetch: globalThis.fetch.bind(globalThis),
         createEventSource: (url) => new EventSource(url, { withCredentials: true }),
+        onUnauthorized: () => {
+          window.location.assign(`${import.meta.env.VITE_LLM_WIKI_SERVER_URL ?? ""}/login`)
+        },
       })
     : tauriPlatform
 

@@ -13,16 +13,24 @@
  * App settings (`app-state.json`) live on the server and are reached via
  * the `app_store_get` / `app_store_set` / `app_store_delete` commands.
  *
+ * The server authenticates the browser with a session cookie set by its
+ * `/login` page. `/rpc` and `/proxy` calls also carry CLIENT_HEADER, which
+ * a cross-site page cannot add, so they cannot be forged (CSRF).
+ *
  * Native dialogs have no browser equivalent for server-side paths; until
  * the in-app directory browser lands (Phase 5) they fall back to
  * `window.prompt` for a path on the server.
  */
 import type { EventHandler, KeyValueStore, OpenDialogOptions, OpenDialogResult, Platform, PlatformEvent } from "./types"
 
+export const CLIENT_HEADER = "X-LLM-Wiki-Client"
+
 export interface WebPlatformDeps {
   baseUrl: string
   fetch: typeof globalThis.fetch
   createEventSource: (url: string) => EventSource
+  /** Called when the server reports the session is missing or expired. */
+  onUnauthorized?: () => void
 }
 
 export function createWebPlatform(deps: WebPlatformDeps): Platform {
@@ -34,10 +42,11 @@ export function createWebPlatform(deps: WebPlatformDeps): Platform {
     const response = await deps.fetch(`${base}/rpc/${encodeURIComponent(command)}`, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", [CLIENT_HEADER]: "web" },
       body: JSON.stringify(args ?? {}),
     })
     const text = await response.text()
+    if (response.status === 401) deps.onUnauthorized?.()
     if (!response.ok) {
       let error = text || `${command} failed with HTTP ${response.status}`
       try {
@@ -104,8 +113,11 @@ export function createWebPlatform(deps: WebPlatformDeps): Platform {
     // plugin-http's `danger` TLS option is meaningless here; the server
     // applies its own proxy/TLS settings.
     const { danger: _danger, ...rest } = (init ?? {}) as RequestInit & { danger?: unknown }
+    const headers = new Headers(rest.headers)
+    headers.set(CLIENT_HEADER, "web")
     return deps.fetch(`${base}/proxy?url=${encodeURIComponent(target)}`, {
       ...rest,
+      headers,
       credentials: "include",
     })
   }

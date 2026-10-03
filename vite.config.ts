@@ -10,8 +10,15 @@ const host = process.env.TAURI_DEV_HOST
 // UI can show the running app version without duplicating the string.
 const pkgJson = JSON.parse(readFileSync(path.resolve(__dirname, "package.json"), "utf-8"))
 
+// `npm run dev:web`: the browser build against a local llm-wiki-server,
+// proxied so the session cookie stays same-origin.
+const webServerTarget = process.env.LLM_WIKI_SERVER ?? "http://127.0.0.1:19830"
+const webServerProxy = Object.fromEntries(
+  ["/rpc", "/events", "/files", "/proxy", "/login", "/logout"].map((path) => [path, { target: webServerTarget }]),
+)
+
 // https://vitejs.dev/config/
-export default defineConfig(async () => ({
+export default defineConfig(async ({ mode }) => ({
   plugins: [react(), tailwindcss()],
 
   resolve: {
@@ -28,8 +35,9 @@ export default defineConfig(async () => ({
   clearScreen: false,
   // 2. tauri expects a fixed port, fail if that port is not available
   server: {
-    port: 1420,
+    port: mode === "web" ? 1430 : 1420,
     strictPort: true,
+    proxy: mode === "web" ? webServerProxy : undefined,
     host: host || false,
     hmr: host
       ? {

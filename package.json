@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:web": "vite --mode web",
     "typecheck": "tsc --build --pretty",
     "build": "npm run typecheck && vite build",
     "build:web": "npm run typecheck && vite build --mode web --outDir dist-web",
