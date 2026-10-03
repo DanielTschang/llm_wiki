@@ -1,6 +1,6 @@
 # Web server mode: self-hosted backend + browser frontend
 
-**Status:** Phase 1 done (uncommitted on `DanielTschang/second`, based on `b6e8dc1`). Phases 2–5 not started.
+**Status:** Phases 1–2 done on `DanielTschang/second`. Phases 3–5 not started.
 
 **Goal:** Run LLM Wiki as a headless server (NAS / VPS / Docker, no
 desktop session) and use the existing React UI from any browser. The
@@ -121,18 +121,39 @@ app shippable.
   **Deferred to Phase 5:** hiding desktop-only UI (autostart toggle,
   reveal-in-folder, Claude/Codex CLI providers) when `!isDesktop`.
 
-### Phase 2 — Rust core crate
-- Cargo workspace: `core/` (lib, no tauri), `src-tauri/` (desktop shell),
-  `server/` (Phase 3).
-- Move commands into `core`; `#[cfg_attr(feature = "tauri", tauri::command)]`
-  or thin wrappers in `src-tauri`.
-- Introduce `EventSink` (replaces `app.emit`) and pass plain state
-  structs instead of `State<…>`; `AppConfigStore` replaces
-  `app.path().app_data_dir()` in `api_server.rs`.
+### Phase 2 — Rust core crate ✅
+- `src-tauri/Cargo.toml` is now also the workspace root
+  (`members = ["crates/core"]`, `default-members = [".", "crates/core"]`),
+  so `src-tauri/target`, `src-tauri/Cargo.lock`, CI's `cargo build` and
+  release paths are unchanged, and `cargo test` in `src-tauri` covers core.
+- `src-tauri/crates/core` (`llm-wiki-core`, no `tauri` dependency) holds
+  `agent/`, `commands/`, `api_server`, `clip_server`, `proxy`, `cors`,
+  `server_bind`, `panic_guard`, `types`. It builds standalone
+  (`cargo check -p llm-wiki-core`).
+- `CoreContext` (core `context.rs`) replaces `AppHandle`/`State<…>`:
+  app data dir (`app-state.json`), host app version, an `EventEmitter`
+  (`EventSink` trait; desktop impl forwards to `AppHandle::emit`) and the
+  long-lived state (file watcher, CLI children, agent sessions/cancellation).
+- `runtime.rs` replaces `tauri::async_runtime` for the tiny_http threads:
+  the desktop installs Tauri's tokio handle; without one (server, tests)
+  core owns a runtime.
+- The agent chat commands moved from `lib.rs` to `agent/commands.rs`;
+  status/proxy commands to `commands/app.rs`. Project "open in file
+  manager" was split: path validation in core
+  (`resolve_project_folder`, `resolve_path_in_project`), the OS opener
+  stays in the desktop shell.
+- `src-tauri/src/commands.rs` holds one-line `#[tauri::command]` wrappers.
+  All 78 IPC commands were checked against the pre-move source: same
+  names, sync/async, argument names and types.
+- Desktop-only and left in `src-tauri/src/lib.rs`: tray, close behavior,
+  autostart/dialog/opener plugins, `mcp_server_entry_path` (resolves
+  bundle resources), `open_project_folder`, `open_path_in_project`.
 
 ### Phase 3 — `server` binary
-- axum + tokio. Routes: `/rpc/:command` (generated dispatch table from a
-  single command list shared with `generate_handler!`), `/events` (SSE
+- New workspace member `src-tauri/crates/server`, building on `CoreContext`
+  with an `EventSink` that fans out to SSE clients.
+- axum + tokio. Routes: `/rpc/:command` (dispatch table mirroring
+  `src-tauri/src/commands.rs`; consider one macro that generates both), `/events` (SSE
   via `EventSink` broadcast), `/proxy` (streams request through reqwest,
   honors proxy config; allow-list = configured provider/search hosts),
   `/files/*` (serves files inside known project roots only), `/upload`,

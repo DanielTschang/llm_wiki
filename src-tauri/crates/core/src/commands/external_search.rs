@@ -16,7 +16,6 @@ pub struct ExternalSearchResult {
     pub source: String,
 }
 
-#[tauri::command]
 pub async fn web_search(
     query: String,
     config: WebSearchConfig,
@@ -37,7 +36,6 @@ pub async fn web_search(
     .await
 }
 
-#[tauri::command]
 pub async fn anytxt_search(
     query: String,
     config: AnyTxtConfig,

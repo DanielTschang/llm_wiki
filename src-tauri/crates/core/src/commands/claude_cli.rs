@@ -21,8 +21,8 @@ use std::path::{Path, PathBuf};
 use std::process::Stdio;
 use std::sync::Arc;
 
+use crate::context::EventEmitter;
 use serde::{Deserialize, Serialize};
-use tauri::{AppHandle, Emitter, State};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, Command};
 use tokio::sync::Mutex;
@@ -170,7 +170,6 @@ fn suppress_windows_console(_cmd: &mut Command) {
 /// Locate `claude` on PATH and confirm it's runnable by calling
 /// `claude --version` with a bounded timeout. Safe to call on
 /// mount of the settings panel.
-#[tauri::command]
 pub async fn claude_cli_detect() -> Result<DetectResult, String> {
     let path = match find_claude_command().await {
         Ok(p) => p,
@@ -248,10 +247,9 @@ pub async fn claude_cli_detect() -> Result<DetectResult, String> {
 /// after writing the serialized history so claude starts processing.
 /// Emits a final `claude-cli:{stream_id}:done` event with `{ code }`
 /// when the child exits.
-#[tauri::command]
 pub async fn claude_cli_spawn(
-    app: AppHandle,
-    state: State<'_, ClaudeCliState>,
+    app: EventEmitter,
+    state: &ClaudeCliState,
     stream_id: String,
     model: String,
     messages: Vec<ClaudeMessage>,
@@ -511,11 +509,7 @@ async fn resolve_claude_working_directory(value: Option<String>) -> Result<PathB
 /// Kill a running child registered under `stream_id`. Called on
 /// AbortSignal in the frontend. No-op if the id is unknown (e.g. the
 /// process already exited).
-#[tauri::command]
-pub async fn claude_cli_kill(
-    state: State<'_, ClaudeCliState>,
-    stream_id: String,
-) -> Result<(), String> {
+pub async fn claude_cli_kill(state: &ClaudeCliState, stream_id: String) -> Result<(), String> {
     if let Some(mut child) = state.children.lock().await.remove(&stream_id) {
         let _ = child.start_kill();
         // Don't wait() here — the stdout-drain task already holds a

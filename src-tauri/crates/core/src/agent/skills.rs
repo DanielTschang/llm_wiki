@@ -26,7 +26,6 @@ pub struct AvailableAgentSkill {
     pub source: String,
 }
 
-#[tauri::command]
 pub fn agent_list_skills(project_path: String) -> Vec<AvailableAgentSkill> {
     list_available_skills(&project_path)
 }

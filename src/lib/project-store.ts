@@ -256,7 +256,7 @@ export async function loadMineruConfig(): Promise<MineruConfig | null> {
 }
 
 // IMPORTANT: Keep this key in sync with the Rust setup hook
-// (src-tauri/src/proxy.rs), which reads this exact field name from
+// (src-tauri/crates/core/src/proxy.rs), which reads this exact field name from
 // the same `app-state.json` store at app launch to translate the
 // config into HTTP_PROXY / HTTPS_PROXY / NO_PROXY env vars.
 const PROXY_CONFIG_KEY = "proxyConfig"

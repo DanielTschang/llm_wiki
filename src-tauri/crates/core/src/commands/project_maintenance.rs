@@ -119,16 +119,13 @@ mod tests {
     }
 }
 
-#[tauri::command]
 pub async fn export_project_archive(
     project_path: String,
     destination: String,
 ) -> Result<(), String> {
-    tauri::async_runtime::spawn_blocking(move || {
-        export_project_archive_inner(project_path, destination)
-    })
-    .await
-    .map_err(|error| format!("Project export task failed: {error}"))?
+    tokio::task::spawn_blocking(move || export_project_archive_inner(project_path, destination))
+        .await
+        .map_err(|error| format!("Project export task failed: {error}"))?
 }
 
 fn resolve_export_destination(root: &Path, output: &Path) -> Result<PathBuf, String> {
@@ -189,16 +186,13 @@ fn export_project_archive_inner(project_path: String, destination: String) -> Re
     Ok(())
 }
 
-#[tauri::command]
 pub async fn import_project_archive(
     archive_path: String,
     destination: String,
 ) -> Result<String, String> {
-    tauri::async_runtime::spawn_blocking(move || {
-        import_project_archive_inner(archive_path, destination)
-    })
-    .await
-    .map_err(|error| format!("Project import task failed: {error}"))?
+    tokio::task::spawn_blocking(move || import_project_archive_inner(archive_path, destination))
+        .await
+        .map_err(|error| format!("Project import task failed: {error}"))?
 }
 
 fn import_project_archive_inner(
@@ -284,9 +278,8 @@ fn frontmatter_value(content: &str, key: &str) -> Option<String> {
         .filter(|value| !value.is_empty())
 }
 
-#[tauri::command]
 pub async fn rebuild_wiki_index(project_path: String) -> Result<RebuildIndexResult, String> {
-    tauri::async_runtime::spawn_blocking(move || rebuild_wiki_index_inner(project_path))
+    tokio::task::spawn_blocking(move || rebuild_wiki_index_inner(project_path))
         .await
         .map_err(|error| format!("Index rebuild task failed: {error}"))?
 }

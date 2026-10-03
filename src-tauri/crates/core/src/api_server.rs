@@ -9,10 +9,10 @@ use std::sync::{Arc, Mutex, OnceLock};
 use std::thread;
 use std::time::{Duration, Instant};
 
+use crate::context::CoreContext;
 use futures::FutureExt;
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Map, Value};
-use tauri::{AppHandle, Manager};
 use tiny_http::{Header, Method, Response, Server, StatusCode};
 use uuid::Uuid;
 use walkdir::WalkDir;
@@ -86,7 +86,7 @@ pub fn invalidate_config_cache() {
     }
 }
 
-pub fn start_api_server(app: AppHandle) {
+pub fn start_api_server(app: Arc<CoreContext>) {
     thread::spawn(move || loop {
         API_STATUS.store(0, Ordering::Relaxed);
         let (server, addr) = match bind_server_with_retry(&app) {
@@ -131,7 +131,7 @@ pub fn start_api_server(app: AppHandle) {
     });
 }
 
-fn bind_server_with_retry(app: &AppHandle) -> Option<(Server, String)> {
+fn bind_server_with_retry(app: &Arc<CoreContext>) -> Option<(Server, String)> {
     let host = server_bind::configured_bind_host(app);
     let addr = server_bind::bind_addr(&host, PORT);
     for attempt in 1..=MAX_BIND_RETRIES {
@@ -202,7 +202,7 @@ fn try_acquire_request_slot() -> Option<RequestSlot> {
     }
 }
 
-fn process_request(app: AppHandle, mut request: tiny_http::Request) {
+fn process_request(app: Arc<CoreContext>, mut request: tiny_http::Request) {
     let method = request.method().clone();
     let url = request.url().to_string();
     let origin = request_origin(&request);
@@ -298,7 +298,7 @@ fn err(status: u16, message: impl Into<String>) -> ApiResponse {
 }
 
 fn handle_request(
-    app: &AppHandle,
+    app: &Arc<CoreContext>,
     method: &Method,
     url: &str,
     body: &str,
@@ -314,7 +314,7 @@ fn handle_request(
         return ok(json!({
             "ok": true,
             "status": get_api_status(),
-            "version": env!("CARGO_PKG_VERSION"),
+            "version": app.app_version(),
             "authRequired": api_auth_required(app),
             "authConfigured": api_token(app).is_some(),
             "tokenSource": api_token_source(app),
@@ -577,7 +577,7 @@ fn percent_decode(input: &str) -> String {
     String::from_utf8_lossy(&out).into_owned()
 }
 
-fn is_authorized(app: &AppHandle, query: &str, headers: &[(String, String)]) -> bool {
+fn is_authorized(app: &Arc<CoreContext>, query: &str, headers: &[(String, String)]) -> bool {
     if !api_auth_required(app) {
         return true;
     }
@@ -585,7 +585,7 @@ fn is_authorized(app: &AppHandle, query: &str, headers: &[(String, String)]) -> 
 }
 
 pub(crate) fn is_token_authorized(
-    app: &AppHandle,
+    app: &Arc<CoreContext>,
     query: &str,
     headers: &[(String, String)],
 ) -> bool {
@@ -614,7 +614,7 @@ pub(crate) fn is_token_authorized(
     })
 }
 
-fn api_token(app: &AppHandle) -> Option<String> {
+fn api_token(app: &Arc<CoreContext>) -> Option<String> {
     if let Ok(token) = std::env::var("LLM_WIKI_API_TOKEN") {
         let trimmed = token.trim();
         if !trimmed.is_empty() {
@@ -630,7 +630,7 @@ fn api_token(app: &AppHandle) -> Option<String> {
         .map(ToOwned::to_owned)
 }
 
-fn api_token_source(app: &AppHandle) -> &'static str {
+fn api_token_source(app: &Arc<CoreContext>) -> &'static str {
     if let Ok(token) = std::env::var("LLM_WIKI_API_TOKEN") {
         if !token.trim().is_empty() {
             return "env";
@@ -652,11 +652,11 @@ fn api_token_source(app: &AppHandle) -> &'static str {
     "none"
 }
 
-fn api_auth_required(app: &AppHandle) -> bool {
+fn api_auth_required(app: &Arc<CoreContext>) -> bool {
     !api_allow_unauthenticated(app)
 }
 
-fn api_allow_unauthenticated(app: &AppHandle) -> bool {
+fn api_allow_unauthenticated(app: &Arc<CoreContext>) -> bool {
     let Some(parsed) = load_app_state(app) else {
         return false;
     };
@@ -667,7 +667,7 @@ fn api_allow_unauthenticated(app: &AppHandle) -> bool {
         .unwrap_or(false)
 }
 
-fn api_allow_lan_access(app: &AppHandle) -> bool {
+fn api_allow_lan_access(app: &Arc<CoreContext>) -> bool {
     let Some(parsed) = load_app_state(app) else {
         return false;
     };
@@ -685,7 +685,7 @@ fn api_allow_lan_access(app: &AppHandle) -> bool {
 /// after the kill-switch was introduced. New users still land in
 /// "enabled + no token = 401" which is fail-closed by virtue of the
 /// missing token, not the enable flag.
-fn api_enabled(app: &AppHandle) -> bool {
+fn api_enabled(app: &Arc<CoreContext>) -> bool {
     let Some(parsed) = load_app_state(app) else {
         return true;
     };
@@ -696,7 +696,7 @@ fn api_enabled(app: &AppHandle) -> bool {
         .unwrap_or(true)
 }
 
-fn api_mcp_enabled(app: &AppHandle) -> bool {
+fn api_mcp_enabled(app: &Arc<CoreContext>) -> bool {
     let Some(parsed) = load_app_state(app) else {
         return false;
     };
@@ -718,7 +718,7 @@ fn constant_time_eq(left: &[u8], right: &[u8]) -> bool {
     diff == 0
 }
 
-fn load_app_state(app: &AppHandle) -> Option<Value> {
+fn load_app_state(app: &Arc<CoreContext>) -> Option<Value> {
     let now = Instant::now();
     let lock = APP_STATE_CACHE.get_or_init(|| Mutex::new(None));
     let mut previous = None;
@@ -731,7 +731,7 @@ fn load_app_state(app: &AppHandle) -> Option<Value> {
         }
     }
 
-    let path = app.path().app_data_dir().ok()?.join("app-state.json");
+    let path = app.app_state_path()?;
     let loaded = fs::read_to_string(path)
         .ok()
         .and_then(|raw| serde_json::from_str::<Value>(&raw).ok());
@@ -754,7 +754,7 @@ struct ProjectEntry {
     current: bool,
 }
 
-fn handle_projects(app: &AppHandle) -> ApiResponse {
+fn handle_projects(app: &Arc<CoreContext>) -> ApiResponse {
     let projects = load_projects(app);
     let current_project = projects.iter().find(|project| project.current).cloned();
     ok(json!({
@@ -764,7 +764,7 @@ fn handle_projects(app: &AppHandle) -> ApiResponse {
     }))
 }
 
-fn load_projects(app: &AppHandle) -> Vec<ProjectEntry> {
+fn load_projects(app: &Arc<CoreContext>) -> Vec<ProjectEntry> {
     let current = normalize_path(&clip_server::current_project_path());
     let mut by_path: BTreeMap<String, ProjectEntry> = BTreeMap::new();
 
@@ -845,7 +845,7 @@ fn load_projects(app: &AppHandle) -> Vec<ProjectEntry> {
     by_path.into_values().collect()
 }
 
-fn resolve_project(app: &AppHandle, project_id: &str) -> Result<ProjectEntry, String> {
+fn resolve_project(app: &Arc<CoreContext>, project_id: &str) -> Result<ProjectEntry, String> {
     let project_id = percent_decode(project_id);
     let wants_current = project_id.eq_ignore_ascii_case("current");
     load_projects(app)
@@ -889,7 +889,7 @@ fn normalize_path(path: &str) -> String {
     path.replace('\\', "/").trim_end_matches('/').to_string()
 }
 
-fn handle_files(app: &AppHandle, project_id: &str, query: &str) -> ApiResponse {
+fn handle_files(app: &Arc<CoreContext>, project_id: &str, query: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -940,7 +940,7 @@ fn handle_files(app: &AppHandle, project_id: &str, query: &str) -> ApiResponse {
     }
 }
 
-fn handle_file_content(app: &AppHandle, project_id: &str, query: &str) -> ApiResponse {
+fn handle_file_content(app: &Arc<CoreContext>, project_id: &str, query: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -1527,7 +1527,7 @@ fn copy_review_options(item: &Value, out: &mut Map<String, Value>) {
     out.insert("options".to_string(), Value::Array(options));
 }
 
-fn handle_reviews(app: &AppHandle, project_id: &str, query: &str) -> ApiResponse {
+fn handle_reviews(app: &Arc<CoreContext>, project_id: &str, query: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -1564,7 +1564,7 @@ struct PatchReviewRequest {
 /// single review item's resolved state. Body `{ resolved?, action? }`;
 /// an empty body resolves the item (resolved defaults to true).
 fn handle_patch_review(
-    app: &AppHandle,
+    app: &Arc<CoreContext>,
     project_id: &str,
     review_id: &str,
     body: &str,
@@ -1611,7 +1611,11 @@ struct BulkResolveRequest {
 /// normal, so this returns 200 with `{ resolved, notFound, count }`
 /// rather than 404 — 404 is reserved for the single-item PATCH where
 /// one unknown id is the entire request.
-fn handle_bulk_resolve_reviews(app: &AppHandle, project_id: &str, body: &str) -> ApiResponse {
+fn handle_bulk_resolve_reviews(
+    app: &Arc<CoreContext>,
+    project_id: &str,
+    body: &str,
+) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -1795,7 +1799,7 @@ struct WritePageRequest {
     allow_overwrite: bool,
 }
 
-fn handle_write_page(app: &AppHandle, project_id: &str, body: &str) -> ApiResponse {
+fn handle_write_page(app: &Arc<CoreContext>, project_id: &str, body: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -1852,7 +1856,7 @@ fn try_acquire_page_embed_slot() -> Option<PageEmbedSlot> {
         .map(|_| PageEmbedSlot)
 }
 
-fn handle_embed_page(app: &AppHandle, project_id: &str, body: &str) -> ApiResponse {
+fn handle_embed_page(app: &Arc<CoreContext>, project_id: &str, body: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -1870,7 +1874,7 @@ fn handle_embed_page(app: &AppHandle, project_id: &str, body: &str) -> ApiRespon
     let Some(_slot) = try_acquire_page_embed_slot() else {
         return err(503, "Too many page indexing requests are already running");
     };
-    let result = tauri::async_runtime::block_on(commands::page_embedding::embed_wiki_page(
+    let result = crate::runtime::block_on(commands::page_embedding::embed_wiki_page(
         &project.path,
         &req.path,
         config,
@@ -1895,7 +1899,7 @@ fn handle_embed_page(app: &AppHandle, project_id: &str, body: &str) -> ApiRespon
     }
 }
 
-fn handle_search(app: &AppHandle, project_id: &str, body: &str) -> ApiResponse {
+fn handle_search(app: &Arc<CoreContext>, project_id: &str, body: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -1909,16 +1913,15 @@ fn handle_search(app: &AppHandle, project_id: &str, body: &str) -> ApiResponse {
     }
     let top_k = req.top_k.unwrap_or(10).clamp(1, MAX_SEARCH_RESULTS);
     let query = req.query;
-    let query_embedding =
-        match tauri::async_runtime::block_on(commands::search::resolve_query_embedding(
-            &query,
-            req.query_embedding,
-            load_embedding_config(app),
-        )) {
-            Ok(embedding) => embedding,
-            Err(e) => return err(400, e),
-        };
-    match tauri::async_runtime::block_on(commands::search::search_project_inner(
+    let query_embedding = match crate::runtime::block_on(commands::search::resolve_query_embedding(
+        &query,
+        req.query_embedding,
+        load_embedding_config(app),
+    )) {
+        Ok(embedding) => embedding,
+        Err(e) => return err(400, e),
+    };
+    match crate::runtime::block_on(commands::search::search_project_inner(
         project.path.clone(),
         query,
         top_k,
@@ -1951,7 +1954,7 @@ struct PreparedChat {
 }
 
 fn prepare_chat(
-    app: &AppHandle,
+    app: &Arc<CoreContext>,
     project_id: &str,
     body: &str,
 ) -> Result<PreparedChat, ApiResponse> {
@@ -1986,7 +1989,7 @@ fn prepare_chat(
     if let Some(session_id) = requested_session_id.as_deref() {
         if req.history.is_empty() && !req.history_explicit {
             req.history = app
-                .state::<agent::session::AgentSessionStore>()
+                .agent_sessions
                 .recent_messages(&project.path, session_id, 12)
                 .into_iter()
                 .map(|message| agent::types::AgentConversationMessage {
@@ -2010,7 +2013,7 @@ fn prepare_chat(
     let session_id = req.session_id.clone().unwrap_or_default();
     let run_id = req.run_id.clone().unwrap_or_default();
     let cancellation = app
-        .state::<agent::cancel::AgentCancellationRegistry>()
+        .agent_cancellation
         .start(&project.id, &session_id, &run_id);
     Ok(PreparedChat {
         project,
@@ -2025,19 +2028,18 @@ fn prepare_chat(
 }
 
 fn persist_chat_response(
-    app: &AppHandle,
+    app: &Arc<CoreContext>,
     prepared: &PreparedChat,
     response: &agent::types::AgentChatResponse,
 ) {
     if prepared.persist_session {
-        app.state::<agent::session::AgentSessionStore>()
-            .append_turn(
-                &prepared.project.path,
-                &prepared.project.id,
-                &response.session_id,
-                &prepared.user_message,
-                &response.message,
-            );
+        app.agent_sessions.append_turn(
+            &prepared.project.path,
+            &prepared.project.id,
+            &response.session_id,
+            &prepared.user_message,
+            &response.message,
+        );
     }
 }
 
@@ -2061,16 +2063,16 @@ fn external_chat_response(mut response: agent::types::AgentChatResponse) -> Valu
     })
 }
 
-fn handle_chat(app: &AppHandle, project_id: &str, body: &str) -> ApiResponse {
+fn handle_chat(app: &Arc<CoreContext>, project_id: &str, body: &str) -> ApiResponse {
     let mut prepared = match prepare_chat(app, project_id, body) {
         Ok(prepared) => prepared,
         Err(response) => return response,
     };
-    let result = tauri::async_runtime::block_on(prepared.runtime.run_once_with_cancel(
+    let result = crate::runtime::block_on(prepared.runtime.run_once_with_cancel(
         std::mem::take(&mut prepared.request),
         prepared.cancellation.take(),
     ));
-    app.state::<agent::cancel::AgentCancellationRegistry>()
+    app.agent_cancellation
         .finish(&prepared.project.id, &prepared.session_id, &prepared.run_id);
     match result {
         Ok(response) => {
@@ -2145,7 +2147,7 @@ fn send_terminal_sse(sender: SyncSender<Vec<u8>>, frame: Vec<u8>) {
 
 fn respond_chat_sse(
     request: tiny_http::Request,
-    app: AppHandle,
+    app: Arc<CoreContext>,
     project_id: &str,
     body: &str,
     origin: Option<&str>,
@@ -2180,10 +2182,7 @@ fn respond_chat_sse(
 
     let (heartbeat_stop, heartbeat_done) = mpsc::channel::<()>();
     let heartbeat_sender = sender.clone();
-    let heartbeat_registry = app
-        .state::<agent::cancel::AgentCancellationRegistry>()
-        .inner()
-        .clone();
+    let heartbeat_registry = app.agent_cancellation.clone();
     let heartbeat_project = prepared.project.id.clone();
     let heartbeat_session = prepared.session_id.clone();
     let heartbeat_run = prepared.run_id.clone();
@@ -2207,12 +2206,9 @@ fn respond_chat_sse(
     });
 
     let task_app = app.clone();
-    tauri::async_runtime::spawn(async move {
+    crate::runtime::spawn(async move {
         let event_sender = sender.clone();
-        let registry = task_app
-            .state::<agent::cancel::AgentCancellationRegistry>()
-            .inner()
-            .clone();
+        let registry = task_app.agent_cancellation.clone();
         let cancel_project = prepared.project.id.clone();
         let cancel_session = prepared.session_id.clone();
         let cancel_run = prepared.run_id.clone();
@@ -2238,9 +2234,11 @@ fn respond_chat_sse(
             ))
             .catch_unwind()
             .await;
-        task_app
-            .state::<agent::cancel::AgentCancellationRegistry>()
-            .finish(&prepared.project.id, &prepared.session_id, &prepared.run_id);
+        task_app.agent_cancellation.finish(
+            &prepared.project.id,
+            &prepared.session_id,
+            &prepared.run_id,
+        );
         match result {
             Ok(Ok(response)) => {
                 persist_chat_response(&task_app, &prepared, &response);
@@ -2290,7 +2288,7 @@ fn respond_chat_sse(
     let _ = request.respond(response);
 }
 
-fn handle_cancel_chat(app: &AppHandle, project_id: &str, session_id: &str) -> ApiResponse {
+fn handle_cancel_chat(app: &Arc<CoreContext>, project_id: &str, session_id: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -2298,13 +2296,15 @@ fn handle_cancel_chat(app: &AppHandle, project_id: &str, session_id: &str) -> Ap
     ok(json!({
         "ok": true,
         "cancelled": app
-            .state::<agent::cancel::AgentCancellationRegistry>()
+            .agent_cancellation
             .cancel(&project.id, session_id, None),
         "sessionId": session_id,
     }))
 }
 
-fn load_embedding_config(app: &AppHandle) -> Option<commands::search::SearchEmbeddingConfig> {
+fn load_embedding_config(
+    app: &Arc<CoreContext>,
+) -> Option<commands::search::SearchEmbeddingConfig> {
     let parsed = load_app_state(app)?;
     let value = parsed.get("embeddingConfig")?.clone();
     serde_json::from_value::<commands::search::SearchEmbeddingConfig>(value).ok()
@@ -2396,7 +2396,10 @@ fn project_llm_config(parsed: &Value, project_id: &str) -> Option<agent::provide
     serde_json::from_value(profile).ok()
 }
 
-fn load_agent_runtime_config(app: &AppHandle, project_id: Option<&str>) -> AgentRuntimeConfig {
+fn load_agent_runtime_config(
+    app: &Arc<CoreContext>,
+    project_id: Option<&str>,
+) -> AgentRuntimeConfig {
     let Some(parsed) = load_app_state(app) else {
         return AgentRuntimeConfig::default();
     };
@@ -2450,7 +2453,7 @@ struct GraphPage {
     has_more: bool,
 }
 
-fn handle_graph(app: &AppHandle, project_id: &str, query: &str) -> ApiResponse {
+fn handle_graph(app: &Arc<CoreContext>, project_id: &str, query: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -2850,7 +2853,7 @@ fn invalidate_graph_cache(project_path: &str) {
     }
 }
 
-fn handle_rescan(app: &AppHandle, project_id: &str) -> ApiResponse {
+fn handle_rescan(app: &Arc<CoreContext>, project_id: &str) -> ApiResponse {
     let project = match resolve_project(app, project_id) {
         Ok(project) => project,
         Err(e) => return err(404, e),
@@ -2858,7 +2861,7 @@ fn handle_rescan(app: &AppHandle, project_id: &str) -> ApiResponse {
     invalidate_graph_cache(&project.path);
     let source_watch_config = load_source_watch_config(app, &project.id);
     match commands::file_sync::rescan_project_files(
-        app.clone(),
+        app.events().clone(),
         project.id.clone(),
         project.path.clone(),
         source_watch_config,
@@ -2870,7 +2873,7 @@ fn handle_rescan(app: &AppHandle, project_id: &str) -> ApiResponse {
 }
 
 fn load_source_watch_config(
-    app: &AppHandle,
+    app: &Arc<CoreContext>,
     project_id: &str,
 ) -> Option<commands::file_sync::SourceWatchConfig> {
     let parsed = load_app_state(app)?;

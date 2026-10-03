@@ -6,6 +6,7 @@
 //! the Agent core; otherwise API/MCP/UI behavior will drift.
 
 pub mod cancel;
+pub mod commands;
 pub mod context;
 pub mod events;
 pub mod permissions;

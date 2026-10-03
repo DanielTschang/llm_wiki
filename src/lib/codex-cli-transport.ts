@@ -1,7 +1,7 @@
 /**
  * Codex CLI subprocess transport.
  *
- * Rust-side counterpart: src-tauri/src/commands/codex_cli.rs. The Rust
+ * Rust-side counterpart: src-tauri/crates/core/src/commands/codex_cli.rs. The Rust
  * command spawns `codex exec --json`, sends a single reconstructed prompt
  * over stdin, and emits each JSONL stdout line back as `codex-cli:{streamId}`.
  */

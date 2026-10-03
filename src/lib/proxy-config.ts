@@ -2,7 +2,7 @@
  * Global HTTP/HTTPS proxy configuration.
  *
  * Persisted to the same `app-state.json` store as other settings.
- * The Rust setup hook (src-tauri/src/proxy.rs) reads this on app
+ * The Rust setup hook (src-tauri/crates/core/src/proxy.rs) reads this on app
  * launch and translates it into HTTP_PROXY / HTTPS_PROXY / NO_PROXY
  * environment variables — reqwest (used by tauri-plugin-http) picks
  * those up automatically and routes every outbound HTTP request

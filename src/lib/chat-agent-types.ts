@@ -1,7 +1,7 @@
 /**
  * UI-facing Agent metadata types.
  *
- * The Agent execution engine lives in Rust (`src-tauri/src/agent`). Keep this
+ * The Agent execution engine lives in Rust (`src-tauri/crates/core/src/agent`). Keep this
  * file intentionally limited to display/persistence shapes used by the React UI.
  * Do not reintroduce routing, retrieval, tool execution, or prompt-building
  * logic here; those belong in the Rust Agent runtime so API, MCP, and UI callers

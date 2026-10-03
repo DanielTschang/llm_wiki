@@ -1,7 +1,7 @@
 /**
  * Claude Code CLI subprocess transport.
  *
- * Rust-side counterpart: src-tauri/src/commands/claude_cli.rs. The Rust
+ * Rust-side counterpart: src-tauri/crates/core/src/commands/claude_cli.rs. The Rust
  * commands spawn `claude -p --output-format stream-json
  * --input-format stream-json --verbose --model <model>`, pipe the
  * serialized history over stdin, and emit stdout back as

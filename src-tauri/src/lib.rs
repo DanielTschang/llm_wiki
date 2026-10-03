@@ -1,287 +1,58 @@
-mod agent;
-mod api_server;
-mod clip_server;
 mod commands;
-mod cors;
-mod panic_guard;
-mod proxy;
-mod server_bind;
 mod tray;
-mod types;
 
-use panic_guard::run_guarded;
-use serde::{Deserialize, Serialize};
-use serde_json::Value;
-use std::sync::Mutex;
-use tauri::{Emitter, Manager};
-use uuid::Uuid;
+use std::sync::{Arc, Mutex};
+
+use llm_wiki_core::panic_guard::run_guarded;
+use llm_wiki_core::{api_server, clip_server, proxy, CoreContext, EventEmitter, EventSink};
+use tauri::{AppHandle, Emitter, Manager};
+use tauri_plugin_opener::OpenerExt;
+
+/// Forwards core events to the webview as Tauri events.
+struct TauriEventSink(AppHandle);
+
+impl EventSink for TauriEventSink {
+    fn emit_value(&self, event: &str, payload: serde_json::Value) -> Result<(), String> {
+        self.0.emit(event, payload).map_err(|e| e.to_string())
+    }
+}
 
 struct CloseBehaviorState(Mutex<String>);
 struct TrayAvailabilityState(Mutex<bool>);
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
-struct AgentProjectEntry {
-    id: String,
-    name: String,
-    path: String,
-    current: bool,
-}
-
-#[derive(Debug, Clone, Default)]
-struct AgentRuntimeConfig {
-    embedding: Option<commands::search::SearchEmbeddingConfig>,
-    llm: Option<agent::provider::LlmConfig>,
-    web_search: Option<agent::tools::WebSearchConfig>,
-    anytxt: Option<agent::tools::AnyTxtConfig>,
+/// Opens `path` with the OS default handler, falling back to revealing
+/// it in the file manager.
+fn open_with_os(app: &AppHandle, path: String, what: &str) -> Result<(), String> {
+    match app.opener().open_path(path.clone(), None::<&str>) {
+        Ok(()) => Ok(()),
+        Err(open_err) => app.opener().reveal_item_in_dir(path).map_err(|reveal_err| {
+            format!(
+                "Failed to open {what}: {}; reveal fallback also failed: {}",
+                open_err, reveal_err
+            )
+        }),
+    }
 }
 
 #[tauri::command]
-fn clip_server_status() -> String {
-    run_guarded("clip_server_status", || {
-        Ok(clip_server::get_daemon_status().to_string())
+fn open_project_folder(app: AppHandle, path: String) -> Result<(), String> {
+    run_guarded("open_project_folder", || {
+        let canonical = llm_wiki_core::commands::project::resolve_project_folder(&path)?;
+        open_with_os(&app, canonical, "project folder")
     })
-    .unwrap_or_else(|e| format!("error: {e}"))
 }
 
 #[tauri::command]
-fn api_server_status() -> String {
-    run_guarded("api_server_status", || {
-        Ok(api_server::get_api_status().to_string())
+fn open_path_in_project(
+    app: AppHandle,
+    project_path: String,
+    target_path: String,
+) -> Result<(), String> {
+    run_guarded("open_path_in_project", || {
+        let target =
+            llm_wiki_core::commands::project::resolve_path_in_project(&project_path, &target_path)?;
+        open_with_os(&app, target, "project path")
     })
-    .unwrap_or_else(|e| format!("error: {e}"))
-}
-
-#[tauri::command]
-fn api_server_reload_config() -> String {
-    run_guarded("api_server_reload_config", || {
-        api_server::invalidate_config_cache();
-        Ok("ok".to_string())
-    })
-    .unwrap_or_else(|e| format!("error: {e}"))
-}
-
-#[tauri::command]
-async fn agent_start_turn(
-    app: tauri::AppHandle,
-    project_id: String,
-    mut request: agent::AgentChatRequest,
-    llm_config: Option<agent::provider::LlmConfig>,
-) -> Result<agent::types::AgentChatResponse, String> {
-    let project = resolve_agent_project(&app, &project_id)?;
-    if request
-        .session_id
-        .as_deref()
-        .map(str::trim)
-        .unwrap_or("")
-        .is_empty()
-    {
-        request.session_id = Some(format!("ui_{}", Uuid::new_v4()));
-    }
-    let active_session_id = request.session_id.clone().unwrap_or_default();
-    if request
-        .run_id
-        .as_deref()
-        .map(str::trim)
-        .unwrap_or("")
-        .is_empty()
-    {
-        request.run_id = Some(format!("run_{}", Uuid::new_v4()));
-    }
-    let active_run_id = request.run_id.clone().unwrap_or_default();
-    if let Some(session_id) = request.session_id.clone() {
-        if request.history.is_empty() && !request.history_explicit {
-            request.history = app
-                .state::<agent::session::AgentSessionStore>()
-                .recent_messages(&project.path, &session_id, 12)
-                .into_iter()
-                .map(|message| agent::types::AgentConversationMessage {
-                    role: message.role,
-                    content: message.content,
-                })
-                .collect();
-        }
-    }
-    let mut runtime_config = load_agent_runtime_config(&app);
-    runtime_config.llm = llm_config.or(runtime_config.llm);
-    let runtime = agent::AgentRuntime::new(
-        project.id.clone(),
-        project.path.clone(),
-        runtime_config.embedding,
-        runtime_config.llm,
-        runtime_config.web_search,
-        runtime_config.anytxt,
-    );
-    let user_message = request.message.clone();
-    let persist_session = request.persist_session;
-    let cancellation = app
-        .state::<agent::cancel::AgentCancellationRegistry>()
-        .start(&project.id, &active_session_id, &active_run_id);
-    let result = runtime
-        .run_once_with_cancel(request, Some(cancellation))
-        .await;
-    app.state::<agent::cancel::AgentCancellationRegistry>()
-        .finish(&project.id, &active_session_id, &active_run_id);
-    let response = result?;
-    if persist_session {
-        app.state::<agent::session::AgentSessionStore>()
-            .append_turn(
-                &project.path,
-                &project.id,
-                &response.session_id,
-                &user_message,
-                &response.message,
-            );
-    }
-    Ok(response)
-}
-
-#[tauri::command]
-fn agent_cancel_turn(
-    app: tauri::AppHandle,
-    project_id: String,
-    session_id: String,
-    run_id: Option<String>,
-) -> Result<bool, String> {
-    let project = resolve_agent_project(&app, &project_id)?;
-    Ok(app
-        .state::<agent::cancel::AgentCancellationRegistry>()
-        .cancel(&project.id, &session_id, run_id.as_deref()))
-}
-
-#[tauri::command]
-async fn agent_start_turn_stream(
-    app: tauri::AppHandle,
-    project_id: String,
-    mut request: agent::AgentChatRequest,
-    llm_config: Option<agent::provider::LlmConfig>,
-) -> Result<String, String> {
-    let project = resolve_agent_project(&app, &project_id)?;
-    if request
-        .session_id
-        .as_deref()
-        .map(str::trim)
-        .unwrap_or("")
-        .is_empty()
-    {
-        request.session_id = Some(format!("ui_{}", Uuid::new_v4()));
-    }
-    let active_session_id = request.session_id.clone().unwrap_or_default();
-    if request
-        .run_id
-        .as_deref()
-        .map(str::trim)
-        .unwrap_or("")
-        .is_empty()
-    {
-        request.run_id = Some(format!("run_{}", Uuid::new_v4()));
-    }
-    let active_run_id = request.run_id.clone().unwrap_or_default();
-    if request.history.is_empty() && !request.history_explicit {
-        request.history = app
-            .state::<agent::session::AgentSessionStore>()
-            .recent_messages(&project.path, &active_session_id, 12)
-            .into_iter()
-            .map(|message| agent::types::AgentConversationMessage {
-                role: message.role,
-                content: message.content,
-            })
-            .collect();
-    }
-    let mut runtime_config = load_agent_runtime_config(&app);
-    runtime_config.llm = llm_config.or(runtime_config.llm);
-    let runtime = agent::AgentRuntime::new(
-        project.id.clone(),
-        project.path.clone(),
-        runtime_config.embedding,
-        runtime_config.llm,
-        runtime_config.web_search,
-        runtime_config.anytxt,
-    );
-    let app_for_task = app.clone();
-    let project_for_task = project.clone();
-    let session_for_task = active_session_id.clone();
-    let run_for_task = active_run_id.clone();
-    let user_message = request.message.clone();
-    let persist_session = request.persist_session;
-    let cancellation = app
-        .state::<agent::cancel::AgentCancellationRegistry>()
-        .start(&project.id, &active_session_id, &active_run_id);
-    tauri::async_runtime::spawn(async move {
-        let emit_app = app_for_task.clone();
-        let emit_session = session_for_task.clone();
-        let emit_run = run_for_task.clone();
-        let sink: agent::runtime::AgentEventSink = std::sync::Arc::new(move |event| {
-            let _ = emit_app.emit(
-                "agent-event",
-                serde_json::json!({
-                    "sessionId": emit_session.clone(),
-                    "runId": emit_run.clone(),
-                    "event": event,
-                }),
-            );
-        });
-        let result = runtime
-            .run_once_with_cancel_and_events(request, Some(cancellation), Some(sink))
-            .await;
-        app_for_task
-            .state::<agent::cancel::AgentCancellationRegistry>()
-            .finish(&project_for_task.id, &session_for_task, &run_for_task);
-        match result {
-            Ok(response) => {
-                if persist_session {
-                    app_for_task
-                        .state::<agent::session::AgentSessionStore>()
-                        .append_turn(
-                            &project_for_task.path,
-                            &project_for_task.id,
-                            &response.session_id,
-                            &user_message,
-                            &response.message,
-                        );
-                }
-            }
-            Err(err) => {
-                let _ = app_for_task.emit(
-                    "agent-event",
-                    serde_json::json!({
-                        "sessionId": session_for_task,
-                        "runId": run_for_task,
-                        "event": { "type": "error", "message": err },
-                    }),
-                );
-            }
-        }
-    });
-    Ok(active_session_id)
-}
-
-#[tauri::command]
-fn agent_get_session(
-    app: tauri::AppHandle,
-    project_id: String,
-    session_id: String,
-    limit: Option<usize>,
-) -> Result<Vec<agent::session::AgentSessionMessage>, String> {
-    let project = resolve_agent_project(&app, &project_id)?;
-    Ok(app
-        .state::<agent::session::AgentSessionStore>()
-        .recent_messages(
-            &project.path,
-            &session_id,
-            limit.unwrap_or(40).clamp(1, 200),
-        ))
-}
-
-#[tauri::command]
-fn agent_list_sessions(
-    app: tauri::AppHandle,
-    project_id: String,
-) -> Result<Vec<agent::session::AgentSession>, String> {
-    let project = resolve_agent_project(&app, &project_id)?;
-    Ok(app
-        .state::<agent::session::AgentSessionStore>()
-        .list_sessions(&project.path))
 }
 
 #[tauri::command]
@@ -325,192 +96,6 @@ fn mcp_server_entry_path(app: tauri::AppHandle) -> Result<String, String> {
 
         Err("MCP server entry was not found. Run `npm run mcp:build` from the LLM Wiki repository, then reopen Settings.".to_string())
     })
-}
-
-fn resolve_agent_project(
-    app: &tauri::AppHandle,
-    project_id: &str,
-) -> Result<AgentProjectEntry, String> {
-    let decoded = percent_decode(project_id);
-    let wants_current = decoded.eq_ignore_ascii_case("current");
-    load_agent_projects(app)
-        .into_iter()
-        .find(|project| {
-            project.id == decoded
-                || project_path_matches(&project.path, &decoded)
-                || (wants_current && project.current)
-        })
-        .ok_or_else(|| format!("Unknown project: {decoded}"))
-}
-
-fn load_agent_projects(app: &tauri::AppHandle) -> Vec<AgentProjectEntry> {
-    let current = normalize_path(&clip_server::current_project_path());
-    let mut projects = Vec::new();
-    if let Some(parsed) = load_agent_app_state(app) {
-        if let Some(registry) = parsed.get("projectRegistry").and_then(Value::as_object) {
-            for (id, value) in registry {
-                let path = value.get("path").and_then(Value::as_str).unwrap_or("");
-                if path.is_empty() {
-                    continue;
-                }
-                let path = normalize_path(path);
-                let name = value
-                    .get("name")
-                    .and_then(Value::as_str)
-                    .map(ToOwned::to_owned)
-                    .unwrap_or_else(|| project_name_from_path(&path));
-                projects.push(AgentProjectEntry {
-                    id: id.clone(),
-                    name,
-                    current: path == current,
-                    path,
-                });
-            }
-        }
-        if let Some(recents) = parsed.get("recentProjects").and_then(Value::as_array) {
-            for value in recents {
-                let path = value.get("path").and_then(Value::as_str).unwrap_or("");
-                if path.is_empty() {
-                    continue;
-                }
-                let path = normalize_path(path);
-                if projects.iter().any(|project| project.path == path) {
-                    continue;
-                }
-                let name = value
-                    .get("name")
-                    .and_then(Value::as_str)
-                    .map(ToOwned::to_owned)
-                    .unwrap_or_else(|| project_name_from_path(&path));
-                projects.push(AgentProjectEntry {
-                    id: read_project_id(&path).unwrap_or_else(|| path.clone()),
-                    name,
-                    current: path == current,
-                    path,
-                });
-            }
-        }
-    }
-    if !current.is_empty() && !projects.iter().any(|project| project.path == current) {
-        projects.push(AgentProjectEntry {
-            id: read_project_id(&current).unwrap_or_else(|| current.clone()),
-            name: project_name_from_path(&current),
-            current: true,
-            path: current,
-        });
-    }
-    projects
-}
-
-fn load_agent_app_state(app: &tauri::AppHandle) -> Option<Value> {
-    let path = app.path().app_data_dir().ok()?.join("app-state.json");
-    let raw = std::fs::read_to_string(path).ok()?;
-    serde_json::from_str(&raw).ok()
-}
-
-fn load_agent_runtime_config(app: &tauri::AppHandle) -> AgentRuntimeConfig {
-    let Some(parsed) = load_agent_app_state(app) else {
-        return AgentRuntimeConfig::default();
-    };
-    AgentRuntimeConfig {
-        embedding: parsed
-            .get("embeddingConfig")
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-        llm: parsed
-            .get("llmConfig")
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-        web_search: parsed
-            .get("searchApiConfig")
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-        anytxt: parsed
-            .get("searchApiConfig")
-            .and_then(|value| value.get("anyTxt"))
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-    }
-}
-
-fn read_project_id(path: &str) -> Option<String> {
-    let raw = std::fs::read_to_string(
-        std::path::Path::new(path)
-            .join(".llm-wiki")
-            .join("project.json"),
-    )
-    .ok()?;
-    serde_json::from_str::<Value>(&raw)
-        .ok()?
-        .get("id")
-        .and_then(Value::as_str)
-        .map(ToOwned::to_owned)
-}
-
-fn project_name_from_path(path: &str) -> String {
-    std::path::Path::new(path)
-        .file_name()
-        .and_then(|s| s.to_str())
-        .filter(|name| !name.is_empty())
-        .unwrap_or("Project")
-        .to_string()
-}
-
-fn project_path_matches(stored_path: &str, candidate: &str) -> bool {
-    let stored = normalize_path(stored_path);
-    let candidate = normalize_path(candidate);
-    if cfg!(windows) {
-        stored.eq_ignore_ascii_case(&candidate)
-    } else {
-        stored == candidate
-    }
-}
-
-fn normalize_path(path: &str) -> String {
-    path.replace('\\', "/").trim_end_matches('/').to_string()
-}
-
-fn percent_decode(input: &str) -> String {
-    let bytes = input.as_bytes();
-    let mut out = Vec::with_capacity(bytes.len());
-    let mut i = 0;
-    while i < bytes.len() {
-        if bytes[i] == b'%' && i + 2 < bytes.len() {
-            if let (Some(hi), Some(lo)) = (hex_val(bytes[i + 1]), hex_val(bytes[i + 2])) {
-                out.push((hi << 4) | lo);
-                i += 3;
-                continue;
-            }
-        }
-        out.push(bytes[i]);
-        i += 1;
-    }
-    String::from_utf8(out).unwrap_or_else(|_| input.to_string())
-}
-
-fn hex_val(b: u8) -> Option<u8> {
-    match b {
-        b'0'..=b'9' => Some(b - b'0'),
-        b'a'..=b'f' => Some(b - b'a' + 10),
-        b'A'..=b'F' => Some(b - b'A' + 10),
-        _ => None,
-    }
-}
-
-/// Apply a proxy configuration to the process env immediately, so the
-/// next outbound HTTP request picks it up without needing the user to
-/// restart the app. tauri-plugin-http builds a fresh
-/// `reqwest::ClientBuilder` per fetch and reqwest's `auto_sys_proxy`
-/// re-reads HTTP_PROXY / HTTPS_PROXY / NO_PROXY each time, so updating
-/// these env vars is sufficient to flip the proxy on/off live.
-///
-/// Returns the same human-readable summary `apply_proxy_env` produces
-/// for logging.
-#[tauri::command]
-fn set_proxy_env(config: proxy::ProxyConfig) -> String {
-    let summary = proxy::apply_proxy_env(&config);
-    eprintln!("[proxy] live update: {summary}");
-    summary
 }
 
 #[tauri::command]
@@ -569,7 +154,7 @@ pub fn run() {
             // Let the PDF extractor find the bundled pdfium dynamic
             // library via Tauri's platform-correct resource path.
             if let Ok(dir) = app.path().resource_dir() {
-                commands::fs::set_resource_dir_hint(dir);
+                llm_wiki_core::commands::fs::set_resource_dir_hint(dir);
             }
             // Apply user-configured global HTTP proxy by setting
             // HTTP_PROXY / HTTPS_PROXY / NO_PROXY env vars BEFORE
@@ -577,7 +162,7 @@ pub fn run() {
             // client reads these on first construction. Lives next
             // to the resource-dir hint so the proxy applies to
             // everything: LLM, embedding, update check, deep
-            // research, captioning. See src-tauri/src/proxy.rs.
+            // research, captioning. See src-tauri/crates/core/src/proxy.rs.
             if let Ok(dir) = app.path().app_data_dir() {
                 let store_path = dir.join("app-state.json");
                 eprintln!("[proxy] reading from {}", store_path.display());
@@ -590,20 +175,21 @@ pub fn run() {
             } else {
                 eprintln!("[proxy] could not resolve app_data_dir");
             }
-            // Registry of running `claude` subprocesses, keyed by the
-            // frontend-generated stream id. Populated by claude_cli_spawn,
-            // drained on process exit or by claude_cli_kill.
-            app.manage(commands::claude_cli::ClaudeCliState::default());
-            app.manage(commands::codex_cli::CodexCliState::default());
-            app.manage(commands::file_sync::FileSyncState::default());
-            app.manage(agent::session::AgentSessionStore::default());
-            app.manage(agent::cancel::AgentCancellationRegistry::default());
+            // Keep core background work (API server threads) on Tauri's
+            // runtime instead of a second one.
+            llm_wiki_core::runtime::install(tauri::async_runtime::handle().inner().clone());
+            let core = Arc::new(CoreContext::new(
+                app.path().app_data_dir().ok(),
+                env!("CARGO_PKG_VERSION"),
+                EventEmitter::new(TauriEventSink(app.handle().clone())),
+            ));
+            app.manage(Arc::clone(&core));
             app.manage(CloseBehaviorState(Mutex::new("minimize".to_string())));
             app.manage(TrayAvailabilityState(Mutex::new(false)));
             // Start the API before optional desktop integrations so the
             // backend is reachable if tray setup or another integration fails.
-            clip_server::start_clip_server(app.handle().clone());
-            api_server::start_api_server(app.handle().clone());
+            clip_server::start_clip_server(Arc::clone(&core));
+            api_server::start_api_server(core);
             let tray_available = match tray::create_tray(app.handle()) {
                 Ok(()) => true,
                 Err(err) => {
@@ -628,12 +214,6 @@ pub fn run() {
             commands::fs::write_file_atomic,
             commands::fs::apply_text_selection_edit,
             commands::fs::create_missing_wiki_page,
-            commands::file_history::list_file_history,
-            commands::file_history::restore_file_history,
-            commands::file_history::get_file_history_stats,
-            commands::file_history::get_file_history_settings,
-            commands::file_history::set_file_history_settings,
-            commands::file_history::clear_file_history,
             commands::fs::list_directory,
             commands::fs::copy_file,
             commands::fs::copy_directory,
@@ -646,10 +226,14 @@ pub fn run() {
             commands::fs::get_file_size,
             commands::fs::get_file_md5,
             commands::fs::read_file_as_base64,
+            commands::file_history::list_file_history,
+            commands::file_history::restore_file_history,
+            commands::file_history::get_file_history_stats,
+            commands::file_history::get_file_history_settings,
+            commands::file_history::set_file_history_settings,
+            commands::file_history::clear_file_history,
             commands::project::create_project,
             commands::project::open_project,
-            commands::project::open_project_folder,
-            commands::project::open_path_in_project,
             commands::project_maintenance::export_project_archive,
             commands::project_maintenance::import_project_archive,
             commands::project_maintenance::rebuild_wiki_index,
@@ -659,16 +243,16 @@ pub fn run() {
             commands::search::get_page_links,
             commands::external_search::web_search,
             commands::external_search::anytxt_search,
-            clip_server_status,
-            api_server_status,
-            api_server_reload_config,
-            agent_start_turn,
-            agent_start_turn_stream,
-            agent_cancel_turn,
-            agent_get_session,
-            agent_list_sessions,
-            agent::skills::agent_list_skills,
-            mcp_server_entry_path,
+            commands::app::clip_server_status,
+            commands::app::api_server_status,
+            commands::app::api_server_reload_config,
+            commands::app::set_proxy_env,
+            commands::agent_commands::agent_start_turn,
+            commands::agent_commands::agent_start_turn_stream,
+            commands::agent_commands::agent_cancel_turn,
+            commands::agent_commands::agent_get_session,
+            commands::agent_commands::agent_list_sessions,
+            commands::agent_skills::agent_list_skills,
             commands::vectorstore::vector_upsert,
             commands::vectorstore::vector_search,
             commands::vectorstore::vector_delete,
@@ -698,7 +282,9 @@ pub fn run() {
             commands::file_sync::get_file_change_queue,
             commands::file_sync::retry_file_change_task,
             commands::file_sync::ignore_file_change_task,
-            set_proxy_env,
+            open_project_folder,
+            open_path_in_project,
+            mcp_server_entry_path,
             set_close_behavior,
         ])
         .on_window_event(|window, event| {

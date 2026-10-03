@@ -13,8 +13,8 @@ use std::sync::{
 };
 use std::time::Duration;
 
+use crate::context::EventEmitter;
 use serde::Serialize;
-use tauri::{AppHandle, Emitter, State};
 use tokio::io::{AsyncBufReadExt, AsyncWriteExt, BufReader};
 use tokio::process::{Child, Command};
 use tokio::sync::Mutex;
@@ -69,7 +69,6 @@ fn suppress_windows_console(_cmd: &mut Command) {
     }
 }
 
-#[tauri::command]
 pub async fn codex_cli_detect() -> Result<DetectResult, String> {
     let path = match find_codex_command().await {
         Ok(p) => p,
@@ -133,10 +132,9 @@ pub async fn codex_cli_detect() -> Result<DetectResult, String> {
     }
 }
 
-#[tauri::command]
 pub async fn codex_cli_spawn(
-    app: AppHandle,
-    state: State<'_, CodexCliState>,
+    app: EventEmitter,
+    state: &CodexCliState,
     stream_id: String,
     model: String,
     prompt: String,
@@ -354,11 +352,7 @@ async fn resolve_codex_working_directory(value: Option<String>) -> Result<PathBu
         .map_err(|e| format!("Failed to canonicalize Codex CLI working directory {raw}: {e}"))
 }
 
-#[tauri::command]
-pub async fn codex_cli_kill(
-    state: State<'_, CodexCliState>,
-    stream_id: String,
-) -> Result<(), String> {
+pub async fn codex_cli_kill(state: &CodexCliState, stream_id: String) -> Result<(), String> {
     if let Some(mut child) = state.children.lock().await.remove(&stream_id) {
         let _ = child.start_kill();
     }

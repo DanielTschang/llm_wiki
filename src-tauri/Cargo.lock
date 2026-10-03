@@ -4755,6 +4755,21 @@ checksum = "11d3d7f243d5c5a8b9bb5d6dd2b1602c0cb0b9db1621bafc7ed66e35ff9fe092"
 name = "llm-wiki"
 version = "0.6.12"
 dependencies = [
+ "llm-wiki-core",
+ "serde_json",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-autostart",
+ "tauri-plugin-dialog",
+ "tauri-plugin-http",
+ "tauri-plugin-opener",
+ "tauri-plugin-store",
+]
+
+[[package]]
+name = "llm-wiki-core"
+version = "0.1.0"
+dependencies = [
  "anydoc",
  "arrow-array",
  "arrow-schema",
@@ -4776,13 +4791,6 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
- "tauri",
- "tauri-build",
- "tauri-plugin-autostart",
- "tauri-plugin-dialog",
- "tauri-plugin-http",
- "tauri-plugin-opener",
- "tauri-plugin-store",
  "tiny_http",
  "tokio",
  "uuid",

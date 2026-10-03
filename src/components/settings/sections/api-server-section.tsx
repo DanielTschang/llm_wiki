@@ -38,7 +38,7 @@ interface ApiHealth {
 
 /**
  * Documented endpoint surface. Kept in lock-step with
- * `src-tauri/src/api_server.rs::handle_request`. When you add or remove
+ * `src-tauri/crates/core/src/api_server.rs::handle_request`. When you add or remove
  * a route there, update this list — it's the only place users discover
  * the API contract until we ship a proper OpenAPI doc.
  */

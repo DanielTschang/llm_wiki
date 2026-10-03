@@ -1,6 +1,6 @@
 /**
  * Search ranking scenarios moved to Rust with the shared backend search
- * service (`src-tauri/src/commands/search.rs`). The WebView now only
+ * service (`src-tauri/crates/core/src/commands/search.rs`). The WebView now only
  * wraps that command, so this file guards the command contract from
  * the TS side instead of duplicating ranking logic in Node.
  */
