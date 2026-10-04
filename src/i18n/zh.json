@@ -1090,7 +1090,8 @@
   "fileTree": {
     "noProject": "未打开项目",
     "openProjectFolder": "打开项目目录",
-    "openProjectFolderFailed": "无法打开项目目录。"
+    "openProjectFolderFailed": "无法打开项目目录。",
+    "loadFailed": "无法加载项目文件：{{error}}"
   },
   "graph": {
     "openProject": "打开项目以查看关系图",
@@ -1169,5 +1170,32 @@
     "minutesAgo": "{{count}} 分钟前",
     "hoursAgo": "{{count}} 小时前",
     "daysAgo": "{{count}} 天前"
+  },
+  "serverPicker": {
+    "titleFile": "选择文件",
+    "titleFiles": "选择文件",
+    "titleFolder": "选择文件夹",
+    "titleSave": "另存为",
+    "tabServer": "服务器上",
+    "tabDevice": "从此设备",
+    "up": "上一级",
+    "locations": "服务器位置",
+    "path": "服务器路径",
+    "newFolder": "新建文件夹",
+    "folderName": "文件夹名称",
+    "fileName": "文件名",
+    "create": "创建",
+    "empty": "此文件夹中没有符合条件的项目",
+    "loadFailed": "无法打开此文件夹：{{error}}",
+    "uploadFailed": "上传失败：{{error}}",
+    "selectedCount": "已选择 {{count}} 项",
+    "useFolder": "使用此文件夹",
+    "save": "保存",
+    "select": "选择",
+    "uploading": "正在上传 {{done}} / {{total}}……",
+    "deviceFilesHint": "将文件拖到这里，或从此设备中选择。文件会上传到服务器。",
+    "deviceFolderHint": "从此设备中选择一个文件夹，其中的文件会上传到服务器。",
+    "chooseFiles": "选择文件",
+    "chooseFolder": "选择文件夹"
   }
 }

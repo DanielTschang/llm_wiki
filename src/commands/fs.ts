@@ -1,4 +1,4 @@
-import { invoke } from "@/platform"
+import { invoke, isDesktop, openPath } from "@/platform"
 import type { FileNode, WikiProject } from "@/types/wiki"
 import { ensureProjectId, upsertProjectInfo } from "@/lib/project-identity"
 import { isAbsolutePath } from "@/lib/path-utils"
@@ -267,6 +267,11 @@ export async function openProjectFolder(path: string): Promise<void> {
 }
 
 export async function openPathInProject(projectPath: string, targetPath: string): Promise<void> {
+  if (!isDesktop) {
+    // No server-side file manager to hand it to: show the file in a new tab.
+    const absolute = targetPath.startsWith("/") ? targetPath : `${projectPath.replace(/\/+$/, "")}/${targetPath}`
+    return openPath(absolute)
+  }
   return invoke<void>("open_path_in_project", { projectPath, targetPath })
 }
 

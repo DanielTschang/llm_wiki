@@ -29,6 +29,13 @@ export interface OpenDialogOptions {
   multiple?: boolean
   createDirectories?: boolean
   filters?: DialogFilter[]
+  /**
+   * Web build: also offer uploading from the browser's device. Uploads are
+   * staged on the server and removed after a day, so only set this when the
+   * caller copies the picked files (imports), never for a location the app
+   * keeps using (opening or creating a project). Ignored on desktop.
+   */
+  allowUpload?: boolean
 }
 
 /** Mirrors plugin-dialog: `multiple: true` yields an array. */

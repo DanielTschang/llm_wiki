@@ -391,6 +391,11 @@ interface WikiState {
   project: WikiProject | null
   fileTree: FileNode[]
   /**
+   * Why the last project file listing failed, or null. While set, the tree
+   * and the Sources/Related link index may be stale or empty.
+   */
+  fileTreeError: string | null
+  /**
    * Lightweight lookup index derived from `fileTree`. Production code must
    * update fileTree through `setFileTree` so this stays in sync; direct
    * `useWikiStore.setState({ fileTree })` is only for tests that also reset or
@@ -449,6 +454,7 @@ interface WikiState {
 
   setProject: (project: WikiProject | null) => void
   setFileTree: (tree: FileNode[], options?: { syncPathIndex?: boolean }) => void
+  setFileTreeError: (error: string | null) => void
   setProjectPathIndexFromTree: (tree: FileNode[]) => void
   setSelectedFile: (path: string | null) => void
   setFileContent: (content: string) => void
@@ -484,6 +490,7 @@ interface WikiState {
 export const useWikiStore = create<WikiState>((set) => ({
   project: null,
   fileTree: [],
+  fileTreeError: null,
   projectPathIndex: createEmptyProjectPathIndex(),
   selectedFile: null,
   fileContent: "",
@@ -540,6 +547,7 @@ export const useWikiStore = create<WikiState>((set) => ({
   },
   setProjectPathIndexFromTree: (tree) =>
     set({ projectPathIndex: buildProjectPathIndexFromTree(tree) }),
+  setFileTreeError: (fileTreeError) => set({ fileTreeError }),
   setSelectedFile: (selectedFile) =>
     set({ selectedFile, previewContentPath: null, externalPreview: null }),
   setFileContent: (fileContent) => set({ fileContent }),

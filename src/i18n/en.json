@@ -1090,7 +1090,8 @@
   "fileTree": {
     "noProject": "No project open",
     "openProjectFolder": "Open project folder",
-    "openProjectFolderFailed": "Failed to open the project folder."
+    "openProjectFolderFailed": "Failed to open the project folder.",
+    "loadFailed": "Could not load the project files: {{error}}"
   },
   "graph": {
     "openProject": "Open a project to view the graph",
@@ -1169,5 +1170,32 @@
     "minutesAgo": "{{count}} min ago",
     "hoursAgo": "{{count}} h ago",
     "daysAgo": "{{count}} d ago"
+  },
+  "serverPicker": {
+    "titleFile": "Choose a file",
+    "titleFiles": "Choose files",
+    "titleFolder": "Choose a folder",
+    "titleSave": "Save as",
+    "tabServer": "On the server",
+    "tabDevice": "From this device",
+    "up": "Up",
+    "locations": "Server locations",
+    "path": "Server path",
+    "newFolder": "New folder",
+    "folderName": "Folder name",
+    "fileName": "File name",
+    "create": "Create",
+    "empty": "No matching items in this folder",
+    "loadFailed": "Cannot open this folder: {{error}}",
+    "uploadFailed": "Upload failed: {{error}}",
+    "selectedCount": "{{count}} selected",
+    "useFolder": "Use this folder",
+    "save": "Save",
+    "select": "Select",
+    "uploading": "Uploading {{done}} of {{total}}…",
+    "deviceFilesHint": "Drop files here, or choose them from this device. They are uploaded to the server.",
+    "deviceFolderHint": "Choose a folder from this device. Its files are uploaded to the server.",
+    "chooseFiles": "Choose files",
+    "chooseFolder": "Choose folder"
   }
 }

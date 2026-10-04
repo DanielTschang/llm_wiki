@@ -64,6 +64,11 @@ pub struct Args {
     /// Do not start the ingest worker.
     #[arg(long, env = "LLM_WIKI_NO_WORKER")]
     pub no_worker: bool,
+
+    /// Do not copy model settings from the desktop app on this machine when
+    /// the server has none configured yet.
+    #[arg(long, env = "LLM_WIKI_NO_DESKTOP_SETTINGS")]
+    pub no_desktop_settings: bool,
 }
 
 impl Args {

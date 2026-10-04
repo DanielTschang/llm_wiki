@@ -1,6 +1,6 @@
 # Web server mode: self-hosted backend + browser frontend
 
-**Status:** Phases 1–4 done on `DanielTschang/second`, plus a Dockerfile. Phase 5 not started.
+**Status:** Phases 1–5 done on `DanielTschang/second`, plus a Dockerfile.
 
 **Goal:** Run LLM Wiki as a headless server (NAS / VPS / Docker, no
 desktop session) and use the existing React UI from any browser. The
@@ -256,13 +256,53 @@ As built:
 Earlier alternatives kept for reference: keep ingest in the tab (resumes
 on reopen) or port ingest to Rust (largest cost).
 
-### Phase 5 — Web UX polish
-- Server directory picker + drag-and-drop upload into `raw/sources/`.
-- Export downloads the ZIP; import uploads it.
-- PWA manifest; "open in system browser" links instead of `openUrl`.
-- Surface file-tree load failures instead of keeping an empty path
-  index: a tab opened while the server could not read the project kept
-  every Sources/Related link marked missing until a manual reload.
+### Phase 5 — Web UX polish ✅
+- **Server file browser** (`components/server-path-picker.tsx`,
+  `stores/path-picker-store.ts`): the web platform's `openDialog` /
+  `saveDialog` resolve through an in-app picker that browses the allowed
+  roots (`server_locations` RPC, `list_directory`, `create_directory`),
+  so desktop call sites are unchanged. `window.prompt` remains only as the
+  fallback when no picker is injected.
+- **Upload from the device** (`POST /upload`, `lib/server-upload.ts`):
+  files (or a folder, keeping its layout) stream into
+  `<data-dir>/projects/.uploads/<batch>/` and the picker returns those
+  server paths to the existing import code, which copies them. Batches
+  older than a day are swept at startup. Because staged files disappear,
+  the device tab only appears when the caller opts in with
+  `allowUpload` (source import, project-archive import), never for
+  opening or creating a project.
+- **Export downloads** the ZIP: exported into the staging area, then
+  fetched with `/files?download=true` (`Content-Disposition` with an RFC
+  5987 UTF-8 name, so non-ASCII project names survive).
+- **Desktop-only UI hidden** when `!isDesktop`: the General (startup /
+  window) and API Server settings sections, the clip/API status rows in
+  About (which also stopped probing the browser's own 127.0.0.1), the
+  Claude Code / Codex CLI providers, and "reveal folder" buttons.
+  `openPathInProject` opens the file in a new tab instead.
+- **File-tree load failures** set `fileTreeError`; the sidebar shows the
+  error with a Retry button instead of silently keeping an empty link
+  index.
+- **PWA**: `public/manifest.webmanifest` and icons (served without auth,
+  since browsers fetch them without cookies); `index.html` now points at a
+  real favicon.
+- Verified in a browser: open project through the picker, upload a file
+  from the device into `raw/sources/`, settings/About without desktop-only
+  entries, export producing the archive; download headers checked with
+  curl. Not verified: the browser actually saving the downloaded ZIP (the
+  automated browser did not issue the download request).
+
+### Follow-up fixes
+- **Stale tabs after an update.** Rebuilding `dist-web` renames hashed
+  chunks, so a tab loaded earlier failed lazily loaded parts (PDF viewer,
+  Mermaid) with "Failed to fetch dynamically imported module": the server
+  answered the missing chunk with `index.html`. Now `/assets/*` 404s when
+  missing and is cached `immutable`; `index.html` is `no-cache`; the web
+  build reloads once on `vite:preloadError` (`stale-build-reload.ts`, with
+  a 30 s loop guard).
+- **Settings start empty.** On first start, when the server has no model
+  configured, it imports the model-related keys from the desktop app's
+  `app-state.json` on the same machine (`desktop_settings.rs`;
+  `--no-desktop-settings` to opt out). Settings files are written `0600`.
 
 ---
 

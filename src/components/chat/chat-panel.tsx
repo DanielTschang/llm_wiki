@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { convertFileSrc, invoke, listen } from "@/platform"
+import { convertFileSrc, invoke, isDesktop, listen } from "@/platform"
 import { BookOpen, Plus, Trash2, MessageSquare, X, Maximize2, FolderOpen, FileText, ListTree, ChevronDown, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChatMessage, StreamingMessage, useSourceFiles, type ChatReferencePreview } from "./chat-message"
@@ -1533,7 +1533,8 @@ export function ChatPanel() {
         <GeneratedOutputsPanel
           outputs={generatedOutputPreviews}
           onOpen={openGeneratedOutputModal}
-          onOpenDirectory={project ? openGeneratedOutputDirectory : undefined}
+          // Revealing a folder needs the desktop's file manager.
+          onOpenDirectory={project && isDesktop ? openGeneratedOutputDirectory : undefined}
           onClose={closeGeneratedOutputsPanel}
         />
       )}

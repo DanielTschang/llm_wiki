@@ -73,18 +73,24 @@ make token
 - `./projects/`：repo 底下若有這個資料夾，Makefile 會自動把它加進允許的範圍
 - 其他資料夾：用 `ALLOW_ROOT` 指定，例如 `make server ALLOW_ROOT=~/Documents/wikis`
 
-開啟或匯入檔案時會跳出輸入框，請貼上**伺服器上的完整路徑**，例如
-`/Users/you/Projects/llm_wiki/projects/Lithography-wiki`。
+開啟專案或匯入檔案時，會出現**伺服器檔案瀏覽器**，可以在允許的資料夾之間瀏覽、建立新資料夾，或直接在上方輸入伺服器上的完整路徑。
+
+匯入來源檔案或專案 ZIP 時，還可以切換到「**從此裝置**」分頁，從你正在用的電腦或手機上傳檔案（支援拖曳，也可以上傳整個資料夾）。上傳的檔案會先暫存在伺服器上，匯入時複製進專案，暫存檔一天後自動清除。
+
+匯出專案（設定 → 維護 → 匯出專案）會直接下載 ZIP 到你的裝置。
 
 ### 沿用桌面版的設定
 
-網頁版的設定存在另一個檔案（`~/.llm-wiki-server/app-state.json`）。想沿用桌面版的模型和 API key，可以在 **server 停止時**複製一份過去：
+網頁版的設定存在另一個檔案（`~/.llm-wiki-server/app-state.json`）。如果這台電腦上也有桌面版，server **第一次啟動、還沒有任何模型設定時**，會自動從桌面版帶入模型相關的設定（模型、provider 的 endpoint 與 API key、任務路由、embedding、多模態、MinerU、proxy、輸出語言），啟動訊息會出現：
 
-```bash
-cp ~/Library/Application\ Support/com.llmwiki.app/app-state.json ~/.llm-wiki-server/app-state.json
+```
+  settings:  imported model settings from the desktop app (...)
 ```
 
-複製之後，兩邊的設定各自獨立，不會互相同步。
+- 只會在網頁版**還沒設定模型**時匯入一次，之後兩邊的設定各自獨立，不會互相同步，也不會覆蓋你在網頁版改過的設定。
+- 專案登記、最近的專案等網頁版自己的資料不會被動到。
+- 不想自動匯入的話，加上 `--no-desktop-settings`（或環境變數 `LLM_WIKI_NO_DESKTOP_SETTINGS=1`）。
+- 設定檔含有 API key，server 會把它設成只有你能讀寫（`0600`）。
 
 ### 背景 ingest
 

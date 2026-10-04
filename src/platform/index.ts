@@ -9,6 +9,7 @@
  * the Node ingest worker build sets `worker` (see `.env.worker`).
  */
 import { NodeEventSource } from "./node-event-source"
+import { requestServerPath } from "@/stores/path-picker-store"
 import { tauriPlatform } from "./tauri"
 import { createWebPlatform } from "./web"
 import type { Platform } from "./types"
@@ -56,6 +57,7 @@ const platform: Platform =
         onUnauthorized: () => {
           window.location.assign(`${import.meta.env.VITE_LLM_WIKI_SERVER_URL ?? ""}/login`)
         },
+        pickPath: requestServerPath,
       })
     : tauriPlatform
 

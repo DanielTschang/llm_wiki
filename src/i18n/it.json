@@ -1090,7 +1090,8 @@
   "fileTree": {
     "noProject": "Nessun progetto aperto",
     "openProjectFolder": "Apri la cartella del progetto",
-    "openProjectFolderFailed": "Impossibile aprire la cartella del progetto."
+    "openProjectFolderFailed": "Impossibile aprire la cartella del progetto.",
+    "loadFailed": "Impossibile caricare i file del progetto: {{error}}"
   },
   "graph": {
     "openProject": "Apri un progetto per vedere il grafo",
@@ -1169,5 +1170,32 @@
     "minutesAgo": "{{count}} min fa",
     "hoursAgo": "{{count}} h fa",
     "daysAgo": "{{count}} g fa"
+  },
+  "serverPicker": {
+    "titleFile": "Scegli un file",
+    "titleFiles": "Scegli i file",
+    "titleFolder": "Scegli una cartella",
+    "titleSave": "Salva come",
+    "tabServer": "Sul server",
+    "tabDevice": "Da questo dispositivo",
+    "up": "Su",
+    "locations": "Posizioni sul server",
+    "path": "Percorso sul server",
+    "newFolder": "Nuova cartella",
+    "folderName": "Nome della cartella",
+    "fileName": "Nome del file",
+    "create": "Crea",
+    "empty": "Nessun elemento corrispondente in questa cartella",
+    "loadFailed": "Impossibile aprire questa cartella: {{error}}",
+    "uploadFailed": "Caricamento non riuscito: {{error}}",
+    "selectedCount": "{{count}} selezionati",
+    "useFolder": "Usa questa cartella",
+    "save": "Salva",
+    "select": "Seleziona",
+    "uploading": "Caricamento {{done}} di {{total}}…",
+    "deviceFilesHint": "Trascina qui i file oppure sceglili da questo dispositivo. Verranno caricati sul server.",
+    "deviceFolderHint": "Scegli una cartella da questo dispositivo. I suoi file verranno caricati sul server.",
+    "chooseFiles": "Scegli i file",
+    "chooseFolder": "Scegli la cartella"
   }
 }

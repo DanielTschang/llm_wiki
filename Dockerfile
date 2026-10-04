@@ -13,6 +13,7 @@ COPY package.json package-lock.json ./
 RUN npm ci --no-audit --no-fund
 COPY index.html vite.config.ts tsconfig.json tsconfig.app.json tsconfig.node.json components.json .env.web .env.worker ./
 COPY src ./src
+COPY public ./public
 RUN npm run build:web && npm run build:worker
 
 # ── Server binary ──────────────────────────────────────────────────────

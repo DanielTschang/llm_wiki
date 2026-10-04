@@ -76,6 +76,11 @@ async fn call(
             app_store(state, command, args).await
         }
         "ingest_command" => ingest_command(state, args).await,
+        // Where the web file picker may browse and stage uploads.
+        "server_locations" => Ok(json!({
+            "roots": state.roots.roots(),
+            "uploads": state.upload_root.as_ref(),
+        })),
         "review_inbox_append" | "review_inbox_take" => review_inbox(state, command, args).await,
         _ => dispatch::dispatch(&state.core, command, args).await,
     }

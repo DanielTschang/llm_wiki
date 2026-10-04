@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react"
 import { ChevronDown, ChevronRight, AlertCircle, CheckCircle2, Loader2, XCircle, Plus, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { invoke } from "@/platform"
+import { invoke, isDesktop } from "@/platform"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -55,7 +55,14 @@ export function LlmProviderSection() {
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [savedId, setSavedId] = useState<string | null>(null)
-  const presets = useMemo(() => availableLlmPresets(customLlmPresets), [customLlmPresets])
+  // The local Claude Code / Codex CLIs run on the user's machine; the
+  // self-hosted server disables them, so the web build does not offer them.
+  const presets = useMemo(
+    () => availableLlmPresets(customLlmPresets).filter(
+      (preset) => isDesktop || (preset.provider !== "claude-code" && preset.provider !== "codex-cli"),
+    ),
+    [customLlmPresets],
+  )
 
   function toggleExpand(id: string) {
     setExpanded((prev) => ({ ...prev, [id]: !prev[id] }))

@@ -96,6 +96,13 @@ const CATEGORIES: Category[] = [
   { id: "about", labelKey: "settings.categories.about", icon: Info },
 ]
 
+/** Desktop shell features (window/startup behavior, the local HTTP API on
+ *  127.0.0.1:19828) that the self-hosted web edition does not have. */
+const DESKTOP_ONLY_CATEGORIES = new Set<CategoryId>(["general", "api-server"])
+const VISIBLE_CATEGORIES = isDesktop
+  ? CATEGORIES
+  : CATEGORIES.filter((category) => !DESKTOP_ONLY_CATEGORIES.has(category.id))
+
 function initialDraft(
   llm: ReturnType<typeof useWikiStore.getState>["llmConfig"],
   embed: ReturnType<typeof useWikiStore.getState>["embeddingConfig"],
@@ -701,7 +708,7 @@ export function SettingsView() {
           {t("settings.title")}
         </div>
         <nav className="flex-1 overflow-y-auto px-2 pb-3">
-          {CATEGORIES.map((c) => {
+          {VISIBLE_CATEGORIES.map((c) => {
             const Icon = c.icon
             const isActive = c.id === active
             // Mirror the gear-icon dot inside the settings sidebar

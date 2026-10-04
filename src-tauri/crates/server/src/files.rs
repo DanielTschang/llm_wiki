@@ -22,6 +22,10 @@ const ACTIVE_CONTENT_EXTENSIONS: &[&str] = &["html", "htm", "xhtml", "svg", "xml
 #[derive(Deserialize)]
 pub struct FileQuery {
     path: String,
+    /// Ask the browser to save the file (project export) instead of
+    /// displaying it.
+    #[serde(default)]
+    download: bool,
 }
 
 pub async fn serve(
@@ -55,5 +59,56 @@ pub async fn serve(
             HeaderValue::from_static("sandbox"),
         );
     }
+    if query.download {
+        let name = path
+            .file_name()
+            .map(|name| name.to_string_lossy().into_owned())
+            .unwrap_or_else(|| "download".into());
+        if let Ok(value) = HeaderValue::from_str(&content_disposition(&name)) {
+            headers.insert(header::CONTENT_DISPOSITION, value);
+        }
+    }
     response
+}
+
+/// `attachment` with an ASCII fallback name plus the RFC 5987 UTF-8 form,
+/// so non-ASCII project names (e.g. Chinese) survive the download.
+fn content_disposition(name: &str) -> String {
+    let ascii: String = name
+        .chars()
+        .map(|c| {
+            if c.is_ascii_graphic() && !matches!(c, '"' | '\\') || c == ' ' {
+                c
+            } else {
+                '_'
+            }
+        })
+        .collect();
+    let encoded: String = name
+        .bytes()
+        .map(|b| match b {
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' => {
+                (b as char).to_string()
+            }
+            _ => format!("%{b:02X}"),
+        })
+        .collect();
+    format!("attachment; filename=\"{ascii}\"; filename*=UTF-8''{encoded}")
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn content_disposition_keeps_unicode_names() {
+        assert_eq!(
+            content_disposition("光學.llmwiki.zip"),
+            "attachment; filename=\"__.llmwiki.zip\"; filename*=UTF-8''%E5%85%89%E5%AD%B8.llmwiki.zip"
+        );
+        assert_eq!(
+            content_disposition("a\"b.zip"),
+            "attachment; filename=\"a_b.zip\"; filename*=UTF-8''a%22b.zip"
+        );
+    }
 }

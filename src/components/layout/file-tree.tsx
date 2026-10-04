@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react"
 import { ChevronRight, ChevronDown, File, Folder, FolderOpen } from "lucide-react"
-import { messageDialog } from "@/platform"
+import { isDesktop, messageDialog } from "@/platform"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useWikiStore } from "@/stores/wiki-store"
 import type { FileNode } from "@/types/wiki"
@@ -168,19 +168,22 @@ export function FileTree() {
           ))}
         </div>
       </ScrollArea>
-      <div className="shrink-0 border-t p-2">
-        <button
-          type="button"
-          onClick={() => void handleOpenProjectFolder()}
-          className="flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent/50 hover:text-accent-foreground"
-          title={project.path}
-        >
-          <FolderOpen className="h-3.5 w-3.5 shrink-0" />
-          <span className="truncate">
-            {t("fileTree.openProjectFolder", { defaultValue: "Open project folder" })}
-          </span>
-        </button>
-      </div>
+      {/* Revealing the folder needs the desktop's file manager. */}
+      {isDesktop && (
+        <div className="shrink-0 border-t p-2">
+          <button
+            type="button"
+            onClick={() => void handleOpenProjectFolder()}
+            className="flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent/50 hover:text-accent-foreground"
+            title={project.path}
+          >
+            <FolderOpen className="h-3.5 w-3.5 shrink-0" />
+            <span className="truncate">
+              {t("fileTree.openProjectFolder", { defaultValue: "Open project folder" })}
+            </span>
+          </button>
+        </div>
+      )}
     </div>
   )
 }

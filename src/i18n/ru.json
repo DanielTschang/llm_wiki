@@ -1090,7 +1090,8 @@
   "fileTree": {
     "noProject": "Проект не открыт",
     "openProjectFolder": "Открыть папку проекта",
-    "openProjectFolderFailed": "Не удалось открыть папку проекта."
+    "openProjectFolderFailed": "Не удалось открыть папку проекта.",
+    "loadFailed": "Не удалось загрузить файлы проекта: {{error}}"
   },
   "graph": {
     "openProject": "Откройте проект, чтобы просмотреть граф",
@@ -1169,5 +1170,32 @@
     "minutesAgo": "{{count}} мин назад",
     "hoursAgo": "{{count}} ч назад",
     "daysAgo": "{{count}} дн. назад"
+  },
+  "serverPicker": {
+    "titleFile": "Выберите файл",
+    "titleFiles": "Выберите файлы",
+    "titleFolder": "Выберите папку",
+    "titleSave": "Сохранить как",
+    "tabServer": "На сервере",
+    "tabDevice": "С этого устройства",
+    "up": "Вверх",
+    "locations": "Расположения на сервере",
+    "path": "Путь на сервере",
+    "newFolder": "Новая папка",
+    "folderName": "Имя папки",
+    "fileName": "Имя файла",
+    "create": "Создать",
+    "empty": "В этой папке нет подходящих элементов",
+    "loadFailed": "Не удалось открыть папку: {{error}}",
+    "uploadFailed": "Ошибка загрузки: {{error}}",
+    "selectedCount": "Выбрано: {{count}}",
+    "useFolder": "Использовать эту папку",
+    "save": "Сохранить",
+    "select": "Выбрать",
+    "uploading": "Загрузка {{done}} из {{total}}…",
+    "deviceFilesHint": "Перетащите файлы сюда или выберите их на этом устройстве. Они будут загружены на сервер.",
+    "deviceFolderHint": "Выберите папку на этом устройстве. Её файлы будут загружены на сервер.",
+    "chooseFiles": "Выбрать файлы",
+    "chooseFolder": "Выбрать папку"
   }
 }

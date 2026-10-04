@@ -17,11 +17,20 @@
  * `/login` page. `/rpc` and `/proxy` calls also carry CLIENT_HEADER, which
  * a cross-site page cannot add, so they cannot be forged (CSRF).
  *
- * Native dialogs have no browser equivalent for server-side paths; until
- * the in-app directory browser lands (Phase 5) they fall back to
+ * Native dialogs have no browser equivalent for server-side paths: the app
+ * injects `pickPath` (the in-app server file browser,
+ * components/server-path-picker.tsx). Without it they fall back to
  * `window.prompt` for a path on the server.
  */
-import type { EventHandler, KeyValueStore, OpenDialogOptions, OpenDialogResult, Platform, PlatformEvent } from "./types"
+import type {
+  EventHandler,
+  KeyValueStore,
+  OpenDialogOptions,
+  OpenDialogResult,
+  Platform,
+  PlatformEvent,
+  SaveDialogOptions,
+} from "./types"
 
 export const CLIENT_HEADER = "X-LLM-Wiki-Client"
 
@@ -38,6 +47,10 @@ export interface WebPlatformDeps {
    * Only for Node, where there is no CORS to work around.
    */
   directFetch?: boolean
+  /** Picks server paths for open/save dialogs. */
+  pickPath?: (
+    request: ({ mode: "open" } & OpenDialogOptions) | ({ mode: "save" } & SaveDialogOptions),
+  ) => Promise<string | string[] | null>
 }
 
 export function createWebPlatform(deps: WebPlatformDeps): Platform {
@@ -141,12 +154,14 @@ export function createWebPlatform(deps: WebPlatformDeps): Platform {
     createHttpFetch: async () => (deps.directFetch ? deps.fetch : proxiedFetch),
     loadStore,
     openDialog: async <T extends OpenDialogOptions>(options: T) => {
+      if (deps.pickPath) return (await deps.pickPath({ mode: "open", ...options })) as OpenDialogResult<T>
       const label = options.title ?? (options.directory ? "Folder path on the server" : "File path on the server")
       const value = window.prompt(label, options.defaultPath ?? "")?.trim()
       if (!value) return null as OpenDialogResult<T>
       return (options.multiple ? [value] : value) as OpenDialogResult<T>
     },
     saveDialog: async (options) => {
+      if (deps.pickPath) return (await deps.pickPath({ mode: "save", ...options })) as string | null
       const value = window.prompt(options.title ?? "Save to path on the server", options.defaultPath ?? "")?.trim()
       return value || null
     },

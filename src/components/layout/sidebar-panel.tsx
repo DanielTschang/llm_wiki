@@ -1,8 +1,10 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { PanelLeftClose } from "lucide-react"
+import { AlertTriangle, PanelLeftClose } from "lucide-react"
 import { KnowledgeTree } from "./knowledge-tree"
 import { FileTree } from "./file-tree"
+import { useWikiStore } from "@/stores/wiki-store"
+import { refreshProjectFileTree } from "@/lib/project-file-tree-refresh"
 
 interface SidebarPanelProps {
   onCollapse?: () => void
@@ -11,6 +13,8 @@ interface SidebarPanelProps {
 export function SidebarPanel({ onCollapse }: SidebarPanelProps) {
   const { t } = useTranslation()
   const [mode, setMode] = useState<"knowledge" | "files">("knowledge")
+  const project = useWikiStore((s) => s.project)
+  const fileTreeError = useWikiStore((s) => s.fileTreeError)
 
   return (
     <div className="flex h-full flex-col">
@@ -47,6 +51,21 @@ export function SidebarPanel({ onCollapse }: SidebarPanelProps) {
           </button>
         )}
       </div>
+      {fileTreeError && project && (
+        <div role="alert" className="flex shrink-0 items-start gap-2 border-b bg-amber-500/10 px-3 py-2 text-xs">
+          <AlertTriangle className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
+          <div className="min-w-0 flex-1 space-y-1">
+            <p className="break-words">{t("fileTree.loadFailed", { error: fileTreeError })}</p>
+            <button
+              type="button"
+              onClick={() => void refreshProjectFileTree(project.path, { projectId: project.id })}
+              className="font-medium text-primary hover:underline"
+            >
+              {t("common.retry")}
+            </button>
+          </div>
+        </div>
+      )}
       <div className="flex-1 overflow-hidden">
         {mode === "knowledge" ? <KnowledgeTree /> : <FileTree />}
       </div>

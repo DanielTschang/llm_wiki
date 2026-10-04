@@ -2,6 +2,7 @@
 
 mod auth;
 mod config;
+mod desktop_settings;
 mod dispatch;
 mod events;
 mod files;
@@ -9,6 +10,7 @@ mod paths;
 mod proxy;
 mod rpc;
 mod store;
+mod upload;
 mod worker;
 
 use std::net::SocketAddr;
@@ -25,6 +27,7 @@ use clap::Parser;
 use llm_wiki_core::{CoreContext, EventEmitter};
 use serde::Deserialize;
 use serde_json::json;
+use tower::ServiceExt;
 use tower_http::services::{ServeDir, ServeFile};
 
 use crate::auth::{Auth, Credential, CLIENT_HEADER};
@@ -46,6 +49,8 @@ pub struct AppState {
     worker: Arc<WorkerBridge>,
     /// Serializes `.llm-wiki/review-inbox.json` read-modify-writes.
     inbox_lock: Arc<Mutex<()>>,
+    /// Staging area for files uploaded from the browser's device.
+    upload_root: Arc<PathBuf>,
 }
 
 #[tokio::main]
@@ -66,9 +71,25 @@ async fn run(args: config::Args) -> Result<(), String> {
         .map_err(|e| format!("Cannot resolve {}: {e}", data_dir.display()))?;
 
     let (token, generated) = auth::load_or_create_token(&data_dir, args.token.clone())?;
+    let upload_root = data_dir.join("projects").join(upload::UPLOAD_DIR);
+    std::fs::create_dir_all(&upload_root)
+        .map_err(|e| format!("Cannot create {}: {e}", upload_root.display()))?;
+    upload::sweep_stale(&upload_root);
     let roots = AllowedRoots::new(
         std::iter::once(data_dir.join("projects")).chain(args.allow_roots.iter().cloned()),
     )?;
+
+    // On a machine that also runs the desktop app, start from its models.
+    let mut desktop_import = None;
+    if !args.no_desktop_settings {
+        if let Some(desktop) = desktop_settings::desktop_app_state_path() {
+            match desktop_settings::seed_from_desktop(&data_dir.join("app-state.json"), &desktop) {
+                Ok(Some(_)) => desktop_import = Some(desktop),
+                Ok(None) => {}
+                Err(e) => eprintln!("[settings] could not import desktop settings: {e}"),
+            }
+        }
+    }
 
     // Same startup step as the desktop app: honor the saved proxy settings
     // before any outbound request.
@@ -93,6 +114,7 @@ async fn run(args: config::Args) -> Result<(), String> {
         allow_shell: args.allow_shell,
         worker: Arc::new(WorkerBridge::new(events.clone())),
         inbox_lock: Arc::new(Mutex::new(())),
+        upload_root: Arc::new(upload_root),
         events,
     };
 
@@ -121,6 +143,12 @@ async fn run(args: config::Args) -> Result<(), String> {
         eprintln!(
             "  token:     from {}",
             data_dir.join("server-token").display()
+        );
+    }
+    if let Some(desktop) = &desktop_import {
+        eprintln!(
+            "  settings:  imported model settings from the desktop app ({})",
+            desktop.display()
         );
     }
     if args.allow_shell {
@@ -162,7 +190,9 @@ fn router(state: AppState, web_dir: Option<PathBuf>) -> Router {
         .route("/events", get(events::sse))
         .route("/files", get(files::serve))
         .route("/proxy", any(proxy::forward))
-        .layer(DefaultBodyLimit::max(MAX_RPC_BODY_BYTES));
+        .layer(DefaultBodyLimit::max(MAX_RPC_BODY_BYTES))
+        // Streams to disk with its own size check.
+        .route("/upload", post(upload::receive));
 
     let app = Router::new()
         .route("/login", get(login_page).post(login))
@@ -171,10 +201,7 @@ fn router(state: AppState, web_dir: Option<PathBuf>) -> Router {
         .merge(api);
 
     let app = match web_dir {
-        Some(dir) => {
-            let index = dir.join("index.html");
-            app.fallback_service(ServeDir::new(dir).fallback(ServeFile::new(index)))
-        }
+        Some(dir) => app.merge(static_routes(&dir)),
         None => app.fallback(|| async {
             (
                 StatusCode::SERVICE_UNAVAILABLE,
@@ -187,15 +214,55 @@ fn router(state: AppState, web_dir: Option<PathBuf>) -> Router {
         .with_state(state)
 }
 
-/// Everything except the login page and health check needs the token.
+/// The built web app. Hashed `/assets/*` files are immutable and a missing
+/// one is a 404, so a tab still running an older build fails clearly (and
+/// reloads, see main.tsx) instead of receiving `index.html` as JavaScript.
+/// Everything else falls back to `index.html`, which is never cached so a
+/// reload always picks up the current build.
+fn static_routes<S: Clone + Send + Sync + 'static>(dir: &std::path::Path) -> Router<S> {
+    fn immutable<B>(mut response: Response<B>) -> Response<B> {
+        if response.status().is_success() {
+            response.headers_mut().insert(
+                header::CACHE_CONTROL,
+                HeaderValue::from_static("public, max-age=31536000, immutable"),
+            );
+        }
+        response
+    }
+    fn revalidate<B>(mut response: Response<B>) -> Response<B> {
+        response
+            .headers_mut()
+            .insert(header::CACHE_CONTROL, HeaderValue::from_static("no-cache"));
+        response
+    }
+    let assets = ServiceExt::<Request>::map_response(ServeDir::new(dir.join("assets")), immutable);
+    let app = ServiceExt::<Request>::map_response(
+        ServeDir::new(dir).fallback(ServeFile::new(dir.join("index.html"))),
+        revalidate,
+    );
+    Router::new()
+        .nest_service("/assets", assets)
+        .fallback_service(app)
+}
+
+/// Everything except the login page, health check and PWA assets needs the token.
 async fn require_auth(State(state): State<AppState>, mut request: Request, next: Next) -> Response {
     let path = request.uri().path().to_owned();
     let path = path.as_str();
-    if path == "/login" || path == "/healthz" {
+    // The PWA manifest and icons are fetched without cookies by browsers,
+    // and are not sensitive.
+    let public = path == "/login"
+        || path == "/healthz"
+        || path == "/manifest.webmanifest"
+        || path.starts_with("/icons/");
+    if public {
         return next.run(request).await;
     }
-    let is_api =
-        path.starts_with("/rpc/") || matches!(path, "/events" | "/files" | "/proxy" | "/logout");
+    let is_api = path.starts_with("/rpc/")
+        || matches!(
+            path,
+            "/events" | "/files" | "/proxy" | "/upload" | "/logout"
+        );
     let credential = state.auth.credential(request.headers());
     request.extensions_mut().insert(credential);
     match credential {
@@ -265,6 +332,7 @@ fn login_html(error: Option<&str>) -> String {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>LLM Wiki · Sign in</title>
+<link rel="icon" type="image/png" href="/icons/icon-192.png">
 <style>
   :root {{ color-scheme: light dark; --bg: #ffffff; --fg: #1f2023; --muted: #6b6f76; --border: #d9dbe0; --accent: #2f6fed; }}
   @media (prefers-color-scheme: dark) {{ :root {{ --bg: #27282b; --fg: #ececee; --muted: #a0a3aa; --border: #3d3f44; --accent: #6b9bff; }} }}
@@ -288,4 +356,58 @@ fn login_html(error: Option<&str>) -> String {
 </body>
 </html>"#
     )
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use axum::body::Body;
+    use axum::http::Request as HttpRequest;
+
+    async fn get(router: &Router, path: &str) -> (StatusCode, Option<String>, String) {
+        let response = router
+            .clone()
+            .oneshot(HttpRequest::get(path).body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        let status = response.status();
+        let cache = response
+            .headers()
+            .get(header::CACHE_CONTROL)
+            .map(|v| v.to_str().unwrap().to_string());
+        let body = http_body_util::BodyExt::collect(response.into_body())
+            .await
+            .unwrap()
+            .to_bytes();
+        (status, cache, String::from_utf8_lossy(&body).into_owned())
+    }
+
+    #[tokio::test]
+    async fn serves_assets_immutably_and_404s_stale_ones() {
+        let dir = tempfile::tempdir().unwrap();
+        std::fs::create_dir_all(dir.path().join("assets")).unwrap();
+        std::fs::write(dir.path().join("index.html"), "<html>app</html>").unwrap();
+        std::fs::write(dir.path().join("assets/mermaid-NEW.js"), "export {}").unwrap();
+        let router: Router = static_routes(dir.path());
+
+        let (status, cache, _) = get(&router, "/assets/mermaid-NEW.js").await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(
+            cache.as_deref(),
+            Some("public, max-age=31536000, immutable")
+        );
+
+        let (status, _, body) = get(&router, "/assets/mermaid-OLD.js").await;
+        assert_eq!(
+            status,
+            StatusCode::NOT_FOUND,
+            "stale chunk must not get index.html"
+        );
+        assert!(!body.contains("<html>"));
+
+        let (status, cache, body) = get(&router, "/some/client/route").await;
+        assert_eq!(status, StatusCode::OK);
+        assert_eq!(cache.as_deref(), Some("no-cache"));
+        assert_eq!(body, "<html>app</html>");
+    }
 }

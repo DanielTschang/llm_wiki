@@ -62,7 +62,32 @@ describe("refreshProjectFileTree", () => {
       fileTree: [],
       projectPathIndex: { byPath: new Map(), filesByName: new Map() },
       dataVersion: 0,
+      fileTreeError: null,
     })
+  })
+
+  it("reports a failed load so the sidebar can offer a retry, and clears it once a refresh succeeds", async () => {
+    vi.useFakeTimers()
+    try {
+      mocks.listDirectory.mockRejectedValue("Path is outside the server's allowed folders: /tmp/project")
+
+      const failing = refreshProjectFileTree(project.path, { projectId: project.id })
+      await vi.runAllTimersAsync()
+      await failing
+      await vi.runAllTimersAsync()
+
+      expect(useWikiStore.getState().fileTreeError).toContain("outside the server's allowed folders")
+
+      mocks.listDirectory.mockImplementation(async (_path: string, options?: { maxDepth?: number }) =>
+        options?.maxDepth === 2 ? shallowTree : fullTree,
+      )
+      await refreshProjectFileTree(project.path, { projectId: project.id })
+      await vi.runAllTimersAsync()
+
+      expect(useWikiStore.getState().fileTreeError).toBeNull()
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it("updates the visible tree shallowly and refreshes the full resolver index in the background", async () => {

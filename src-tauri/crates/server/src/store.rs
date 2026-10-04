@@ -72,9 +72,27 @@ fn read(path: &Path) -> Result<Map<String, Value>, String> {
 }
 
 fn write(path: &Path, map: &Map<String, Value>) -> Result<(), String> {
+    write_private_json(path, map)
+}
+
+/// Atomically replaces `path` with `map` as pretty JSON, readable only by
+/// the owner: these files hold API keys.
+pub fn write_private_json(path: &Path, map: &Map<String, Value>) -> Result<(), String> {
     let raw = serde_json::to_string_pretty(map).map_err(|e| e.to_string())?;
     let tmp = path.with_extension("json.tmp");
-    fs::write(&tmp, raw).map_err(|e| format!("Failed to write {}: {e}", tmp.display()))?;
+    let mut options = fs::OpenOptions::new();
+    options.write(true).create(true).truncate(true);
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::OpenOptionsExt;
+        options.mode(0o600);
+    }
+    let mut file = options
+        .open(&tmp)
+        .map_err(|e| format!("Failed to write {}: {e}", tmp.display()))?;
+    std::io::Write::write_all(&mut file, raw.as_bytes())
+        .map_err(|e| format!("Failed to write {}: {e}", tmp.display()))?;
+    drop(file);
     fs::rename(&tmp, path).map_err(|e| format!("Failed to replace {}: {e}", path.display()))
 }
 

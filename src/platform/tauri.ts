@@ -22,7 +22,7 @@ export const tauriPlatform: Platform = {
   convertFileSrc: (path) => convertFileSrc(path),
   createHttpFetch: () => import("@tauri-apps/plugin-http").then((m) => m.fetch),
   loadStore: (name) => load(name, { autoSave: true, defaults: {} }),
-  openDialog: (options) => open(options),
+  openDialog: ({ allowUpload: _allowUpload, ...options }) => open(options),
   saveDialog: (options) => save(options),
   messageDialog: async (text, options) => {
     await message(text, options)

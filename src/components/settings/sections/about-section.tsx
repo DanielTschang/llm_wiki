@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { Download, RefreshCw, CheckCircle2, Sparkles } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { openUrl } from "@/platform"
+import { isDesktop, openUrl } from "@/platform"
 import { apiServerStatus, clipServerStatus } from "@/commands/fs"
 import { Button } from "@/components/ui/button"
 import { API_SERVER_HEALTH_URL, API_SERVER_PORT } from "@/lib/api-server-constants"
@@ -24,6 +24,8 @@ export function AboutSection() {
   const updateStore = useUpdateStore()
 
   useEffect(() => {
+    // The clip server and local API (127.0.0.1) exist only in the desktop app.
+    if (!isDesktop) return
     let alive = true
     clipServerStatus()
       .then((s) => {
@@ -106,8 +108,12 @@ export function AboutSection() {
   })()
   const rows: Array<{ label: string; value: string; mono?: boolean }> = [
     { label: t("settings.sections.about.version"), value: `v${__APP_VERSION__}`, mono: true },
-    { label: t("settings.sections.about.clipServer"), value: `${clipStatus}  @  127.0.0.1:19827`, mono: true },
-    { label: t("settings.sections.about.apiServer"), value: `${apiStatusDisplay}  @  127.0.0.1:${API_SERVER_PORT}`, mono: true },
+    ...(isDesktop
+      ? [
+          { label: t("settings.sections.about.clipServer"), value: `${clipStatus}  @  127.0.0.1:19827`, mono: true },
+          { label: t("settings.sections.about.apiServer"), value: `${apiStatusDisplay}  @  127.0.0.1:${API_SERVER_PORT}`, mono: true },
+        ]
+      : []),
   ]
 
   // About panel = user-initiated navigation. They came here on

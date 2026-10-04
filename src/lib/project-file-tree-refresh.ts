@@ -49,6 +49,15 @@ function mergeLoadedDisplayTree(existing: FileNode[], refreshed: FileNode[]): Fi
   })
 }
 
+/**
+ * Surfaces a failed listing instead of silently keeping an empty tree, which
+ * would mark every Sources/Related link as missing until a manual reload.
+ */
+function reportLoadFailure(projectId: string | undefined, projectPath: string, err: unknown): void {
+  if (!isStillCurrentProject(projectId, projectPath)) return
+  useWikiStore.getState().setFileTreeError(err instanceof Error ? err.message : String(err))
+}
+
 export async function refreshProjectFileTree(
   projectPath: string,
   options: RefreshProjectFileTreeOptions = {},
@@ -74,6 +83,7 @@ export async function refreshProjectFileTree(
       }
     } catch (err) {
       console.error("Failed to refresh project file tree:", err)
+      reportLoadFailure(currentProjectId, normalizedProjectPath, err)
     }
   }
 
@@ -100,9 +110,12 @@ export async function refreshProjectFileTree(
         useWikiStore
           .getState()
           .setProjectPathIndexFromTree([...fullTree, ...filterRawSourceTree(rawSourcesTree)])
+        // A complete listing means the project is readable again.
+        useWikiStore.getState().setFileTreeError(null)
       })
       .catch((err) => {
         console.error("Failed to refresh project path index:", err)
+        reportLoadFailure(currentProjectId, normalizedProjectPath, err)
       })
   }
 

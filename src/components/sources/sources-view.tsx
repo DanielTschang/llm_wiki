@@ -168,6 +168,7 @@ export function SourcesView() {
     if (!project) return
 
     const selected = await openDialog({
+      allowUpload: true,
       multiple: true,
       title: t("sources.importSourceFiles"),
       filters: [
@@ -226,6 +227,7 @@ export function SourcesView() {
     if (!project) return
 
     const selected = await openDialog({
+      allowUpload: true,
       directory: true,
       title: t("sources.importSourceFolder"),
     })
