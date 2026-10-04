@@ -1569,6 +1569,15 @@ impl AgentRuntime {
             }
 
             if action.action.eq_ignore_ascii_case("invalid_tool_json") {
+                let chars: Vec<char> = raw.chars().collect();
+                let head: String = chars.iter().take(1500).collect();
+                let tail: String = chars[chars.len().saturating_sub(500).max(1500.min(chars.len()))..]
+                    .iter()
+                    .collect();
+                eprintln!(
+                    "[agent] unparseable loop action ({} chars):\n{head}\n…\n{tail}\n[/agent]",
+                    chars.len()
+                );
                 observations.push(record_loop_tool_rejection(
                     "agent.action",
                     action.answer.unwrap_or_else(|| {
@@ -3082,6 +3091,11 @@ fn parse_agent_loop_action(raw: &str) -> AgentLoopAction {
         if let Ok(action) = serde_json::from_str::<AgentLoopAction>(json) {
             return normalize_agent_loop_action(action);
         }
+        if let Some(escaped) = escape_control_chars_in_json_strings(json) {
+            if let Ok(action) = serde_json::from_str::<AgentLoopAction>(&escaped) {
+                return normalize_agent_loop_action(action);
+            }
+        }
     }
     if looks_like_agent_tool_json(trimmed) {
         return AgentLoopAction {
@@ -3826,13 +3840,70 @@ fn parse_model_tool_plan(raw: &str) -> Result<ModelToolPlan, String> {
     serde_json::from_str(json_text).map_err(|err| format!("Invalid Agent tool plan JSON: {err}"))
 }
 
+/// Returns the first balanced `{...}` object, ignoring braces inside strings
+/// and any trailing text the model kept generating after the object.
 fn extract_json_object(raw: &str) -> Option<&str> {
     let start = raw.find('{')?;
-    let end = raw.rfind('}')?;
-    if end <= start {
-        return None;
+    let mut depth = 0usize;
+    let mut in_string = false;
+    let mut escaped = false;
+    for (offset, ch) in raw[start..].char_indices() {
+        if in_string {
+            match ch {
+                _ if escaped => escaped = false,
+                '\\' => escaped = true,
+                '"' => in_string = false,
+                _ => {}
+            }
+            continue;
+        }
+        match ch {
+            '"' => in_string = true,
+            '{' => depth += 1,
+            '}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(&raw[start..=start + offset]);
+                }
+            }
+            _ => {}
+        }
     }
-    Some(&raw[start..=end])
+    None
+}
+
+/// Escapes raw control characters (literal newlines, tabs, ...) inside JSON
+/// string literals. Some models emit them in long answers, which strict JSON
+/// rejects.
+fn escape_control_chars_in_json_strings(json: &str) -> Option<String> {
+    let mut out = String::with_capacity(json.len() + 16);
+    let mut in_string = false;
+    let mut escaped = false;
+    let mut changed = false;
+    for ch in json.chars() {
+        if in_string {
+            if escaped {
+                escaped = false;
+            } else if ch == '\\' {
+                escaped = true;
+            } else if ch == '"' {
+                in_string = false;
+            } else if (ch as u32) < 0x20 {
+                changed = true;
+                match ch {
+                    '\n' => out.push_str("\\n"),
+                    '\r' => out.push_str("\\r"),
+                    '\t' => out.push_str("\\t"),
+                    _ => out.push_str(&format!("\\u{:04x}", ch as u32)),
+                }
+                continue;
+            }
+        } else if ch == '"' {
+            in_string = true;
+        }
+        out.push(ch);
+    }
+    changed.then_some(out)
 }
 
 fn check_cancel(cancellation: Option<&AgentCancellationToken>) -> Result<(), String> {
@@ -5153,6 +5224,42 @@ mod tests {
         assert!(sanitize_user_input_request(&invalid)
             .unwrap_err()
             .contains("at least one valid field"));
+    }
+
+    #[test]
+    fn agent_loop_action_accepts_raw_newlines_inside_json_strings() {
+        // DeepSeek often emits literal newlines in long answers instead of `\n`.
+        let action = parse_agent_loop_action(
+            "{\"action\":\"final\",\"answer\":\"第一段\n\n**第二段**\n- \\\"引號\\\"\ttab\"}",
+        );
+
+        assert_eq!(action.action, "final");
+        assert_eq!(
+            action.answer.as_deref(),
+            Some("第一段\n\n**第二段**\n- \"引號\"\ttab")
+        );
+    }
+
+    #[test]
+    fn agent_loop_action_ignores_trailing_text_with_braces() {
+        // Models sometimes keep writing after the JSON object, echoing prompt
+        // text that contains more JSON-looking braces.
+        let action = parse_agent_loop_action(
+            "{\"action\":\"tool\",\"tool\":\"wiki.search\",\"query\":\"Cut OD {定義}\"}\n\nUser request:\nReturn the next JSON action now. Prefer {\"action\":\"final\",\"answer\":\"...\"}",
+        );
+
+        assert_eq!(action.action, "tool");
+        assert_eq!(action.tool.as_deref(), Some("wiki.search"));
+        assert_eq!(action.query.as_deref(), Some("Cut OD {定義}"));
+    }
+
+    #[test]
+    fn agent_loop_action_still_flags_truncated_json() {
+        let action = parse_agent_loop_action(
+            r#"{"action":"tool","tool":"workspace.write_file","path":"a.html","content":"<html>"#,
+        );
+
+        assert_eq!(action.action, "invalid_tool_json");
     }
 
     #[test]
