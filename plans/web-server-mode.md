@@ -1,6 +1,6 @@
 # Web server mode: self-hosted backend + browser frontend
 
-**Status:** Phases 1–3 done on `DanielTschang/second` (Phase 3 without Docker). Phases 4–5 not started.
+**Status:** Phases 1–4 done on `DanielTschang/second`, plus a Dockerfile. Phase 5 not started.
 
 **Goal:** Run LLM Wiki as a headless server (NAS / VPS / Docker, no
 desktop session) and use the existing React UI from any browser. The
@@ -149,7 +149,7 @@ app shippable.
   autostart/dialog/opener plugins, `mcp_server_entry_path` (resolves
   bundle resources), `open_project_folder`, `open_path_in_project`.
 
-### Phase 3 — `server` binary ✅ (Docker pending)
+### Phase 3 — `server` binary ✅
 - `src-tauri/crates/server` (`llm-wiki-server`): axum on `127.0.0.1:19830`
   by default. Run: `npm run build:web`, then
   `cargo run -p llm-wiki-server -- --web-dir ../dist-web` from `src-tauri`
@@ -185,20 +185,76 @@ app shippable.
 - Verified end to end: 21 curl checks (auth, CSRF, confinement, store,
   `/files` headers, proxy) plus a browser run (login → open project →
   preview page; SSE connected, file watcher events delivered).
-- **Not done yet:** Dockerfile (needs a Linux pdfium build), running the
-  tiny_http API/MCP and clip servers inside the server process, and
-  serving the server behind `--secure-cookie` HTTPS in a documented setup.
+- Docker: `Dockerfile` (web + worker build, server build with
+  protoc/libprotobuf-dev, the repo's Linux pdfium per `TARGETARCH`,
+  Debian slim runtime with the node binary for the worker) and
+  `docker-compose.yml` (data volume, loopback-only port, optional
+  `/projects` bind mount as an allowed root).
+- **Not done yet:** running the tiny_http API/MCP and clip servers inside
+  the server process, and a documented HTTPS reverse-proxy setup.
 
-### Phase 4 — Headless ingest
-Problem: ingest runs in the tab. Options, in order of preference:
-- **A. Node worker (recommended).** `src/lib/ingest-*` already runs in
-  Node under vitest (`isNodeEnv` paths in `tauri-fetch.ts`). Bundle a
-  `worker/` entry that runs the persisted ingest queue against the
-  server's `/rpc`, launched as a sidecar by `server`. Browser UI becomes
-  a viewer of queue state via SSE. No logic rewrite.
-- B. Keep ingest in the browser; the persisted queue already resumes on
-  reopen. Acceptable stopgap, poor for large batches.
-- C. Port ingest to Rust. Most robust long-term, largest cost.
+### Phase 4 — Headless ingest ✅
+Goal: closing every browser tab no longer stops ingest.
+
+Audit: `ingest-queue.ts` / `ingest.ts` (~5k lines) depend only on
+zustand stores (plain JS) and `@/platform`, so they run in Node. The UI
+polls `getQueue()` in-process; `ingest.ts` adds review items and updates
+activity items through stores; the browser auto-saves the *whole* review
+list to `.llm-wiki/review.json`.
+
+Design:
+- **Worker process.** `src/worker/main.ts`, bundled to
+  `dist-worker/ingest-worker.mjs`, supervised by `llm-wiki-server`
+  (spawned with Node, restarted on exit). It reaches the server over
+  loopback with the Bearer token using the existing web platform
+  (`/rpc`, `/events`), with Node's `fetch` instead of `/proxy` (no CORS
+  in Node). It hydrates settings from `app-state.json` and re-hydrates
+  on `app-store://changed`.
+- **Single owner of the queue.** The web build swaps
+  `@/lib/ingest-queue` for a remote module with the same API: it
+  mirrors `ingest://queue` snapshots from SSE and forwards mutations
+  (enqueue, cancel, retry, pause, …) as `ingest_command` RPCs that the
+  server relays to the worker. The worker publishes queue and activity
+  snapshots back through `worker_publish`.
+- **Review items without lost writes.** The worker never writes
+  `review.json`. It appends new items to a server-side inbox
+  (`review_inbox_append`, serialized by a mutex in the server); the
+  browser drains it (`review_inbox_take`) on project load and on
+  `ingest://review-inbox` events, then its usual auto-save persists them.
+- **v1 limits:** file watching stays browser-driven (the Rust watcher
+  holds one project at a time); files added while no tab is open are
+  picked up by the startup rescan when a tab next opens. `withProjectLock`
+  is per process, so edits in the UI during ingest are as safe as
+  concurrent edits from two tabs, not as safe as on desktop.
+- Docker image gains a Node runtime for the worker.
+
+As built:
+- `npm run build:worker` bundles `src/worker/main.ts` with all
+  dependencies into `dist-worker/ingest-worker.mjs` (Vite SSR build,
+  `--mode worker`, `.env.worker`). The platform's `worker` mode is the web
+  implementation with a Bearer token, direct `fetch` and a fetch-based SSE
+  client (`node-event-source.ts`).
+- The server spawns it when the bundle exists (`--worker-script`,
+  `--node`, `--no-worker`), with a per-run worker token
+  (`Credential::Worker`), keeps its stdin open as a liveness pipe, and
+  restarts it with backoff. `worker_*` RPCs are worker-only;
+  `ingest_command` fails fast when no heartbeat arrived in 30s.
+- `settings-hydration.ts` is shared by App.tsx and the worker; the worker
+  never writes settings and re-hydrates on `app-store://changed`.
+- The worker follows the project the tab last opened (`restoreQueue`
+  forwarded from the tab, `lastProject` on worker start).
+- Worker activity is mirrored under a `worker:` id prefix; review items
+  go through the inbox and are re-keyed by content id (`reviewIdFor`), so
+  reviews the owner already resolved stay resolved.
+- `ingest-queue-remote.test.ts` pins the remote module's exports to the
+  real queue's.
+- Verified end to end with a real model: a file imported in the web UI,
+  tab closed immediately, the worker finished the ingest alone (source
+  summary, concept pages, index/log, embeddings).
+- Still in the tab: the dedup queue and file watching (see v1 limits).
+
+Earlier alternatives kept for reference: keep ingest in the tab (resumes
+on reopen) or port ingest to Rust (largest cost).
 
 ### Phase 5 — Web UX polish
 - Server directory picker + drag-and-drop upload into `raw/sources/`.

@@ -31,6 +31,13 @@ export interface WebPlatformDeps {
   createEventSource: (url: string) => EventSource
   /** Called when the server reports the session is missing or expired. */
   onUnauthorized?: () => void
+  /** Bearer token instead of the browser session cookie (ingest worker). */
+  authToken?: string
+  /**
+   * Call user-configured endpoints directly instead of through `/proxy`.
+   * Only for Node, where there is no CORS to work around.
+   */
+  directFetch?: boolean
 }
 
 export function createWebPlatform(deps: WebPlatformDeps): Platform {
@@ -42,7 +49,11 @@ export function createWebPlatform(deps: WebPlatformDeps): Platform {
     const response = await deps.fetch(`${base}/rpc/${encodeURIComponent(command)}`, {
       method: "POST",
       credentials: "include",
-      headers: { "Content-Type": "application/json", [CLIENT_HEADER]: "web" },
+      headers: {
+        "Content-Type": "application/json",
+        [CLIENT_HEADER]: "web",
+        ...(deps.authToken ? { Authorization: `Bearer ${deps.authToken}` } : {}),
+      },
       body: JSON.stringify(args ?? {}),
     })
     const text = await response.text()
@@ -127,7 +138,7 @@ export function createWebPlatform(deps: WebPlatformDeps): Platform {
     invoke,
     listen,
     convertFileSrc: fileSrc,
-    createHttpFetch: async () => proxiedFetch,
+    createHttpFetch: async () => (deps.directFetch ? deps.fetch : proxiedFetch),
     loadStore,
     openDialog: async <T extends OpenDialogOptions>(options: T) => {
       const label = options.title ?? (options.directory ? "Folder path on the server" : "File path on the server")

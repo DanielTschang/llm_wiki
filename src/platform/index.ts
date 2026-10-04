@@ -5,8 +5,10 @@
  *
  * The desktop (Tauri) implementation is the default — including under
  * vitest, so existing `vi.mock("@tauri-apps/...")` mocks keep applying.
- * `vite build --mode web` sets VITE_LLM_WIKI_PLATFORM=web (see `.env.web`).
+ * `vite build --mode web` sets VITE_LLM_WIKI_PLATFORM=web (see `.env.web`);
+ * the Node ingest worker build sets `worker` (see `.env.worker`).
  */
+import { NodeEventSource } from "./node-event-source"
 import { tauriPlatform } from "./tauri"
 import { createWebPlatform } from "./web"
 import type { Platform } from "./types"
@@ -23,8 +25,30 @@ export type {
   UnlistenFn,
 } from "./types"
 
+/** Environment of the Node ingest worker, set by llm-wiki-server. */
+function workerEnv(name: string): string {
+  const value = (globalThis as { process?: { env: Record<string, string | undefined> } }).process?.env[name]
+  if (!value) throw new Error(`${name} is not set; the ingest worker must be started by llm-wiki-server`)
+  return value
+}
+
+function createWorkerPlatform(): Platform {
+  const token = workerEnv("LLM_WIKI_WORKER_TOKEN")
+  const fetch = globalThis.fetch.bind(globalThis)
+  return createWebPlatform({
+    baseUrl: workerEnv("LLM_WIKI_SERVER_URL"),
+    fetch,
+    authToken: token,
+    directFetch: true,
+    createEventSource: (url) =>
+      new NodeEventSource(url, { Authorization: `Bearer ${token}` }, fetch) as unknown as EventSource,
+  })
+}
+
 const platform: Platform =
-  import.meta.env.VITE_LLM_WIKI_PLATFORM === "web"
+  import.meta.env.VITE_LLM_WIKI_PLATFORM === "worker"
+    ? createWorkerPlatform()
+    : import.meta.env.VITE_LLM_WIKI_PLATFORM === "web"
     ? createWebPlatform({
         baseUrl: import.meta.env.VITE_LLM_WIKI_SERVER_URL ?? "",
         fetch: globalThis.fetch.bind(globalThis),

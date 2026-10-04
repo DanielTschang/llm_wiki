@@ -5,6 +5,7 @@ node_modules/
 dist/
 dist-ssr/
 dist-web/
+dist-worker/
 # RC artifacts pulled from CI for local Windows / Intel Mac verification.
 # These are pre-release binaries downloaded via `gh run download`, never
 # meant for the repo.

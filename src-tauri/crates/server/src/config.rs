@@ -50,6 +50,20 @@ pub struct Args {
     /// Mark the session cookie `Secure`. Enable when served over HTTPS.
     #[arg(long, env = "LLM_WIKI_SECURE_COOKIE")]
     pub secure_cookie: bool,
+
+    /// Ingest worker bundle (`npm run build:worker` →
+    /// `dist-worker/ingest-worker.mjs`). Defaults to that path when it
+    /// exists. Without a worker, ingest runs in the browser tab.
+    #[arg(long, env = "LLM_WIKI_WORKER_SCRIPT")]
+    pub worker_script: Option<PathBuf>,
+
+    /// Node.js executable used to run the worker.
+    #[arg(long, env = "LLM_WIKI_NODE", default_value = "node")]
+    pub node: PathBuf,
+
+    /// Do not start the ingest worker.
+    #[arg(long, env = "LLM_WIKI_NO_WORKER")]
+    pub no_worker: bool,
 }
 
 impl Args {
@@ -62,6 +76,16 @@ impl Args {
             .map(PathBuf::from)
             .unwrap_or_else(|| PathBuf::from("."));
         home.join(".llm-wiki-server")
+    }
+
+    pub fn resolved_worker_script(&self) -> Option<PathBuf> {
+        match &self.worker_script {
+            Some(script) => Some(script.clone()),
+            None => {
+                let default = PathBuf::from("dist-worker/ingest-worker.mjs");
+                default.is_file().then_some(default)
+            }
+        }
     }
 
     pub fn resolved_web_dir(&self) -> Option<PathBuf> {

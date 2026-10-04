@@ -1,0 +1,26 @@
+# Self-hosted LLM Wiki. Start with `docker compose up -d`, then read the
+# generated access token from `docker compose logs llm-wiki` (first start
+# only; it is also kept in the data volume as /data/server-token).
+services:
+  llm-wiki:
+    build: .
+    image: llm-wiki-server
+    restart: unless-stopped
+    ports:
+      # Loopback only. To reach it from other devices, put an HTTPS reverse
+      # proxy in front and set LLM_WIKI_SECURE_COOKIE=true.
+      - "127.0.0.1:19830:19830"
+    volumes:
+      # Settings, access token, and projects created in the web UI
+      # (/data/projects).
+      - llm-wiki-data:/data
+      # Optional: existing wiki projects on the host. Open them in the UI as
+      # /projects/<name>. The folder must be writable by uid 1000.
+      # - ./projects:/projects
+    environment:
+      LLM_WIKI_ALLOW_ROOTS: /projects
+      # LLM_WIKI_TOKEN: change-me          # instead of a generated token
+      # LLM_WIKI_SECURE_COOKIE: "true"     # when served over HTTPS
+
+volumes:
+  llm-wiki-data:

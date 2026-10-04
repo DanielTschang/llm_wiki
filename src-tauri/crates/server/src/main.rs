@@ -9,10 +9,11 @@ mod paths;
 mod proxy;
 mod rpc;
 mod store;
+mod worker;
 
 use std::net::SocketAddr;
 use std::path::PathBuf;
-use std::sync::Arc;
+use std::sync::{Arc, Mutex};
 
 use axum::extract::{DefaultBodyLimit, Request, State};
 use axum::http::{header, HeaderValue, Method, StatusCode};
@@ -30,6 +31,7 @@ use crate::auth::{Auth, Credential, CLIENT_HEADER};
 use crate::events::EventHub;
 use crate::paths::AllowedRoots;
 use crate::store::AppStore;
+use crate::worker::WorkerBridge;
 
 const MAX_RPC_BODY_BYTES: usize = 256 * 1024 * 1024;
 
@@ -41,6 +43,9 @@ pub struct AppState {
     roots: Arc<AllowedRoots>,
     auth: Arc<Auth>,
     allow_shell: bool,
+    worker: Arc<WorkerBridge>,
+    /// Serializes `.llm-wiki/review-inbox.json` read-modify-writes.
+    inbox_lock: Arc<Mutex<()>>,
 }
 
 #[tokio::main]
@@ -75,17 +80,20 @@ async fn run(args: config::Args) -> Result<(), String> {
     llm_wiki_core::runtime::install(tokio::runtime::Handle::current());
 
     let events = EventHub::new();
+    let worker_token = uuid::Uuid::new_v4().simple().to_string();
     let state = AppState {
         core: Arc::new(CoreContext::new(
             Some(data_dir.clone()),
             env!("CARGO_PKG_VERSION"),
             EventEmitter::new(events.clone()),
         )),
-        events,
         store: Arc::new(AppStore::new(&data_dir)),
         roots: Arc::new(roots),
-        auth: Arc::new(Auth::new(&token, args.secure_cookie)),
+        auth: Arc::new(Auth::new(&token, args.secure_cookie).with_worker_token(&worker_token)),
         allow_shell: args.allow_shell,
+        worker: Arc::new(WorkerBridge::new(events.clone())),
+        inbox_lock: Arc::new(Mutex::new(())),
+        events,
     };
 
     let web_dir = args.resolved_web_dir();
@@ -117,6 +125,27 @@ async fn run(args: config::Args) -> Result<(), String> {
     }
     if args.allow_shell {
         eprintln!("  WARNING: --allow-shell lets approved agent commands run on this machine");
+    }
+
+    match args.resolved_worker_script() {
+        Some(script) if !args.no_worker => {
+            eprintln!("  ingest:    worker {}", script.display());
+            // The worker always connects over loopback, whatever --bind is.
+            let host = if args.bind.is_unspecified() || args.bind.is_loopback() {
+                "127.0.0.1".to_string()
+            } else {
+                args.bind.to_string()
+            };
+            worker::supervise(worker::WorkerLaunch {
+                node: args.node.clone(),
+                script,
+                server_url: format!("http://{host}:{}", args.port),
+                token: worker_token,
+            });
+        }
+        _ => eprintln!(
+            "  ingest:    in the browser tab (no worker; build it with `npm run build:worker`)"
+        ),
     }
 
     axum::serve(listener, app)
@@ -159,15 +188,18 @@ fn router(state: AppState, web_dir: Option<PathBuf>) -> Router {
 }
 
 /// Everything except the login page and health check needs the token.
-async fn require_auth(State(state): State<AppState>, request: Request, next: Next) -> Response {
-    let path = request.uri().path();
+async fn require_auth(State(state): State<AppState>, mut request: Request, next: Next) -> Response {
+    let path = request.uri().path().to_owned();
+    let path = path.as_str();
     if path == "/login" || path == "/healthz" {
         return next.run(request).await;
     }
     let is_api =
         path.starts_with("/rpc/") || matches!(path, "/events" | "/files" | "/proxy" | "/logout");
-    match state.auth.credential(request.headers()) {
-        Credential::Bearer => next.run(request).await,
+    let credential = state.auth.credential(request.headers());
+    request.extensions_mut().insert(credential);
+    match credential {
+        Credential::Bearer | Credential::Worker => next.run(request).await,
         Credential::Cookie => {
             let changes_state = request.method() != Method::GET && request.method() != Method::HEAD;
             let needs_client_header =

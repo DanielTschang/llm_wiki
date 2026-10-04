@@ -1,6 +1,6 @@
 import path from "path"
 import { readFileSync } from "fs"
-import { defineConfig } from "vite"
+import { defineConfig, type UserConfig } from "vite"
 import react from "@vitejs/plugin-react"
 import tailwindcss from "@tailwindcss/vite"
 
@@ -17,13 +17,32 @@ const webServerProxy = Object.fromEntries(
   ["/rpc", "/events", "/files", "/proxy", "/login", "/logout"].map((path) => [path, { target: webServerTarget }]),
 )
 
+// `--mode worker`: the Node ingest worker llm-wiki-server supervises,
+// bundled with its dependencies into dist-worker/ingest-worker.mjs.
+const workerBuild: UserConfig["build"] = {
+  ssr: "src/worker/main.ts",
+  outDir: "dist-worker",
+  target: "node22",
+  rolldownOptions: { output: { entryFileNames: "ingest-worker.mjs" } },
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(async ({ mode }) => ({
-  plugins: [react(), tailwindcss()],
+  plugins: mode === "worker" ? [] : [react(), tailwindcss()],
 
   resolve: {
-    alias: { "@": path.resolve(__dirname, "./src") },
+    alias: [
+      // In the browser build the ingest queue runs in the server's worker;
+      // the tab gets a remote proxy with the same API.
+      ...(mode === "web"
+        ? [{ find: /^@\/lib\/ingest-queue$/, replacement: path.resolve(__dirname, "./src/lib/ingest-queue-remote.ts") }]
+        : []),
+      { find: "@", replacement: path.resolve(__dirname, "./src") },
+    ],
   },
+
+  build: mode === "worker" ? workerBuild : undefined,
+  ssr: mode === "worker" ? { noExternal: true as const } : undefined,
 
   define: {
     __APP_VERSION__: JSON.stringify(pkgJson.version),

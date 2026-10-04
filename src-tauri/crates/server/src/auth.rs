@@ -22,11 +22,14 @@ const TOKEN_FILE: &str = "server-token";
 pub enum Credential {
     Cookie,
     Bearer,
+    /// The ingest worker this server spawned (its own per-run token).
+    Worker,
     None,
 }
 
 pub struct Auth {
     token_digest: [u8; 32],
+    worker_token_digest: Option<[u8; 32]>,
     session_value: String,
     secure_cookie: bool,
 }
@@ -39,9 +42,17 @@ impl Auth {
         ));
         Self {
             token_digest,
+            worker_token_digest: None,
             session_value,
             secure_cookie,
         }
+    }
+
+    /// Accept `token` as the worker credential. Kept separate from the
+    /// owner token so the owner's secret is never handed to a subprocess.
+    pub fn with_worker_token(mut self, token: &str) -> Self {
+        self.worker_token_digest = Some(Sha256::digest(token.as_bytes()).into());
+        self
     }
 
     pub fn token_matches(&self, candidate: &str) -> bool {
@@ -55,8 +66,15 @@ impl Auth {
             .and_then(|v| v.to_str().ok())
             .and_then(|v| v.strip_prefix("Bearer "))
         {
-            if self.token_matches(bearer.trim()) {
+            let digest: [u8; 32] = Sha256::digest(bearer.trim().as_bytes()).into();
+            if bool::from(digest.ct_eq(&self.token_digest)) {
                 return Credential::Bearer;
+            }
+            if self
+                .worker_token_digest
+                .is_some_and(|worker| bool::from(digest.ct_eq(&worker)))
+            {
+                return Credential::Worker;
             }
         }
         let cookie_ok = headers
@@ -167,6 +185,20 @@ mod tests {
             Credential::None,
             "the raw token is not a valid session value"
         );
+    }
+
+    #[test]
+    fn worker_token_is_a_distinct_credential() {
+        let auth = Auth::new("owner", false).with_worker_token("worker");
+        assert_eq!(
+            auth.credential(&headers(&[(header::AUTHORIZATION, "Bearer worker")])),
+            Credential::Worker
+        );
+        assert_eq!(
+            auth.credential(&headers(&[(header::AUTHORIZATION, "Bearer owner")])),
+            Credential::Bearer
+        );
+        assert!(!auth.token_matches("worker"), "worker token cannot sign in");
     }
 
     #[test]

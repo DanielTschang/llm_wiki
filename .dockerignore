@@ -1,0 +1,21 @@
+# Only what the web build and llm-wiki-server need; keeps the context
+# small (src-tauri/target alone is several GB).
+**/node_modules
+**/target
+**/dist
+**/dist-web
+**/dist-worker
+**/dist-ssr
+.git
+.github
+.env
+.env.*
+!.env.web
+!.env.worker
+assets
+extension
+mcp-server
+plans
+scripts
+projects
+*.md

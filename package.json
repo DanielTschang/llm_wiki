@@ -9,6 +9,7 @@
     "typecheck": "tsc --build --pretty",
     "build": "npm run typecheck && vite build",
     "build:web": "npm run typecheck && vite build --mode web --outDir dist-web",
+    "build:worker": "vite build --mode worker",
     "build:desktop": "npm --prefix mcp-server ci && npm run mcp:build && npm run build",
     "preview": "vite preview",
     "test": "npm run test:mocks && npm run test:llm",
