@@ -102,6 +102,18 @@ describe("detectLanguage", () => {
       ].join("\n"))).toBe("English")
     })
 
+    it("detects Swahili via word patterns", () => {
+      expect(detectLanguage("Watoto wa shule wanasoma kitabu katika darasa na mwalimu wao")).toBe("Swahili")
+    })
+
+    it("does not classify English optics text using the acronym NA as Swahili", () => {
+      expect(detectLanguage([
+        "# Köhler illumination",
+        "The ratio of the illumination NA to the projection NA (sigma) sets the",
+        "spatial coherence and therefore the trade-off between resolution and depth of focus.",
+      ].join("\n"))).toBe("English")
+    })
+
     it("detects Spanish via word patterns", () => {
       expect(detectLanguage("el nino y los libros del colegio que son para todos")).toBe("Spanish")
     })

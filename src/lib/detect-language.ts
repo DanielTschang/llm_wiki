@@ -337,8 +337,14 @@ function detectLatinLanguage(text: string): string | null {
     if (/\b(yang|dari|untuk|dengan|adalah)\b/.test(lower)) return "Indonesian"
   }
 
-  // Swahili — common patterns
-  if (/\b(na|ya|wa|ni|kwa|katika|hii|hiyo)\b/.test(lower)) {
+  // Swahili — require multiple independent function-word signals, as for
+  // German. A single `na` is the optics acronym NA (numerical aperture) in
+  // English lithography/microscopy text, and previously switched such
+  // sources to Swahili in auto mode.
+  const swahiliSignals = new Set(
+    lower.match(/\b(?:na|ya|wa|ni|kwa|katika|hii|hiyo)\b/g) ?? [],
+  )
+  if (swahiliSignals.size >= 2) {
     return "Swahili"
   }
 
