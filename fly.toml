@@ -1,0 +1,42 @@
+# Fly.io deployment of the self-hosted web edition (see START.md).
+#
+# One machine with one volume: the ingest worker, live events and file
+# locks live in a single process, so the app must not scale out. Deploys
+# replace the machine (the volume cannot attach to two at once).
+
+app = "llmwiki-danchang11"
+primary_region = "nrt"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  # Fly terminates HTTPS, so the session cookie can require it.
+  LLM_WIKI_SECURE_COOKIE = "true"
+
+[mounts]
+  source = "llm_wiki_data"
+  destination = "/data"
+
+[http_service]
+  internal_port = 19830
+  force_https = true
+  # Ingest keeps running in the background worker with no browser open;
+  # an idle-stopped machine would interrupt it.
+  auto_stop_machines = "off"
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "30s"
+    method = "GET"
+    path = "/healthz"
+    timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "1gb"
+
+# Headroom for large PDFs and vector indexing on a 1 GB machine.
+swap_size_mb = 1024

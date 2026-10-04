@@ -67,12 +67,15 @@ COPY --from=web /app/dist-web /opt/llm-wiki/web
 # binary is needed at runtime.
 COPY --from=web /usr/local/bin/node /usr/local/bin/node
 COPY --from=web /app/dist-worker /opt/llm-wiki/worker
+COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 
-USER llmwiki
+# Starts as root only to take ownership of a root-owned volume (Fly.io),
+# then runs the server as `llmwiki` (docker/entrypoint.sh).
 # Inside the container the server must listen on all interfaces; keep it
 # private with the host port mapping (docker-compose.yml publishes to
 # 127.0.0.1 only).
-ENV LLM_WIKI_DATA_DIR=/data \
+ENV HOME=/home/llmwiki \
+    LLM_WIKI_DATA_DIR=/data \
     LLM_WIKI_BIND=0.0.0.0 \
     LLM_WIKI_PORT=19830 \
     LLM_WIKI_WEB_DIR=/opt/llm-wiki/web \
@@ -81,4 +84,5 @@ ENV LLM_WIKI_DATA_DIR=/data \
     PDFIUM_DYNAMIC_LIB_PATH=/opt/llm-wiki/lib/libpdfium.so
 VOLUME ["/data"]
 EXPOSE 19830
+ENTRYPOINT ["docker-entrypoint"]
 CMD ["llm-wiki-server"]
