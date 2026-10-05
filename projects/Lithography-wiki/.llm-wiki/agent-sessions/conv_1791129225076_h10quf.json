@@ -1,0 +1,27 @@
+{
+  "sessionId": "conv_1791129225076_h10quf",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "overlay是什麼？ 有什麼相關的文件嗎？",
+      "timestamp": 1791129234244
+    },
+    {
+      "role": "assistant",
+      "content": "## Overlay（疊對）是什麼？\n\n**Overlay 是微影中一層圖形相對晶圓上既有圖形的位置誤差**——也就是「新曝光層有沒有對準下面的舊層」。依 [[wiki/concepts/overlay-控制.md]] 的定義，overlay 控制管理的是**層與層之間**的相對位置誤差；這與 **registration**（圖形相對絕對座標網格的位置）是兩件事，兩者不可混用。\n\n### 量測與誤差來源\n- **box-in-box**：以兩側間隙差的一半估計位置差。可抵消對稱的 CD 變化，但**無法抵消不對稱**。[[aim]] 利用多條帶改善精密度與製程穩健性。\n- **TIS**（tool induced shift）：採 `TIS = Overlay(0°) + Overlay(180°)`。固定 TIS 可校正，**變動的 TIS 才是不確定度來源**。\n- **WIS**（wafer induced shift）：標靶不對稱造成，可能與量測焦距交互作用，**不保證能用固定偏移修正**。\n\n### 模型與可識別性\n基本線性模型含晶圓與場內各兩個旋轉、倍率項，加上共用的兩個平移項，共 **10 個係數**。重點限制：\n- 平移**無法單從此模型分離**為晶圓或 reticle 來源。\n- **backlash** 另加兩個隨掃描方向改號的平移項。\n- 高階畸變、reticle registration、stage signature 需額外表徵（見下方方法論）。\n- **殘差不能未經檢查就視為純隨機。**\n\n### 實務用途\noverlay 資料可用於批次放行、曝光工具設定修正與量測診斷。稀疏量測點的最大值未必代表未取樣區域；較有意義的做法是結合模型與誤差估計，預測每個 die 的 **overlay-limited yield**，再比較良率損失與重工成本。可修正項是對已處理批次的回溯估計，用於下一批的 APC 仍依賴誤差的時間穩定性。\n\n## 相關文件\n| 頁面 | 內容 |\n|---|---|\n| [[wiki/concepts/overlay-控制.md]] | 主概念頁：量測偏差、模型與可識別性、批次處置 |\n| [[wiki/methodology/overlay-fingerprint-表徵.md]] | overlay fingerprint 的表徵方法（工具匹配等） |\n| [[wiki/comparisons/overlay-與-pattern-placement-error-比較.md]] | overlay 與 pattern placement error（PPE）的區分 |\n| [[wiki/concepts/aim.md]] | AIM 標靶，改善 overlay 量測精密度 |\n| [[wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md]] | 來源文件（Optical Lithography, ch8, §8.4） |\n| [[wiki/concepts/adi-與重工.md]] | 與重工流程的關聯 |\n\n以上概念頁的來源皆為 `optical-lithography/08 - ch8.pdf`，§8.4。",
+      "timestamp": 1791129234244
+    },
+    {
+      "role": "user",
+      "content": "cut od你會知道是什麼嗎?",
+      "timestamp": 1791129259980
+    },
+    {
+      "role": "assistant",
+      "content": "## 「Cut OD」是什麼意思？\n\n老實說，**「cut OD」不是本 wiki（Lithography 專案）既有文件裡已定義的術語**——我在 overlay 控制、ADI/重工、光學微影等頁面與來源（`optical-lithography` ch1/ch8/ch10）中都找不到這個組合的既定用法。所以我只能根據半導體製程的一般語意來推測，並標明哪些是推論、哪些頁面可能相關。\n\n### 一般語意拆解\n\n- **OD**：在 CMOS 製程裡通常指 **oxide definition / active area（主動區）**。定義 OD 的那層光罩（OD mask / active mask）框出 STI 隔離之間的矽主動區。\n- **Cut（cut mask / cutting）**：指用一個**切割光罩**去「切斷」原本連續的圖形，把它分離成多段。常見於：\n  - **Cut mask for poly/line**（切斷連續的閘極/線段，做出隔離的 line end）\n  - **Cut metal / cut via**（SADP/SAQP 流程中，線是週期性間距的，靠 cut 光罩斷開成獨立導線或通孔）\n- 因此 **cut OD** 最可能的意思是：**用一個切割光罩把（原本連續或通用的）OD 圖形切斷**，以定義出真正獨立的主動區島塊——即 **OD cut / active cut**。這是多重曝光、SADP 等 advanced patterning 流程會用到的步驟類型。\n\n### 這是推論，不是本 wiki 的既有定義\n\n我這樣解讀是基於一般半導體製程知識，**並非**本 wiki 已收錄的內容。如果你指的是某家公司/某份文件裡特定的定義（例如某代製程的 OD cut layer 命名），需要你補充來源我才能對上。\n\n### 可能相關的本 wiki 文件\n\n| 頁面 | 為何相關 |\n|---|---|\n| [[wiki/concepts/adi-與重工.md]] | ADI（after-develop inspection）與重工，涵蓋「圖形定義後量測/判定」的流程概念 |\n| [[wiki/concepts/光學微影.md]] | 製程整合總覽（圖案轉移、光阻、顯影等） |\n| [[wiki/concepts/overlay-控制.md]] | 若是後段切斷層，層與層對準即 overlay 議題 |\n| [[wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md]] | 微影製程與圖案轉移背景（含蝕刻/遮罩概念） |\n| [[wiki/concepts/關鍵形狀誤差與邊緣位置誤差.md]] | cut 會產生 line end，屬 edge/關鍵形狀誤差議題 |\n\n### 需要什麼才能給你確定答案\n\n- 你指的是「OD 這層的 cut mask」還是「把 OD 切斷的製程步驟」？\n- 是 SADP/SAQP 那種 cutting 流程，還是單純 active area 的隔離定義？\n- 若有來源文件（製程 flow、光罩層命名表），我可以把它建成 wiki 頁面並交叉連結到上面的概念頁。",
+      "timestamp": 1791129259980
+    }
+  ],
+  "updatedAt": 1791129259980
+}

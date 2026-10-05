@@ -1,0 +1,430 @@
+[
+  {
+    "id": "msg_1790998889024_5_0whihf",
+    "role": "user",
+    "content": "wiki中 有哪些知識牽涉到CD?",
+    "timestamp": 1790998889024,
+    "conversationId": "conv_1790998886019_w98742"
+  },
+  {
+    "id": "msg_1790998900376_6_6w2hrh",
+    "role": "assistant",
+    "content": "以下是這個 wiki 中與 CD（critical dimension，關鍵尺寸）直接相關的知識，依頁面類型分組。\n\n## 1. 核心概念\n- **[[mask-error-enhancement-factor]]**（MEEF）— 遮罩 CD 誤差被放大到晶圓 CD 的倍率，是 CD 控制的核心指標。\n- **[[關鍵形狀誤差與邊緣位置誤差]]** — CD 誤差與邊緣位置誤差（EPE）的關係。\n- **[[圖案倒塌]]** — 圖案倒塌是一種 CD 失效機制（見下方 finding）。\n- **[[焦距與曝光製程窗口]]** — 製程窗口的定義以 CD 容差為軸。\n- **[[線端縮短]]** — 線端 CD 縮短現象。\n- **[[nils-與影像邊緣品質]]** — NILS 決定影像邊緣品質，進而決定 CD 控制。\n\n## 2. Findings（實證結果）\n- **[[圖案倒塌先於-cd-規格失效]]**（wiki/findings/圖案倒塌先於-cd-規格失效.md）— 圖案倒塌會在到達 CD 規格極限之前先發生，即 CD 規格並非最嚴格的限制條件。\n- **[[低-k1-光阻對比度影響-meef]]** — 低 k1 下光阻對比度對 MEEF（CD 誤差放大）的影響。\n\n## 3. Methodology（方法）\n- **[[composite-cd-空間分解]]**（wiki/methodology/composite-cd-空間分解.md）— 把 composite CD 誤差分解成不同空間頻率成分，用於分析 CD 誤差來源。\n- **[[雙標靶劑量與焦距監控]]** — 以 CD 量測驅動的劑量／焦距控制。\n\n## 4. Synthesis\n- **[[微影資訊傳遞與-cd-誤差傳播]]**（wiki/synthesis/微影資訊傳遞與-cd-誤差傳播.md）— 串連 NILS、MEEF、LWR/LER、PEB 擴散等，描述 CD 誤差如何從遮罩經光學、光阻一路傳播到最終 CD。\n\n## 5. Source 頁面（提供 CD 論述的來源）\n- **[[19-optical-lithography--8-08-ch8--1az2fh0]]** — 半導體製造中的微影控制：CD 量測、composite CD、MEEF、製程窗口。\n- **[[19-optical-lithography--9-10-ch10--y2hwiy]]** — 解析度增強技術與可製造解析度：特徵 CD 解析度、duty cycle、DOF 與曝光裕度下的 CD 控制。\n- **[[19-optical-lithography--8-07-ch7--dxj4cs]]** — 光阻顯影動力學與對比度：決定最終 CD 的光阻端因素。\n- 相關上游來源：[[19-optical-lithography--8-01-ch1--cmoy1o]]、[[19-optical-lithography--8-02-ch2--k73j1g]]。\n\n## 6. Query（未解問題）\n- **[[製程窗口橢圓應採何種聯合覆蓋率]]** — 涉及 CD 容差在曝光—焦距二維空間中的聯合覆蓋率設定。\n- 索引中亦見 **[[不等酸與-quencher-擴散係數如何影響-nils-與-ler-最佳化]]**（與 CD 品質的間接關聯）。\n\n## 關聯圖（概念層）\n```mermaid\ngraph LR\n  A[遮罩 CD 誤差] -->|MEEF| B[晶圓 CD]\n  N[NILS/影像邊緣品質] --> B\n  R[光阻對比度] --> B\n  P[PEB 擴散] --> B\n  B --> C[composite CD 空間分解]\n  B --> D[製程窗口/焦距與曝光]\n  B --> E[CD 失效: 圖案倒塌 / 線端縮短]\n  F[低 k1] --> R\n  A --> G[微影資訊傳遞與 CD 誤差傳播]\n```\n\n**觀察**：本 wiki 的 CD 知識主軸是一條「誤差傳播鏈」— 遮罩誤差（MEEF 放大）→ 光學（NILS、NA、製程窗口）→ 光阻（對比度、PEB 擴散）→ 最終 CD 及其失效模式。其中 composite CD 空間分解提供量測與分析框架，而 synthesis 頁面 [[微影資訊傳遞與-cd-誤差傳播]] 是把這些環節串起來的樞紐頁。\n\n（未見專門以「CD」為標題的 entity 或 concept 頁；CD 相關內容散佈於上述頁面，若要系統化，可考慮新增一個 `critical-dimension` concept 頁作為聚合點。）",
+    "timestamp": 1790998900376,
+    "conversationId": "conv_1790998886019_w98742",
+    "references": [
+      {
+        "title": "圖案倒塌先於 CD 規格失效",
+        "path": "wiki/findings/圖案倒塌先於-cd-規格失效.md",
+        "kind": "wiki",
+        "snippet": "--- type: finding title: 圖案倒塌先於 CD 規格失效 created: 2026-10-03 updated: 2026-10-03 tags: [圖案倒塌, 製程窗口, 模型] related: [圖..."
+      },
+      {
+        "title": "composite CD 空間分解",
+        "path": "wiki/methodology/composite-cd-空間分解.md",
+        "kind": "wiki",
+        "snippet": "--- type: methodology title: composite CD 空間分解 created: 2026-10-03 updated: 2026-10-03 tags: [微影, 統計, CD] related: [mask-..."
+      },
+      {
+        "title": "微影資訊傳遞與 CD 誤差傳播",
+        "path": "wiki/synthesis/微影資訊傳遞與-cd-誤差傳播.md",
+        "kind": "wiki",
+        "snippet": "--- type: synthesis title: 微影資訊傳遞與 CD 誤差傳播 created: 2026-10-03 updated: 2026-10-03 tags: [optical-lithography, error-..."
+      },
+      {
+        "title": "解析度增強技術與可製造解析度",
+        "path": "wiki/sources/19-optical-lithography--9-10-ch10--y2hwiy.md",
+        "kind": "wiki",
+        "snippet": "...改善影像及共同製程窗口。  ## 解析度的三種意義  - **特徵解析度**：指定圖案在要求的 DOF、曝光裕度與光阻輪廓規格下，可列印的最小尺寸。主要限制是 CD 與輪廓控制逐漸惡化，而非單一硬截止。 - **節距解析度**：指定 duty cycle 與 DOF 下，可列印的最小節距。本章將 duty cycle 定義..."
+      },
+      {
+        "title": "Wiki Index",
+        "path": "wiki/index.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "... PEB - [[findings/酸擴散造成-ler-雜訊與梯度權衡]] — 酸擴散造成 LER 雜訊與梯度權衡 - [[synthesis/微影資訊傳遞與-cd-誤差傳播]] — 微影資訊傳遞與 CD 誤差傳播 - [[queries/不等酸與-quencher-擴散係數如何影響-nils-與-ler-最佳化]] — ...",
+        "graphRelations": [
+          "Mask Error Enhancement Factor (MEEF)",
+          "composite CD 空間分解",
+          "圖案倒塌先於 CD 規格失效",
+          "微影資訊傳遞與 CD 誤差傳播",
+          "解析度增強技術與可製造解析度"
+        ]
+      },
+      {
+        "title": "光阻顯影動力學、對比度與顯影路徑",
+        "path": "wiki/sources/19-optical-lithography--8-07-ch7--dxj4cs.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 39 related link(s)"
+      },
+      {
+        "title": "半導體製造中的微影控制",
+        "path": "wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 38 related link(s)"
+      },
+      {
+        "title": "光學微影基礎與半導體製程整合",
+        "path": "wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 25 related link(s)"
+      },
+      {
+        "title": "空中像形成的基礎",
+        "path": "wiki/sources/19-optical-lithography--8-02-ch2--k73j1g.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 33 related link(s)"
+      }
+    ],
+    "agentSteps": [
+      {
+        "id": "backend-0-skills.load-completed",
+        "type": "tool_result",
+        "tool": "project_file_read",
+        "message": "35 skill(s) available",
+        "status": "success",
+        "timestamp": 1790998889134
+      },
+      {
+        "id": "backend-1-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "CD critical dimension",
+        "status": "running",
+        "timestamp": 1790998890492
+      },
+      {
+        "id": "backend-2-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 5 new, mode=hybrid, tokenHits=45, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1790998891472
+      },
+      {
+        "id": "backend-3-graph.search-started",
+        "type": "tool_call",
+        "tool": "graph_search",
+        "message": "CD",
+        "status": "running",
+        "timestamp": 1790998892176
+      },
+      {
+        "id": "backend-4-graph.search-completed",
+        "type": "tool_result",
+        "tool": "graph_search",
+        "message": "5 result(s), 4 new",
+        "status": "success",
+        "timestamp": 1790998892193
+      },
+      {
+        "id": "backend-5-graph.search-started",
+        "type": "tool_call",
+        "tool": "graph_search",
+        "message": "CD 關鍵尺寸 誤差",
+        "status": "running",
+        "timestamp": 1790998893151
+      },
+      {
+        "id": "backend-6-graph.search-completed",
+        "type": "tool_result",
+        "tool": "graph_search",
+        "message": "5 result(s), 1 new",
+        "status": "success",
+        "timestamp": 1790998893169
+      },
+      {
+        "id": "backend-7-graph.search-started",
+        "type": "tool_call",
+        "tool": "graph_search",
+        "message": "CD 臨界尺寸 criticism dimension",
+        "status": "running",
+        "timestamp": 1790998894163
+      },
+      {
+        "id": "backend-8-graph.search-completed",
+        "type": "tool_result",
+        "tool": "graph_search",
+        "message": "5 result(s), 0 new",
+        "status": "success",
+        "timestamp": 1790998894181
+      }
+    ]
+  },
+  {
+    "id": "msg_1790998963111_7_mpflby",
+    "role": "user",
+    "content": "cut od你會知道是什麼嗎?",
+    "timestamp": 1790998963111,
+    "conversationId": "conv_1790998886019_w98742"
+  },
+  {
+    "id": "msg_1790998971631_8_u6ib65",
+    "role": "assistant",
+    "content": "「cut OD」在我們這個 wiki 的脈絡下，我推測你指的是 **cut open/diffusion（OD = oxide definition / active area）**——也就是把「定義主動區（OD/active）的那層圖案」用切斷的方式來做（常見於 **cut-mask 製程**：先畫出一整條連續的 OD/active，再用一道「cut OD」遮罩把不要的地方切開，形成彼此隔離的主動區）。這是先進節點常用的 **cut mask / trim mask** 手法之一（同類還有 cut poly、cut metal 等）。\n\n不過要說明清楚：**我目前檢索到的 wiki 頁面裡，並沒有直接以「cut OD」或「OD / active area 切斷遮罩」為主題的內容。** 現有 CD 相關知識集中在光阻、光學成像、MEEF、NILS、製程窗口等（例如 [[微影資訊傳遞與-cd-誤差傳播]]、[[mask-error-enhancement-factor]]、[[焦距與曝光製程窗口]]），其中 [[19-optical-lithography--8-08-ch8--1az2fh0]] 有談到 ADI 與重工、composite CD 等量測控制，但未見 cut-mask OD 的專門討論。\n\n所以：\n- 如果你的意思是 **cut mask 切斷 OD（active area）**，那確實是這層意思，但本 wiki 尚未收錄相關頁面。\n- 如果你指的是別的縮寫（例如某個量測參數或特定公司的術語），請補充上下文，我再幫你查。\n\n需要的話，我可以幫你新建一個 concept 頁（例如 `cut-mask-od` 或 `cut-mask-製程`）並串接到既有的 CD 誤差傳播鏈，但那需要你先確認語意並明示要寫入。",
+    "timestamp": 1790998971631,
+    "conversationId": "conv_1790998886019_w98742",
+    "references": [
+      {
+        "title": "光阻顯影動力學、對比度與顯影路徑",
+        "path": "wiki/sources/19-optical-lithography--8-07-ch7--dxj4cs.md",
+        "kind": "wiki",
+        "snippet": "...cal-lithography, photoresist, development] related: [chris-mack, original-mack-model, enhanced-kinetic-model, notch-model, critical-ionization-model, 表面抑制, 光阻理論對比..."
+      },
+      {
+        "title": "傳統光阻的曝光與烘烤化學",
+        "path": "wiki/sources/19-optical-lithography--8-05-ch5--x0rq4s.md",
+        "kind": "wiki",
+        "snippet": "...dated: 2026-10-03 tags: [光學微影, 光阻, 曝光, 烘烤] related: [chris-mack, dnq, novolac, kodak-820, dill-abc-參數, 曝光互易性, 修正-fujita-doolittle-模型, peb-擴散與-dpsf, abc-透射率全曲線擬合, ..."
+      },
+      {
+        "title": "光阻內成像：駐波與 swing curves",
+        "path": "wiki/sources/19-optical-lithography--8-04-ch4--ccwms.md",
+        "kind": "wiki",
+        "snippet": "...2)\\)。  多層底膜可整合為複數有效反射係數。其幅值控制干涉幅度，相位控制振盪位置與光阻底部曝光；因此，僅追蹤強度反射率不足以預測 footing、undercut 或 CD 變動。本章 nitride／oxide／silicon 案例中，約 ±20 nm 的 nitride 厚度變化已造成顯著輪廓差異，但不是通用臨界值。..."
+      },
+      {
+        "title": "低 k1 光阻對比度影響 MEEF",
+        "path": "wiki/findings/低-k1-光阻對比度影響-meef.md",
+        "kind": "wiki",
+        "snippet": "...tags: [模擬, 光阻對比度, MEEF] related: [mask-error-enhancement-factor, original-mack-model, 光阻理論對比度與量測對比度] sources: [\"optical-lithography/08 - ch8.pdf\"] source: \"[[19-o..."
+      },
+      {
+        "title": "Wiki Index",
+        "path": "wiki/index.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "...concepts/attenuated-psm]] — attenuated PSM - [[concepts/自然解析度]] — 自然解析度 - [[methodology/model-based-opc-校準與迭代]] — model-based OPC 校準與迭代 - [[comparisons/rule-based...",
+        "graphRelations": [
+          "低 k1 光阻對比度影響 MEEF",
+          "傳統光阻的曝光與烘烤化學",
+          "光學微影基礎與半導體製程整合",
+          "光阻內成像：駐波與 swing curves",
+          "光阻顯影動力學、對比度與顯影路徑"
+        ]
+      },
+      {
+        "title": "半導體製造中的微影控制",
+        "path": "wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md",
+        "kind": "wiki",
+        "snippet": "...scan direction 改號的 backlash 項後為 12 個。[[overlay-fingerprint-表徵]]補充高階工具差異。批次放行宜估計 die 層級 overlay-limited yield，而不只檢查稀疏量測點的最大誤差。  ## 條件化製程窗口  [[焦距與曝光製程窗口]]是 CD、sidewa..."
+      },
+      {
+        "title": "光學微影基礎與半導體製程整合",
+        "path": "wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md",
+        "kind": "wiki",
+        "snippet": "... Principles of Optical Lithography: The Science of Microfabrication* 第 1 章 *Introduction to Semiconductor Lithography*，涵蓋第 1–28 頁。章節將微影視為成像、光阻化學、熱處理、顯影、量測與圖案轉移共同構..."
+      },
+      {
+        "title": "梯度式微影最佳化與 NILS",
+        "path": "wiki/sources/19-optical-lithography--8-09-ch9--1xlwz30.md",
+        "kind": "wiki",
+        "snippet": "...es of Optical Lithography: The Science of Microfabrication*（2007）第 9 章，原章名為 *Gradient-Based Lithographic Optimization: Using the Normalized Image Log-Slope*，書內頁碼 3..."
+      },
+      {
+        "title": "微影資訊傳遞與 CD 誤差傳播",
+        "path": "wiki/synthesis/微影資訊傳遞與-cd-誤差傳播.md",
+        "kind": "wiki",
+        "snippet": "...hy--8-09-ch9--1xlwz30, nils-與影像邊緣品質, 光阻內成像, peb-擴散與-dpsf, rdpsf, original-mack-model, lumped-parameter-model, 線邊緣粗糙度] sources: [\"optical-lithography/09 - ch9.pdf\"..."
+      }
+    ],
+    "agentSteps": [
+      {
+        "id": "backend-0-skills.load-completed",
+        "type": "tool_result",
+        "tool": "project_file_read",
+        "message": "35 skill(s) available",
+        "status": "success",
+        "timestamp": 1790998963274
+      },
+      {
+        "id": "backend-1-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "cut OD 顯影 光阻 線寬",
+        "status": "running",
+        "timestamp": 1790998964711
+      },
+      {
+        "id": "backend-2-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 5 new, mode=hybrid, tokenHits=116, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1790998965941
+      },
+      {
+        "id": "backend-3-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "OD cut on die 晶粒 切割 微影 疊對 邊緣 晶粒",
+        "status": "running",
+        "timestamp": 1790998967118
+      },
+      {
+        "id": "backend-4-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 4 new, mode=hybrid, tokenHits=105, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1790998968232
+      }
+    ]
+  },
+  {
+    "id": "msg_1790999055018_9_bd4qsu",
+    "role": "user",
+    "content": "對, OD是oxide definition. \n如果我不做COD, 會發生什麼事？ 最大的挑戰會是OD本身嗎？",
+    "timestamp": 1790999055018,
+    "conversationId": "conv_1790998886019_w98742"
+  },
+  {
+    "id": "msg_1790999067040_10_iuzyoh",
+    "role": "assistant",
+    "content": "先釐清一下用語，避免答錯方向：\n\n- **OD = oxide definition**（你確認的），也就是定義主動區（active area / diffusion）的那層。\n- **COD = cut OD**（cut mask 切斷 OD）。在先進節點，做法通常是：先用一道連續/較寬鬆的 OD 圖案，再用 COD 這道「cut mask」把不要的地方切開，形成彼此隔離的 active 區。\n\n## 如果我不做 COD，會發生什麼事？\n\n**1. 你必須把 OD 圖案本身畫成最終想要的形狀**\n沒有 cut mask，OD 就只能在「單一曝光—蝕刻」裡直接成形，於是所有間隔（isolation）、端點、轉角都要由 OD 這一層自己解掉。\n\n**2. 最大的挑戰不完全是「OD 本身」，而是 OD 的「間隔 / 端點 / 二維形狀」**\n這正是 cut mask 存在的理由：\n- **1D 陣列好做，2D 切斷難做**。連續線/緊密週期的 OD 對光學與蝕刻都友善；但要把一條線切成島狀（tip-to-tip 間隔、line-end 收尾、轉角），就是典型的高難度二維圖案。\n- **解析度與 DOF 最吃緊的地方就是這些切斷處**。它們同時逼近 k1 極限、又缺乏週期性輔助，NILS 低、製程窗口窄（對應本 wiki 的 [[nils-與影像邊緣品質]]、[[焦距與曝光製程窗口]]）。\n- **CD 與 EPE 落差集中在此**。切斷處的 CD 誤差會被 MEEF 放大（[[mask-error-enhancement-factor]]），也直接反映為 EPE（[[關鍵形狀誤差與邊緣位置誤差]]）。\n- **圖案倒塌風險上升**。細、孤立、高深寬比的切斷結構比密集週期結構更容易倒；本 wiki 的 finding [[圖案倒塌先於-cd-規格失效]] 說明這種失效常在碰到 CD 規格極限之前就先發生，等於限制你的實際製程窗口。\n- **OPC 負擔變重**。沒有 cut 的自由度，你得靠 OPC / SRAF 硬把這些二維形狀救回來（[[opc]]、[[sraf]]、[[ret]]），但可修正量有其極限，且與 [[線端縮短]] 糾纏。\n\n**3. 為什麼 cut mask（COD）能緩解這些挑戰**\n替 OD 與「切斷」各給一次曝光，可把最難的二維圖形拆成兩層較簡單、較友善的圖案：密集週期 OD 用一層，切斷用另一層。代價是多了光罩、增加了 overlay 誤差項（切斷位置相對 OD 的對位），也就是多了一次 overlay 預算與可能的 CD/EPE 誤差耦合。\n\n## 直接回答你的兩個問題\n\n- **不做 COD 會發生什麼事？** 你被迫在單一 OD 層內解掉所有二維切斷圖案 → NILS 低、DOF 小、MEEF/EPE 敏感、圖案倒塌與線端縮短風險升高，實際可用的製程窗口明顯變窄。\n- **最大的挑戰會是 OD 本身嗎？** 不完全是 OD「材料/蝕刻」本身，而是 **OD 這層上的切斷幾何（tip-to-tip、line-end、轉角）**——那才是 cut mask 想分離出去、也是解析度與製程窗口最吃緊的地方。\n\n**需要說明的一點**：以上是就 cut-mask / COD 的一般原理推論，**本 wiki 目前沒有收錄以「OD / cut mask / COD」為主題的頁面**（相關頁面如 [[19-optical-lithography--9-10-ch10--y2hwiy]] 談的是 RET/OPC/解析度極限，[[19-optical-lithography--8-08-ch8--1az2fh0]] 談 CD 量測與製程控制，都未專門處理 cut mask 的 OD 切斷）。若你要，我可以新增一個 concept 頁（例如 `cut-mask-od` 或 `cut-mask-切斷製程`），把上述挑戰串接到既有的 CD 誤差傳播鏈（[[微影資訊傳遞與-cd-誤差傳播]]），並標註哪些是 wiki 來源支持、哪些是外部通則推論——請明示是否要我寫入。",
+    "timestamp": 1790999067040,
+    "conversationId": "conv_1790998886019_w98742",
+    "references": [
+      {
+        "title": "圖案倒塌先於 CD 規格失效",
+        "path": "wiki/findings/圖案倒塌先於-cd-規格失效.md",
+        "kind": "wiki",
+        "snippet": "...-10-03 updated: 2026-10-03 tags: [圖案倒塌, 製程窗口, 模型] related: [圖案倒塌, tanaka-t, 焦距與曝光製程窗口] sources: [\"optical-lithography/08 - ch8.pdf\"] source: \"[[19-optical-lithog..."
+      },
+      {
+        "title": "光學微影基礎與半導體製程整合",
+        "path": "wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md",
+        "kind": "wiki",
+        "snippet": "... Principles of Optical Lithography: The Science of Microfabrication* 第 1 章 *Introduction to Semiconductor Lithography*，涵蓋第 1–28 頁。章節將微影視為成像、光阻化學、熱處理、顯影、量測與圖案轉移共同構..."
+      },
+      {
+        "title": "SRAF 提高示例重疊 DOF",
+        "path": "wiki/findings/sraf-提高示例重疊-dof.md",
+        "kind": "wiki",
+        "snippet": "...simulation] related: [19-optical-lithography--9-10-ch10--y2hwiy, sraf, oai, 焦距與曝光製程窗口] sources: [\"optical-lithography/10 - ch10.pdf\"] --- # SRAF 提高示例重疊 DOF  ## 直..."
+      },
+      {
+        "title": "光阻顯影動力學、對比度與顯影路徑",
+        "path": "wiki/sources/19-optical-lithography--8-07-ch7--dxj4cs.md",
+        "kind": "wiki",
+        "snippet": "...cal-lithography, photoresist, development] related: [chris-mack, original-mack-model, enhanced-kinetic-model, notch-model, critical-ionization-model, 表面抑制, 光阻理論對比..."
+      },
+      {
+        "title": "Wiki Index",
+        "path": "wiki/index.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "...anced Imaging Metrology (AIM) - [[concepts/焦距與曝光製程窗口]] — 焦距與曝光製程窗口 - [[concepts/mask-error-enhancement-factor]] — Mask Error Enhancement Factor (MEEF) - [[concepts/...",
+        "graphRelations": [
+          "SRAF 提高示例重疊 DOF",
+          "光學微影",
+          "光學微影基礎與半導體製程整合",
+          "光阻顯影動力學、對比度與顯影路徑",
+          "圖案倒塌先於 CD 規格失效"
+        ]
+      },
+      {
+        "title": "離子植入遮罩",
+        "path": "wiki/concepts/離子植入遮罩.md",
+        "kind": "wiki",
+        "snippet": "...-03 updated: 2026-10-03 tags: [離子植入, 光阻厚度] related: [az-7500, az-7500-植入深度冪律擬合, 圖案轉移] sources: [\"optical-lithography/01 - ch1.pdf\"] --- # 離子植入遮罩  離子植入遮罩利用光阻阻擋摻雜離..."
+      },
+      {
+        "title": "OPC",
+        "path": "wiki/concepts/opc.md",
+        "kind": "wiki",
+        "snippet": "...phy, OPC, EPE] related: [19-optical-lithography--9-10-ch10--y2hwiy, ret, sraf, model-based-opc-校準與迭代, rule-based-與-model-based-opc-比較, 線端縮短, 光阻理論對比度與量測對比度] source..."
+      },
+      {
+        "title": "半導體製造中的微影控制",
+        "path": "wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 38 related link(s)"
+      },
+      {
+        "title": "空中像形成的基礎",
+        "path": "wiki/sources/19-optical-lithography--8-02-ch2--k73j1g.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 33 related link(s)"
+      },
+      {
+        "title": "解析度增強技術與可製造解析度",
+        "path": "wiki/sources/19-optical-lithography--9-10-ch10--y2hwiy.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 32 related link(s)"
+      },
+      {
+        "title": "光阻內成像：駐波與 swing curves",
+        "path": "wiki/sources/19-optical-lithography--8-04-ch4--ccwms.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "matched entity; 24 related link(s)"
+      }
+    ],
+    "agentSteps": [
+      {
+        "id": "backend-0-skills.load-completed",
+        "type": "tool_result",
+        "tool": "project_file_read",
+        "message": "35 skill(s) available",
+        "status": "success",
+        "timestamp": 1790999055144
+      },
+      {
+        "id": "backend-1-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "cut mask OD active area 圖案切斷 多重曝光",
+        "status": "running",
+        "timestamp": 1790999056407
+      },
+      {
+        "id": "backend-2-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 5 new, mode=hybrid, tokenHits=152, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1790999057423
+      },
+      {
+        "id": "backend-3-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "cut mask OD active area 圖案切斷 剪裁 遮罩 OD 隔離",
+        "status": "running",
+        "timestamp": 1790999058457
+      },
+      {
+        "id": "backend-4-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 2 new, mode=hybrid, tokenHits=119, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1790999059507
+      },
+      {
+        "id": "backend-5-graph.search-started",
+        "type": "tool_call",
+        "tool": "graph_search",
+        "message": "cut mask",
+        "status": "running",
+        "timestamp": 1790999060078
+      },
+      {
+        "id": "backend-6-graph.search-completed",
+        "type": "tool_result",
+        "tool": "graph_search",
+        "message": "5 result(s), 4 new",
+        "status": "success",
+        "timestamp": 1790999060095
+      }
+    ]
+  }
+]

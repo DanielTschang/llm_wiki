@@ -1,0 +1,17 @@
+{
+  "sessionId": "conv_1791118880784_7d2cmb",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hello",
+      "timestamp": 1791120148331
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I'm your LLM Wiki assistant for this project. I can search the wiki, look up relationships between concepts/entities, read source snippets, or draft new pages and artifacts. What would you like to do?",
+      "timestamp": 1791120148331
+    }
+  ],
+  "updatedAt": 1791120148331
+}

@@ -1,0 +1,37 @@
+{
+  "sessionId": "conv_1790971067083_8k7llb",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "CD是什麼？",
+      "timestamp": 1790971110292
+    },
+    {
+      "role": "assistant",
+      "content": "在這裡的微影與蝕刻語境中，**CD 是 Critical Dimension（關鍵尺寸／臨界尺寸）**，指圖案中需要精準控制的尺寸，例如線條寬度、線與線之間的間距，或孔洞直徑。\n\n例如，設計要求某條線寬為 **50 nm**，這個線寬就是要控制的 CD；製程後若變成 45 nm，就表示 CD 發生了偏差。\n\n**光阻的 CD 正確，不代表蝕刻後的 CD 一定正確**：蝕刻時光阻與材料可能受到側向侵蝕，使最終線寬改變。這正是 `wiki/concepts/蝕刻選擇比與光阻輪廓.md` 與 `wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md` 中討論 CD 變化的重點。",
+      "timestamp": 1790971110292
+    },
+    {
+      "role": "user",
+      "content": "?",
+      "timestamp": 1790973606180
+    },
+    {
+      "role": "assistant",
+      "content": "在你這個**微影（Lithography）**專案的語境中，**CD 通常指 Critical Dimension（關鍵尺寸）**，也就是圖案中需要精準控制的尺寸，例如線條寬度、溝槽寬度或孔洞直徑，通常以奈米（nm）表示。\n\n例如：設計線寬為 20 nm，量測結果為 22 nm，就表示這個圖案的 CD 比目標大 2 nm。\n\nCD 會影響元件的電性與製程良率，因此微影與蝕刻製程都需要控制它。**CD 不等於解析度**：CD 是圖案的尺寸；解析度則是製程能分辨或形成多小圖案的能力。\n\n目前 wiki 沒有找到可引用的對應頁面；以上是依微影領域的一般用法說明。",
+      "timestamp": 1790973606180
+    },
+    {
+      "role": "user",
+      "content": "wiki中 有哪些知識牽涉到CD?",
+      "timestamp": 1790977050544
+    },
+    {
+      "role": "assistant",
+      "content": "The Agent reached the tool-iteration limit after 8 step(s). It gathered 8 tool observation(s), but did not produce a final answer. Please narrow the request or ask it to continue from the latest result.",
+      "timestamp": 1790977050544
+    }
+  ],
+  "updatedAt": 1790977050544
+}

@@ -1,0 +1,17 @@
+{
+  "sessionId": "conv_1791127894909_jzllqk",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "cut od你會知道是什麼嗎?",
+      "timestamp": 1791127902285
+    },
+    {
+      "role": "assistant",
+      "content": "你指的「cut od」我不太確定是什麼，因為這不是你這個 Lithography wiki 專案裡的既有頁面或術語，我這邊也沒有相關檢索結果。\n\n它可能是幾種情況，麻煩你確認一下：\n\n- **Cut / OD 是「cut off date」或「cut order」之類的縮寫？** 例如交期、截單日、訂單截止。\n- **是某個特定領域的縮寫？** 例如 OLED 相關的「OD」、光刻/塗佈製程的某個參數、或某公司內部代號。\n- **是打字/語音輸入錯誤？** 例如本來想打別的詞，被切成「cut od」。\n- **是這個 wiki 要收錄的新概念？** 如果是，你告訴我它的全稱與背景，我可以幫你建一個 concept 頁面。\n\n你補一句全稱或使用情境（在哪看到、哪個領域、原文上下文），我就能準確回答，或直接在這個 wiki 裡建立對應頁面。",
+      "timestamp": 1791127902285
+    }
+  ],
+  "updatedAt": 1791127902285
+}

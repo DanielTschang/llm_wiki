@@ -1,0 +1,4157 @@
+## Page 1
+
+4
+Imaging in Resist: Standing Waves 
+and Swing Curves
+The previous chapter developed a comprehensive theory for calculating aerial images, 
+the image of a photomask as projected by the imaging tool into air. But of course the 
+real goal is to project that image into photoresist, where chemical reactions responding to the local exposure dose will transform the intensity image into a latent image 
+of exposed and unexposed material. The coupling of the aerial image into the photoresist involves the behavior of light as it encounters interfaces between materials – 
+refl ection and transmission – and the propagation of light through an absorbing 
+medium.
+One of the unique aspects of the image in resist (as opposed to the aerial image) 
+comes from refl ections off the substrate (or fi lms coated on the substrate). The total 
+energy in the resist is the sum of the downward-propagating image and the upwardpropagating refl ected image. Since these two images will interfere, the results are 
+highly dependent on the thickness of the resist, and possibly other fi lms above or 
+below the resist. Two consequences of this interference are (1) standing waves – a sinusoidal variation of dose through the thickness of the resist – and (2) swing curves – a 
+sinusoidal dependence of the energy coupled into the resist as a function of resist 
+thickness.
+A thorough understanding of these phenomena, plus a recognition of their detrimental impact on linewidth control, leads to a search for methods to reduce standing 
+waves and swing curves. A description of antirefl ection coatings, both top and bottom, 
+will show how linewidth control can be reclaimed through effective refl ection 
+control.
+Finally, examining how light propagates through the photoresist, including all of the 
+various thin fi lm interference effects, allows for a rigorous understanding of the difference 
+between an aerial image and an image in resist.
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+130 Fundamental Principles of Optical Lithography
+4.1 Standing Waves
+Standing waves occur whenever two waves, traveling in opposite directions and with a 
+fi xed phase relationship to each other, combine. Examples of standing waves abound, 
+from vibrational waves traveling down a guitar string and refl ecting off the fi xed end of 
+that string, to acoustic waves bouncing within the metal tube of a pipe organ, to the design 
+of impedance matching connections for coaxial television cables. In lithography, light 
+passing through the photoresist is refl ected off the substrate. This refl ected light wave 
+interferes with the light wave traveling down to produce a standing wave pattern.1,2
+4.1.1 The Nature of Standing Waves
+Before looking at the lithographic case in great detail, we’ll examine the basic nature of 
+standing waves by considering an exceedingly simplifi ed version of light standing waves. 
+Suppose a plane wave of monochromatic light traveling through air (which we’ll assume 
+to be nonabsorbing with an index of refraction of 1.0) is normally incident on a mirror. 
+What is the total light intensity in the vicinity of the mirror? The total electric fi eld will 
+be the sum of the wave traveling toward the mirror and the refl ected wave. Letting z be 
+the direction the incident light is traveling in, the electric fi eld EI of a plane wave traveling in this direction has the mathematical form
+Ez A ikz I() = e (4.1)
+where A is the amplitude of the plane wave and k is the propagation constant (equal to 
+2pn/l where n is the refractive index of the medium and l is the vacuum wavelength of 
+the light). (This equation requires an assumption about the sign convention for the phasor 
+representation of a sinusoidal wave, as discussed in Chapter 2. Unfortunately, there is no 
+standard and the convention commonly used for thin fi lm calculations is the opposite to 
+that normally used for imaging. In this book, a plane wave traveling in the +z-direction 
+is represented by exp(+ikz) and the imaginary part of the index of refraction must be 
+positive to represent an absorbing media.) For simplicity, let z = 0 defi ne the position of 
+the mirror. Letting r be the electric fi eld refl ectivity of the mirror, the refl ected light 
+electric fi eld will be
+Ez E A ikz ikz RI () () == ee −− ρρ 0 (4.2)
+The total electric fi eld is just the sum of the incident and refl ected fi elds.
+E z E z Ez A ikz ikz T RI () () () ( ) = += + ee +− ρ (4.3)
+The special case of a perfectly refl ective mirror (r = −1) provides an especially simple 
+result. The two complex exponentials in Equation (4.3) become a sinusoid by using the 
+Euler identity.
+E z A i A kz ikz ikz T( ) ( ) sin( ) = −= ee +− 2 (4.4)
+The intensity of the light in this region is the ‘interference pattern’ between the incident 
+and refl ected beams:
+I z E z A kz A kz TT ( ) ( ) sin ( ) ( cos( )) = = =− 2 22 2 4 21 2 (4.5)
+
+
+## Page 3
+
+ Imaging in Resist: Standing Waves and Swing Curves 131
+The most striking aspect of this simple result is that the traveling wave has been converted 
+to a standing wave. The plane wave in Equation (4.1) is ‘traveling’, meaning that the 
+phase of the electric fi eld varies linearly with distance traveled. Literally, the wave moves 
+through its ups and downs of the sinusoidal phase cycle as it travels, while the amplitude 
+remains constant. In contrast, the wave in Equation (4.4) is stationary; it is ‘standing’ in 
+place. The amplitude of the electric fi eld varies sinusoidally with position z, but the phase 
+remains fi xed and independent of position.
+(As an interesting historical footnote, the mathematical experiment described above is 
+almost identical to a famous and seminal experiment performed in 1888 by Heinrich 
+Hertz. Attempting to verify Maxwell’s new theory of electromagnetic radiation, Hertz 
+covered one of the walls of his laboratory with copper and refl ected radio waves off this 
+‘mirror’. Using a wire loop detector sensitive to the magnitude of the electric fi eld, he 
+measured the resulting sinusoidal standing wave, which agreed well with Maxwell’s 
+theory. Otto Wiener fi rst demonstrated that light exhibits standing waves in 1890 by 
+exposing a photographic fi lm tilted at a small angle to a normally illuminated plane 
+mirror.)
+4.1.2 Standing Waves for Normally Incident Light in a Single Film
+The very simple standing wave result derived above shows us the basic form of standing 
+waves caused by plane waves traveling in opposite directions. For the case of standing 
+waves in a photoresist, the simplest example is a thin layer of photoresist coated on a 
+thick (semi-infi nite) substrate. Let us begin with the simple geometry shown in Figure 
+4.1a. A thin photoresist (layer 2) rests on a thick substrate (layer 3) in air (layer 1). Each 
+material has optical properties governed by its complex index of refraction, n = n + ik, 
+where n is the real index of refraction and k is the imaginary part, sometimes called the 
+extinction coeffi cient. This later name comes from the relationship between the imaginary 
+part of the refractive index and a, the absorption coeffi cient of the material (as derived 
+in Chapter 2).
+α
+πκ
+λ = 4 (4.6)
+Consider now the propagation of light through this fi lm stack. We will begin with illumination of the stack by a monochromatic plane wave normally incident on the resist. When 
+Resist
+Substrate
+Air n1
+D
+z = 0 
+Resist
+Substrate
+Air
+EI
+n2
+n3
+(a) (b)
+Figure 4.1 Film stack showing (a) the geometry for the standing wave derivation, and (b) 
+a normally incident electric fi eld EI
+
+
+## Page 4
+
+132 Fundamental Principles of Optical Lithography
+this plane wave strikes the resist surface, some of the light will be transmitted and some 
+will be refl ected. The amount of each is determined by the transmission and refl ection 
+coeffi cients. Defi ned as the ratio of the transmitted to incident electric fi eld, the transmission coeffi cient tij for a normally incident plane wave transmitting from layer i to 
+layer j is given by
+τij
+i
+ij
+= +
+2n
+nn
+ (4.7)
+In general, the transmission coeffi cient will be complex, indicating that when light is 
+transmitted from one material to another, both the magnitude and the phase of the electric 
+fi eld will change. Similarly, the light refl ected off layer j back into layer i is given by the 
+refl ection coeffi cient rij:
+ρij
+ij
+ij
+= −
++
+nn
+nn
+ (4.8)
+Both of these equations are derived from the requirement that electric and magnetic fi eld 
+components that are within (or tangential to) the plane of the interface between materials 
+i and j must be continuous across that boundary.
+If an electric fi eld EI is incident on the photoresist (see Figure 4.1b), the transmitted 
+electric fi eld will be t12EI. The transmitted plane wave will now travel down through the 
+photoresist. As it travels, the wave will change phase sinusoidally with distance and 
+undergo absorption. Both of these effects are given by the standard description of a plane 
+wave as a complex exponential:
+Ez ikz i z () == ee 2πλ n / (4.9)
+where this E(z) represents a plane wave traveling in the +z-direction. Using the coordinates defi ned in Figure 4.1a, the transmitted electric fi eld propagating through the resist, 
+E0, will be given by
+Ez E iz 0 12 2 2 () = τ πλ I / e n (4.10)
+Eventually, the wave will travel through the resist thickness D and strike the substrate, 
+where it will be partially refl ected. The refl ected wave, E1, just after refl ection will be
+Ez D E iD 1 12 23 2 2 () == τρ πλ I / e n (4.11)
+The complex exponential term in the above equation has some physical signifi cance: it 
+represents the electric fi eld transmitted from the top to the bottom of the photoresist and 
+is called the internal transmittance of the resist, tD.
+τ πλ D iD = e 2 n2 / (4.12)
+As the refl ected wave travels back up through the resist, the distance traveled will be (D-z) 
+and the propagation will be similar to that described by Equation (4.9):
+Ez E E D i Dz D iz 1 12 23 2 12 23 22 22 () () == −− τ ρτ τ ρτ π λ πλ I / I / ee nn (4.13)
+
+
+## Page 5
+
+ Imaging in Resist: Standing Waves and Swing Curves 133
+So far, our incident wave (EI) has been transmitted in the photoresist (E0) and then 
+refl ected off the substrate (E1), as pictured in Figure 4.1b. The resultant electric fi eld in 
+the photoresist will be the sum of E0 and E1.
+Ez Ez E iz D iz 0 1 12 2 23 22 22 () () ( ) += + − τ ρτ πλ πλ I // ee nn (4.14)
+This sum is not the total electric fi eld in the photoresist. The wave E1 will travel to the 
+top of the resist where it will be refl ected by the air–resist interface. The new wave, E2, 
+will travel down through the resist where it will be refl ected by the substrate, giving 
+another wave E3. The next two waves are given by
+Ez E
+Ez E
+D iz
+D iz
+2 21 23 12 2
+3 21 232 12 4
+2
+2
+()
+()
+=
+= −
+I
+I
+e
+e
+ρρττ
+ρρττ
+k
+k (4.15)
+The total electric fi eld within the thin fi lm, ET(z), is the sum of each Ej(z). Performing 
+this summation gives
+Ez E S ik z D ik z TI () ( ) =+ ee− τ ρτ 12 23 22 2 (4.16)
+where S =+ + + 111 21 23 DD
+2 21 23 2 ρρτ ρρτ ( ( ...
+The summation S is simply a geometric series and converges to
+S DD= − = +
+1
+1
+1
+21 23 1 2 12 23 2 ρρτ ρρτ
+ (4.17)
+Thus, the total electric fi eld in the resist will be3
+Ez
+E
+iz D iz
+D
+T
+I
+// () ( ) ee = +
++
+− τ ρτ
+ρρτ
+πλ πλ 12 2 23 22
+12 23 2
+22
+1
+nn
+ (4.18)
+Although we have determined an expression for the standing wave electric fi eld, it is 
+the intensity of the light that causes exposure. Calculation of the relative intensity from 
+Equation (4.18) leads to a somewhat messy result, but a few algebraic simplifi cations 
+allow for a reasonably useful form:
+Iz nEz
+nE
+Tn z Dz D
+() ()
+( ) cos( ()
+=
+=+ + − −− −
+2
+2
+1
+2
+23
+2 2 24 23
+I
+eff ee e αα α ρ ρπ 2 23 () ) Dz −+ 
+
+ 
+
+ /λφ
+ (4.19)
+where ρρ φ 23 23 23 = ei , and
+T
+n
+n T
+DD
+eff = , the effective t
++ = +
+2
+1
+12
+2
+12 23 2 2
+12
+12 23 2 2
+11
+τ
+ρρτ ρρτ
+ransmittance into the photoresist.
+This equation is graphed in Figure 4.2 for an i-line photoresist with typical properties on 
+a silicon substrate. By comparing the equation to the graph, many important aspects of 
+the standing wave effect become apparent. The most striking feature of the standing wave 
+
+
+## Page 6
+
+134 Fundamental Principles of Optical Lithography
+plot is its sinusoidal variation. The cosine term in Equation (4.19) shows that the period 
+of the standing wave is given by
+Period / = λ 2n2 (4.20)
+The amplitude of the standing waves is given by the multiplier of the cosine in Equation 
+(4.19). It is quite apparent that there are two basic ways to reduce the amplitude of the 
+standing wave intensity. The fi rst is to reduce the refl ectivity of the substrate (reduce r23). 
+The use of an antirefl ection coating on the substrate is one of the most common methods 
+of reducing standing waves (see section 4.3). The second method for reducing the standing wave intensity that Equation (4.19) suggests is to increase absorption in the resist 
+(reduce the e−aD term). This is accomplished by adding a dye to the photoresist (increasing 
+a). Finally, the ‘bulk’ intensity variation, the variation of the intensity averaged over the 
+standing wave period, is given by the pair of exponential terms being added to the cosine 
+in Equation (4.19). The bulk effect is a function of both absorption in the resist and the 
+refl ectivity of the substrate.
+As an aside, it is worth mentioning one diffi culty in using Equation (4.19): the conversion of the complex substrate refl ectivity from rectangular to polar form. The calculation 
+of the magnitude of the refl ection coeffi cient is straightforward:
+ρ
+κκ
+κκ 23
+23 2 23 2
+23 2 23 2 = − +−
++ ++
+( )( )
+( )( )
+nn
+nn (4.21)
+However, determining the angle of the refl ectivity using an arctangent function (as one 
+might commonly do in spreadsheet calculations) can introduce an ambiguity if the range 
+over which the arctangent is defi ned is not properly taken into account. Defi ning two 
+simplifying variables x and y,
+xn n
+yn n
+=+−+
+=−
+( )( )
+()
+2
+2 22 32 32
+2 32 23
+κκ
+κκ
+ (4.22)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+1.6
+1.8
+0 200 400 600 800 1000
+Depth into Resist (nm)
+Relative Intensity
+Figure 4.2 Standing wave intensity in one micron of photoresist on a silicon substrate for 
+an i-line exposure
+
+
+## Page 7
+
+ Imaging in Resist: Standing Waves and Swing Curves 135
+(1) If tan−1 is defi ned on the interval [0,p), then
+θ
+θπ
+23 1
+23 1
+0
+0
+= 
+
+
+ >
+= 
+
+
+ +<
+−
+−
+tan
+tan
+y
+x
+y
+y
+x
+y
+,
+,
+ (4.23)
+(2) If tan−1 is defi ned on the interval [−p/2,p/2), then
+θ
+θπ
+23 1
+23 1
+0
+0
+= 
+
+
+ >
+= 
+
+
+ +<
+−
+−
+tan
+tan
+y
+x
+x
+y
+x
+x
+,
+,
+ (4.24)
+The cases of y = 0 or x = 0 can be handled separately from the arctangent evaluation.
+4.1.3 Standing Waves in a Multiple-Layer Film Stack
+It is very common to have more than one fi lm coated on a substrate. An analysis similar 
+to that for one fi lm yields the following result for the electric fi eld in the top layer of an 
+m-1 layer system:
+Ez
+E
+iz D iz
+D
+2 12 2 23 22
+12 23 2
+22
+1
+()
+I
+// ee = () + ′
++ ′
+− τ ρτ
+ρρτ
+πλ πλ nn
+ (4.25)
+where
+′ = −
++
+ρ23
+2 33
+2 33
+nn
+nn
+X
+X
+X D
+D
+3
+34 3 2
+34 3 2
+1
+1 = − ′+ ′
+ρτ
+ρτ
+′ = −
++
+ρ34
+3 44
+3 44
+nn
+nn
+X
+X
+.
+.
+.
+Xm
+m m Dm
+m m Dm
+= −
++
++
++
+1
+1
+1 2
+1 2
+ρτ
+ρτ
+,
+,
+ρmm
+mm
+mm
+, +
++
++
+= −
++ 1
+1
+1
+nn
+nn
+τ Dj
+ik Djj = e
+
+
+## Page 8
+
+136 Fundamental Principles of Optical Lithography
+and all other parameters are as previously defi ned. The parameter ρ23′ is the effective 
+refl ection coeffi cient between the thin resist fi lm and what lies beneath it. Once the effective refl ection coeffi cient of the substrate fi lm stack is determined, Equation (4.25) 
+becomes identical to Equation (4.18).
+To better understand the nature and impact of the effective refl ection coeffi cient of the 
+substrate, let’s consider two special cases where one layer (layer 3) lies between the resist 
+and the substrate. For the fi rst case, let this layer 3 be thick and absorbing enough so that 
+no refl ected light from the substrate makes it back to the top of layer 3. In other words, 
+let τ D3
+2 = 0. From the equations above, X3 will equal 1 and ρρ 23 23 ′ = . In other words, a 
+suffi ciently thick absorbing layer acts as a substrate. For the second case, assume layer 3 
+is optically matched to the photoresist so that n2 = n3. For this case, ρ ρτ 23 34 3 ′ = 2
+D . Ignoring 
+any small amount of absorption that may occur in layer 3 (the imaginary part of n2 is 
+usually very small), τ D3
+2 will have a magnitude of about 1 and will thus only impact the 
+phase of ρ23′ . In other words, the magnitude of the effective substrate refl ection coeffi cient 
+will be determined by the refl ection coeffi cient of layer 3 with the substrate and the phase 
+of the effective refl ection coeffi cient will be determined by the thickness of layer 3. (The 
+resist on oxide on silicon case shown in Figure 4.3 is very similar to this idealized case.) 
+This impact of the phase of the refl ection coeffi cient on lithography is explored below in 
+section 4.6.
+If the thin fi lm in question is not the top fi lm (layer 2), the intensity can be calculated 
+in layer j from
+Ez E j jj
+ik z
+j j Dj
+ik z
+jjj
+jj
+() () = + ′
++ ′ −
++
+−
+−
+I,eff ,
+,
+,
+* ee
+*
+τ ρτ
+ρρ 1
+1 2
+1 1
+jj
+,j Dj +1 2 τ
+ (4.26)
+where τρ ** jj jj −− 11 ,, =+1 . The effective refl ection coeffi cient r* is analogous to the coeffi -
+cient r′, looking in the opposite direction. EI,eff is the effective intensity incident on layer 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+1.6
+0 200 400 600 800 1000
+Depth into Resist (nm)
+Relative Intensity
+Figure 4.3 Standing wave intensity within a photoresist fi lm at the start of exposure (850 nm 
+of resist on 100-nm SiO2 on silicon, l = 436 nm). Note the impact of the oxide fi lm on the 
+phase of the effective substrate refl ectivity, which affects the intensity at the bottom of 
+the resist
+
+
+## Page 9
+
+ Imaging in Resist: Standing Waves and Swing Curves 137
+j. Both EI,eff and r* are defi ned in detail in Reference 3. Equation (4.26) is needed when 
+using a top antirefl ection coating, as described in section 4.4.
+If the resist fi lm is not homogeneous, the equations above are, in general, not valid. 
+Let us, however, examine one special case in which the inhomogeneity takes the form of 
+small variations in the imaginary part of the index of refraction of the fi lm in the zdirection, leaving the real part constant. Photoresist bleaching (described in detail in 
+Chapter 5) will cause such a variation of the absorption coeffi cient with depth into the 
+resist. In this case, the absorbance Abs is no longer simply az, but becomes
+Abs z z z
+z
+() ( ) = ′′ ∫α d
+0
+ (4.27)
+Equations (4.18), (4.25) and (4.26) are still approximately valid if this anisotropic expression for absorbance is used. Thus, I(z) can be found if the absorption coeffi cient is known 
+as a function of z.
+Figure 4.3 shows a typical result of the standing wave intensity within a photoresist 
+fi lm coated on an oxide on silicon fi lm stack.
+4.1.4 Oblique Incidence and the Vector Nature of Light
+For simplicity, fi rst consider a plane wave traveling through a uniform material and striking a partially refl ective substrate at z = 0 (see Figure 4.4). The plane wave, described by 
+its propagation vector k (defi ned as the propagation constant multiplied by a unit vector 
+pointing in the direction of propagation), makes an angle q with respect to the z-axis 
+(which is also normal to the refl ecting surface). Taking the x–z plane as the plane of incidence, any point in space (x,z) is described by its position vector r. The electric fi eld of 
+the plane wave (before it refl ects off the substrate) is then given by
+E xz A A i ik x z () ( sin cos ) ,e e == kr⋅+θθ (4.28)
+z
+x
+(x,z)
+Substrate
+θ
+x
+z = 0 
+Plane
+Wave
+k
+r
+Figure 4.4 Geometry used for describing plane waves and standing waves for oblique 
+incidence
+
+
+## Page 10
+
+138 Fundamental Principles of Optical Lithography
+where A is the amplitude of the plane wave and the (complex) propagation constant k is 
+given by 2pn/l where n is the complex refractive index of the medium. This plane wave 
+will refl ect off the substrate with an angle- and polarization-dependent refl ectivity r(q) 
+as given by the Fresnel formulae.
+ρθ θθ
+θθ
+τθ
+ij j
+i ij j
+i ij j
+ij j
+⊥
+⊥
+= −
++
+=
+() cos( ) cos( )
+cos( ) cos( )
+()
+nn
+nn
+2nii
+i ij j
+ij j
+i jj i
+cos( )
+cos( ) cos( )
+() cos( ) cos( ) ||
+θ
+θθ
+ρθ θθ
+nn
+nn
+n
++
+= −
+i jj i
+ij j
+ii
+i jj i
+cos( ) cos( )
+() cos( )
+cos( ) cos( ) ||
+θθ
+τθ θ
+θθ
++
+= +
+n
+n
+nn
+2
+ (4.29)
+and the two angles qi and qj are related by Snell’s law,
+nn i ij j sin( ) sin( ) θθ = (4.30)
+Here, || represents an electric fi eld vector that lies in a plane defi ned by the direction of 
+the incident light and a normal to the resist surface (i.e. in the plane of the paper in Figure 
+4.4). Other names for || polarization include p-polarization and TM (transverse magnetic) 
+polarization. The polarization denoted by ⊥ represents an electric fi eld vector that lies in 
+a plane perpendicular to that defi ned by the direction of the incident light and a normal 
+to the resist surface (i.e. perpendicular to the plane of the paper in Figure 4.4). Other 
+names for ⊥ polarization include s-polarization and TE (transverse electric) polarization. 
+Note that for light normally incident on the resist surface, both s- and p-polarization result 
+in electric fi elds that lie along the resist surface and the four Fresnel formulae revert to 
+the two standard defi nitions of refl ection and transmission coeffi cients used earlier in 
+Equations (4.7) and (4.8). Figure 4.5 shows how the intensity refl ectivity (the square of 
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40
+0.45
+0.50
+0 10 20 30 40 50 60 70 80 90
+Incident Angle (degrees)
+Intensity Reflectivity (|
+ρ12|
+2
+p-polarization
+s-polarization
+Air
+Resist
+p-polarization
+s-pol.
+)
+Figure 4.5 Refl ectivity (square of the refl ection coeffi cient) as a function of the angle of 
+incidence showing the difference between s- and p-polarization (n1 = 1.0, n2 = 1.7). Both air 
+and resist layers are assumed to be infi nitely thick
+
+
+## Page 11
+
+ Imaging in Resist: Standing Waves and Swing Curves 139
+the magnitude of the refl ection coeffi cient) varies with incident angle for both s- and ppolarized illumination for a particular case.
+The total electric fi eld to the left of the substrate in Figure 4.4 is then the sum of the 
+incident and refl ected waves. This simple summation brings up the fi rst interesting complication – the effect of polarization, the direction that the electric fi eld is pointing. If the 
+original electric fi eld in Equation (4.28) is s-polarized (also called TE polarized) so that 
+the electric fi eld vector points directly out of the plane of Figure 4.4, then both the incident 
+and refl ected electric fi elds will point in the same direction and the vector sum will equal 
+the scalar (algebraic) sum of the incident and refl ected fi elds:
+s-polarized , e e e
+,
+: ( ) ( () )
+()
+sin cos cos Exz A
+I xz
+ikx ikz ikz =+ θθ θ − ρθ
+= =+ + + E x z A kz ( ) ( ( ) ( ) cos( cos )) , 22 2 1 22 ρθ ρθ θ φρ
+ (4.31)
+where fr is the phase angle of the complex refl ectivity r and, for simplicity, the propagation medium is assumed to be nonabsorbing. The amplitude of the standing waves, given 
+by the factor multiplying the cosine in the intensity expression above, is controlled by 
+the magnitude of the electric fi eld refl ectivity. Note that this equation reverts to the simpler 
+perfect mirror Equation (4.5) when r = −1.
+Thus, for s-polarized light, the standing wave Equation (4.18) can be easily modifi ed 
+for the case of non-normally incident plane waves. Suppose a plane wave is incident on 
+the resist fi lm at some angle q1. The angle of the plane wave inside the resist will be q2
+as determined from Snell’s law. An analysis of the propagation of this plane wave within 
+the resist will give an expression similar to Equation (4.18) but with the position z replaced 
+with z cos q2. For this case, the electric fi eld will point in the y-direction.
+Ez
+E
+y iz D iz () ( )( ( ) ( ) cos co , ee
+I
+/ θ τ θ ρ θτθ π θλ π 2 12 2 2 23 2 2 2 22 2 2
+= + nn − s )
+() ()()
+θλ
+ρθρ θτθ
+2
+1 12 2 23 2 2 2
+/
++ D
+ (4.32)
+The transmission and refl ection coeffi cients are now functions of the angle of incidence 
+(as well as the polarization of the incident light) and are given by the Fresnel formulae 
+above. The internal transmittance becomes
+τ π θλ D iD = e 2 n22 cos / (4.33)
+The resulting relative intensity becomes
+Iz T
+T
+z Dz ( ) ( )( ( ) )
+()
+cos ( ) cos =+
++
+− −−
+eff / /
+eff
+θ ρθ ee
+θ
+αθ αθ
+2 23 2
+2 2
+2
+2 2
+24 23 2 2 2 23 2 ρθ π θ λφ αθ ( ) cos( cos ( ) ) cos e/ − / −+ D n Dz (4.34)
+(For an understanding of why the absorption terms vary as distance/cos q2, see section 
+4.8.2)
+For p-polarized incident light, reduced overlap in electric fi elds causes the standing 
+wave amplitude to be reduced by the factor cos(2q2), as will be shown below.4
+ The resulting electric fi eld will have both x- and z-components (x being the dimension in the plane 
+of incidence), whereas for the s-polarized case the electric fi eld only points in the ydirection (out of the plane of incidence).
+E
+E
+x iz D iz
+I
+/ ee = + − cos( ) ( )( ( ) ( ) cos c θτ θ ρ θτθ π θλ π 2 12 2 2 23 2 2 2 nn 22 2 2 os )
+() ()()
+θλ
+ρ θρ θτ θ
+2
+1 12 2 23 2 2 2
+/
++ D
+ (4.35)
+
+
+## Page 12
+
+140 Fundamental Principles of Optical Lithography
+E
+E
+z iz D iz
+I
+/ ee = − − sin( ) ( )( ( ) ( ) cos c θτ θ ρ θτ θ π θλ π 2 12 2 2 23 2 2 2 nn 22 2 2 os )
+() ()()
+θλ
+ρ θρ θτ θ
+2
+1 12 2 23 2 2 2
+/
++ D
+ (4.36)
+The total standing wave intensity, relative to the incident intensity, will be
+Iz nE E
+nE
+T
+xz
+z Dz
+() ()
+( )( ( ) cos (
+= +
+=+ − −−
+2
+22
+1
+2
+2 23 2 2 2 2
+I
+eff / θ ρθ ee αθ α ) cos
+cos
+)
+( ) ( ) cos( )cos( cos (
+/
+eff / e
+θ
+αθ θ ρθ θ π θ
+2
+2 + 2 23 2 2 2 2 2 24 − Tn D Dz −+ )) /λφ23
+ (4.37)
+If q2 = 45°, the incident and refl ected waves have no overlap of their electric fi elds and 
+the resulting lack of interference means there will be no standing waves (only the bulkeffect term survives).
+It is interesting to look at the impact of direction that the light is traveling on the defi nitions of the refl ection and transmission coeffi cients. Completely reversing the direction 
+of the light, if light approaches the interface through material j at an angle qj, the resulting 
+refl ection and transmission coeffi cients become
+ρρ
+τ
+θ
+θ
+τ
+ji ij
+ji
+jj
+ii
+ij
+=−
+= n
+n
+cos( )
+cos( )
+ (4.38)
+where these relationships hold for either polarization.
+Figure 4.6 shows an example of the impact of incident angle on the resulting standing 
+wave pattern in the resist. The change in incident angle causes a change in the period of 
+the standing waves and, because of the angular dependence of Teff, a difference in the 
+amount of light transmitted into the photoresist fi lm.
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+0 100 200 300 400 500
+Depth into Resist (nm)
+Relative Intensity
+Angle
+Angle
+= 0
+ = 30
+Figure 4.6 Standing wave intensity within a photoresist fi lm (500 nm of resist on silicon, 
+l = 248 nm) as a function of incident angle (s-polarization assumed)
+
+
+## Page 13
+
+ Imaging in Resist: Standing Waves and Swing Curves 141
+A second approximation can be made to simplify the evaluation of Equations (4.32), 
+(4.35) or (4.36). For a complex resist refractive index, Snell’s law produces the nonintuitive but mathematically correct result of a complex angle of refraction in the resist. For 
+the case where the resist is only weakly absorbing (quite a normal situation), the imaginary 
+part of the angle of refraction into the resist can be ignored with only a small loss 
+of accuracy. The impact of making such an approximation is explored more fully below 
+in section 4.8.
+4.1.5 Broadband Illumination
+The analysis presented above applies to monochromatic illumination. What if broadband 
+(polychromatic) illumination were used? In general, the use of broadband illumination in 
+imaging applications can be thought of as the incoherent superposition of individual 
+monochromatic results. Thus, the standing wave intensity for a single wavelength is 
+integrated over the wavelengths of the source, weighted by the source illumination spectrum. Figure 4.7 shows a typical mercury arc lamp output spectrum (before fi ltering in 
+the illumination system of the projection tool). Table 4.1 describes the common wavelengths used in lithographic tools. For 248- and 193-nm lithography tools, where a linenarrowed excimer laser is used to generate the light, bandwidths are less than a picometer, 
+so that these sources can be considered monochromatic from a standing wave 
+perspective.
+Although wavelength appears explicitly in the expressions for the standing wave electric fi eld in the resist, an implicit dependence occurs in the indices of refraction of the 
+various resist and substrate materials. The variation of the index of refraction of a material 
+with wavelength, called dispersion, is extremely material dependent. Over a limited range 
+of wavelengths, many photoresist materials’ dispersion curves can be adequately described 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+200 250 300 350 400 450 500 550 600
+Wavelength (nm)
+Relative Intensity
+I-Line
+H-Line
+G-Line
+E-Line
+Figure 4.7 Spectral output of a typical high-pressure mercury arc lamp. The illumination 
+spectrum of an i-line or g-line lithographic exposure tool is usually a fi ltered portion of this 
+lamp spectrum
+
+
+## Page 14
+
+142 Fundamental Principles of Optical Lithography
+by an empirical expression called the Cauchy equation (named for the 19th century French 
+mathematician Augustin-Louis Cauchy):
+nC CC () λ λλ =+ + 1
+2
+2
+3
+4 (4.39)
+where C1, C2 and C3 are the empirically derived Cauchy coeffi cients (higher-order terms 
+are possible, but rarely used for photoresists). It is important to note that any Cauchy fi t 
+to refractive index data will be valid only over the wavelength range of the data and 
+should not be extrapolated. Further, this equation applies well only to dielectrics with no 
+or small amounts of absorption over the wavelength range of interest. Some typical resist 
+Cauchy coeffi cients are given in Table 4.2.
+Figure 4.8 shows the impact of using a range of wavelengths on the resulting standing 
+wave pattern in the resist. In this example, a single 365-nm-wavelength exposure is compared to a very broadband exposure over a range of wavelengths from 350 to 450 nm 
+using a mercury arc lamp exposure tool. The total broadband standing wave result is the 
+sum of many monochromatic standing wave curves, each with different periods due to 
+the different wavelengths. As a result, these sinusoids tend to average out making the fi nal 
+intensity within the fi lm more uniform with depth. Note also that the standing waves are 
+at their largest at the substrate, where an insuffi cient number of standing wave periods 
+are available for averaging.
+An alternate viewpoint is to consider the coherence length of the light source. While 
+commonly used to describe lasers, coherence length can in fact be used to describe any 
+light source and is defi ned as the longest distance light can travel and still maintain a 
+Table 4.1 Wavelengths for various lithographic light sources (high pressure mercury arc 
+lamps and free-running, unnarrowed excimer lasers)
+Source
+Center Wavelength 
+(nm)
+Typical Unnarrowed 
+Bandwidth (nm)
+Mercury Arc Lamp g-line 435.8 5
+Mercury Arc Lamp h-line 404.7 5
+Mercury Arc Lamp i-line 365.0 6
+KrF excimer laser 248.35 0.30
+ArF excimer laser 193.3 0.45
+F2 excimer laser 157.63 0.002
+Table 4.2 Some values for Cauchy coeffi cients of photoresists (from http://www.microe.
+rit.edu/research/lithography/)
+Photoresist C1 C2 (nm2
+) C3 (nm4) Wavelength Range (nm)
+SPR-500 i-line (unexposed) 1.6133 5481.6 1.4077 × 109 300–800
+SPR-500 i-line (fully 
+exposed)
+1.5954 9291.9 4.2559 × 108 300–800
+193-nm resist 1.5246 3484 1.49 × 108 190–800
+
+
+## Page 15
+
+ Imaging in Resist: Standing Waves and Swing Curves 143
+fi xed phase relationship all along that length (that is, still maintain the ability to interfere 
+with itself). Suppose light of wavelength l1 travels a distance L/2, strikes a mirror at 
+normal incidence, and travels back a distance L/2. Further suppose that the total distance 
+traveled L is an integer number of wavelengths Nl1. Consider now a second wavelength 
+l2 such that this same distance is equal to ( ). N +12 2 / λ For this case, when the fi rst wavelength interferes constructively, the second wavelength will be interfering destructively. 
+If both wavelengths are present, no interference pattern will be observed at the distance 
+L/2 away from the mirror and L is called the coherence length.
+Combining the two equations
+LN N L= =+ = + 
+
+ 
+ λλ  λ 12 λ 1
+12 12 2 () // (4.40)
+Solving for L,
+L = −
+λλ
+λλ
+12
+2( ) 12
+ (4.41)
+Letting l1 − l2 = ∆l, the bandwidth, and assuming this bandwidth is small compared to 
+the wavelength so that l1l2 = l2, where the geometric mean l is about equal to the arithmetic mean, the equation becomes
+L = λ
+λ
+2
+2∆ (4.42)
+As an example, if both g-line and i-line light exposes a photoresist, the range of wavelengths is about 80 nm and the mean wavelength is about 400 nm. The coherence length 
+will be 1000 nm, which means that there will be no standing waves at about 500 nm up 
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+0 200 400 600 800 1000
+Depth into Resist (nm)
+Relative Intensity
+Single Wavelength 
+Broadband
+Figure 4.8 Standing wave intensity within a photoresist fi lm (1000 nm of resist on silicon), 
+for monochromatic (l = 365 nm) and broadband illumination (350–450 nm range of the 
+mercury spectrum)
+
+
+## Page 16
+
+144 Fundamental Principles of Optical Lithography
+from the substrate. This matches the result seen in Figure 4.8 quite well. For laser lithography at 248 or 193 nm, the source bandwidth is extremely small. For a 248-nm source 
+with a 1-pm bandwidth, the coherence length will be on the order of 3 cm.
+4.2 Swing Curves
+Generically, a swing curve refers to the sinusoidal variation of some lithographic parameter with resist thickness.5
+ There are several parameters that vary in this way, but the most 
+important is the critical dimension (CD) of the photoresist feature being printed. Figure 
+4.9 shows a typical CD swing curve for i-line exposure of a 0.5-mm line on silicon. The 
+change in linewidth is quite large (more than the typical 10% tolerance) for relatively 
+small changes in resist thickness. Another swing curve is the E0 swing curve, showing 
+the same sinusoidal swing in the photoresist dose-to-clear (Figure 4.10). For a resist 
+thickness that requires a higher dose-to-clear, the photoresist will, as a consequence, 
+require a higher dose to achieve the desired line size. But if the exposure dose is fi xed 
+(as it was for the CD swing curve), the result will be an underexposed line that prints too 
+large. Thus, it follows that the E0 and CD swing curves result from the same effect, 
+coupled by the exposure latitude of the feature. The fi nal swing curve measures the 
+refl ectivity of the resist-coated wafer as a function of resist thickness (Figure 4.11). 
+Although refl ectivity is further removed from lithographic metrics such as E0 or CD, it is 
+the refl ectivity swing curve that provides the most insight as to the cause of the 
+phenomenon.
+4.2.1 Refl ectivity Swing Curve
+The refl ectivity swing curve shows that variations in resist thickness result in a sinusoidal 
+variation in the refl ectivity of the resist-coated wafer. Since the defi nition of refl ectivity 
+is the total refl ected light intensity divided by the total incident intensity, an increase in 
+0.40
+0.45
+0.50
+0.55
+0.60
+0.65
+0.90 0.95 1.00 1.05 1.10 1.15 1.20
+Resist Thickness (µm)
+Resist Linewidth (µm)
+Figure 4.9 CD swing curve showing a sinusoidal variation in the resist linewidth with resist 
+thickness (i-line exposure of resist on silicon)
+
+
+## Page 17
+
+ Imaging in Resist: Standing Waves and Swing Curves 145
+refl ectivity results in more light that does not make it into the resist. Less light being 
+coupled into the resist means that a higher dose is required to affect a certain chemical 
+change in the resist, resulting in a larger E0. Thus, the E0 and CD swing curves can both 
+be explained by the refl ectivity swing curve. (The interested reader can convince him/
+herself that the phases of the sinusoids of Figure 4.9 through Figure 4.11 make sense with 
+respect to each other.)
+What causes the refl ectivity swing curve of Figure 4.11? Of course, the answer lies in 
+the thin fi lm interference effects that were discussed in the previous section on standing 
+waves. Using the same simple geometry shown in Figure 4.1, a thin photoresist (layer 2) 
+rests on a thick substrate (layer 3) in air (layer 1). If we illuminate this fi lm stack with a 
+0.0
+0.0
+0.1
+0.1
+0.2
+0.2
+0.3
+0.90 0.95 1.00 1.05 1.10 1.15 1.20
+Resist Thickness (µm)
+Reflectivity
+40
+50
+60
+70
+80
+90
+100
+0.90 0.95 1.00 1.05 1.10 1.15 1.20
+Resist Thickness (µm)
+Dose-to-Clear (mJ/cm2
+)
+Figure 4.10 Eo swing curve showing a sinusoidal variation in the resist dose-to-clear with 
+resist thickness (i-line exposure of resist on silicon)
+Figure 4.11 Refl ectivity swing curve showing a sinusoidal variation in the resist-coated wafer 
+refl ectivity with resist thickness (i-line exposure of resist on silicon)
+
+
+## Page 18
+
+146 Fundamental Principles of Optical Lithography
+monochromatic plane wave normally incident on the resist, the analysis given before was 
+used to determine the standing wave intensity within the resist. However, our goal here 
+is to determine the total light refl ected by the fi lm stack. As shown in Figure 4.12, the 
+total refl ected light is made up of the incident beam refl ecting off the air–resist interface 
+and beams that have bounced off of the substrate and then were transmitted by the air–
+resist interface.
+Let’s begin by writing an expression for the electric fi eld of the ray that is directly 
+refl ected by the air–resist interface. Recalling the defi nitions used in section 4.1.2,
+EE rI 0 12 = ρ (4.43)
+The next ‘refl ected’ beam is transmitted into the resist, refl ected off the substrate, and 
+transmitted into the air. The result, denoted as Er1, is given by
+EE rI 1 12 21 23 D
+2 = ττρτ (4.44)
+The next refl ected beam makes two bounces inside the resist before being transmitted 
+out, resulting in an additional r21 r23 τ D
+2 term.
+The total refl ection coeffi cient can be computed by totaling up all the refl ected electric 
+fi elds and then dividing by the incident fi eld.
+ρρ ττρτ
+ρρτ
+ρ ρτ
+ρρ total
+r
+I
+= =+
++ = ++
+∑E
+E
+i D
+D
+D
+12
+12 21 23 2
+12 23 2
+12 23 2
+11 12 23 2 τ D
+ (4.45)
+Note that since all of the refl ected light will always be traveling in the same direction, 
+Equation (4.45) applies equally well to s- or p-polarization. The intensity refl ectivity of 
+the fi lm stack is the square of the magnitude of the electric fi eld refl ection coeffi cient. At 
+fi rst glance, the sinusoidal dependence of refl ectivity with resist thickness is not obvious 
+from Equation (4.45). The dependence is contained in the internal transmittance. Carrying 
+out the calculation of refl ectivity for the case of normal incidence,
+R
+nD DD
+= + + −+
++
+−− ρ ρ ρρ π λ φ φ
+ρρ
+αα 12
+2
+23
+2 2 12 23 2 12 23
+12 23
+2
+24
+1
+e e/
+e
+cos( )
+−− + ++ αα ρρ π λ φ φ 2 24 12 23 2 12 23 DD e/ cos( ) nD
+ (4.46)
+where f12 and f23 are the phase angles of the refl ection coeffi cients r12 and r23, 
+respectively.
+() a) (b
+Resist
+Substrate
+Air n1
+D
+z = 0
+EI
+Er0
+n2
+n3
+Resist
+Substrate
+Air
+Er1
+Figure 4.12 Film stack showing (a) geometry for swing curve derivation, and (b) incident, 
+transmitted and refl ected waves [oblique angles are shown for diagrammatical purposes 
+only]
+
+
+## Page 19
+
+ Imaging in Resist: Standing Waves and Swing Curves 147
+The discussion so far has been mostly mathematical. Equation (4.45) gives a rigorous 
+result that, when expressed as Equation (4.46), leads to an understanding of the refl ectivity 
+swing curve. Physically, the refl ectivity swing curve is the result of interference among 
+the refl ected rays. As pictured in Figure 4.12, the total refl ected fi eld is the sum of the 
+various rays. How the initially refl ected ray Er0 adds to the fi rst transmitted and refl ected 
+ray Er1 depends on the phase of Er1, which in turn depends on the resist thickness. At 
+some thickness, Er1 will be in phase with Er0, resulting in a maximum refl ectivity. At 
+another thickness Er1 will be out of phase with Er0, resulting in a minimum refl ectivity.
+Equation (4.46) can also lead to a better understanding of swing curves. The period of 
+all of the swing curves can be easily obtained from Equation (4.46) and is the same as 
+the period of the standing waves in the photoresist. Likewise, the effects of increasing or 
+reducing the refl ectivities can be seen. Twice the multiplier of the cosine in Equation 
+(4.46) is called the swing amplitude,
+6
+ and is equal to 4|r12r23|e−aD. If the substrate is nonrefl ective (r23 = 0), the fi lm stack refl ectivity becomes constant (the swing amplitude goes 
+to zero). Thus, a bottom antirefl ection coating can reduce or eliminate the swing curve. 
+Less obviously, if r12 = 0 the refl ectivity will also become constant, eliminating the swing 
+curve. This can be achieved by using a top antirefl ection coating. Physically, if the swing 
+curve results from interference between Er0 and Er1, eliminating either Er0 or Er1 will 
+eliminate the interference and the swing. Finally, absorption in the resist will reduce the 
+swing amplitude in Equation (4.46) by reducing the amplitude of Er1 and thus the amount 
+of interference that can take place.
+While not as obvious from the above discussion, the use of broadband illumination can 
+reduce or eliminate swing curves as well. Recalling the discussion in section 4.1.5, swing 
+curves will be reduced whenever the resist thickness approaches the coherence length of 
+the light source.
+Some refractive index values for common materials encountered in optical lithography 
+are given in Table 4.3. For the case of a typical resist on silicon at 248 nm, a = 0.5 mm−1, 
+|r12| = 0.275 and |r23| = 0.73. For a nominal 300-nm resist thickness, that gives
+R D
+D = + −+
++
+0 47 0 345 2 70 5
+1 03 0 345 2 70
+12 23 . . cos( ( . ) )
+. . cos( (
+π φφ
+π
+/ nm
+/ . ) ) 5nm ++ φφ 12 23
+ (4.47)
+Table 4.3 Some refractive index values of common materials at common lithographic 
+wavelengths7
+Material n at 436 nm n at 365 nm n at 248 nm n at 193 nm
+Photoresist 1.65 + i0.022 1.69 + i0.027 1.76 + i0.010 1.71 + i0.018
+Silicon 4.84 + i0.178 6.50 + i2.61 1.57 + i3.57 0.883 + i2.78
+Amorphous Silicon 4.45 + i1.73 3.90 + i2.66 1.69 + i2.76 1.13 + i2.10
+Silicon Dioxide 1.470 + i0.0 1.474 + i0.0 1.51 + i0.0 1.56 + i0.0
+Silicon Nitride 2.06 + i0.0 2.09 + i0.0 2.28 + i0.0 2.66 + i0.240
+Aluminum 0.580 + i5.30 0.408 + i4.43 0.190 + i2.94 0.113 + i2.20
+Copper 1.17 + i2.33 1.27 + i1.95 1.47 + i1.78 0.970 + i1.40
+Chrome 1.79 + i4.05 1.39 + i3.24 0.85 + i2.01 0.84 + i1.65
+Gallium Arsenide 5.07 + i1.25 3.60 + i2.08 2.27 + i4.08 1.36 + i2.02
+Indium Phosphide 4.18 + i0.856 3.19 + i1.95 2.13 + i3.50 1.49 + i2.01
+Germanium 4.03 + i2.16 4.07 + i2.58 1.39 + i3.20 1.13 + i2.09
+
+
+## Page 20
+
+148 Fundamental Principles of Optical Lithography
+where f12 = −179.5° and f23 = −134°. The maximum refl ectivity is about 0.59, and the 
+minimum is about 0.18. For the case of a typical resist on silicon at 365 nm, a = 0.95 mm−1, 
+|r12| = 0.257 and |r23| = 0.634 (before bleaching). For a nominal 600-nm resist thickness, 
+that gives
+R D
+D = + −+
++
+0 195 0 184 2 108
+1 008 0 184 2 1
+12 23 . . cos( ( ) )
+. . cos( (
+π φφ
+π
+/ nm
+/ 08nm) ) ++ φφ 12 23
+ (4.48)
+The maximum refl ectivity for this case is about 0.318, and the minimum is about 
+0.013.
+4.2.2 Dose-to-Clear and CD Swing Curves
+An approximate behavior of the E0 swing curve can be obtained by assuming an ideal, 
+threshold resist. For such a case, the resist will just clear away when the dose at the 
+bottom of the resist (for an open-frame exposure) reaches some critical threshold. Using 
+Equation (4.19) and assuming the standing waves in the resist are averaged out by 
+some post-exposure bake mechanism (see Chapter 5), the average or bulk intensity 
+will be
+IzT z Dz avg eff () ( ) ee () =+ − −− αα ρ23
+2 2 (4.49)
+where this equation was derived by averaging the standing wave intensity Equation (4.19) 
+over one period. It is the effective transmittance Teff that contains the swing curve effect 
+of energy coupled into the resist as a function of resist thickness. Evaluating this expression at the bottom of the resist,
+I zD T D avg eff ()( ) == + e− 1 23
+2 ρ α (4.50)
+The incident dose will equal the dose-to-clear, E0, when the energy at the bottom of 
+the resist (equal to E0 Iavg) reaches some critical dose, Ecrit. Thus,
+E E
+T
+E
+D
+DD
+0
+23
+2
+12 23
+2 2 12 23
+1
+12
+= +
+= ++
+−
+−−
+crit
+eff
+crit
+e
+ee
+()
+co
+ρ
+ρρ ρρ
+α
+αα s( ) 4
+1
+2 12 23
+12 23
+2
+π λφ φ
+ρ α
+nD
+T D
+/
+( )e
+++
++ −
+ (4.51)
+Likewise, for a threshold resist, the dose to achieve a certain CD will follow this same 
+equation though with a different critical dose. For a fi xed dose, the CD obtained will 
+depend on the exposure latitude of the feature. A simple expression that relates CD to 
+exposure dose will be derived in Chapter 8, and takes the form
+CD CD
+CD
+CD
+E
+E
+EE E
+− =− 
+
+
+ =
+1
+1
+1
+1
+1 d
+d
+ln
+ln (4.52)
+where E1 is a reference dose (such as the nominal dose) that produces the CD = CD1, and 
+the exposure latitude term (dlnCD/dlnE) can be approximated as a constant.
+
+
+## Page 21
+
+ Imaging in Resist: Standing Waves and Swing Curves 149
+In the context of swing curves, the best choice for E1 will be the dose that produces 
+the nominal CD when the resist thickness is at a minimum or maximum. For the case of 
+operating at a swing curve minimum (resist thickness = Dmin),
+EE
+T
+DD
+D 1
+12 23
+2 2 12 23
+12 23
+2
+12
+1 = +−
++
+−−
+− crit
+ee
+( )e
+ρρ ρρ
+ρ
+αα
+α
+min min
+min
+ (4.53)
+Substituting Equation (4.51) for E and Equation (4.53) for E1 into Equation (4.52) gives 
+a CD swing curve expression.
+4.2.3 Swing Curves for Partially Coherent Illumination
+Just as for the standing wave expressions, the above swing curve equations will change 
+as a function of the incident angle of illumination, so that actual swing curves are strongly 
+dependent on the NA and illumination of the stepper. In fact, the range of angles coming 
+from a partially coherent imaging source will produce a range of periods of standing 
+waves and swing curves in the resist, reducing the amplitude in the same way that a range 
+of wavelengths does.
+Suppose that the incident light strikes the resist at an angle q1. The angle inside the 
+resist will be q2, given by Snell’s law. Then the swing curve expressions given above will 
+be correct if the resist thickness D is replaced by D cos q2 and the refl ection and transmission coeffi cients are calculated for the appropriate angle and polarization according to the 
+Fresnel formulae [Equation (4.29)]. The swing curve period becomes
+Period = λ
+2n22 cosθ (4.54)
+Consider a simple case. Light normally incident on a thin resist fi lm coated on a refl ective substrate is found to have a maximum of its swing curve at a certain thickness. This 
+means that the path length traveled by the light through the resist is an integer multiple 
+of the wavelength. If now the angle of incidence is increased, the path length through 
+the resist will also increase. If the angle is large enough so that the path length increases 
+by half a wavelength, this same resist thickness will correspond to a minimum of the 
+swing curve. The angle inside the resist which causes this swing curve phase reversal is 
+given by
+θ2 1
+05 = +
+
+
+
+ − cos .
+m
+m (4.55)
+where m is the multiple of wavelengths that the swing curve maximum represents. For 
+m = 9 (typical for a 1000-nm fi lm used for i-line lithography), q2 ≈ 18.7° inside the resist, 
+corresponding to about a 32° angle incident on a typical photoresist and sin q1 = 0.53. For 
+m = 5, (typical for a 250-nm resist fi lm used for 193-nm lithography), q2 ≈ 24.6° inside 
+the resist, corresponding to about a 45° angle incident on a typical photoresist and 
+sin q1 = 0.71. Both of these conditions are commonly met.
+What does this mean for real swing curves in real lithographic situations? When 
+measuring a dose-to-clear (E0) swing curve, the light striking the resist is made up of 
+
+
+## Page 22
+
+150 Fundamental Principles of Optical Lithography
+zero-order light (that is, light which is not diffracted). If the illumination were coherent, 
+the light would be normally incident on the resist. For conventional partially coherent 
+illumination, the light is incident on the resist over a range of angles given by sin q1 =
+±sNA where NA is the numerical aperture of the objective lens and s is the partial coherence factor. Each angle produces its own ‘swing curve’ and the total result is the superposition of all the individual responses to each angle. Since any change in s or NA will 
+change the range of angles striking the photoresist, the swing curve will change as well. 
+Figure 4.13 shows how E0 swing curves vary with sNA (affected by changing either the 
+partial coherence or the numerical aperture).
+Consider also a simple example of imaging small lines and spaces. For conventional 
+illumination, the zero order will be centered around normal incidence at the resist surface 
+with a range of angles determined by sNA. The ±1st diffraction orders will strike the 
+resist at an angle of sin−1
+(l/p) where p is the pitch of the line/space pattern. For 350-nm 
+features imaged with i-line, the center of the fi rst-order angular range will be about 31.4° 
+in air – very close to the angle given above for swing curve phase reversal for a 1000-
+nm-thick resist fi lm. For 130-nm lines and spaces imaged with 193-nm light, the fi rstorder light also produces a swing that is nearly perfectly out of phase with the normally 
+incident light. Thus, if the resist thickness were adjusted to give a maximum of the E0
+swing curve (i.e. the zero order is at a maximum of the swing curve), the fi rst orders 
+would effectively be at a minimum of the swing curve. The zero-order light would be 
+maximally refl ected out of the resist while the fi rst-order light would be maximally 
+coupled into the resist. When these orders combine to form the image in resist, the result 
+will be signifi cantly different than the case of imaging on a nonrefl ecting substrate. On 
+the other hand, if the resist thickness were at an E0 swing curve minimum, the fi rst orders 
+would be at a swing curve maximum. The lithographic response of these features (for 
+example, the size of the focus-exposure process window) could be quite different when 
+operating at an E0 swing curve minimum versus a maximum.
+1.00 1.05 1.10 1.15 1.20
+90
+100
+110
+120
+130
+140
+150
+Dose-to-Clear,
+E0 (mJ/cm2
+)
+Resist Thickness (microns)
+NA = 0.2
+NA = 0.3
+NA = 0.4
+NA = 0.5
+sNA = 0.0
+s
+s
+s
+s
+Figure 4.13 The phase and amplitude of a dose-to-clear swing curve are affected by the 
+range of angles striking the resist, which is controlled by the product of the partial coherence 
+and the numerical aperture (sNA) for conventional illumination
+
+
+## Page 23
+
+ Imaging in Resist: Standing Waves and Swing Curves 151
+4.2.4 Swing Ratio
+While detailed equations for swing curve effects are certainly possible, as the above 
+discussions have shown, it is often convenient to defi ne simple metrics to capture the 
+essence of the effects. For swing curves, it is the amplitude of the swing that determines 
+the degree of the problem caused by resist thickness variations. A simple metric for the 
+magnitude of the swing is called the swing ratio, defi ned as the difference between adjacent min and max values of the swing curve divided by their average value. For example, 
+for an E0 swing curve, the swing ratio (SR) would be
+SR EE
+EE = −
++
+00
+00 2
+max min
+min max ( )/ (4.56)
+Since any two adjacent min/max pairs can be used, it will make a difference whether the 
+max is at a greater or lesser thickness compared to the min, as will be seen below.
+Using Equation (4.51),
+EE
+T
+EE
+DD
+0
+12 23
+2
+12 23
+12 23
+2
+0
+2
+1 min
+max
+min min
+() = +−
++
+=
+−
+crit
+ee αα ρρ ρρ
+ρ
+crit
+ee αα ρρ ρρ
+ρ
+DD
+T
+max max
+()
+++
++
+− 12 23
+2
+12 23
+12 23
+2
+2
+1
+ (4.57)
+which gives a swing ratio of
+SR
+DD D D
+D
+= −+ − + −− ( )( )
+[(
+max min ee e e
+e
+αα α α max min
+α
+ρρ ρρ 12 23
+2 4 12 23
+1
+2
+max min max min ++ + e ee α αα −− ρρ D DD ) ( )] 12 23
+2
+ (4.58)
+Let Dmax = D + ∆D/2 and Dmin = D − ∆D/2, where a positive value of ∆D means that the 
+max is at a resist thickness greater than the min. (Note that ∆D will be the swing period, 
+that is l/2n2.) Equation (4.58) can be rewritten as
+SR
+DD D D D D
+= − + −+ − −− ee e e e e αα α α α α ()() ρρ ρρ ∆ ∆ ∆∆ / / // 22 12 23
+2 22 4 12 23
+1
+2
+22 12 23
+2 22 [ ( ) ( )] / / // ee e e e e αα α α α α ρρ DD D D D D ∆ ∆ ∆∆ ++ + − −−
+ (4.59)
+If the amount of absorption is moderate, so that a∆D << 1, this equation can be 
+simplifi ed to
+SR
+DD DD
+DD
+≈ () + −+
++
+−
+−
+ee
+ee
+αα
+αα
+α ρρ α ρρ
+ρρ
+∆∆ 12 23
+2
+12 23
+12 23
+2
+() 4
+ (4.60)
+In general,
+ρρ α 12 23
+2 2 e 1 − << D (4.61)
+
+
+## Page 24
+
+152 Fundamental Principles of Optical Lithography
+(for example, for resist on silicon at 248 nm, the value of this term is about 0.01). Neglecting this term gives
+SR D D ≈+ − α ρρ α ∆ 4 12 23 e (4.62)
+Thus, the swing ratio is equal to the swing amplitude plus an absorption term that 
+describes the tilt of the swing curve over one swing period.
+From Equation (4.62) it is easy to see how the standard approaches to reducing swing 
+curves are captured by the swing ratio metric: (1) reduce substrate refl ectivity |r23| by 
+using a bottom antirefl ection coating; (2) reduce air–resist refl ectivity |r12| by using a top 
+antirefl ection coating; and (3) reduce e−aD by increasing absorption. However, the sign of 
+∆D will also have an impact. If the maximum of the swing curve is at a greater thickness 
+than the minimum, ∆D will be positive and the upward tilt of the swing curve due to 
+absorption will make the swing ratio worse. If, however, the maximum of the swing curve 
+is chosen to be at a lower resist thickness than the minimum, ∆D will be negative and 
+bulk absorption will lower the swing ratio. In fact, it is possible to make the swing ratio 
+go to zero:
+SR
+D
+D
+≈= −
+−
+0 4 12 23 when eα ρρ α
+∆ (4.63)
+Figure 4.14 shows an example of zero swing ratio for a specifi c case. The upward tilt of 
+the swing curve due to absorption can make the swings look more like stair steps. Operating in the fl at region (where SR ≈ 0) can lead to greater CD control for these cases.
+As mentioned in the previous section, light strikes the wafer over a range of angles, 
+each angle setting up its own swing curve with its own period. If the range of angles is 
+great enough, a very noticeable decrease in the total swing ratio can be observed (see 
+Figure 4.13). For a simple case, we can calculate the impact of the range of angles on 
+the swing ratio metric defi ned above. Let’s consider the E0 swing curve for conventional 
+illumination. Further, let’s assume that the effect of angle on the refl ection and 
+140
+160
+180
+200
+220
+240
+260
+200 220 240 260 280 300 320 340 360 380 400 
+Resist Feature Width, CD (nm) 
+Resist Thickness (nm)
+Figure 4.14 Proper balancing of absorption and refl ectivities can make the minimum of 
+a swing curve (D = 310 nm) achieve the same CD as the previous swing curve maximum 
+(D = 280 nm)
+
+
+## Page 25
+
+ Imaging in Resist: Standing Waves and Swing Curves 153
+transmission coeffi cients and on absorption is small compared to the effect on the period. 
+Thus, we can put the E0 swing curve formula [Equation (4.51)] into the basic approximate 
+form
+E a b nD 0 22 =+ + cos( cos ) 4π θλ φ / (4.64)
+where the swing ratio is 2b/a.
+Inside the resist, let s = sin q2 so that we must integrate over the range ± smax where
+s
+NA
+n max = σ
+2
+ (4.65)
+Integrating over the source,
+E ab
+s
+nD s ss
+s
+0 2 2 2
+0
+2
+=+ − + 41 ∫ max
+cos( )
+max
+π λφ d (4.66)
+This integral is not analytically solvable, but it can be approximated by letting
+cosθ2 2
+2
+11
+2 = − ≈− s
+s (4.67)
+A typical value for smax is about 0.5, so that this approximation is not too bad. Using the 
+approximation and carrying out the integral gives
+E ab c
+c
+nD s 02
+2
+41
+4
+=+ − 
+
+ 
+
+ + 
+
+ 
+
+ sin( )
+cos max π λφ (4.68)
+where
+c
+D NA
+n = πσ
+λ
+()2
+2
+By using the same small angle approximation as was used in Equation (4.67),
+E ab c
+c 02 nD 2 4
+2
+=+ 
+  +  
+sin( )
+cos cos max π
+θ λφ (4.69)
+At fi rst glance, it is not clear what the period of the new standing wave is, since there is 
+a product of a sine and a cosine. However, the sine term has a period that is 10–20 times 
+larger than the cosine term, so it is easiest to interpret the cosine as creating the swing 
+curve and the sinc function as an amplitude modifi cation. Thus, the period of the partially 
+coherent swing curve is about
+Period where eff== eff
+λ
+θ
+θ θ
+2 2 2
+2
+n cos
+max (4.70)
+and the swing ratio is reduced by the factor sin(c)/c. Consider a typical 193-nm imaging 
+case where NA = 0.93 and s = 0.7. The swing curve period for normally incident light 
+would be 56 nm, but for the partially coherent light it grows slightly to 59 nm. The real 
+
+
+## Page 26
+
+154 Fundamental Principles of Optical Lithography
+impact is in the reduction of the swing ratio, which for a 300-nm-thick resist would 
+produce sin(c)/c = 0.77, meaning a 23% reduction in the swing ratio.
+4.2.5 Effective Absorption
+As we shall see, the optimum resist absorption is a strong function of the refl ectivity of 
+the substrate. Consider fi rst, however, the simple case of a nonrefl ecting substrate so that 
+light travels only downward through a resist fi lm of thickness D. The absorption of light 
+through the resist leads to an exposure dose error: a smaller dose at the bottom of the 
+resist (Ebottom) compared to the top (Etop). The fraction of light making it to the bottom is 
+given by
+E
+E
+TD
+bottom D
+top
+== e−α (4.71)
+As an example, for a resist with a = 0.5 mm−1, a 500-nm-thick fi lm will absorb 22% of 
+the light so that TD = 0.78.
+If the resist fi lm is coated on a refl ective substrate, refl ected light traveling up through the 
+fi lm will also be absorbed. The refl ected beam will be brighter at the bottom of the resist, 
+so that the sum of the incident and refl ected beams will have a smaller variation in dose from 
+top to bottom than for the nonrefl ective substrate case. The amount can be quantifi ed using 
+one of the previously derived expressions for the standing wave intensity. The ‘average’ 
+intensity (averaged over one standing wave period) was previously derived in Equation 
+(4.50), and is given here normalized so that the intensity at the top of the resist is 1:
+Iz z
+Dz
+D
+avg e
+ee
+e
+() = +
++
+
+
+
+
+
+
+
+
+−
+−
+−
+α
+αα
+α
+ρ
+ρ
+1
+1
+23
+2 22
+23
+2 2
+ (4.72)
+The term |r23|
+2
+e−a2D represents the fraction of the light intensity that makes it back to the 
+top of the resist after traveling down through the resist, refl ecting off the substrate, and 
+traveling back up to the top. It can be thought of as a ‘round-trip’ transmittance and is an 
+important factor in determining the difference between Equation (4.72) and simple bulk 
+absorption.
+For small amounts of absorption (a2D < 1, for example), the z-dependent exponential 
+term in the parentheses of Equation (4.72) can be expanded as Taylor series and an 
+approximate expression for the bulk effect can be derived:
+Iz z average e eff () ≈ −α (4.73)
+where the effective absorption coeffi cient is given by
+αα ρ
+ρ
+α
+α
+eff
+e
+e
+= −
++
+
+
+
+
+
+
+
+
+−
+−
+1
+1
+23
+2 2
+23
+2 2
+D
+D
+ (4.74)
+As discussed above, a more refl ective substrate actually reduces the bulk intensity variation through the resist, which is expressed here as a lower effective absorption 
+coeffi cient.
+
+
+## Page 27
+
+ Imaging in Resist: Standing Waves and Swing Curves 155
+Because of the Taylor series expansion, the expression (4.74) used in Equation (4.73) 
+provides a very good match for the actual intensity as a function of depth near the top of 
+the resist. However, the approximate expression overestimates the amount of absorption, 
+resulting in an intensity that is too low everywhere, with the greatest error at the bottom 
+of the resist. A second approach toward defi ning an effective absorption is to match the 
+intensity at the top and the bottom of the resist.8
+ This results in an effective absorption 
+coeffi cient of
+αα ρ
+ρ α
+eff
+e
+=− +
++
+
+
+
+
+
+
+
+− 
+11
+1
+23
+2
+23
+D 2 2D
+ln (4.75)
+For the case of small substrate refl ectivity (when using a good bottom antirefl ection 
+coating, for example), this expression simplifi es to
+αα ρ
+α
+α
+eff
+e ≈− − 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+−
+12 1
+2 23
+2 2D
+D (4.76)
+For moderate to small amounts of absorption, this equation can be further simplifi ed to
+αα ρ α eff ≈− − [ ( )] 12 1 23
+2 D (4.77)
+While the intensity using the effective absorption of Equation (4.75) matches the actual 
+average intensity at the top and the bottom of the resist, it gives an intensity that is higher 
+than the actual intensity everywhere else. To match the integrated intensity through the 
+thickness of the resist, the effective absorption coeffi cient must satisfy the following 
+equation:
+α
+α ρ
+ρρ
+α
+α
+αα
+eff
+e
+e
+ee eff 1
+1
+11
+23
+2 2
+23
+2 2 23
+− 2
+= +
+− −−
+−
+−
+−−
+D
+D
+DD ()
+ (4.78)
+The effective absorption coeffi cient that matches the integrated intensity will generally 
+lie about halfway between the values given by Equations (4.74) and (4.75).
+How can the effective absorption be used when designing resists for different refl ectivity applications? One simple design criterion might be to fi x the effective absorption 
+coeffi cient. Suppose that a 0.7-mm-thick deep-UV resist with an absorption coeffi cient of 
+0.4 mm−1
+ is currently providing acceptable resist profi le results on a bare silicon wafer 
+(|r23|
+2 ≈ 0.5). In other words, for the parameters given, the effective absorption provides 
+an acceptable dose variation from the top to the bottom of the resist. From Equation (4.74), 
+the effective absorption coeffi cient is 0.22 mm−1. Thus, for a resist to have approximately 
+the same profi le behavior on a perfectly nonrefl ecting substrate, its absorption coeffi cient 
+would have to be lowered to this 0.22-mm−1 value. On the other hand, if one wanted 
+to use an equivalent resist on an aluminum substrate with a refl ectivity of 0.84 (not 
+necessarily a good idea, given the swing curve effects), one could raise the absorption 
+coeffi cient to 0.52 mm−1 and still exhibit the same effective absorption.
+
+
+## Page 28
+
+156 Fundamental Principles of Optical Lithography
+Light traveling at an angle through the photoresist will result in an apparent difference 
+in the absorption coeffi cient. As will be derived in section 4.8.2, a plane wave traveling 
+through resist at some angle q2 will be absorbed according to
+Iz z ( ) exp( cos ) ∝−αθ / 2 (4.79)
+Thus, an effective absorption coeffi cient can be defi ned as a/cos q2. If a refl ective substrate 
+is present, Equations (4.74)–(4.78) can still be used if a/cos q2 is substituted for a. If a 
+range of angles is used, such as for partially coherent illumination, Equation (4.79) can 
+be integrated over the angular range of the source. For conventional illumination, and for 
+moderate amounts of absorption so that the exponential can be expanded as a Taylor 
+series, the resulting effective absorption coeffi cient becomes
+αα
+θ eff ≈ +
+
+
+ 
+
+ 2
+1 cos 2max
+ (4.80)
+where q2max is the angle in resist corresponding to the maximum angle of the conventional 
+partially coherent source.
+4.3 Bottom Antirefl ection Coatings
+As discussed above, refl ections from the substrate can cause unwanted variations in the 
+resist profi le and swing curve effects. Refl ections are caused by a difference in the 
+complex index of refraction of two materials. Since lithography takes place on a variety 
+of substrates with fi lm stacks of many materials and thicknesses, each interface in the 
+fi lm stack can contribute to the overall refl ectivity back into the photoresist. This complicated situation is made worse by the inevitable variations in the thicknesses, and 
+sometimes the refractive indices, of the fi lms. One possible solution to refl ectivity problems is the bottom antirefl ection coating (BARC). Also, swing curves can be improved 
+by the use of a top antirefl ection coating (TARC), described in the next section. These 
+types of antirefl ection coatings have somewhat different goals, but their basic behavior 
+is the same.
+The goals of fi lm stack optimization are to minimize standing waves in the resist, and 
+to reduce the sensitivity of the process to fi lm stack variations (including resist and BARC, 
+but other layers as well). By far the most common way to accomplish all of these goals 
+is by using an optimized BARC. When optimizing a lithography process for refl ectivity, 
+there are three basic tasks: (1) optimize the BARC, (2) optimize the resist thickness (from 
+a swing curve perspective) and (3) understand the sensitivity to BARC, resist and fi lm 
+stack variations. For the fi rst task, there are two classes of BARC problems:
+• BARC on an absorbing substrate (such as metal) – the goal is to reduce the refl ectivity 
+(the thickness of the metal or what is underneath doesn’t matter)
+• BARC on a transparent substrate (such as silicon dioxide) – reduce the sensitivity to 
+oxide thickness variations (while also keeping refl ectivity low)
+There is an unfortunate problem in that the substrate refl ectivity experienced by the 
+photoresist cannot be measured. Measuring the refl ectivity of the substrate when not 
+coated by photoresist is not useful to this task, and once coated the refl ectivity becomes 
+hidden from measurement. Thus, the approach that must be used is to calculate the 
+
+
+## Page 29
+
+ Imaging in Resist: Standing Waves and Swing Curves 157
+refl ectivity from measured fundamental parameters, namely the thickness and complex 
+refractive index of each layer in the fi lm stack.
+For a single-layer BARC, there are three parameters available for optimization: the 
+thickness of the BARC, and the real and imaginary parts of its refractive index. For the 
+simplest use case, a BARC is given and the goal is just to optimize its thickness. Figure 
+4.15 shows substrate refl ectivity calculations for two different resist/BARC/substrate 
+stacks. These refl ectivity curves show a characteristic feature of a resist/BARC/substrate 
+stack: the lowest refl ectivity could be at the fi rst minimum or at the second minimum 
+depending on the parameters. Etch and process integration considerations determine the 
+range of acceptable BARC thicknesses, and thus the preference for a fi rst-minimum 
+BARC or a second-minimum BARC.
+4.3.1 BARC on an Absorbing Substrate
+For the case where all of the BARC properties are available for optimization, a more 
+detailed look at the problem is required. Recapping the basic thin fi lm refl ectivity theory, 
+the electric fi eld refl ection coeffi cient (the ratio of refl ected to incident electric fi elds) at 
+the interface between two materials is a function of the complex indices of refraction 
+for the two layers. For normal incidence, the refl ection coeffi cient of light traveling 
+through layer i and striking layer j is given by Equation (4.8). For the case of a bottom 
+antirefl ection coeffi cient (BARC), assume the BARC (layer 2) is sandwiched between a 
+resist (layer 1) and a very thick substrate (layer 3). The total refl ectivity looking down on 
+layer 2 includes refl ections from both the top and bottom of the BARC fi lm. The resulting 
+refl ectivity, taking into account all possible refl ections, is
+R D
+D
+total total == +
++
+ρ ρ ρτ
+ρρτ
+2 12 23 2
+12 23 2
+2
+1 (4.81)
+where the internal transmittance, tD, is the change in the electric fi eld as it travels from 
+the top to the bottom of the BARC, given by Equation (4.12).
+Substrate Reflectivity
+Thickness Layer #2 (nm)
+First Minimum BARC Second Minimum BARC
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+Substrate Reflectivity
+Thickness Layer #2 (nm)
+0 20 40 60 80 100 120 140 0 20 40 60 80 100 120 140
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+Figure 4.15 Typical examples of substrate refl ectivity versus BARC thickness for different 
+resist/BARC/substrate stacks
+
+
+## Page 30
+
+158 Fundamental Principles of Optical Lithography
+If the role of layer 2 is to serve as an antirefl ection coating between materials 1 and 3, 
+one obvious requirement might be to minimize the total refl ectivity given by Equation 
+(4.81). If the light refl ecting off the top of layer 2 (r12) can cancel out the light that travels 
+down through layer 2, refl ects off layer 3, and then travels back up through layer 2 23 2 ( ), ρτ D
+then the refl ectivity can become exactly zero. In other words,
+Rtotal = += = 00 when or 12 23 DD
+2 21 23 2 ρ ρτ ρ ρτ (4.82)
+When designing a BARC material, there are only three variables that can be adjusted: the 
+real and imaginary parts of the refractive index of the BARC, and its thickness. One 
+classic solution to Equation (4.82) works perfectly when the materials 1 and 3 are nonabsorbing: let τ D
+2 =−1 and r12 = r23. This is equivalent to saying that the BARC thickness 
+is a ‘quarter wave’ (D = l/4n2), and the nonabsorbing BARC has a refractive index of 
+n nn 2 13 = . While this BARC solution is ideal for applications like antirefl ective coatings 
+on lens surfaces, it is not particularly useful for common lithography substrates, which 
+are invariably absorbing.
+Will a solution to Equation (4.82) always exist, even when the resist and substrate have 
+complex refractive indices? Since all the terms in Equation (4.82) are complex, zero 
+refl ectivity occurs when both the real part and the imaginary part of Equation (4.82) are 
+true. This requirement can be met by adjusting only two of the three BARC parameters 
+(n, k and D). In other words, there is not just one solution but a family of solutions to 
+the optimum BARC problem. Expressing each refl ection coeffi cient in terms of magnitude 
+and phase,
+ρρ θ
+ij ij
+i ij = e (4.83)
+Equation (4.82) can be expressed as two equalities:
+D n = =− λ
+πκ
+ρ
+ρ
+λ
+π
+θθ
+44 2
+23
+21 2
+21 23 ln ( ) (4.84)
+Unfortunately, the seemingly simple forms of Equations (4.82) and (4.84) are deceptive: 
+solving for the unknown complex refractive index of the BARC is exceedingly messy. 
+As a consequence, numerical solutions to Equation (4.82) or (4.84) are almost always 
+used. Note that a second-minimum BARC can be optimized using Equation (4.84) by 
+adding 2p to the angle difference on the right-hand side of the equation.
+Consider a common case of a BARC for 193-nm exposure of resist on silicon. The 
+ideal BARC is the family of solutions as shown in Figure (4.16), which gives the 
+ideal BARC n and k values as a function of BARC thickness. Each solution produces 
+exactly zero refl ectivity for normally incident monochromatic light. Within this family 
+of solutions, available materials and the acceptable range of BARC thicknesses 
+(usually constrained by coating and etch requirements) will dictate the fi nal solution 
+chosen.
+Another criterion for choosing the optimum BARC is the sensitivity to BARC thickness 
+variations. Often, BARC layers are coated over topography and are partially planarizing. 
+This means that BARC thickness variations across the device are inevitable. Is one BARC 
+solution from the family of solutions given in Figure 4.16 better from a BARC thickness 
+
+
+## Page 31
+
+ Imaging in Resist: Standing Waves and Swing Curves 159
+sensitivity perspective? Consider only small errors in BARC thickness about the optimum 
+value, so that D = Dopt + ∆ where Dopt is the optimum thickness given by Equation (4.84). 
+Since Equation (4.82) is true at the optimum thickness,
+ρ ρτ ρ ρτ ρ πλ πλ 12 23 2 12 23 24 12 22 4 + =+ = − DD 1 ii
+opt ee nn ∆∆ // () (4.85)
+Using a similar operation on the denominator of the refl ectivity expression (4.81) gives
+R
+i
+i = −
+−
+ρ
+ρ
+πλ
+πλ
+12 4
+12
+24
+2
+1
+1
+2
+2
+() e
+e
+/
+/
+n
+n
+∆
+∆ (4.86)
+(b)
+1.2
+1.4
+1.6
+1.8
+2.0
+2.2
+2.4
+2.6
+2.8
+50 70 90 110 130
+BARC Thickness (nm)
+Refractive Index – Real
+0.16
+0.21
+0.26
+0.31
+0.36
+0.41
+Refractive Index –Imaginary
+n
+κ
+(a)
+1.0
+1.2
+1.4
+1.6
+1.8
+2.0
+2.2
+2.4
+2.6
+10 20 30 40 50 60
+BARC Thickness (nm)
+Refractive Index – Real
+0.30
+0.35
+0.40
+0.45
+0.50
+0.55
+0.60
+0.65
+0.70
+0.75
+0.80
+Refractive Index – Imaginary
+κ
+n
+Figure 4.16 Optimum BARC refractive index (real and imaginary parts, n and k) as a function of BARC thickness for normal incidence illumination (resist index = 1.7 + i0.01536 and 
+silicon substrate index = 0.8831 + i2.778) at 193 nm. (a) First minimum BARCs, and (b) 
+second minimum BARCs
+
+
+## Page 32
+
+160 Fundamental Principles of Optical Lithography
+Assuming ∆ is small, keeping only the fi rst two terms of a Taylor’s expansion of the 
+exponential in the numerator gives
+R n ≈ 
+
+
+ − 
+
+ 
+ ∆  2 1
+2
+2
+1
+2 2
+1 π
+λ
+n
+n
+ (4.87)
+As can be seen, the refl ectivity increases approximately quadratically about the optimum 
+BARC thickness. Different BARC solutions will have different sensitivities, depending 
+on how close the ratio n2/n1 is to one. For the fi rst minimum resist on BARC on silicon 
+example above, the ∼50-nm BARC thickness solution has the minimum sensitivity to 
+BARC thickness errors.
+Similarly, variations in refractive index of a BARC can cause the refl ectivity of an 
+otherwise optimal BARC solution to increase. For the case of the optimal normal-incidence BARC, the refl ectivity for a given change is BARC index ∆n (which can be an 
+error in real and/or imaginary parts) will be approximately
+R iD ≈ −
++
+− + −− ∆n +nn nn
+2 12
+122
+2
+12
+12
+23
+23
+2
+1
+11 4 ρ
+ρ
+ρρ πλ/ (4.88)
+Note that |∆n|
+2
+ is the sum of the squares of the errors in the real and imaginary parts of 
+the index. The sensitivity to BARC errors, either in thickness or in refractive index, is 
+shown in Figures 4.17 and 4.18 for the case of the BARC solutions of Figure 4.16. Note 
+that for the fi rst minimum case, practical BARC solutions have thicknesses in the 20- to 
+50-nm range. Thus, for this case, thicker BARCs are less sensitive to thickness errors but 
+more sensitive to refractive index errors. Assuming that a refl ectivity of 0.1 % can be 
+tolerated, a 20-nm optimal BARC can tolerate 1 nm of thickness error, or a 0.053 change 
+in refractive index. A 40-nm optimal BARC can tolerate 2 nm of thickness error, or a 0.04 
+change in refractive index. Roughly, if the BARC thickness has no error, the real part of 
+the refractive index of these BARCs must be controlled to 2.5 % assuming no error in the 
+imaginary part, or the imaginary parts must be controlled to 8 % for no error in the real 
+part. Likewise, if the refractive index has no error, the BARC thickness must be controlled 
+to roughly 5 % for the given 0.1 % refl ectivity tolerance.
+4.3.2 BARCs at High Numerical Apertures
+Things become a bit more complicated for the more general case of light traveling at an 
+angle with respect to the fi lm stack normal. In lithographic terms, high numerical apertures 
+allow large ranges of angles to pass through the lens and arrive at the wafer. Off-axis 
+illumination of small pitch patterns produces images made of light concentrated at large 
+angles. Small isolated features with large s partially coherent illumination create light 
+reaching the wafer over a wide range of angles. And of course, low numerical apertures 
+result in limited ranges of angles reaching the wafer.
+How does non-normal incidence affect Equation (4.81)? Each refl ection coeffi cient rij
+is a function of the angle of light, and a function of polarization. Randomly polarized 
+light (often called unpolarized light, the kind most commonly employed in lithographic 
+tools) can be considered the incoherent sum of two linear and orthogonal polarizations. 
+If qi is the incident (and refl ected) angle inside the resist and qj is the transmitted angle 
+
+
+## Page 33
+
+(a) (b)
+0.0000
+0.0002
+0.0004
+0.0006
+0.0008
+0.0010
+0.0012
+0.0014
+0.0016
+50 70 90 110 130
+Optimum BARC Thickness ( nm)
+R/∆2 (1/nm2
+)
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+50 70 90 110 130
+Optimum BARC Thickness (nm)
+R/|∆n|
+2
+0.000
+0.001
+0.002
+0.003
+0.004
+0.005
+0 20 40 60 80
+Optimum BARC Thickness (nm)
+R/
+∆2 2 (1/nm2
+)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+0 10 20 30 40 50 60 70
+Optimum BARC Thickness (nm)
+R/|∆
+n|
+(a)
+(b)
+Figure 4.17 Sensitivity of substrate refl ectivity for the optimum fi rst minimum BARCs of 
+Figure 4.16a as a function of (a) BARC thickness errors, or (b) BARC refractive index errors
+Figure 4.18 Sensitivity of substrate refl ectivity for the optimum second minimum BARCs of 
+Figure 4.16b as a function of (a) BARC thickness errors, or (b) BARC refractive index errors
+
+
+## Page 34
+
+162 Fundamental Principles of Optical Lithography
+in the BARC, then the electric fi eld refl ection and transmission coeffi cients are given by 
+the Fresnel formulae [Equation (4.29)]. Of course, the relationship between incident and 
+transmitted angle is given by Snell’s law, Equation (4.30). The internal transmittance is 
+also a function of angle as given by Equation (4.33).
+The requirements for zero refl ectivity remain the same. Equation (4.82) must be satisfi ed for both s- and p-polarization. Since each equation has both real and imaginary parts, 
+there are four constraints that must be satisfi ed in order to achieve exactly zero refl ectivity 
+for unpolarized illumination. However, the BARC fi lm gives us only three degrees of 
+freedom (n, k and D). In general, there can be no single BARC fi lm that results in zero 
+refl ectivity for a non-normal incident randomly polarized plane wave. Calculating the 
+unpolarized intensity refl ectivity (defi ned as the average of the individual refl ectivities 
+for s- and p-polarization), the best case optimum BARC parameters are given in Figure 
+4.19 as a function of incident angle in air (before striking the resist).
+Figure 4.20 shows the lowest possible refl ectivity as a function of incident angle, using 
+the optimum BARC parameters defi ned in Figure 4.19 for each angle. As can be seen, 
+the best case refl ectivity grows rapidly as the angle increases, and is worse for the thinner 
+BARC fi lm.
+Polarization plays a large role in determining the effect of angle on refl ectivity. Figures 
+4.19 and 4.20 show results assuming unpolarized light striking the BARC, while Figure 
+4.21 separates out the behavior of refl ectivity by polarization for two example BARCs. 
+The trend toward using polarized illumination will greatly improve the performance of 
+BARCs at high numerical apertures since only the refl ectivity for that one polarization 
+need be optimized.
+Stringent CD control requirements demand refl ectivities below 0.1 %, making BARC 
+design diffi cult at high numerical apertures with extreme off-axis illumination (i.e. at large 
+incident angles). One potential solution, though not pleasant from a cost and complexity 
+perspective, is to increase the number of free variables available for optimization by using 
+a two-layer or three-layer BARC. This technique, a standard practice in antirefl ective 
+1.50
+1.52
+1.54
+1.56
+1.58
+1.60
+1.62
+1.64
+1.66
+1.68
+0 10 20 30 40 50 60 70
+Angle (in air, degrees)
+Refractive Index – Real
+0.475
+0.480
+0.485
+0.490
+0.495
+0.500
+0.505
+0.510
+Refractive Index – Imaginary
+n κ
+D = 40 nm
+2.10
+2.11
+2.12
+2.13
+2.14
+2.15
+2.16
+2.17
+2.18
+2.19
+2.20
+0 10 20 30 40 50 60 70
+Angle (in air, degrees)
+Refractive Index – Real
+0.665
+0.670
+0.675
+0.680
+0.685
+0.690
+0.695
+0.700
+0.705
+0.710
+0.715
+0.720
+Refractive Index – Imaginary
+n κ
+D = 20 nm
+(a) (b)
+Figure 4.19 Optimum BARC parameters to achieve minimum substrate refl ectivity as a 
+function of incident angle (angle defi ned in air, before entering the photoresist) for two different BARC thicknesses (resist index = 1.7 + i0.01536 and silicon substrate index = 0.8831 
++ i2.778) at 193-nm exposure: (a) 20-nm BARC thickness, and (b) 40-nm BARC thickness
+
+
+## Page 35
+
+ Imaging in Resist: Standing Waves and Swing Curves 163
+coatings for lenses, would provide enough adjustable parameters to make the refl ectivity 
+go to zero at normal incidence and at one or more angles, thus providing low refl ectivity 
+over a wide range of angles. This approach has become necessary with the advent of 
+immersion lithography and numerical apertures greater than 1.0. Alternately, a gradient 
+index material, with low k near the top of the BARC gradually increasing toward the 
+bottom, can be used.
+0.0000
+0.0005
+0.0010
+0.0015
+0.0020
+0.0025
+0.0030
+0 10 20 30 40 50 60 70
+Angle (in air, degrees)
+Minimum Intensity Reflectivity
+D = 20nm
+D = 40nm
+Figure 4.20 The best case (minimum) refl ectivity (using the BARC parameters shown in 
+Figure 4.19) of the substrate as a function of incident angle for 20- and 40-nm-thick BARC 
+fi lms. Note that 60 ° corresponds to the maximum angle in air allowed for NA = 0.866
+0.00
+0.05
+0.10
+0.15
+0.20
+0 10 20 30 40 50 60 70 80
+Angle in Air (degrees)
+Resist/BARC Electric Field Reflectivity
+A: p-polarized
+A: s-polarized
+B: s-polarized
+B: p -polarized
+Figure 4.21 An example of the variation of BARC refl ectivity as a function of light angle 
+and polarization for two different BARCs. The intensity refl ectivity is the square of the electric 
+fi eld refl ectivity plotted here, but interference makes the fi eld refl ectivity a better measure of 
+the standing wave effects (resist index = 1.7 + i0.01536, silicon substrate index = 0.8831 +
+i2.778, BARC A index = 1.80 + i0.48, BARC A thickness = 30 nm, BARC B index = 1.53 +
+i0.54, BARC B thickness = 39 nm)
+
+
+## Page 36
+
+164 Fundamental Principles of Optical Lithography
+4.3.3 BARC on a Transparent Substrate
+The second type of BARC optimization problem involves the use of a BARC on a transparent substrate, such as an oxide fi lm. For such a case, the overall substrate refl ectivity 
+will be a function of the oxide thickness and one of the goals of the BARC design is to 
+reduce the sensitivity to underlying fi lm thickness variations. As can be seen from Figure 
+4.22, using the BARC at a fi rst minimum results in a very large sensitivity to underlying 
+oxide thickness variations. In fact, the thickest BARC fi lms provide the most robust 
+behavior when a wide range of oxide thicknesses are expected. Thus, the preferred design 
+approach for this case is to determine the maximum allowed BARC thickness from an 
+integration perspective, then optimize the n and k values of the BARC to minimize the 
+maximum refl ectivity over the range of expected oxide thicknesses.
+If the oxide thickness under the BARC varies by only a small amount, the use of a 
+fi rst-minimum BARC becomes practical. The sensitivity to small amounts of underlying 
+oxide thickness variation ∆ox can be derived in a manner similar to Equation (4.87):
+R n ≈ 
+
+
+ ∆ox − 2 ox
+2
+1
+2
+2
+1
+2 π
+λ
+n
+n
+n
+n
+ (4.89)
+where nox is the oxide refractive index. Of course, while oxide was used here as an 
+example, this analysis applies equally well to any reasonably transparent fi lm under the 
+BARC.
+A ‘thick’ BARC solution can be thought of as a BARC that completely absorbs all of 
+the light that may refl ect off the substrate and is thus insensitive to changes in the substrate 
+stack. For this case, the product of BARC thickness and the imaginary part of its 
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0 20 40 60 80 100 120 140
+100
+105
+110
+115
+120
+125
+130
+135
+140
+145
+150
+155
+160
+165
+170
+175
+180
+185
+190
+195
+200
+Oxide Thickness
+Substrate Reflectivity
+Thickness Layer #2 (nm)
+100
+105
+110
+115
+120
+125
+130
+135
+140
+145
+150
+155
+160
+165
+170
+175
+180
+185
+190
+195
+200
+100
+105
+110
+115
+120
+125
+130
+135
+140
+145
+150
+155
+160
+165
+170
+175
+180
+185
+190
+195
+200
+Figure 4.22 Substrate refl ectivity versus BARC thickness over a range of underlying oxide 
+thicknesses (oxide on top of a silicon substrate)
+
+
+## Page 37
+
+ Imaging in Resist: Standing Waves and Swing Curves 165
+refractive index (k2) must be suffi ciently high to make τ D
+2 ≈ 0. Maximum BARC thickness 
+is usually determined by process considerations, thus fi xing the minimum k2. Assuming 
+the imaginary part of the resist refractive index is suffi ciently small, the resulting refl ectivity is
+R nni
+nni
+nn
+nn total == −−++ = −+
+++
+ρ
+κ
+κ
+κ
+κ 12
+2 12 2
+12 2
+2
+12 2 2
+2
+12 2 2
+2
+()
+() (4.90)
+The optimum real part of the BARC refractive index to minimize refl ectivity will 
+then be
+nn 212 2
+2 =+κ (4.91)
+The resulting refl ectivity is
+R nn
+nn n = −
++ ≈ +
+21
+21
+2
+2
+1
+2 22 4
+κ
+κ
+ (4.92)
+Obviously, the thick BARC solution is insensitive to BARC thickness variations by 
+design. The sensitivity to errors in BARC refractive index can be obtained from Equation 
+(4.90). For a small change in the real part of the BARC refractive index,
+∆ ∆∆ R
+R n nnn n n nn ≈ − 2 = 2 1
+222 1
+2 2
+2 1
+222 () κ
+ (4.93)
+For a small change in the imaginary part of the BARC refractive index,
+∆∆ R
+R
+n
+n ≈ 
+
+ 
+
+ κ
+κ
+2
+2
+1
+2
+2 (4.94)
+4.3.4 BARC Performance
+How critical is BARC optimization? How low must the substrate refl ectivity be before 
+acceptable CD control can be expected? There is no single answer to these questions, 
+since they are process and feature dependent. But consider the example shown in Figure 
+4.23. Here, 100-nm lines on a 280-nm pitch are simulated with a stepper using annular 
+illumination, with a center sigma given by sNA = 0.54. As can be seen, a substrate refl ectivity of less than 0.1 % still leads to a noticeable swing behavior.
+A common approach to characterizing the impact of substrate refl ectance (that is, the 
+impact of a nonideal BARC) is to relate refl ectivity in the presence of fi lm thickness 
+variations to effective dose errors. Consider, for example, the case where topography on 
+the wafer results in resist thickness variations that extend beyond one swing curve period. 
+For such a case, the swing ratio is effectively the fractional dose error range resulting 
+from resist thickness variations.
+∆ ∆ E
+E
+SR D D ≈≈ + − α ρρ α 4 12 23 e (4.95)
+
+
+## Page 38
+
+166 Fundamental Principles of Optical Lithography
+Consider a 193-nm resist with a = 1.2 mm−1, D = 200 nm, a resist thickness variation 
+equal to the swing period of 56 nm, and | r12 | = 0.26. This results in a fractional effective 
+dose error of
+∆E
+E
+≈+ 0 067 0 83 23 .. ρ (4.96)
+For a BARC that allows 1 % refl ectance (| r23 | = 0.1), bulk absorbance adds 6.7 % effective dose error while the swing effect adds another 8.3 % dose error. Both of these numbers 
+are clearly too high, so that a 193-nm lithography process must employ planarization to 
+reduce the resist thickness variations caused by topography.
+For a 248-nm resist with a = 0.5 mm−1
+, D = 400 nm, a resist thickness variation 
+equal to the swing period of 70 nm, and |r12| = 0.275, the fractional effective dose 
+error is
+∆E
+E
+≈+ 0 035 0 90 23 .. ρ (4.97)
+For a BARC that allows 1 % refl ectance (|r23| = 0.1), bulk absorbance adds 3.5 % effective 
+dose error while the swing effect adds another 9 % dose error.
+A more thorough ‘dose budget’ analysis would consider variations in resist thickness, BARC thickness and underlying fi lm stack simultaneously to determine the effective 
+dose errors caused by changes in the energy coupled into the resist. Equation (4.95) 
+assumed suffi cient topography to cause one full swing period of resist thickness 
+variations. When smaller amounts of resist thickness variation are present, the effective 
+dose errors are also smaller. Consider a resist thickness D = Dmin ± ∆ where Dmin is the 
+thickness at the swing curve minimum and ∆ is small compared to the swing period. 
+80
+90
+100
+110
+120
+130
+Resist Feature Width, CD (nm) 
+Resist Thickness (nm)
+R = 0.43% 
+R = 0.07%
+150 160 170 180 190 200 210 220 230 240 250 
+Figure 4.23 CD swing curves (100-nm lines with a 280-nm pitch are printed with a stepper 
+using annular illumination, with a center sigma given by sNA = 0.54) for two different BARCs 
+with different levels of optimization, as given by the resulting substrate refl ectivity R
+
+
+## Page 39
+
+ Imaging in Resist: Standing Waves and Swing Curves 167
+Equation (4.51) can be used to derive the effective dose error for a small resist thickness 
+error:
+∆∆ ∆ E
+E
+n D
+D ≈ −+ −
+−
+
+
+ 
+
+
+−
+−
+[ ] [ cos( )] ee /
+e
+αα
+α
+ρρ π λ
+ρρ
+12 1 4
+12
+12 23 2
+12 23
+ (4.98)
+which can be further approximated for small ∆ as
+∆∆ ∆ E
+E
+n D
+D ≈ +
+−
+
+
+ 
+
+
+−
+−
+α ρρ π λ
+ρρ
+α
+α
+42
+12
+12 23 2 2
+12 23
+e/
+e
+() (4.99)
+and for a reasonably good BARC as
+∆ ∆∆ E
+E n D ≈+ − α ρρ π λ α 42 12 23 2 2 e/ () (4.100)
+The dose error comes from a bulk absorption term (a∆) plus a fraction of the swing 
+amplitude. Consider the standard 193-nm resist on BARC on silicon case described above, 
+with a = 1.2 mm−1, D = 200 nm, nresist = 1.7, and |rair–resist| = 0.26. For ∆ in nanometers,
+∆ ∆∆ E
+E
+≈+ 0 0012 0 0025 23 2 .. ρ (4.101)
+For an 8.3-nm increase in resist thickness, the bulk effect causes about a 1 % effective 
+dose error. The swing effect will cause another 1 % effective dose error for that 8.3-nm 
+resist thickness error if the substrate refl ectivity is 0.33 %. The maximum allowed substrate refl ectivity is a function of the range of resist thickness that must be tolerated and 
+the amount of effective dose error one is willing to accept. Specifi cations of substrate 
+refl ectivity in the 0.1–0.5 % range are not uncommon.
+Swing curves are extremely important in lithography for one simple reason: topography 
+on the wafer can lead to variations in resist thickness on the order of a period in the swing 
+curve or more. In some processes, these effects are the leading cause of CD errors on 
+some critical mask levels. Figure 4.24 shows an example of how a line printing over a 
+topographical step on the wafer can lead to linewidth variations due to swing curve 
+effects.
+BARCs of course can dramatically reduce the linewidth variation caused by topography 
+on the wafer. A second problem that BARCs can solve is refl ective notching. As Figure 
+4.25 illustrates, light can refl ect off the tilted edges of refl ective topography. Patterns being 
+printed near such a refl ective edge may receive extra exposure from the refl ection, causing 
+a notch, usually near the top of the feature. BARCs can also signifi cantly suppress refl ective notching (Figure 4.26).
+4.4 Top Antirefl ection Coatings
+As we saw in Equation (4.46), the amplitude of the refl ectivity swing curve is determined 
+by the multiplier of the cosine term, 2|r12r23|e−aD. It is clear that this term can be reduced 
+in three ways: (1) increase absorption (increase the term aD) through the use of a dyed 
+
+
+## Page 40
+
+168 Fundamental Principles of Optical Lithography
+Swing Curve 
+Maximum
+Top View 
+Side View Resist 
+Swing Curve 
+Minimum
+Top of Step Bottom of Step
+or
+Figure 4.24 Example of how resist thickness variations over topography produce linewidth 
+variations due to swing curve effects when a BARC is not used
+Resist
+Figure 4.25 Refl ective notching occurs when nearby topography refl ects light obliquely into 
+an adjacent photoresist feature
+Figure 4.26 Imaging of lines and spaces over refl ective topography without BARC (left) 
+showing refl ective notching, and with BARC (right) showing the refl ective notching effectively 
+suppressed (photos courtesy of AZ Photoresist, used with permission)
+resist; (2) decrease substrate refl ectivity (decrease r23) by using a BARC; and (3) decrease 
+resist refl ectivity (decrease r12) by using a top antirefl ection coating (TARC).9,10 Looking 
+again at Figure 4.12b, the refl ectivity swing curve comes about through the interference 
+of Er0 with the other refl ected rays such as Er1. By eliminating Er0 using a TARC, there 
+can be no interference and thus no swing curve.
+
+
+## Page 41
+
+ Imaging in Resist: Standing Waves and Swing Curves 169
+One can simplify the design of the TARC somewhat by imagining the photoresist as 
+infi nitely thick. Thus, Equation (4.81) applies where layer 2 is the TARC and layer 3 is 
+the resist. If the role of layer 2 is to serve as an antirefl ection coating between materials 
+1 and 3, one obvious requirement might be to minimize the total refl ectivity given by 
+Equation (4.81). If the light refl ecting off the top of layer 2 (r12) can cancel out the light 
+which travels down through layer 2, refl ects off layer 3, and then travels back up through 
+layer 2 23 2 ( ), ρτ D then the refl ectivity can become exactly zero [in other words, when 
+Equation (4.82) is true for the TARC].
+When designing an antirefl ection coating material, there are only three variables that 
+can be adjusted: the real and imaginary parts of the refractive index of the coating, and 
+its thickness. One classic solution to Equation (4.82) works very well when the materials 
+1 and 3 are not very absorbing. It is clear that Equation (4.82) is satisfi ed when τ D
+2 =−1
+and r12 = r23. The requirement that τ D
+2 =−1 means that two passes of the light through 
+the TARC cause a 180° phase change with no absorption (since the magnitude is still 
+one). From the defi nition of the internal transmittance, this means that the TARC thickness 
+must be adjusted to a ‘quarter wave’:
+D n = λ
+4 2
+ (4.102)
+The requirement that r12 = r23 will be satisfi ed when the index of refraction of the TARC 
+is made to be
+n nn 2 13 = (4.103)
+Further, since the TARC does not absorb, the imaginary part of its index is zero. Thus, 
+Equation (4.82) can only be true if both materials 1 and 3 have no imaginary parts to 
+their indices of refraction. For a resist with a refractive index of 1.7 at a wavelength of 
+193 nm (in air), the optimum TARC will have a refractive index of about 1.30 and a 
+thickness of 37 nm.
+An antirefl ection layer defi ned by Equations (4.102) and (4.103) will have zero refl ectivity. Also, due to the lack of absorption, 100 % of the light striking the TARC will be 
+transmitted into layer 3. Thus, this type of antirefl ection coating is commonly used for 
+coating optical components (such as camera or stepper lenses) where the goal is not so 
+much reducing the refl ectivity as it is maximizing the transmittance. The ‘maximum 
+transmittance’ type of antirefl ection coating is also used for top antirefl ection coatings. 
+This perfect TARC solution, however, is only available for the special case when both 
+layers 1 and 3 are transparent. Thus, since in reality resist will always be somewhat 
+absorbing, a perfect TARC is not possible, with a residual refl ectance off of the TARC 
+proportional to the imaginary part of the resist refractive index squared. However, since 
+resists have an imaginary part of the refractive index in the range of 0.01–0.02, the impact 
+of resist absorption on TARC performance is quite negligible.
+More problematically, it is very diffi cult to fi nd practical materials with refractive 
+indices low enough to make a near ideal TARC. Most available TARCs have refractive 
+indices greater than 1.4 (versus an ideal index closer to 1.3). Letting nopt be the optimum 
+TARC refractive index given by Equation (4.103) and assuming a quarter wave thickness 
+
+
+## Page 42
+
+170 Fundamental Principles of Optical Lithography
+of TARC is always used, the refl ectivity resulting from the use of a nonoptimum TARC 
+refractive index is
+R nn
+nn = −+
+
+
+ 
+
+ TARC opt
+opt TARC
+22
+22
+2
+ (4.104)
+If the TARC refractive index is close to the optimum, this refl ectivity is approximately
+R nn
+n ≈  −
+
+ 
+
+ TARC opt
+opt
+2
+ (4.105)
+Like BARCs, the performance of TARCs is degraded when a range in incident angles 
+of light is used. Both the optimum TARC thickness and the optimum refractive index will 
+be a function of incident angle and polarization.
+4.5 Contrast Enhancement Layer
+A contrast enhancement layer (CEL) is a highly bleachable coating placed on top of the 
+photoresist that serves to enhance the contrast of an aerial image projected through it.11
+Unlike a TARC, where the real part of the refractive index is chosen to maximize transmittance and the imaginary part is kept as low as possible, the CEL works by having a 
+high absorbance that ‘bleaches’, i.e. that becomes more transparent as it is exposed. The 
+mechanism of CEL bleaching is similar to the bleaching that occurs in g-line and i-line 
+photoresists, which will be covered in Chapter 5.
+The CEL is initially opaque so that essentially no light is transmitted into the photoresist. Clear areas of the mask, and thus areas of high intensity of the aerial image, produce 
+exposure of the CEL, which begins to bleach in these regions. As the CEL bleaches, light 
+is transmitted into the photoresist where it can begin to expose the resist. In the regions 
+of low intensity, however, the CEL remains more opaque and less transmitting. As a result, 
+the image transmitted into the resist exhibits a steeper transition from bright to dark 
+(Figure 4.27).
+CELs are not commonly used for submicron semiconductor lithography. Their main 
+drawback, besides the expense of the material and added processing, is the signifi cant 
+increase in exposure dose (in the range of 2–3 times higher) required to bleach the 
+CEL.
+4.6 Impact of the Phase of the Substrate Refl ectance
+The refractive index of a material is complex in general, the imaginary part being directly 
+proportional to the absorption coeffi cient of the material. Thus, in general, the refl ection 
+coeffi cient between two materials will be a complex number. The magnitude of r determines the magnitude of the refl ected light while its phase gives a phase change upon 
+refl ection. As we’ve seen, it is the magnitude of the refl ection coeffi cient that impacts the 
+amplitudes of standing waves and swing curves. But the phase will have an impact on 
+
+
+## Page 43
+
+ Imaging in Resist: Standing Waves and Swing Curves 171
+lithography as well. Consider a typical resist on silicon at the i-line wavelength (365 nm). 
+The magnitude of the refl ection coeffi cient is about 0.63 with a phase of −169°. For resist 
+on aluminum, r = 0.93 ∠ −138° (the notation meaning that the refl ection coeffi cient has 
+a magnitude of 0.93 and a phase angle of −138°). For more complicated layered substrates, 
+both the magnitude and phase of the refl ection coeffi cient will depend on the thicknesses 
+of the various layers.
+Consider a simple but common fi lm stack: resist (1 mm thick) on silicon nitride (100 nm) 
+on silicon dioxide (40 nm) on silicon. The refl ection coeffi cient between the resist and the 
+underlying fi lm stack is a function of the optical properties of all of the materials, but 
+also of the thickness of the nitride and the oxide fi lms. For example, variation of the 
+nitride thickness leads to a moderate variation in the magnitude and a large variation in 
+the phase of the refl ection coeffi cient, as shown in Figure 4.28. Oxide thickness variations 
+produce similar effects.
+What will be the lithographic effects of this nitride thickness variation? The ±7 % 
+change in the magnitude of the refl ection coeffi cient will have some subtle effects, but 
+the large change in the phase of the refl ection will cause two major problems. The resist 
+swing curve is a function of the phase change of light that passes down and back up 
+through the resist. Changes in resist thickness cause a change in this phase, giving rise 
+to a sinusoidal variation in dose-to-clear (E0) and linewidth. Any change in the phase upon 
+refl ection will produce the same effect [a variation in f23 in Equation (4.51), for example]. 
+Figure 4.29 shows two resist swing curves corresponding to two nitride thicknesses 
+(minimum and maximum thicknesses from Figure 4.28). The nitride thickness variation 
+produces its own swing curve, resulting in linewidth variations of the same magnitude as 
+for resist thickness variations. Control of the nitride thickness (and oxide thickness, for 
+that matter) is just as critical as resist thickness control.
+The second effect of this phase change upon refl ection is on the shape of the resulting 
+resist profi le. When the refl ected light is 180° out of phase with the incident light, 
+Image Transmitted 
+Through the CEL 
+CEL
+Incident Aerial Image
+Figure 4.27 Contrast Enhancement Layer (CEL) bleaching improves the quality of the aerial 
+image transmitted into the photoresist
+
+
+## Page 44
+
+172 Fundamental Principles of Optical Lithography
+0.90 0.95 1.00 1.05 1.10
+Dose -to -Clear (mJ/cm2
+)
+Resist Thickness (microns)
+93-nm Nitride
+136-nm Nitride
+75
+100
+125
+150
+175
+25 75 125 175 225
+0.65
+0.70
+0.75
+0.80
+0.85
+Magnitude, |
+ρ|
+Nitride Thickness (nm)
+–200
+–100
+0
+100
+200
+Phase (degrees)
+Figure 4.28 Variation of the magnitude and phase of the resist/substrate refl ection coeffi -
+cient as a function of silicon nitride thickness for a fi lm stack of resist on nitride on 40 nm of 
+oxide on silicon
+Figure 4.29 Changes in nitride thickness cause a shift in the phase of the resist swing curve, 
+making nitride thickness control as critical as resist thickness control
+destructive interference results in a minimum light intensity at the resist/substrate interface. When the refl ected light is in phase with the incident light, constructive interference 
+results in a maximum light intensity at the resist/substrate interface. Although standing 
+waves are generally smoothed out by post-exposure bake diffusion, any asymmetry in the 
+standing wave pattern inside the resist can lead to less than perfect reduction of the 
+amplitude. When the phase change upon refl ection is about +90° or −90°, the local region 
+near the interface has an average intensity that is higher or lower, respectively, than the 
+average through the bulk. The result is resist undercutting and resist footing. Figure 4.30 
+shows typical resist profi le shapes at different nitride thicknesses.
+One can see that nitride thickness variations of just ±20 nm can have huge effects 
+on both linewidth and resist profi le shape. If oxide thickness can vary as well, 
+the requirements for nitride thickness control become even tighter. In many cases, the 
+
+
+## Page 45
+
+ Imaging in Resist: Standing Waves and Swing Curves 173
+lithographic requirements for thin fi lm thickness uniformity and control far exceed 
+other device-related restrictions on these thicknesses. As with other swing curve effects, 
+a BARC can be very effective at reducing the sensitivity to underlying fi lm stack 
+variations.
+4.7 Imaging in Resist
+The aerial image is, quite literally, the image in air. In the world of semiconductor lithography, it is the image of a photomask projected onto the plane of the wafer, but assuming 
+that only air occupies this space rather than the resist-coated wafer. Although aerial images 
+do not really exist in lithography, the aerial image, which is reasonably easy to calculate 
+though very diffi cult to measure, is a convenient proxy for the fi nal resist image. By 
+picking an exposure-dose dependent intensity threshold, an estimate of the fi nal resist CD 
+is obtained (this essentially assumes that the resist is ideal, with an infi nite contrast). Such 
+uses are based on the idea that an aerial image is a good predictor of what the resist image 
+will look like. However, at high numerical apertures the aerial image is in fact a very 
+poor predictor of the fi nal resist image. Due to vector effects, the image in resist can be 
+greatly different from the aerial image, as will be discussed below.
+4.7.1 Image in Resist Contrast
+At high numerical apertures, the vector nature of light affects the formation of an image 
+as a function of the polarization of the light and the angles of the various diffraction orders 
+that add together to form the image (see Chapter 3). Two plane waves, approaching a 
+wafer at different angles, will interfere to form fringe patterns of light and dark making 
+the simplest of lithographic patterns – an array of lines and spaces. This phenomenon of 
+25 75 125 175 225
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Substrate Reflectivity
+Nitride Thickness (nm)
+Figure 4.30 Nitride thickness also affects the shape of the resist profi le, causing resist footing, 
+undercuts or vertical profi les. Substrate refl ectivity (the square of the magnitude of the refl ection coeffi cient) is shown for comparison
+
+
+## Page 46
+
+174 Fundamental Principles of Optical Lithography
+interference is the key to pattern formation. Without it, light hitting the wafer from different directions would simply add to give a uniform intensity. We can see mathematically 
+the effect of interference by examining how two electric fi elds combine to form a resultant 
+electric fi eld (magnitude and intensity). Ignoring a few details that will be described in 
+the following section, the intensity of light I is the square of the magnitude of the electric 
+fi eld E. If two electric fi elds are combined, what is the intensity of the combination? If 
+the two electric fi elds do not interfere, the total intensity is the sum of the individual 
+intensities (i.e. it is a constant).
+IE E =+ 1
+2
+2
+2 (4.106)
+If, however, the two electric fi elds interfere completely, the total intensity will be
+IEE =+12
+2
+ (4.107)
+Here, the variation in the phase of E1 relative to E2 produces a spatial variation in intensity 
+that is our image.
+As discussed in detail in Chapters 2 and 3, two electric fi elds interfere only if two 
+conditions are met: (1) there is a fi xed phase relationship between the electric fi elds, and 
+(2) there is some overlap in electric fi eld direction. The fi rst condition is met when the 
+electric fi elds arise from diffraction orders created from a single source point. The second 
+condition means that the two electric fi elds interfere with each other only to the extent 
+that their electric fi elds oscillate in the same direction. If the electric fi elds are at right 
+angles to each other, there will be no interference. Thus, to determine the amount of 
+interference between two electric fi elds, one must fi rst determine the amount of directional 
+overlap between them. Standard vector mathematics gives us some simple tools to calculate directional overlap and thus the amount of interference. When thinking of light as 
+a scalar rather than a vector quantity, we ignore the subtleties discussed above. Essentially, 
+a scalar description of light always assumes that the electric fi elds are 100 % overlapped 
+and all electric fi elds add together as in Equation (4.107). Since interference is what gives 
+us the patterns we want, a scalar view of light is generally too optimistic. The vector 
+description of light says that there is usually some fraction of the electric fi elds of our 
+two vectors that don’t overlap and thus don’t contribute to interference. The noninterfering 
+light is still there, but it adds as a uniform intensity that degrades the quality of the 
+image.
+As was done in Chapter 3, consider the interference of two plane waves approaching 
+the wafer at fairly large angles (Figure 4.31). The electric fi eld can point in any direction 
+perpendicular to the direction of propagation. This arbitrary direction can in turn be 
+expressed as the sum of any two orthogonal (basis) directions. The most convenient basis 
+directions are called transverse electric or TE (the electric fi eld pointing out of the page 
+of the drawing) and transverse magnetic or TM (the electric fi eld pointing in the page of 
+the drawing). The TE case means that the electric fi elds of the two plane waves are always 
+100 % overlapped regardless of the angle between the plane waves. For the TM case, 
+however, the extent of overlap between the two vectors grows smaller as the angle 
+between the plane waves grows larger.
+We can calculate how much the two electric fi elds for the TM case will interfere with 
+each other. Suppose that two rays are traveling at an angle q with respect to the vertical 
+direction (i.e. the direction normal to the wafer), as shown in Figure 4.31. The electric 
+
+
+## Page 47
+
+ Imaging in Resist: Standing Waves and Swing Curves 175
+fi elds E1 and E2 will have an angle between them of 2q. The amount of the electric fi eld 
+vector E2 that points in the same direction as E1 is just the geometric projection, E2cos(2q). 
+Thus, the intensity will be given by the coherent (electric fi eld) sum of the parts that 
+overlap plus the incoherent (intensity) sum of the parts that don’t overlap.
+IEE E =+ + 12
+2
+2
+2 cos( ) sin( ) 22 θθ (4.108)
+Note that for q = 0, this equation reverts to the perfectly coherent (interfering) sum of 
+Equation (4.107). For q = 45°, the two electric fi elds are perpendicular to each other and 
+Equation (4.108) becomes the perfectly incoherent (noninterfering) sum of Equation 
+(4.106). If we consider the simplest case of two unit amplitude plane waves,
+EE
+Ix
+iz x iz x 1 2 2 2
+22
+==
+=+
++− e ,e //
+TE
+π θ θλ π θ θλ ( cos sin ) ( cos sin )
+( ) cos( sin )
+( ) cos( )cos( sin )
+4
+22 2 4
+π θλ
+θ π θλ
+x
+Ix x
+/
+TM =+ /
+ (4.109)
+Note that for both TE and TM illumination, the resulting images have no z-dependence. 
+In other words, the simple two-beam imaging case has infi nite depth of focus.
+Two common image metrics, the normalized image log-slope (NILS) and the image 
+contrast will now be calculated for the images in Equation (4.109). For the TE image, the 
+NILS (assuming the desired image is equal lines and spaces) is equal to p, and for the 
+TM image it is p cos(2q). The visibility (or contrast) of the resulting fringes is the difference of the maximum and minimum intensities of the interference pattern divided by the 
+sum of these two quantities. For the TE polarization case, the contrast is always exactly 
+1. For the TM case, the contrast depends on the angle between the two waves and is equal 
+to cos(2q). Thus, as the angle between the plane waves increases, the contrast of the 
+resulting image decreases. One can see why the TM polarization is often called the ‘bad’ 
+polarization – it provides less interference and reduced image quality.
+The resist is not exposed by an aerial image, but by the image in resist. The plane 
+waves that interfere to form the image fi rst propagate into the resist. Once in the resist, 
+they can interfere to form an image in the resist. This image will be different than the 
+aerial image due to refraction. As each plane wave travels from air to resist, refraction 
+lowers the angle of the light according to Snell’s law. Letting n be the refractive index of 
+12 E
+1E
+E
+2 E
+TE or s-polarization TM or p-polarization
+Figure 4.31 Two plane waves with different polarizations will interfere very differently. For 
+transverse electric (TE) polarization (electric fi eld vectors pointing out of the page), the 
+electric fi elds of the two vectors overlap completely regardless of the angle between the 
+interfering beams
+
+
+## Page 48
+
+176 Fundamental Principles of Optical Lithography
+the resist (and assuming the air above the resist has an index of refraction of 1.0), the 
+angle of one of the plane waves inside the resist will be
+sin( ) sin( ) θθ resist air = 1
+n (4.110)
+For the TE light, the interference will be the same and the two plane waves will produce 
+a sinusoidal image of contrast 1. For the TM light, the contrast will be
+TM Contrast n = =− =− cos( ) sin ( ) sin ( ) 2 12 1 2 2
+2
+2 θθ θ resist resist air (4.111)
+Figure 4.32 illustrates the difference between the NILS and the contrast in air versus 
+in resist as a function of angle for TM light when the resist refractive index is 1.7. For 
+an angle of 30° (corresponding to two-beam imaging at the resolution limit of a lens of 
+a modest NA = 0.5), the aerial image for TM illumination has a contrast of 0.5, while the 
+image in resist has a much more acceptable contrast of 0.83. Unpolarized light, which 
+produces an average of the TE and TM images, produces a contrast that is also the average 
+between 1 and the value given by Equation (4.111) (ignoring the difference in transmission of the two polarizations into the resist). Thus,
+Unpolarized Contrast n ≈−1 1
+2
+2 sin ( ) θair (4.112)
+For the case of unpolarized two-beam imaging at the resolution limit of an NA = 0.9 lens, 
+the aerial image would show a contrast of 0.19 (obviously unacceptable) while the image 
+in resist would have a more reasonable contrast of 0.72. In fact, though, Equation (4.112) 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+0 10 20 30 40 50
+Angle in Air (degrees)
+Contrast or NILS/
+Aerial Image
+Image in Resist
+p
+Figure 4.32 The interference between two TM polarized plane waves produces an image 
+whose contrast and NILS depend on the angle. Since the angle in resist is reduced by refraction, the contrast and NILS of the image in resist are better than those of the aerial image
+
+
+## Page 49
+
+ Imaging in Resist: Standing Waves and Swing Curves 177
+is optimistic since TM light will always transmit into the photoresist better than TE 
+light. Using the data in Figure 4.5, for example, at an incident angle of 60° almost 100 % 
+of the TM light is transmitted into the resist, whereas only 75 % of the high-contrastproducing TE light makes it into the resist.
+What does all of this mean? When calculating aerial images, vector effects can dramatically alter the resulting image compared to an approximate scalar calculation. The resist, 
+however, mitigates some of these vector effects and the image in resist can be dramatically different from the aerial image. When trying to approximate a resist feature by a 
+calculated intensity image, only the image in resist (calculated correctly using the vector 
+nature of light) can be expected to give reasonable results.
+4.7.2 Calculating the Image in Resist
+An aerial image is formed by the interference of plane waves that result from discrete 
+diffraction orders passing through the lens. One of the simplest cases to consider is the 
+imaging of small lines and spaces so that only the zero and the two fi rst orders travel 
+through the lens. For coherent illumination, the zero order will be a plane wave traveling 
+in the z-direction, with magnitude a0. The two fi rst orders will be plane waves each with 
+magnitudes a1 and traveling at angles given by
+np sinθλ =± / (4.113)
+where p is the pitch of the line/space pattern and n is the refractive index of the media. 
+Ignoring for a moment the refl ecting substrate, the image will be formed by the interference (sum) of these three plane waves. Assuming that the image is focused at z = 0 
+(the z-position where all three of the plane waves have the same phase), the resulting 
+electric fi eld of the image will be, for s-polarization,
+Exz a a a ikz ikx ikz ikx ikz () sin cos sin cos , e ee e e =+ + − 01 1 θθ θθ (4.114)
+This sum can be simplifi ed into a more common and convenient form as
+E(x, z) = eikz(a0 + 2a1 cos(2px/p)e−ikz(1−cos q)
+)
+giving
+I x z a a a a kz x p a x ( ) cos( ( cos ))cos( ) cos( ,/ =+ + − + 0
+2 12 01 12 24 1 2 2 4 θπ π /p) (4.115)
+Equation (4.115) is the standard s-polarized three-beam image where z can be interpreted 
+as the distance from best focus. A similar expression for p-polarized illumination can also 
+be derived:
+E a a xp
+Ei a
+x ikz ikz
+z ikz
+=+
+=
+−− e /e
+e
+( cos cos( ) )
+(
+( cos )
+cos
+01 1
+1
+22
+2
+θπ θ
+θ sin sin( )) θπ2 xp/ (4.116)
+giving
+I x z a a a a kz x p
+a
+( , ) cos cos( ( cos ))cos( )
+cos
+=+ + −
++
+0
+2 12 01
+1
+2
+24 1 2
+2
+θ θπ /
+( )cos( ) 24 θπxp/ (4.117)
+
+
+## Page 50
+
+178 Fundamental Principles of Optical Lithography
+To determine the aerial image in the presence of a refl ecting substrate, the same procedure is followed as above, but including the refl ected plane waves as well. The result 
+is, for s-polarization,
+E x z a a xp ikz ik z ikz ( ) ( [ ( ) ] cos( ) [ ( cos ) , e e /e =+ + + − −− 0 2 1 1 10 2 2 1 ρπ θ ρθ θ ( ) ]) cos e−ik z 2 (4.118)
+In this equation, interference between plane waves causes a variation of the electric fi eld 
+in the x-direction (the image) and a variation in the z-direction (a combination of defocus 
+and standing waves). In fact, one can think of each plane wave as creating its own electric 
+fi eld standing wave, with the fi nal image as the weighted sum of these standing waves:
+Ez
+Exz aE z a
+ikz ikz sw
+sw
+,e e
+,,
+( ) ()
+( ) ( ) cos(
+cos cos θ ρθ
+π
+θθ =+
+=+
+−
+01 02 2 xpE z /, )() sw θ (4.119)
+The above image in resist analysis captured the essence of the physics involved, but 
+ignored the air–resist interface and the multiple refl ections that would result. However, 
+the fi nal form of Equation (4.119) suggests that the more detailed standing wave expression of Equation (4.32) can be used as Esw in Equation (4.119) to get an accurate image 
+in resist result. Alternately, the diffraction order amplitudes a0 and a1 can be replaced by 
+their effective ‘in-resist’ amplitudes:
+aa
+aa
+D
+00
+12
+12 23 2
+11
+12
+12 23
+0
+1 0 00
+1
+r
+r
+= +
+= +
+τ
+ρρτ
+τθ
+ρ θρ θ
+()
+() () ()
+()
+() ()τθ D
+2 ()
+ (4.120)
+and the simplifi ed standing wave z-dependence would become
+Ez ikz D ikz sw( ) () () ,e e cos cos θ ρθτ θ θθ =+ 2 − (4.121)
+In these two equations, q now represents the angle in the resist.
+Calculating the intensity in the resist from Equation (4.121) results in cumbersome 
+algebra. However, for the case of a low-refl ectivity substrate (through the use of a 
+reasonably good BARC, for example), some of the resulting terms can be ignored, 
+giving
+I xz a I z a I z xp
+aa
+( ) ( ) ( )cos ( ) , , ,/
+e
+r SW r SW
+rr eff
+≈+
++ −
+0
+2
+1
+2 2
+01
+04 2
+4
+θπ
+α z cos( ( cos ) )cos( ) 21 2 π θλ π nz xp 2 − // (4.122)
+where I zE z sw sw eff () () , , and
+cos
+θ θα . α
+θ
+= =+ 
+
+
+
+2
+2
+1 1
+Each diffraction order (plane wave) produces a standing wave. The interaction between 
+the zero and fi rst orders produces the interference pattern that forms the image, but the 
+difference in propagation angles also creates a defocus term that accounts for defocusing 
+of the image through the resist thickness. The terms that were ignored in this expression 
+describe the defocusing of the refl ected waves.
+
+
+## Page 51
+
+ Imaging in Resist: Standing Waves and Swing Curves 179
+4.7.3 Resist-Induced Spherical Aberrations
+Even with TE-polarized light and no substrate refl ection, the resist causes important 
+changes to the nature of the image. Consider Equation (4.122), three-beam imaging for 
+TE illumination, for the case of no substrate refl ection:
+I xz a a xp
+aa
+zz
+z
+( ) cos ( )
+co
+cos ,e e /
+e
+rr /
+rr eff
+=+
++
+−−
+−
+0
+2
+1
+2 2
+01
+42
+4
+α αθ
+α
+π
+s( ( cos ) )cos( ) 21 2 π δ θλ π n xp 2 − // (4.123)
+where  = z − z0, and z0 is the position of the plane of best focus. As a comparison, consider the same case for an aerial image:
+I xz a a xp
+aa n
+air ,/
+/
+( ) cos ( )
+cos( ( cos ) )cos
+=+
++−
+0
+2
+1
+2 2
+01 1
+42
+4 21
+π
+πδ θλ () 2πxp/
+ (4.124)
+There are three important and distinct differences between the image in air and the image 
+in resist. First, as given in Equation (4.120), the amplitude of each diffraction order is 
+different in the resist compared to air, and for the case of the fi rst order this difference is 
+angle, and thus pitch, dependent. Second, each diffracted order is absorbed differently 
+also according to its angle, and thus pitch. In fact, an effective z-dependent diffraction 
+order can be defi ned as
+aa aa z z z z 00 2 11 2 rr / rr / ≡≡ e, e −− α αθ ( cos ) (4.125)
+so that the image in resist becomes
+I xz a a xp
+aa n
+zz
+zz
+( ) cos ( )
+cos( ( cos )
+,/
+/
+rr
+rr
+=+
++−
+0
+2
+1
+2 2
+01 2
+42
+4 21
+π
+π δ θλπ )cos( ) 2 xp/ (4.126)
+As the image propagates further into the resist, the fi rst orders are attenuated due to 
+absorption to a greater degree than the zero order. This difference is more acute for larger 
+angles (smaller pitches).
+A more subtle but important difference between the images in air and resist is the 
+defocus term, which includes the normalized optical path difference term nd(1 − cosq)/l. 
+Both the refractive index and the angle q are different in resist than in air. The results are 
+depicted graphically in Figure 4.33, where larger angles (corresponding to smaller pitches) 
+are focused further into the resist than smaller angles. First, the plane of best focus is 
+shifted due to refraction. Further, there is a pitch dependence to best focus, a characteristic 
+of spherical aberration.
+To compare the defocus term in air to the case in resist, we can express the cosq as a 
+sine and expand the resulting square root in a Taylor series.
+OPD n n n = − = −− () = ++ 
+
+ 
+ δ θδ θ δ θ  θ ( cos ) sin sin sin 1 11 ... 4
+22
+4 1
+2 (4.127)
+
+
+## Page 52
+
+180 Fundamental Principles of Optical Lithography
+Using Snell’s law to compare the angles and refractive indices in air and resist,
+OPD n
+OPD n
+air
+resist
+= ++ 
+
+ 
+
+
+=+
+1
+24
+1
+2
+1 2 1
+4 1
+2 2 2
+δθ θ
+δθ
+sin sin ..
+sin
+.
+sin . . sin sin .. ..
+4 21
+2
+1 2 1
+2
+2
+1
+2
+4 2
+4
+1
+24
+θ δθ θ
++ 
+
+ 
+
+ = ++ 
+
+ 
+
+ n
+n n n
+n
+ (4.128)
+and
+OPD
+OPD
+n
+n
+resist
+air
+=
+++ 
+
+ 
+
+
+++ 
+
+ 
+
+
+1
+2
+2 2
+2 1
+1
+4
+1
+4
+sin ..
+sin ..
+.
+.
+θ
+θ (4.129)
+In the paraxial limit, where only the lowest order term in the series above is kept, the 
+impact of defocus is reduced in resist compared to that in air by the factor n1/n2. The 
+distance of the plane of best focus relative to the top of the resist is scaled by this 
+factor. Also, the defocusing of the image through the resist is scaled by this amount. Since 
+n2 > n1, the plane of best focus is shifted down into the resist, and the thickness of resist 
+causes less defocusing than when the image propagates through the same thickness of 
+air.
+To see how the resist induces spherical aberration, we need only keep one more term 
+in the series of Equation (4.129).
+OPD n
+n OPD nn nn resist air ≈−  −
+
+ 
+
+ 1
+2
+1
+2 22 12
+2
+3
+4 1 8
+δθ () sin (4.130)
+The added term varies as the radial position in the pupil to the fourth power, characteristic 
+of 3rd order spherical aberration. Comparing to this Zernike term as given in Chapter 3, 
+an effective amount of 3rd order spherical induced by the resist would be
+Z z nn n
+n 8 NA 1
+2 22 12
+2
+3
+4
+24 ≈−  −
+
+ 
+
+ λ
+() (4.131)
+(a) (b)
+Figure 4.33 Focusing of plane waves arriving at different angles (a) in air, and (b) in resist, 
+showing that the resist induces spherical aberration
+
+
+## Page 53
+
+ Imaging in Resist: Standing Waves and Swing Curves 181
+Consider a typical case where n1 = 1 and n2 = 1.7:
+Z z 8 NA4 ≈−0 016 . λ (4.132)
+For an NA of 0.9, 10 milliwaves of spherical aberration is induced per wavelength of 
+resist thickness. Since resists tend to be between one and two wavelengths thick for such 
+a high NA, the center of the resist can be expected to show between 5 and 10 milliwaves 
+of effective spherical aberration. Since this resist-induced spherical aberration is systematic, it is possible to correct for it by adding an equivalent amount of oppositely directed 
+spherical aberration into the lens design.
+4.7.4 Standing Wave Amplitude Ratio
+Our goal is now to understand how refl ectivity, as well as the variation of refl ectivity with 
+angle, affects standing waves in the image. To begin, we’ll defi ne a metric called the 
+standing wave amplitude ratio (SWAR), given by
+SWAR II
+II
+II
+I = −+ ≈ −=
+max min
+max min
+max min
+20 () ρ
+ (4.133)
+Here, I(r = 0) denotes the intensity that would be present if there were no refl ecting substrate and is approximately the average of the min and max intensities. For a single plane 
+wave, such as Equation (4.31), the SWAR is equal to twice the substrate amplitude refl ection coeffi cient r(q), and would be zero if the BARC were perfect. In fact, one goal of 
+BARC design is to make the SWAR as close to zero as possible.
+For the imaging case, pulling the maximum and minimum values out of Equation 
+(4.118) or Equation (4.122) is complicated by two factors: the defocus dependence of the 
+image, and the fact that each diffraction order produces a standing wave of a different 
+period. If, however, the variation of the image intensity with z caused by defocus is small 
+compared to the standing wave variation (i.e. if the depth of focus is much larger than 
+one standing wave half-period), and best focus is near the position in the resist where the 
+SWAR is being evaluated, this effect can be ignored. Further, by looking at the standing 
+waves at the bottom of the resist, the mismatch in standing wave peak positions will be 
+at their minimum. Under these circumstances, an approximate value for the SWAR can 
+be obtained for this three-beam imaging case. For the simplifi ed case ignoring absorption 
+and multiple refl ections in the resist,
+SWAR
+a aa xp a xp oo
+≈
++  +
+  +
+2
+04 2 0
+2
+42 2 1122 ρπ ρ ρθ ( ) cos( ) π () () // cos ( ) ()
+cos( ) cos ( )
+ρθ
+a aa xp a xp oo ππ 2 1122 ++ 4 242 // (4.134)
+It is very interesting to note that the standing wave amplitude ratio is a function of x. 
+Consider x = 0, the center of the space of the line/space pattern. Here, the SWAR is an 
+average of the zero- and fi rst-order refl ectivities, weighted in a certain way by the amplitudes of the diffracted orders.
+SWAR x a aa a aa
+a aa a
+oo o
+oo
+() ( )( ) ( )( ) =≈ ++ +
+++
+02 0 2 42
+44
+2 112 1
+2 112
+ρ ρθ (4.135)
+
+
+## Page 54
+
+182 Fundamental Principles of Optical Lithography
+At x = p/4, corresponding to the nominal edge of the feature, the SWAR takes on a very 
+different value.
+SWAR x p ( ) () =≈ /4 2 0 ρ (4.136)
+In other words, the standing waves at the edge of the feature are controlled only by the 
+refl ectivity of the zero order. Figure 4.34 shows an example of how the standing wave 
+amplitude ratio varies with position along the line/space features. Note that Equations 
+(4.134)–(4.136) and Figure 4.34 all assume a nonabsorbing medium. A real resist, with 
+its reasonably high absorption, will reduce the actual SWAR signifi cantly. Equation 
+(4.134) can be modifi ed to account for absorption and multiple refl ections in a real resist 
+if the diffraction order amplitudes a0 and a1 are replaced by their in-resist values a0r and 
+a1r, and the substrate refl ectivity r is replaced by
+ρθτ θ αθ () () cos D
+2 z e− / (4.137)
+While the mathematics derived above apply to a fairly simple case, the results are 
+appropriate for considering the approach toward optimizing a bottom antirefl ection coating 
+for three-beam, high-numerical-aperture imaging (for two-beam imaging there is no 
+ambiguity, since there is only one angle to optimize for). Equation (4.135) shows that 
+standing waves in the middle of the space are controlled by a weighted average of the 
+refl ectivities of the zero and fi rst orders (i.e. at zero angle and at the angle of the fi rst 
+orders). However, when considering the more important standing waves at the edge of 
+the feature, only the zero-order refl ectivity matters. While Equation (4.136) applies to 
+both s- and p-polarized illumination, Equation (4.135) can be modifi ed to approximate 
+p-polarization by replacing a1 with a1cosq (to account for reduced interference creating 
+the image) and by adding a cos2q term to the weighting of the high-angle refl ectivity (to 
+account for reduced interference in the standing wave formation). Thus, for p-polarization, 
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+0.30
+–100 –80 –60 –40 –20 0 20 40 60 80 100
+Horizontal Position (nm)
+SWAR
+Line
+Edge
+2ρ(0)
+Mask
+Line
+Edge
+Center
+of
+Space
+Figure 4.34 The standing wave amplitude ratio (SWAR) at different positions on the feature 
+for coherent three-beam imaging and s-polarization. For this example of three-beam imaging 
+of 100-nm lines and spaces, ao = 0.5, a1 = 0.3183, |r(0)| = 0.1 and |r(q)| = 0.15
+
+
+## Page 55
+
+ Imaging in Resist: Standing Waves and Swing Curves 183
+even the SWAR in the center of the space becomes more heavily weighted to the normally 
+incident refl ectivity due to the reduced interference of the large-angle fi rst diffracted 
+orders. It seems that designing a BARC by reducing the normally incident refl ectivity 
+provides a very good starting point for obtaining the best standing wave control. Beyond 
+this initial design, full lithographic simulation will be required.
+4.8 Defi ning Intensity
+While seemingly simple in concept, the defi nition of light intensity is more complicated 
+than expected. In particular, a comparison of intensity values when the light is in different 
+materials and traveling at different angles requires careful consideration. One case where 
+these diffi culties become apparent is the simple refraction of a plane wave traveling from 
+one medium to another. Thus, our discussion will begin with a look at electric fi eld and 
+intensity refl ection and transmission coeffi cients. The following derivations are based on 
+the standard treatment given in Born and Wolf.12
+4.8.1 Intensity at Oblique Incidence
+When determining the intensity (also called irradiance) transmitted into a material at an 
+oblique angle, it is very important to understand the exact defi nition of intensity. By defi -
+nition (and as was discussed briefl y in Chapter 2), the intensity of light is the magnitude 
+of the (time averaged) Poynting vector, the energy per second crossing a unit area perpendicular to the direction of propagation of the light. In a medium of refractive index n
+the intensity I is given by
+I nE = 2 (4.138)
+where E is the electric fi eld. Note that the defi nition given in Equation (4.138) may differ 
+by a constant multiplicative factor depending on the units used.
+The intensity refl ectivity and transmission, for either polarization, are derived by considering a unit area on the interface between two materials labeled 1 and 2. Consider the 
+projected power per unit area, J, of the incident light along the surface of the interface 
+between the materials. If the angle of incidence is q1,
+JI ii = cos( ) θ1 (4.139)
+Likewise, the projected power per unit area of the refl ected and transmitted light along 
+this surface are
+JI
+JI
+rr
+tt
+=
+=
+cos( )
+cos( )
+θ
+θ
+1
+2
+ (4.140)
+Now the refl ectivity and transmission coeffi cients for each polarization can be defi ned:
+RRR J
+J
+TTT J
+J
+12 21 12
+2
+12 21
+22
+11
+12
+2
+= == =
+= == =
+r
+i
+t
+i
+ρ
+θ
+θ
+τ
+n
+n
+cos( )
+cos( )
+ (4.141)
+
+
+## Page 56
+
+184 Fundamental Principles of Optical Lithography
+From these two equations it is easy to show that R + T = 1 for each polarization, which 
+is a consequence of conservation of energy. Figure 4.5 shows how the intensity refl ectivity 
+varies with incident angle for both s- and p-polarized illumination for a typical air–resist 
+interface. An alternate form for Equation (4.141), making use of the reverse direction 
+defi nitions of refl ection and transmission coeffi cients in Equation (4.38), are
+R
+T
+=
+=
+ρρ
+ττ
+12 21
+12 21
+ (4.142)
+Also note that for randomly polarized light, the overall intensity refl ectivity and transmittance can be computed from the values obtained for each polarization:
+RR R
+TT T
+=+
+=+
+⊥
+⊥
+||
+||
+cos sin
+cos sin
+2 1 2 1
+2 1 2 1
+θθ
+θθ (4.143)
+Consider a unit intensity plane wave incident on the plane boundary between materials 
+1 and 2 at an incident angle q1 and with intensity Ii. From Equation (4.138), the magnitude 
+of the incident electric fi eld must be
+E I
+n i
+i = 1
+ (4.144)
+The transmitted electric fi eld is then
+EE I
+n ti
+i == ττ 12 12
+1
+ (4.145)
+The transmitted intensity (i.e. the intensity in material 2) is found by applying the defi nition of intensity to Equation (4.145).
+I nE n
+n I tt i == 2
+2 2
+1
+12
+2 τ (4.146)
+By comparing Equation (4.146) with Equation (4.141), the somewhat nonintuitive result 
+below is obtained.
+I
+I
+T t
+i
+= cos( )
+cos( )
+θ
+θ
+1
+2
+ (4.147)
+As can be seen in Equation (4.147), the transmittance T is not the ratio of the intensities 
+It and Ii (see Figure 4.35). The difference comes from the change in the direction of the 
+energy fl ow caused by refraction. Thus, one might ask the question, which is more important to know inside fi lm 2, the intensity of the plane wave, or its projected power along 
+a surface parallel to the material interface? The answer to this question depends on the 
+task at hand, as discussed in section 4.8.3.
+4.8.2 Refraction into an Absorbing Material
+The well-known Snell’s law of refraction [Equation (4.30)] dictates how a plane wave, 
+traveling across a plane boundary between two materials of different optical properties, 
+
+
+## Page 57
+
+ Imaging in Resist: Standing Waves and Swing Curves 185
+will change its direction. The material boundary conditions required by Maxwell’s equations state that any electric fi eld tangential to the material interface must be continuous 
+across that interface. This requirement will lead directly to the derivation of Snell’s law. 
+When both refractive indices are real (i.e. neither material is absorbing), the interpretation 
+of Snell’s law is quite straightforward. However, if one or both of the materials are absorbing (for example, light traveling from air into photoresist), one or both of the angles will 
+be complex. How is a complex angle of transmittance to be interpreted? To answer this 
+question, a more rigorous treatment of refraction and absorption is required.
+Assuming a unit amplitude plane wave, the electric fi eld can be expressed mathematically in two dimensions as
+E xz i n x z i( ) exp( ( sin cos ) ) ,/ =+ 2π θ θλ 11 1 (4.148)
+where the interface between the two materials lies in the x − y plane, positive x is up and 
+positive z is to the right (as seen in Figure 4.4). Here we shall assume for simplicity that 
+material 1 is nonabsorbing. The transmitted electric fi eld will be
+E xz i x z t( ) exp( ( sin cos ) ) ,/ =+ τ π θ θλ 12 2 2 2 2 n (4.149)
+where the appropriate expression for t12 is used depending on the polarization of the 
+incident plane wave. If material 2 is absorbing, the angle q2 will be complex. The resulting mathematics are quite cumbersome when trying to express all quantities as real 
+numbers. For a weakly absorbing fi lm, however, some simplifi cations are possible. The 
+optical distance in Equation (4.149) is
+OD x z =+ n22 2 ( sin cos ) θθ (4.150)
+Applying Snell’s law to eliminate the complex angle q2,
+nn n 2 22 2 222 11 2 cos sin ( sin ) θθ θ = − =− 1 n (4.151)
+0.0
+0 20 40 60 80
+Incident Angle (degrees)
+T or It/Ii
+0.2
+0.4
+0.6
+0.8
+1.0
+It/Ii, s-pol.
+It/Ii, p-pol.
+T, p-pol. T, s-pol.
+Figure 4.35 Intensity transmitted into layer 2 relative to the incident intensity (solid lines) 
+and the transmittance T (dashed lines) as a function of the angle of incidence for both s- and 
+p-polarization (n1 = 1.0, n2 = 1.5)
+
+
+## Page 58
+
+186 Fundamental Principles of Optical Lithography
+If material 2 is weakly absorbing, the imaginary part of n2 will be much smaller than the 
+real part (for example, a highly absorbing photoresist may have n2 = n2 + ik2 = 1.7 +
+i0.02). Thus,
+n2
+2 22 22 22 22 =−+ ≈+ n in n in κκ κ 22 22 (4.152)
+where the error in neglecting the κ 2
+2
+ term is only about 0.01 % for the example photoresist. 
+Thus,
+n2 22
+11
+2
+2
+2
+2
+1 2cos
+sin θ θκ ≈− 
+
+ 
+ n  + n
+n i n (4.153)
+Now let us defi ne a new angle called θ2
+′ given by
+sin( ) sin( ) θ′ = θ 2
+11
+2
+n
+n (4.154)
+This new angle is not the actual transmitted angle, but is the angle of transmission that 
+would be obtained if material 2 were nonabsorbing. For a weakly absorbing material, it 
+is approximately the angle of transmission. Using this angle in Equation (4.153),
+n2 22 2 2
+2
+2
+22
+2
+2 2 2
+2 1 2
+cos cos cos
+cos
+θθ κ θ κ
+θ ≈ ′ += ′ + ′ ni n ni n (4.155)
+Expanding the square root into a Taylor series,
+1 2 1 1
+22
+2
+2 2 2
+2
+2 2 2
+2
+2 2 2
+2
+2
+2
++ ′=+ ′+ ′
+
+
+ 
+ i  − n i
+nn
+i
+n
+κ
+θ
+κ
+θ
+κ
+θ
+κ
+cos cos cos cos ... 2 2
+3
+′
+
+
+ 
+
+ +
+θ (4.156)
+If only the fi rst two terms of the Taylor series are kept, both the real and imaginary parts 
+of the result will have a relative error of approximately 1
+2
+2
+2 2 2
+2 κ
+n cos θ′
+
+
+ 
+
+ . Using again the 
+optical properties of photoresist mentioned above and assuming a maximum incident 
+angle of 90 ° in air, neglecting this term will provide less than 0.02 % error. Even if 
+extreme immersion lithography is considered, the larger angle inside the resist will cause 
+this error to grow to only 0.04 %. Thus, there is very little error in dropping all but the 
+fi rst two terms in Equation (4.156). The fi nal result for Equation (4.155) is
+n2 22 2
+2
+2
+cos cos
+cos
+θθ κ
+θ ≈ ′ + ′ ni (4.157)
+Thus, the plane wave traveling in material 2 will have an optical path of 
+approximately
+OD xn z n i n x z ≈+ ′ + ′
+
+
+ 
+ 11 2 2  = ′ + ′ + 2
+2
+sin cos 22 2 cosθθ ( sin cos ) κ
+θ
+θθ i zκ
+θ
+2
+cos 2
+′
+ (4.158)
+and the electric fi eld will be
+E xyz i n x z z t( ) exp( ( sin cos ) )exp( ( cos ,, / / ≈ τ π θ θ λ πκ ′ + ′ − ′ 12 2 2 2 2 22 θλ 2 )) / (4.159)
+
+
+## Page 59
+
+ Imaging in Resist: Standing Waves and Swing Curves 187
+For a weakly absorbing fi lm, the phase term of the electric fi eld is approximately equal 
+to the plane wave that would result for a nonabsorbing fi lm with the same real part of the 
+refractive index. The absorption term in Equation (4.159) provides the somewhat intuitive 
+result that larger angles of propagation with respect to the z-axis give faster attenuation 
+of the light along the z-axis. Because the surfaces of constant phase are not parallel to 
+the surfaces of constant amplitude (which instead are parallel to the interface between the 
+two materials), such a wave is called an inhomogeneous wave.
+Applying the defi nition of intensity,
+I xyz n z t( ) exp( cos ) ,, / ≈− ′ 2 12
+2 τ αθ2 (4.160)
+where a = 4pk/l is the absorption coeffi cient. Note that the transmitted plane wave has 
+an intensity with only z-dependence.
+4.8.3 Intensity and Absorbed Energy
+In lithography, the intensity of light inside the resist fi lm is required in order to know 
+the energy absorbed per unit volume in the resist, which in turn determines the amount 
+of chemical change that occurs during exposure. The standard approach to photoresist 
+exposure kinetics makes use of the Dill equation (to be discussed in more detail in 
+Chapter 5),
+d
+d
+m
+t =−CIm (4.161)
+where m is the relative concentration of photosensitive material, C is the exposure rate 
+constant, and t is the exposure time. Obviously, Equation (4.161) makes use of a specifi c 
+defi nition of intensity. What defi nition is used, and why?
+A detailed study of the microscopic mechanism of absorption and exposure can be used 
+to relate the exposure rate constant C to the molar absorptivity of the photosensitive 
+component of the resist (see Chapter 5):
+C a N hc =Φ mA λ (4.162)
+where Φ is the quantum effi ciency, am is the molar absorptivity of the photosensitive 
+component, l is the vacuum wavelength, NA is Avogadro’s number, h is Planck’s constant, 
+and c is the speed of light. The important aspect of this relationship is the direct proportionality between the exposure rate constant and the molar absorptivity of the photosensitizer (which is the absorption coeffi cient divided by the concentration of 
+photosensitizer). Thus, the rate of exposure in Equation (4.161) is directly proportional 
+to the absorption coeffi cient times the intensity of light. However, this same rate of exposure is also directly proportional to the absorbed energy per unit volume of resist per 
+second. After all, it is the absorbed energy that actually causes the chemical reactions to 
+occur. Thus, our use of the intensity of light in the exposure rate Equation (4.161) must 
+be based on the idea that
+Absorbed Energy volume time I // ∝α (4.163)
+
+
+## Page 60
+
+188 Fundamental Principles of Optical Lithography
+Our defi nition of intensity, for it to be useful in this application, must satisfy Equation 
+(4.163). In fact, this can only be true if intensity is defi ned as the power per unit area 
+perpendicular to the direction of travel. Consider fi rst Lambert’s law of absorption:
+d
+d
+I
+s
+=−αI (4.164)
+where s is the direction of propagation of light. The change in intensity with s is just the 
+absorbed power per unit volume when I is defi ned as power per unit area perpendicular 
+to the direction of propagation. Further tying this defi nition of intensity together with the 
+standard formulations for electric fi eld propagation, absorption is accounted for by the use 
+of a complex refractive index. For a homogeneous fi lm, the solution to Lambert’s law is
+Ix I s () = − 0e α (4.165)
+In phasor representation, a plane wave traveling in the s direction is written as
+Es A is () = e 2πλ n / (4.166)
+Equation (4.166) will yield Equation (4.165) by applying the defi nition of intensity as 
+given in Equation (4.138) if the absorption coeffi cient is related to the imaginary part of 
+the refractive index by
+α πκ λ = 4/ (4.167)
+If the direction s makes an angle q with respect to the z-axis, then s = z/cosq and
+Iz nA z I z ( ) exp( cos ) exp( cos ) = − =− 2 αθ αθ 0 // (4.168)
+Thus, one can see that by defi ning intensity as the energy fl ux perpendicular to the direction of travel of the light, the use of an imaginary refractive index in the standard optics 
+equations provides for a straightforward calculation of energy absorbed per unit volume 
+of resist. It is the intensity within the resist fi lm, not J, the intensity projected along a 
+surface parallel to the resist and substrate, that determines the amount of chemical change 
+during exposure.
+Problems
+4.1. Imagine two plane waves moving in opposite directions along the z-axis. Using the 
+time-dependent form of the waves rather than the phasor representation, the +z
+moving E-fi eld wave is given by
+ U+(z,t) = A cos(wt − kz)
+and the −z moving wave is
+ U−(z,t) = A cos(wt + kz)
+Show that the sum of these waves is separable in z and t (that is, can be expressed 
+as product of a function of z and a function of t). Show that this results in an intensity ‘standing wave’, that is, the time average of the square of the electric fi eld 
+varies sinusoidally with position.
+
+
+## Page 61
+
+ Imaging in Resist: Standing Waves and Swing Curves 189
+4.2. Which of the following situations will result in the formation of standing waves? 
+Explain your reasoning.
+(a) the superposition of identical waves that travel in the same direction;
+(b) the superposition of identical waves that travel in opposite directions;
+(c) the superposition of waves that are nearly identical but of different amplitudes 
+that travel in opposite directions;
+(d) the superposition of nearly identical waves of slightly different frequencies that 
+travel in the same direction.
+4.3. Derive Equation (4.19).
+4.4. The optical admittance of a material, h, at normal incidence is just its refractive 
+index, n. For light traveling through that material at an angle q, the optical admittance of the material for TE (s-polarized) and TM (p-polarized) waves are
+η θη θ TE TM == n
+n
+cos
+cos
+Show that by using optical admittance in the Fresnel formulas [Equation (4.29)], 
+one obtains a single equation for refl ection for both polarizations that has the same 
+form as the normally incident defi nition of Equation (4.8). What are the results for 
+transmittance and how do they compare to Equation (4.7)?
+4.5. Brewster’s angle is defi ned as the angle at which p-polarized light will have 
+zero refl ectance at the interface between two materials. Derive an equation for 
+Brewster’s angle. For p-polarized light incident on a photoresist-coated substrate 
+at Brewster’s angle, what is the resulting swing amplitude?
+4.6. For p-polarized light traveling at 45 ° with respect to the normal inside of a photoresist, no standing waves will occur since the incident and refl ected waves will have 
+no overlap in their electric fi elds [see Equation (4.37)]. Will the resist swing curve 
+similarly have zero amplitude at this angle? What if the light is traveling at 45 ° 
+with respect to the normal in air? Explain.
+4.7. Derive Equation (4.46) from Equation (4.45).
+4.8. Derive an expression for the CD swing curve using Equations (4.51)–(4.53).
+4.9. Derive Equation (4.84).
+4.10. Calculate the swing ratio for a nominally 400-nm-thick 193-nm resist (assume 
+typical properties) on a substrate of copper. What is the impact on this swing ratio 
+if the maximum is at a greater thickness than the minimum, compared to the 
+minimum at a greater thickness than the maximum?
+4.11. Using the normal-incidence BARC solution given in Figure 4.16 for a 40-nm 
+BARC thickness, what BARC thickness control is required to keep the BARC 
+intensity refl ectivity below 0.5 %?
+4.12. At 248 nm, a typical resist on silicon will result in a swing amplitude of about 0.69. 
+Using a BARC with a refl ectivity of 1 %, the swing amplitude is reduced to about 
+0.095. Ignoring absorption, what level of resist thickness control is required for 
+each of these two cases (resist on silicon and resist on a 1 % refl ective BARC) to 
+keep the effective dose error below 1 %.
+4.13. Derive Equation (4.103), the refractive index of an ideal TARC.
+4.14. As an example of the use of Equation (4.100), consider a 193-nm resist with 
+n2 = 1.7, a = 1.2 mm−1
+, D = 200 nm and |r12| = 0.26. Suppose that 2 % dose error 
+
+
+## Page 62
+
+190 Fundamental Principles of Optical Lithography
+due to resist thickness variations was considered acceptable. Generate a plot of 
+maximum allowed substrate refl ectivity (|r23|
+2
+) as a function of the resist thickness 
+variation ∆.
+4.15. What will be the impact of using immersion lithography (versus dry lithography at 
+the same numerical aperture) in terms of the contrast of the image-in-resist for 
+unpolarized illumination? Explain.
+4.16. Derive Equation (4.117) from Equation (4.116).
+4.17. For light incident on a plane interface between two materials, use Equation (4.141) 
+to show that R + T = 1 for each polarization.
+References
+ 1 Middlehoek, S., 1970, Projection masking, thin photoresist layers and interference effects, IBM
+Journal of Research and Development, 14, 117–124.
+ 2 Korka, J.E., 1970, Standing waves in photoresists, Applied Optics, 9, 969–970.
+ 3 Mack, C.A., 1986, Analytical expression for the standing wave intensity in photoresist, Applied
+Optics, 25, 1958–1961.
+ 4 Macleod, H.A., 1969, Thin-Film Optical Filters, American Elsevier Publishing (New York, 
+NY).
+ 5 Widmann, D.W., 1975, Quantitative evaluation of photoresist patterns in the 1 mm range, 
+Applied Optics, 14, 931–934.
+ 6 Brunner, T.A., 1991, Optimization of optical properties of photoresist processes, Proceedings
+of SPIE: Advances in Resist Technology and Processing VIII, 1466, 297–308.
+ 7 Palik, E.D. (ed.), 1985–1998, Handbook of Optical Constants of Solids, Vol. I–III, Academic 
+Press (New York, NY).
+ 8 Brunner, T.A., 1999, Relationship between the slope of the HD curve and the fundamental 
+resist contrast, Journal of Vacuum Science and Technology B, 17, 3362–3366.
+ 9 Tanaka, T., Hasegawa, N., Shiraishi, H. and Okazaki, S., 1990, A new photolithography technique with antirefl ective coating on resist: ARCOR, Journal of the Electrochemical Society, 
+137, 3900–3905.
+10 Brunner, T.A., 1991, Optimization of optical properties of resist processes, Proceedings of
+SPIE: Advances in Resist Technology and Processing VIII, 1466, 297–308.
+11 Griffi ng, B.F. and West, P.R., 1983, Contrast enhanced photolithography, IEEE Electron Device
+Letters, EDL-4, 14–16.
+12 Born, M. and Wolf, E., 1980, Principles of Optics, sixth edition, Pergamon Press (Oxford, 
+UK), p. 41.

@@ -1,0 +1,2478 @@
+## Page 1
+
+10
+Resolution Enhancement 
+Technologies
+In general, the optimum image quality for an arbitrary object is obtained by using a classical imaging system with zero aberrations. Semiconductor lithography, however, uses a 
+very limited set of objects (arrays of lines and spaces, isolated lines, small square holes 
+called contacts, etc.) in limited arrangements and orientations. In many cases, the sizes 
+of these objects are also limited to set values. Thus, lithography can pose a unique imaging 
+problem – given a single object (say, an array of contact holes of a given size), is it possible to design a special imaging system which is better than a classical imaging system 
+for the printing of this one object? The answer is yes.
+The design of an imaging system optimized for a reduced class of objects has been 
+called wavefront engineering by one of the earlier pioneers in this area, Marc Levenson.1
+Wavefront engineering can be thought of in a number of different ways, but essentially 
+it refers to manipulating the optical wavefront exiting the projection lens to produce 
+improved images for certain types of objects. There are three basic ways of modifying 
+the wavefront – manipulating the object (the mask), adjusting the illumination of the 
+object, or modifying the wavefront directly with a pupil fi lter. The use of a pupil fi lter is 
+diffi cult with current lens designs since the pupil is not directly accessible within the lens. 
+Modifi ed illumination and masks, however, are widely used in semiconductor lithography 
+to improve imaging.
+In its simplest form, an imaging system uses an object which is identical to the desired 
+image. However, knowing the limitations of the imaging system, one can design a new 
+object which produces an image more like the desired pattern. By adjusting the transmittance of the mask, one can improve the exposure latitude and depth of focus of a given 
+image. Ideally, the spatial variation of both the phase and the transmittance of the mask 
+would be modifi ed in whatever way needed to improve the image. From a practical point 
+of view though, masks for semiconductor lithography are essentially devices with discrete 
+levels of transmittance (the simplest mask is binary, either 100 or 0 % transmittance). 
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+412 Fundamental Principles of Optical Lithography
+Each added level of transmittance adds considerably to the cost and complexity of the 
+mask. For this reason, mask modifi cation falls into two categories – mask shaping (also 
+called optical proximity correction, or OPC) and phase-shifting masks (PSMs). Mask 
+shaping adjusts the shape of the mask features to improve the shape of the resulting image 
+(for example, by applying serifs to the corners of a rectangular pattern). The diffi culty 
+comes in predicting the needed mask shapes (a typical chip will require masks with hundreds of millions or billions of patterns that must be shaped). PSMs change (or possibly 
+add to) the levels of transmittance on the mask to include phase differences between 
+transmittance levels. Light shifted by 180 ° will interfere with unshifted light to produce 
+well-controlled dark areas on the image. The diffi culty again includes designing the mask, 
+but also involves more complicated mask fabrication.
+Modifying the illumination of the mask will also result in different wavefronts and 
+thus different images. As we saw in Chapters 2 and 3, tilting the illumination can double 
+the resolution of grating (line/space) patterns and can also improve the depth of focus 
+of gratings of certain periods. This tilting, however, does not improve the performance 
+of nonrepeating patterns. Thus, the direction (or directions) of the illumination can 
+be customized for given mask features, but there is no one illumination direction which 
+is best for all mask features. Modifi ed illumination (also called off-axis illumination
+or OAI) can be combined with mask modifi cation (OPC and possibly PSM) to 
+produce results better than either approach alone, but with increasingly complicated 
+processes.
+Collectively, these three techniques, OPC, PSM and OAI, are known as resolution 
+enhancement technologies (RETs). To see how they actually improve resolution, it is 
+important to fi rst carefully defi ne what is meant by the term resolution.
+10.1 Resolution
+The resolution limit of optical lithography is not a simple function. In fact, resolution 
+limits differ depending on the type of feature being printed. In general, however, there 
+are two basic types of resolution: the smallest pitch that can be printed (the pitch resolution) and the smallest feature that can be printed (the feature resolution). While related, 
+these two resolutions are limited differently by the physics of lithography, and have different implications in terms of fi nal device performance. Pitch resolution, the smallest 
+linewidth plus spacewidth pair that will print, determines how closely transistors can be 
+packed together on one chip. This resolution has the greatest impact on cost per function 
+and functions per chip. Feature size resolution determines the characteristics and performance of an individual transistor, and has the greatest impact on chip speed and power 
+consumption. Obviously both are very important.
+Pitch resolution is the classical resolution discussed in most optics textbooks and 
+courses. It is governed by the wavelength of the light used to form the images and the 
+numerical aperture of the imaging lens. The classical pitch resolution is given by a version 
+of the Rayleigh resolution equation:
+pitch resolution k NA = pitch
+λ (10.1)
+
+
+## Page 3
+
+ Resolution Enhancement Technologies 413
+where l is the vacuum wavelength of the lithographic imaging tool, NA is the numerical aperture, and kpitch depends on the details of the imaging process. Ultimately, kpitch
+can be as low as 0.5, but only with tremendous effort (as will be discussed below). 
+Values of 0.7–1.0 are typical, with a trend toward decreasing values approaching the 
+0.5 limit.
+While pitch resolution has a hard physical limit given by the Rayleigh equation, feature 
+resolution is limited by the ability to control the critical dimension (CD) of the feature. 
+As features are made smaller, control of the CD of that feature becomes harder. There is 
+no hard cutoff, only a worsening of CD control as the feature size is reduced. Feature 
+size control is governed by the magnitude of various process errors that inevitably occur 
+in a manufacturing environment (such as focus and exposure errors), and the response of 
+the process to those errors (see Chapter 8). In order to improve CD control, one must 
+simultaneously reduce the sources of process errors and improve process latitude (the 
+response of CD to an error). Interestingly, process latitude is similar to pitch resolution 
+in that it also depends most strongly on the imaging wavelength and numerical aperture, 
+though in more complicated ways.
+Process latitude is an exceedingly general concept, but usually the most important 
+process latitudes are the interrelated responses of CD to focus and exposure. Using the 
+process window to characterize these responses (see Chapter 8), we defi ne depth of focus 
+(DOF) as the range of focus which keeps the resist profi le of a given feature within all 
+specifi cations (linewidth and profi le shape) over a specifi ed exposure range. One of the 
+most insidious diffi culties of lithography is that small features tend to have smaller depth 
+of focus.
+10.1.1 Defi ning Resolution
+Resolution is, quite simply, the smallest feature that you are able to print (with a given 
+process, tool set, etc.). The confusion comes from what is meant by ‘able’. For a researcher 
+investigating a new process, ‘ability’ might mean shooting a number of wafers, painstakingly searching many spots on each wafer, and fi nding the one place where a small feature 
+looks somewhat properly imaged. For a production engineer, the manufacturable resolution might be the smallest feature size which provides adequate yield for a device designed 
+to work at that size. We can defi ne resolution, similar to our defi nition of DOF, in such 
+a way that it can meet these varied needs.
+Producing an adequately resolved feature in a realistic working environment means 
+printing the feature within specifi cations (linewidth, sidewall angle, resist loss, line edge 
+roughness, etc.) over some expected range of process variations. As we have seen before, 
+the two most common process variations are focus and exposure. Since our defi nition of 
+depth of focus includes meeting all profi le specifi cations over a set exposure range, a 
+simple defi nition of resolution emerges: the smallest feature of a given type which can be 
+printed with a specifi ed depth of focus. This defi nition is perfectly general. If the exposure 
+latitude specifi cation used in the DOF defi nition is set to zero and the DOF specifi cation 
+in the resolution defi nition is set to zero, the ‘research’ use of the term resolution is 
+obtained (if it prints once, it is resolved). If the exposure latitude and DOF specifi cations 
+are made suffi ciently large to handle all normal process errors encountered in a manufacturing line, the ‘manufacturing’ use of the term resolution is obtained. As with the 
+
+
+## Page 4
+
+414 Fundamental Principles of Optical Lithography
+defi nition of DOF, the choice of the specifi cations determines whether the resulting resolution is appropriate to a given application.
+Figure 10.1 illustrates this concept of resolution. The depth of focus for a pattern of 
+equal lines and spaces is shown as a function of feature size. (For this and subsequent 
+fi gures, the DOF is based on profi le specifi cations of CD ±10 %, sidewall angle >80 °, 
+resist loss <10 %, and an exposure latitude specifi cation of 6 %. All focus and exposure 
+errors are assumed to be random. Each data point assumes that nominal exposure and 
+focus were adjusted to give the best process window and thus the largest possible DOF. 
+Mask linearity – the ability to print different feature sizes at the same time – is not considered here, but could easily be added as a constraint.) If zero DOF is required, the equal 
+line/space resolution for this process would be about 80 nm. A requirement of 160-nm 
+DOF would increase the minimum printable feature size to 100 nm, and a requirement of 
+250-nm DOF would degrade the resolution further to 115 nm. Obviously, a simple statement of the resolution without clearly stating the DOF requirement (and thus the profi le 
+and exposure latitude requirements) would be of little use.
+Figure 10.2 illustrates how a given process, tool set, etc., does not have a single resolution for all feature types. The contact hole shows the worst resolution under these conditions, while the isolated line has the greatest resolution for small required DOF. Figure 
+10.3 illustrates how a careful defi nition of resolution can elucidate fundamental lithographic behavior, such as the role of numerical aperture. For larger features, lower NA 
+gives more depth of focus. But for smaller features, the DOF falls off more quickly for 
+the lower NA. This results in the well-known effect of an optimum NA to give the greatest 
+DOF. But it also impacts resolution in an interesting way. If no DOF is required, the resolution (the point where each curve in Figure 10.3 hits the x-axis) follows the familiar 
+trend of increased resolution with increased NA. If, however, a nonzero DOF is required, 
+the behavior of resolution with NA becomes more complicated.
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+50 100 150 200 250
+Nominal Feature Size (nm)
+Depth of Focus (
+µm)
+Figure 10.1 Resolution can be defi ned as the smallest feature which meets a given DOF 
+specifi cation. Shown are results for equal lines and spaces, l = 193nm, NA = 0.9, s = 0.7, 
+typical resist on a nonrefl ective substrate
+
+
+## Page 5
+
+ Resolution Enhancement Technologies 415
+Figure 10.4 expands on the results of Figure 10.3 and shows the resolution of equal 
+line/space arrays as a function of numerical aperture for different DOF specifi cations.2
+For example, with a required DOF of 200 nm, the resolution reaches an optimum (a 
+minimum in the curve at a feature size of 105 nm) at a numerical aperture of 0.84. Larger 
+numerical apertures actually reduce the resolution! As the required DOF is reduced, the 
+NA which gives maximum resolution moves out to higher values. Also shown on the 
+graph is the Rayleigh resolution criterion (R = k1l/NA) for comparison. For a nonzero 
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+50 100 150 200 250
+Nominal Feature Size (nm)
+Depth of Focus 
+NA = 0.9
+NA = 0.7 0.8
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+50 100 150 200 250
+Nominal Feature Size (nm)
+Depth of Focus (
+µm)
+Isolated
+Line Dense
+Contact
+Hole
+L/S
+Figure 10.2 Comparison of the resolution for different feature types (l = 193nm, NA = 0.9, 
+s = 0.7). Here, L/S means equal lines and spaces
+Figure 10.3 The defi nition of resolution can be used to study fundamental lithographic 
+trends, such as the impact of numerical aperture (NA) on resolution (l = 193nm, s = 0.7, 
+equal lines and spaces)
+
+
+## Page 6
+
+416 Fundamental Principles of Optical Lithography
+required DOF, the Rayleigh criterion is not accurate in predicting the infl uence of NA on 
+resolution.
+10.1.2 Pitch Resolution
+Although the above defi nition of resolution is perfectly general, there is a class of 
+features where a slightly different approach is more appropriate. Consider a simple 
+repeating mask pattern of equal lines and spaces. One could determine the resolution 
+of this pattern type using the above defi nition, with the condition that the resist features 
+must be equal lines and spaces as well (i.e. the desired linewidth equals the desired 
+spacewidth). However, if we were to concentrate only on the line feature, we could 
+easily overexpose our positive resist to produce a smaller linewidth and, most likely, a 
+smaller ‘resolution’. That is, keeping the pitch of the pattern (linewidth plus spacewidth) 
+constant, we could improve the line feature resolution by a simple processing change, but 
+only at the expense of the space feature resolution. Is this truly an improvement in 
+resolution?
+The answer depends on the application. If only the width of the line is critical, then 
+resolution should be based only on the line feature. The electric performance of a device, 
+for example, may be critically dependent on the linewidth of a given device structure, but 
+only marginally affected by the accompanying space feature size. In most cases, however, 
+the space feature is also critical (affecting capacitance at interconnect levels and strain 
+at the gate level, for example). In fact, the ability to decrease both linewidth and spacewidth simultaneously allows manufacturers to shrink chip sizes, putting more chips on a 
+wafer and providing a huge economic driver for the quest for better resolution. For such 
+applications, where linewidth and spacewidth are both critical , one can modify the above 
+defi nition of feature resolution to produce a defi nition for pitch resolution: the smallest 
+90
+95
+100
+105
+110
+115
+120
+125
+130
+0.6 0.7 0.8 0.9 1.0
+Numerical Aperture
+Resolution (nm)
+DOF = 100
+DOF = 200
+DOF = 250
+DOF = 300
+Rayleigh 
+(k1 = 0.415)
+Figure 10.4 Resolution as a function of numerical aperture is more complicated than 
+Rayleigh’s criterion would imply (l = 193nm, s = 0.7, equal lines and spaces). Graphs 
+show different resolution versus NA results for different minimum DOF specifi cations in 
+nanometers
+
+
+## Page 7
+
+ Resolution Enhancement Technologies 417
+pitch of a given duty cycle which can be printed with a specifi ed depth of focus, where 
+duty cycle is defi ned as the ratio of spacewidth to linewidth.
+At fi rst glance the difference between the feature resolution and the pitch resolution 
+seems almost trivial – hardly worth the effort to propose a separate defi nition. However, 
+use of these two different types of resolutions reveals that the physical limits to resolution 
+can be quite different for each. Consider the simple case of forming an image of an equal 
+line/space mask pattern illuminated with a single wavelength, normally incident plane 
+wave (i.e. coherent illumination). For such a case, there will be a hard cutoff for the pitch 
+resolution: when the pitch drops below l/NA no image whatsoever is formed for any duty 
+cycle. Regardless of the profi le, exposure latitude and DOF specifi cations, no pitch below 
+this limit can be imaged. For the case of an isolated line, there is no equivalent ‘hard 
+cutoff’ of the feature resolution, which instead exhibits a gradual reduction in profi le 
+control as the feature size is decreased.
+In general terms, the feature resolution is limited by photoresist profi le control and is 
+a complicated function of wavelength and numerical aperture. Ultimately, the pitch resolution is limited by the cutoff of discrete diffraction information passing through the 
+objective lens and is a relatively simple function of wavelength and numerical aperture. 
+To understand this simple functionality, one must understand that a single diffraction order 
+passing through the objective lens produces a single plane wave of light striking the wafer 
+(see Chapter 2). Two plane waves at the wafer (coming from two separate diffraction 
+orders) will interfere with each other to produce a sinusoidal pattern of light and dark 
+(giving spaces and lines). If the two plane waves strike the image plane (i.e. the wafer 
+plane) with angles q1 and q2 with respect to the optical axis (that is, a normal to the image 
+plane), then the period of the resulting image will be
+period = −
+λ
+sin sin θθ 12
+ (10.2)
+This general expression can be used to understand a variety of imaging situations. For 
+the coherent illumination case described above, q2 = 0 for the zero order and sinq1 has a 
+maximum value of NA, giving the l/NA resolution mentioned above. In other words, for 
+three-beam imaging the minimum kpitch is 1.0. For the special case of two symmetrical 
+beams, q1 = −q2 = q and the period becomes
+period = λ
+2sinθ
+ (10.3)
+The ultimate pitch resolution of an imaging tool is obtained when sinq becomes its 
+maximum value, the NA:
+ultimate pitch resolution NA = λ
+2 (10.4)
+for all duty cycles. Thus, for two-beam imaging, the minimum kpitch is 0.5. This ultimate 
+pitch resolution uses two-beam imaging that can be obtained from an alternating phaseshifting mask or an optimized off-axis illumination scheme (see sections 10.3 and 10.4). 
+However, the actual pitch resolution may not be this good if the resulting printed image 
+
+
+## Page 8
+
+418 Fundamental Principles of Optical Lithography
+does not meet the required DOF specifi cations (that is, if the patterns are limited by the 
+feature resolution of the line or the space making up the pitch).
+10.1.3 Natural Resolutions
+Besides the two kinds of resolution discussed so far, feature resolution and pitch resolution, a third type of resolution emerges from a study of optical imaging: natural resolutions 
+of an imaging system. Since a discussion of natural resolution will make use of many of 
+the concepts that will be developed in the sections that follow, its treatment will be delayed 
+until the end of this chapter, in section 10.5.
+10.1.4 Improving Resolution
+Considering both pitch resolution and feature resolution, the following approaches are 
+commonly used to improve resolution:
+• Reducing the exposure wavelength
+• Increasing the imaging lens numerical aperture
+• Reducing kpitch by using two-beam imaging
+• Increasing the focus–exposure process window size
+• Reducing the magnitude of process errors such as focus and exposure errors.
+Unfortunately, several of these factors work against each other. For a given feature, there 
+is an optimum numerical aperture that gives the largest process window. Increasing the 
+NA further will reduce the process window, making the feature resolution worse even as 
+the pitch resolution is improved. Reducing wavelength is always good, but as a practical 
+matter, it is extraordinarily diffi cult since we are limited by our ability to engineer materials with the proper optical properties at the lower wavelength. Of course, reducing the 
+magnitude of process errors is a never ending quest with cost being the only possible 
+downside. That leaves two fi nal resolution enhancement approaches: reducing kpitch with 
+two-beam imaging and increasing the size of the process window.
+By far the most effective and popular process window improvement approach has been 
+improvements in the photoresist. Over the years, resist capabilities have undergone dramatic progress. While we are still far from being able to ignore the photoresist (that is, 
+we do not have a diffusionless infi nite contrast resist), resist performance today is high 
+enough that even small improvements in optical imaging can be seen in the fi nal 
+patterns.
+Attempts to improve the process window by optical means (sometimes called optical 
+‘tricks’) include:
+• Optimization of the mask pattern shape (called optical proximity correction, OPC)
+• Optimization of the angles of light illuminating the mask (called off-axis illumination, 
+OAI)
+• Adding phase information to the mask in addition to intensity information (called phaseshifting masks, PSM).
+Collectively, these optical approaches (each of which will be described in detail in the 
+sections that follow) are known as resolution enhancement technologies (see Figure 10.5). 
+While some techniques improve feature resolution at the expense of pitch resolution, 
+
+
+## Page 9
+
+ Resolution Enhancement Technologies 419
+many of the resolution enhancement technology (RET) approaches can improve pitch 
+resolution and increase the process window simultaneously, a seemingly no-compromise 
+path to resolution enhancement. However, the most promising RETs (especially the best 
+PSM techniques) require a revolution in chip layout design that has yet to occur. Ultimately, a kpitch as low as 0.5 is possible, but only for chips designed specifi cally to take 
+advantage of these RETs.
+10.2 Optical Proximity Correction (OPC)
+Since, in general, the smallest features in a design are the hardest to print, lithography 
+processes are optimized to best print those smallest features. Unfortunately, the larger 
+features (which, while larger, cannot be considered large) are rarely faithfully reproduced 
+using this same lithography process. The nonlinear nature of a high-resolution lithography 
+process ensures that a ‘what you see is what you get’ imaging ideal, where all features 
+on the mask are faithfully reproduced in resist, will never be achieved.
+10.2.1 Proximity Effects
+Proximity effects are the variations in the linewidth of a feature (or the shape for a 2D 
+pattern) as a function of the proximity of other nearby features. The concept of proximity 
+effects became prominent several decades ago when it was observed that electron beam 
+lithography can exhibit extreme proximity effects (backscattered electrons can travel 
+many microns, exposing photoresist at nearby features). Optical proximity effects refer 
+to those proximity effects that occur during optical lithography (even though they may 
+not be caused by optical phenomenon). The simplest example of an optical proximity 
+effect is the difference in printed linewidth between an isolated line and a line in a dense 
+array of equal lines and spaces, called the iso-dense print bias.
+Although many factors may affect the iso-dense print bias, such as developer fl ow or 
+PEB diffusion, in general this bias is fundamentally the result of optics – the aerial images 
+for dense and isolated lines are different. For high-resolution features, the diffraction 
+patterns from isolated and dense lines are signifi cantly different (see Chapter 2), resulting 
+in different aerial images, as shown in Figure 10.6. In this case, the isolated line will print 
+wider than the dense line (assuming a positive photoresist), giving a positive iso-dense 
+print bias. It is important to note that this result is not a ‘failing’ of the optical system, 
+Optical Proximity Correction (OPC)
+Mask
+Wafer Conventional Annular Quadrupole
+Lens
+Off-Axis Illumination (OAI)
+Quart
+PhaseShifted
+Space
+Quartz
+Phase-Shifting Mask (PSM)
+Figure 10.5 Examples of the three most common resolution enhancement technologies
+
+
+## Page 10
+
+420 Fundamental Principles of Optical Lithography
+but a natural consequence of the physics of imaging. Also, aberrations in the optical 
+system can change the magnitude of the bias, sometimes signifi cantly.
+The proximity effect is very feature size dependent. For large features, the diffraction 
+patterns for isolated and dense lines are similar, giving very little differences in the aerial 
+images. As feature size shrinks, the differences grow. Thus, to fully characterize onedimensional proximity effects, it is common to measure resist CD versus pitch for a range 
+of nominal feature sizes (Figure 10.7). It is very important to note that the resulting 
+( (b) a)
+40
+60
+80
+100
+120
+140
+160
+180
+160 260 360 460 560 660 760
+Pitch (nm)
+Resist CD (nm)
+CD = 160 nm
+CD = 80 nm
+140
+120
+100
+40
+60
+80
+100
+120
+140
+160
+180
+160 260 360 460 560 660 760
+Pitch (nm)
+Resist CD (nm)
+CD = 160 nm
+CD = 80 nm
+140
+120
+100
+0.0
+0.3
+0.6
+0.9
+1.2
+–1000 –600 –200 200 600 1000
+Aerial Image Intensity
+Horizontal Position (nm)
+Figure 10.6 The iso-dense print bias is fundamentally a result of the difference in the aerial 
+images between isolated and dense lines. In this case, the isolated line is wider than the 
+line in a dense array of equal lines and spaces (0.5-micron features, l = 365nm, NA = 0.52, 
+s = 0.5)
+Figure 10.7 Resist CD through pitch for different nominal feature sizes (used to fully characterize 1D proximity effects) can be very different as a function of the optical imaging 
+parameters used: (a) conventional illumination, s = 0.7, and (b) quadrupole illumination, 
+center s = 0.8 (l = 193nm, NA = 0.85, binary mask, dose set to properly size the 100-nm 
+line/space pattern)
+
+
+## Page 11
+
+ Resolution Enhancement Technologies 421
+behavior (the CD-through-pitch curves) is very sensitive to the exact lithographic conditions used. For example, a switch from conventional to quadrupole illumination causes a 
+dramatic change in the shape of the CD-through-pitch curves (Figure 10.7a vs. Figure 
+10.7b), even changing the sign of the iso-dense bias for some features.
+The photoresist will also infl uence proximity effects. A systematic study using lithography simulation showed that the resist property that most signifi cantly infl uences proximity effects is resist contrast.3
+ In simulation terminology, it is the resist dissolution selectivity 
+parameter n of the original kinetic development model (which is directly proportional to 
+resist contrast, see Chapter 7) that infl uences proximity effects. As an example of how an 
+optical proximity effect might change with resist contrast, Figure 10.8 shows the infl uence 
+of the next nearest feature on the linewidth of a nominal 400-nm feature using i-line 
+lithography and a conventional resist. No proximity effects would result in the fl at line 
+shown at 400-nm linewidth. Five curves are shown corresponding to fi ve different resist 
+contrasts (subjectively called low, medium, high, state-of-the-art and future contrast 
+resists). These resists correspond to dissolution selectivity parameters of 4, 5.5, 7, 10 and 
+16, respectively. The infi nite contrast resist corresponds to the width of the image-in-resist 
+itself since an infi nite contrast resist will reproduce the image-in-resist exactly (baring 
+diffusion).
+Obviously, resist contrast plays an important role in determining the actual printed 
+proximity effect. For example, the iso-dense bias (the difference in linewidth between 
+isolated and dense features) for the state-of-the-art resist is twice that of the low-contrast 
+resist for the case shown in Figure 10.8. Also, the lower-contrast resists show a dip in 
+linewidth as the spacewidth is initially increased, whereas the higher-contrast resists do 
+not. Incidentally, the range of printed linewidths often exceeds the iso-dense bias quite 
+signifi cantly, as Figure 10.8 clearly shows.
+800 1200 1600 2000 2400 2800
+Resist Linewidth (nm)
+Pitch (nm)
+Low
+Medium
+High
+State-of-the-Art
+Future Infinite
+380
+400
+420
+440
+460
+480
+Figure 10.8 Proximity effects for different resist contrasts (400-nm nominal features, 
+NA = 0.52, s = 0.5, i-line). The increasing pitch corresponds to increasing distance between 
+400-nm lines
+
+
+## Page 12
+
+422 Fundamental Principles of Optical Lithography
+10.2.2 Proximity Correction – Rule Based
+Since the difference between the desired and actual CD printed on the wafer as a function 
+of feature size and pitch is, for the most part, a systematic error, it should be possible to 
+correct for this error. The only practical means for correction is to change the CD on the 
+mask to compensate for these proximity effects. This compensation is called optical 
+proximity correction (OPC).
+The initial goal of OPC, then, is to determine the optimal mask shape to get the desired 
+resist shape – often called the ‘inverse problem’ in imaging. This simple question is more 
+complicated than it appears. As with most such questions, the answer depends on what 
+is meant by ‘optimal’. Consider fi rst the simple case of printing long lines. What is the 
+optimal width of the mask line to get the desired resist line for many different linewidths 
+and proximity to other lines? One simple defi nition of optimum could be just obtaining 
+the right linewidth at the nominal exposure dose and focus. As an example, consider a 
+100-nm resolution process using the 100-nm equal line/space pattern as the baseline. 
+Without any bias on the mask for this feature, we determine the exposure dose to properly 
+size this feature. Our simple requirement, then, is that all other mask features must properly print at their correct size at this dose as well. Since proximity effects prevent this 
+from occurring naturally, we can only obtain this result by changing the feature sizes on 
+the mask to correct for these proximity effects.
+Figure 10.9 shows one example of what the mask bias solution might look like. The 
+mask correction (CD bias) is defi ned as the actual absorber width that produces the desired 
+resist CD minus the nominal (unbiased) absorber width. Thus, a positive bias means the 
+absorber has been made bigger. Each curve shows the amount of linewidth bias needed 
+as a function of the nominal feature width. For this example, we have defi ned our starting 
+point as zero bias for the most diffi cult feature, the 100-nm lines and spaces. An alternate 
+–15
+–10
+–5
+0
+5
+10
+100 300 500 700 900 1100
+Pitch (nm)
+Linewidth Correction (nm)
+Figure 10.9 Design curves of the mask linewidth bias (in wafer dimensions) required to 
+make all of these features print at the nominal linewidth: 100nm (thick line), 120nm (thin 
+line) and 140nm (dashed line). Dose set to require no bias at 100-nm lines and spaces 
+(l = 193nm, NA = 0.93, s = 0.7, 6 % ESPM)
+
+
+## Page 13
+
+ Resolution Enhancement Technologies 423
+(though less common) approach would be to set zero bias for some large feature and 
+adjust the bias of the smaller features to match the dose-to-size of that larger feature.
+Our defi nition of the optimum mask bias so far is a simple one – the bias which gives 
+the proper printed linewidth at the nominal process conditions. Other defi nitions may 
+include the tolerance to variations in process conditions (for example, the maximum 
+overlap of the focus–exposure process windows of the various features). Ultimately, the 
+best solution is that which gives the tightest distribution of linewidths on the wafer for 
+all of the features in the presence of typical process variations.
+While the curves of Figure 10.9 show how mask correction is a continuous function 
+of nominal CD and pitch, the actual implementation of these corrections on a real design 
+is often snapped to a design grid in order to ease the design and mask-making burden. 
+Typical design grids are 1–3 % of the minimum resist feature size. For example, a typical 
+design curve is snapped to a 5-nm grid in Figure 10.10. When discretized in this way, the 
+information in the design curve can be easily captured in a correction table, called an 
+OPC rules table.
+While all of the examples shown here have been symmetrical (the proximity of 
+other features is identical on both sides of the main feature), in general this will not be 
+the case. Thus, corrections are better described as edge movements rather than linewidth 
+changes. A simple OPC rule might be something like this: ‘If a feature is between A and 
+B in width, and the next feature to the right is between X and Y away, move the right 
+edge of the feature by Z’. Thus, the shape of the feature in the design is changed (its edge 
+is moved) depending on the size of the feature and its proximity to its nearest neighbor. 
+The values of the parameters of the rule (the amount of correction Z as a function of A, 
+B, X and Y in this example) are empirically determined for a given lithography process. 
+Since a large set of these parameters is typically required for each rule, the collection of 
+these parameters is put into a table called a rules table. Figure 10.11 shows an extremely 
+simple case where one-dimensional edge movements based on a rules table were 
+applied.
+400 500 600 700 800 900
+Pitch (nm)
+–20
+–10
+0
+10
+20
+Mask Linewidth Correction (nm)
+Figure 10.10 Discretized design curve (the stair-step approximation to the actual smooth 
+curve) appropriate for use in a design rule table (5-nm correction grid used)
+
+
+## Page 14
+
+424 Fundamental Principles of Optical Lithography
+There are two key aspects of successfully implementing rule-based OPC: (1) having 
+the right set of rules, and (2) having the right parameter values for those rules. While 
+rule-based OPC is conceptually simple and easy to implement for one-dimensional corrections, the rules can get very cumbersome when considering two-dimensional effects. 
+Corner rounding and line-end shortening (see Chapter 8) are two particular examples of 
+important 2D proximity effects that should be addressed with OPC. An intermediate 
+approach is to treat line-ends with their own set of rules, apply serifs to corners, and use 
+1D rules for all of the other edges. Sometimes called ‘1.5D’ correction, an example of 
+this approach is shown in Figure 10.12.
+Rule-based OPC is fairly simple to implement. First, a set of CD-through-pitch curves 
+are experimentally measured for a given process. From these data, a one-dimensional 
+rules table is created by interpolating from these data. Optimum line-end treatments and 
+(a) (b)
+Figure 10.11 A small section of a design (a) before, and (b) after correction of the middle 
+feature with a simple 1D rule-based correction
+(a) (b)
+Figure 10.12 A small section of a design (a) before, and (b) after the use of a simple 1.5D 
+rule-based correction
+
+
+## Page 15
+
+ Resolution Enhancement Technologies 425
+corner serif sizes are also empirically determined for the given process. Corrections are 
+made by implementing the rules as scripts for a design rule checker (DRC) software 
+package. This approach to OPC became important when feature sizes dropped below 
+500 nm, and was widely used at the 250-nm technology generation. However, by the 
+130-nm technology generation, the accuracy and robustness of rules-based OPC began 
+to falter. It was at this technology generation that most semiconductor manufacturers 
+began to switch to model-based OPC.
+10.2.3 Proximity Correction – Model Based
+Rule-based OPC suffers from a diffi cult scalability problem: in order to increase the 
+accuracy of the OPC, the number of rules must grow. This growth in rules is highly nonlinear – a small increase in OPC accuracy may require a very large increase in the number 
+of rules. Additionally, the required accuracy of OPC scales at least linearly with the 
+technology node dimensions. Since each rule requires several experimentally derived 
+parameters, the result is a dramatic increase in effort. For these reasons, most semiconductor manufacturers realized that model-based OPC was required at the 90-nm technology 
+generation.
+Model-based OPC replaces experimentally derived rules with a calibrated lithography 
+model that predicts the proximity effects for the actual chip pattern. Edges of the features 
+are then iteratively moved until the predicted resist shape matches the desired feature 
+shape to within a preset tolerance. A well-designed model-based OPC procedure requires 
+only very few rules to operate. Instead, considerable effort is put into the development 
+and calibration of a simplifi ed lithography model that will predict how each design pattern 
+will print.
+The constraints on the lithography models used for OPC are severe. Since an entire 
+chip must be simulated (with its hundreds of millions or even billions of features), OPC 
+models must be very fast and should also be parallelizable (to take advantage of distributed computing). At the same time, these models must be very accurate, predicting the 
+printed shapes on the wafer for every pattern of the design accurately to within a few 
+percent of the minimum design rule size. This combination of very fast speed with acceptable accuracy has resulted in the development of hybrid physical/empirical lithography 
+models, sometimes called compact models.
+OPC models combine a reasonably accurate and physically correct aerial imaging 
+model with a very simple resist model. Etch effects are sometimes included, or separate 
+etch models are applied, to predict the after-etch feature sizes and shapes. For the aerial 
+image calculation, an approximate solution to the Hopkins imaging equations called 
+Sum of Coherent Sources (SOCS) provides extremely fast computation times by precomputing a small number of coherent convolution kernels for a given source and lens 
+pupil (see Chapter 2). Diffusion effects in the resist are usually approximated by allowing 
+the aerial image to diffuse, which can be conveniently calculated using a Gaussian 
+diffusion kernel in the SOCS formulation. Resist development effects are approximated 
+using a threshold plus bias or a variable threshold model (see Chapters 2 and 7). Alternately, resist effects can be captured as empirical kernels in the SOCS formulation. In 
+either case, these empirical resist models require extensive calibration for a given resist 
+process.
+
+
+## Page 16
+
+426 Fundamental Principles of Optical Lithography
+Model-based OPC begins by fi rst dividing the original design into edge segments, each 
+of which can be individually moved during the OPC process. Simulation of the design 
+predicts a resist shape, which is then compared to the original design at various measurement points (for example, the midpoint of the segment) to calculate an edge placement 
+error (EPE, see Chapter 8). This EPE is then used to guess how much the segment must 
+be moved so that the resist shape will have zero EPE. Edge segments are iteratively moved 
+and the resist shape resimulated until all of the EPEs are below a preset limit (typically 
+requiring three to six iterations). As with rule-based OPC, edge positions are usually 
+snapped to a design grid to reduce the design and mask complexity. An example of modelbased OPC is shown in Figure 10.13. The aggressiveness of the OPC can be adjusted by 
+controlling the segment size (smaller segments mean more aggressive OPC), the smallest 
+movement allowed for an edge compared to its connecting edge (that is, the smallest 
+allowed jog size), and the design grid, among other parameters. A more aggressive OPC 
+results in a larger number of design vertices and greater mask-making cost.
+In general, model-based OPC is used to fi nd a mask shape that produces an acceptable 
+resist shape for a given lithography process that is assumed to be operating at its nominal 
+conditions, i.e. at best focus and exposure. Thus, while OPC can be used to extend the 
+Figure 10.13 Example of model-based OPC: the original design (upper left) prints very 
+poorly (upper right). After aggressive model-based OPC, the resulting design (lower left) 
+prints very close to the desired shape (lower right). OPC and simulations done using 
+PROLITH
+
+
+## Page 17
+
+ Resolution Enhancement Technologies 427
+linear resolution (the smallest features that can be printed while still printing all larger 
+features acceptably), it does not address the issue of process window, and thus the true 
+manufacturable resolution. One important technique used with OPC that addresses process 
+window as well as sizing issues is the subresolution assist feature, as described next.
+10.2.4 Subresolution Assist Features (SRAFs)
+Scattering bars, also called subresolution assist features (SRAFs), are narrow lines or 
+spaces placed adjacent to a primary feature in order to make a relatively isolated primary 
+line behave lithographically more like a dense line.4 The problem being solved is generically described as the problem of iso-dense bias. Isolated features will almost always print 
+at a feature size signifi cantly different than the same mask feature surrounded by other 
+features. The pitch curves of printed CD versus pitch for various nominal mask dimensions show the problem (see Figure 10.7). While sizing the mask to give the correct CD 
+on the wafer for all pitches certainly works (this is the conventional OPC approach), there 
+is another isolated-versus-dense difference that is not addressed by this bias OPC.
+The response of an isolated feature to focus and exposure errors is signifi cantly different 
+than the same-sized dense line. Figure 10.14 shows example focus–exposure matrices for 
+dense and isolated lines after the isolated line has been sized to give the proper CD at the 
+best focus and exposure needed by the dense features. The different shapes of the Bossung 
+curves produce different shapes for the process windows, which limits the overlapping 
+depth of focus even when the features nominally have the same best exposure dose.
+Scattering bars are designed to reduce the difference in the focus response of an isolated 
+feature compared to a dense feature by making the isolated feature seem more ‘dense’. 
+This becomes especially important when an off-axis illumination scheme is optimized for 
+greatest depth of focus of the dense features (a topic that will be discussed extensively 
+in section 10.3). The overlapping process window for the dense and isolated lines of 
+Figure 10.14 is shown in Figure 10.15a. The curvature of the isolated process window 
+severely limits the useable, overlapping DOF.
+0
+50
+100
+150
+200
+250
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2
+Resist Feature Width (nm)
+Focus (µm)
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+Resist Feature Width (nm)
+Focus (µm)
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+Dose
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2
+(a) (b)
+Figure 10.14 Focus–exposure matrices (Bossung curves) for (a) dense and (b) isolated 
+130-nm features (isolated lines biased to give the proper linewidth at the best focus and 
+exposure of the dense lines, l = 248nm, NA = 0.85, quadrupole illumination optimized for 
+a 260-nm pitch)
+
+
+## Page 18
+
+428 Fundamental Principles of Optical Lithography
+An SRAF, as the name implies, is a subresolution feature that is not meant to print. In 
+fact, it must be carefully adjusted in size so that it never prints over the needed process 
+window. This determines the most important trade-off in scattering bar design: make the 
+assist features as large as possible in order to create a more dense-like mask pattern, but 
+not so large as to print. Generally, these assist features are centered on the same pitch for 
+which the off-axis illumination was optimized, though a more careful design will optimize 
+their position and size to maximize the improvement in overlapping process window. As 
+a result, the use of assist features allows the lithographer to design an off-axis illumination 
+process optimized for dense patterns that can also be used to print more isolated 
+features.
+The assist bars used in Figure 10.15b were 50 nm (k1 = 0.17) in size (wafer dimensions), 
+and resulted in an increase in the overlapping DOF from 300 nm, when only bias OPC 
+was used, to 400 nm. Further improvement can be obtained by using ‘double’ scattering 
+bars, where a second set of scattering bars is placed further away to create an effective 
+fi ve-bar pattern. Of course, this requires enough free space around the primary feature to 
+actually be able to fi t these extra assist features.
+While the concept of using scattering bars to improve the DOF of isolated features is 
+a simple one, its practical implementation is anything but simple. Unlike the idealized 
+case of an isolated line, real patterns contain lines with a variety of pitches (i.e. nearby 
+8
+9
+10
+11
+12
+Dose (mJ/cm2
+)
+–0.4
+Focus (µm)
+(a)
+8
+9
+10
+11
+12
+Dose (mJ/cm2
+)
+Focus (µm)
+(b)
+–0.3 –0.2 –0.1 0.0 0.1 0.2 
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2 
+Figure 10.15 Overlapping process windows generated from the focus–exposure matrices 
+of dense and isolated lines for (a) isolated lines with bias OPC (overlapping DOF = 300nm) 
+and (b) isolated lines with scattering bars (overlapping DOF = 400nm)
+
+
+## Page 19
+
+ Resolution Enhancement Technologies 429
+patterns with different distances away), each of which must be outfi tted with an optimal 
+assist feature or features, if one can fi t. While bias OPC can be used on the intermediate 
+cases where the space between two lines is not large enough to accommodate an assist 
+feature, these intermediate pitches do not benefi t from the DOF advantages of SRAFs 
+(see Figure 10.16). And then, of course, there is the problem of what to do with line ends, 
+corners, and other 2D patterns. Rule-based SRAF placement is quite common, but has 
+diffi culty with 2D placement. Model-based SRAF placement is diffi cult, but shows 
+promise for complex 2D geometries. These issues can be resolved, however, and subresolution assist features are commonly used in many chip designs. Polysilicon gate and 
+contact levels, in particular, have seen benefi ts from using SRAFs. For contacts and other 
+dark-fi eld mask levels, the SRAFs take the form of clear slots (spaces) rather than assist 
+lines.
+10.3 Off-Axis Illumination (OAI)
+Off-axis illumination5,6 (OAI) is one of the three major resolution enhancement technologies that have enabled optical lithography to push practical resolution limits far beyond 
+what was once thought possible. In order to effectively use off-axis illumination, the shape 
+and size of the illumination must be optimized for the specifi c mask pattern being printed. 
+This section will describe how to optimize the most popular types of off-axis illumination 
+– dipole, quadrupole and annular illumination – to maximize depth of focus for a given 
+pitch.
+Off-axis illumination refers to any illumination shape that signifi cantly reduces or 
+eliminates the ‘on-axis’ component of the illumination, that is, the light striking the mask 
+at near-normal incidence. By tilting the illumination away from normal incidence, the 
+diffraction pattern of the mask is shifted within the objective lens. For the case of a 
+repeating pattern, the diffraction pattern is made up of discrete diffraction orders. If the 
+pitch of the repeating pattern is small, only a few diffraction orders can actually make it 
+0.10
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40
+200 300 400 500 600 700 800
+Pitch (nm)
+900
+DOF (µm)
+1st SRAF inserted here
+Figure 10.16 Schematic diagram of SRAF placement showing the discontinuous effect of 
+adding an SRAF as the pitch grows (main feature size is 100nm)
+
+
+## Page 20
+
+430 Fundamental Principles of Optical Lithography
+through the fi nite size lens. As discussed in Chapter 3, placing those diffraction orders 
+that make it through the lens evenly about the center of the lens leads to improved depth 
+of focus (DOF). Thus, the main advantage of off-axis illumination is an increase in DOF 
+(and thus the resolution) for small-pitch patterns. For these small pitch patterns, OAI 
+changes the imaging from three-beam to two-beam imaging.
+In spatial frequency terms, the distance between the zero and fi rst diffracted orders is 
+1/p, where p is the pitch. It will be convenient to convert this spatial frequency distance 
+to ‘sigma space’, the spatial frequency normalized by l/NA. In this normalized coordinate 
+system, the maximum spatial frequency passing through the lens is 1.0. Thus, the distance 
+between diffraction orders in sigma space is l/(pNA). To center the zero and fi rst orders 
+about the center of the lens, the zero order (found at the exact center of the lens for normally incident light) must be shifted by l/(2pNA) in sigma space. Thus, this becomes the 
+optimum illumination tilt to give maximum DOF (Figure 10.17). Of course, tilting in the 
+opposite direction [a −l/(2pNA) shift in sigma space] will produce the same effect. Combining both tilts into one illumination shape produces an illumination called dipole illumination that adds the required telecentricity behavior to the imaging. Note that the 
+optimum illumination tilt is pitch dependent.
+Real lithography, however, adds a signifi cant complication to this otherwise simple 
+picture. The line/space pattern shown in Figure 10.17 has a specifi c orientation (the 
+lines are running into and out of the page) that results in an optimum tilt as shown in the 
+fi gure. Most integrated circuit designs will contain many line and space-like features 
+that are oriented both vertically and horizontally. A perspective plot of the same diffraction situation may make this point clearer, as shown in Figure 10.18. If the illumination 
+is tilted by the amount discussed above, that tilt, in a specifi c direction, will only help 
+the lines and spaces that are properly oriented with respect to that tilt. The other orientation of lines will not only not be improved by the illumination tilt, they are likely to 
+Diffraction Pattern
+Lens Aperture
+Mask Pattern 
+(Equal Lines and Spaces)
+(a) (b)
+Figure 10.17 Off-axis illumination modifi es the conventional imaging of a binary mask 
+shown in (a) by tilting the illumination, causing a shift in the diffraction pattern as shown in 
+(b). By positioning the shifted diffraction orders to be evenly spaced about the center of the 
+lens, optimum depth of focus is obtained
+
+
+## Page 21
+
+ Resolution Enhancement Technologies 431
+be signifi cantly degraded in imaging performance. If both vertical and horizontal lines 
+are to be imaged together on the same mask, an illumination shape must be used that 
+provides optimum tilts for both geometries. The simplest shape that provides this optimum 
+tilt for both horizontal and vertical line/space patterns is called quadrupole 
+illumination.
+Quadrupole illumination takes the optimum dipole generated for one orientation of 
+lines and spaces, then shifts it both up and down in the other direction to create the proper 
+angles for the other orientation of lines. The result is four poles evenly spaced about the 
+center of the lens, as shown in Figure 10.19. In sigma space, the radial position of the 
+center of each pole with respect to the center of the lens that gives optimum DOF is 
+22 λ () pNA . Note that this positioning of the quadrupoles gives the same horizontal and 
+vertical spacing between poles as in the dipole case, but places them closer to the edge 
+of the lens aperture.
+While the quadrupole shape provides optimal performance for vertical and horizontal 
+lines, other orientations (such as a line/space array oriented at 45 °) will not be optimum. 
+For any orientation of lines, the optimal dipole for that pattern will be spread in a direction perpendicular to the line orientation, and can be shifted parallel to the lines in any 
+amount that keeps the dipoles within the lens. If the mask will contain arbitrary orientations of lines, many rotations of the dipoles will produce an annulus of illumination (and 
+Conventional Dipole Quadrupole Annular
+Mask 
+Lens
+Mask 
+Lens
+Figure 10.18 The position within the lens of the diffracted orders from a pattern of lines 
+and spaces is a function of the orientation of the lines and spaces on the mask
+Figure 10.19 Various shapes for conventional and off-axis illumination
+
+
+## Page 22
+
+432 Fundamental Principles of Optical Lithography
+thus is called annular illumination). The optimum center of the annular ring is the same 
+as the optimum dipole position.
+By switching from three-beam imaging to two-beam imaging, OAI improves the 
+through-focus performance of the image, but degrades the in-focus quality of the image. 
+Since one of the diffraction orders is lost when the illumination is tilted, the in-focus 
+image will have reduced image log-slope (that is, reduced NILS). But if the tilt is optimized for the pitch being imaged, this reduced NILS will not change much as the image 
+goes out of focus, as seen in Figure 10.20.
+For each illumination shape discussed – dipole, quadrupole and annular illumination – 
+there is one illumination size that maximizes the DOF for a given pitch. However, this 
+illumination shape is only optimum for that one pitch. While pitches close to this optimum 
+will get most of the benefi t of the off-axis illumination, pitches suffi ciently far away from 
+the optimum will receive little or no benefi t. In particular, isolated lines do not see the 
+benefi t of improved DOF when using off-axis illumination. Figures 10.21 and 10.22 show 
+an example of how NILS and the DOF of a 100-nm line vary with pitch for quadrupole 
+illumination nominally optimized for a 200-nm pitch. The DOF reaches a maximum when 
+the pitch is near the designed-for pitch of 200 nm (the nonzero diameter of the poles means 
+that the maximum DOF is obtained at a slightly larger pitch, in this case 230 nm). As the 
+pitch increases, the DOF very quickly drops, leveling off at the DOF of an isolated line 
+(which in this case is about half of the maximum DOF).
+There is, however, a very convenient solution to the problem of lack of DOF for isolated 
+lines: subresolution assist features. As discussed before, adding assist features around the 
+more isolated lines will make them behave more like dense features. When using OAI, 
+this means that the more isolated features can gain some of the benefi t that OAI gives in 
+terms of DOF. But, as we have seen before, SRAFs can be inserted between lines only 
+if there is suffi cient room to fi t them. In general, SRAFs can be inserted when the pitch 
+is greater than about 1.7 times the minimum pitch. For pitches less than about 1.3 times 
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+0 0.1 0.2 0.3 0.4 0.5
+Defocus (µm)
+Conventional σ = 0.5 
+NILS
+Optimized Dipole
+Figure 10.20 The impact of off-axis illumination on the log-slope defocus curve (NA = 0.85, 
+l = 193nm, binary chrome-on-glass mask, 120-nm lines and spaces). The dipole had a radius 
+of 0.2 in sigma space
+
+
+## Page 23
+
+ Resolution Enhancement Technologies 433
+the minimum pitch, the off-axis illumination provides suffi cient DOF. Thus, a range of 
+pitches emerges, roughly about 1.3–1.7 times the minimum pitch, where NILS and DOF 
+are low and there is no possibility of using SRAFs to improve DOF. These pitches are 
+sometimes called ‘forbidden’ pitches,7
+ indicating the lithographer’s desire that these 
+pitches be avoided during circuit design. The forbidden pitch phenomenon signifi cantly 
+complicates the use of off-axis illumination since most chip designs will employ a wide 
+range of pitches.
+Pitch (nm)
+DOF (µm)
+100 300 500 700 900 1100
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.50
+0.70
+0.90
+1.10
+1.30
+1.50
+1.70
+1.90
+2.10
+2.30
+100 300 500 700 900 1100
+Pitch (nm)
+NILS
+In-focus
+Defocus = 200 nm
+Figure 10.21 Quadrupole illumination optimized for a pitch of 200nm showing how NILS 
+varies with pitch both in-focus and with a moderate amount of defocus (NA = 0.85, 
+l = 193nm, 100-nm line, chrome-on-glass mask, quadrupole settings of 0.8/0.2)
+Figure 10.22 Quadrupole illumination optimized for a pitch of 200nm showing how isolated lines do not show improved DOF (NA = 0.85, l = 193nm, 100-nm line, chrome-on-glass 
+mask, quadrupole settings of 0.8/0.2)
+
+
+## Page 24
+
+434 Fundamental Principles of Optical Lithography
+The three major types of off-axis illumination – dipole, quadrupole and annular illumination – have been described above. There are, however, a wide range of other shapes 
+possible. Like line/space patterns, any repeating two-dimensional pattern will have an 
+optimum source shape to maximize image quality over a range of focus. Thus, customized 
+source shapes are often used whenever a certain repeating 2D shape is the most critical 
+pattern in the design (commonly the case for DRAM manufacturing).
+10.4 Phase-Shifting Masks (PSM)
+For a conventional chrome-on-glass mask, the idealized mask transmittance is considered 
+to be binary: the light is 100 % transmitted through the glass areas and 100 % blocked by 
+the chrome. The resulting Kirchhoff approximation predicts a mask (electric fi eld) transmittance function tm(x,y) that is either 0 or 1 (and thus the term ‘binary’ mask to describe 
+this type of transmission). A phase-shifting mask (PSM) modifi es not only the amplitude 
+of the transmitted electric fi eld but the phase of the transmitted light as well.
+Consider the cross section of a mask structure shown in Figure 10.23. Two nearby 
+regions of the mask transmit 100 % of the monochromatic light, but experience different 
+optical path lengths. In one region, the light passes through extra glass (or fused silica) 
+of thickness d and refractive index ng. In a nearby region, the light travels through air of 
+the same thickness (with refractive index of 1). The phase difference between two plane 
+waves traveling perpendicularly through the mask will be
+∆φπ λ =− 21 dn() g / (10.5)
+By adjusting the thickness of this extra layer of glass, any phase difference between the 
+two waves can be obtained. As we shall soon see, it will be very advantageous to make 
+this phase-shift exactly 180 ° (p). The thickness required to achieve this will be
+d n 180 21 = −
+λ
+() g
+ (10.6)
+d Glass Index = ng Air Index = 1 
+Light of Wavelength l
+Figure 10.23 Cross section of a mask showing how the phase of the light transmitted 
+through one part of the mask can be shifted relative to the phase of light transmitted through 
+a nearby part of the mask
+
+
+## Page 25
+
+ Resolution Enhancement Technologies 435
+The fused silica most commonly used for mask blanks has a refractive index of 1.56 at 
+193 nm and 1.51 at 248 nm. Thus, the resulting glass thickness to give a p phase shift is 
+slightly less than one wavelength.
+The phase shift depicted in Figure 10.23 can be achieved by adding extra fused silica 
+to the region on the left, or by etching away the same amount of mask blank material on 
+the right. Alternately, some other material might be added to the mask blank so that both 
+the phase and the amplitude transmittance of the light can be manipulated. There are an 
+extremely large number of possible variations when both the amplitude and the phase of 
+the transmitted light can be varied. However, practical mask-making considerations limit 
+the number of different types of transmittance regions on the mask to a small number, 
+typically two or three. And while many styles of phase-shifting masks have been investigated, only the two most common, alternating PSM and attenuated PSM, will be described 
+in some detail below.
+10.4.1 Alternating PSM
+A conventional, binary chrome-on-glass mask of lines and spaces will produce a diffraction pattern of discrete diffraction orders at spatial frequencies that are multiples of one 
+over the pitch (see Chapter 2). For a high-resolution pattern, only the zero and the plus 
+and minus fi rst diffraction orders pass through the lens (which has a spatial frequency 
+cutoff of NA/l), as seen in Figure 10.24a. In fact, it is the interference of the zero-order 
+light with the fi rst orders that produces the bright and dark image of the proper pitch. If 
+the pitch is made too small, the fi rst-order light diffracts at an angle too large to fi t through 
+the objective lens and no image is produced. The resolution limit, then, occurs when the 
+fx
+0
+Diffraction Pattern
+Lens Aperture
+Mask Pattern 
+(Equal Lines and Spaces)
+fx
+–1
+0
+1
+p
+1
+p
+1 − 0
+2 p
+1
+2 p
+1 −
+Kirchhoff
+Transmittance
+(a) (b)
+Figure 10.24 A mask pattern of equal lines and spaces of pitch p showing the idealized 
+amplitude transmittance function and diffraction pattern for: (a) binary chrome-on-glass 
+mask; and (b) alternating phase-shift mask
+
+
+## Page 26
+
+436 Fundamental Principles of Optical Lithography
+fi rst diffracted order (spatial frequency of 1/pitch) lands exactly at the edge of the aperture 
+(spatial frequency of NA/l) so that the minimum resolvable pitch is equal to l/NA (i.e. 
+kpitch = 1.0). Additionally, the use of partially coherent illumination can extend this classical resolution limit, but only at the expense of reduced image quality.
+Consider now a repeating line/space pattern (with lithographic pitch p = linewidth +
+spacewidth) where every other space has been phase-shifted by 180 °. Letting w be the 
+spacewidth, the diffraction pattern can be calculated as the superposition of one repeating 
+space with pitch 2p and transmittance 1, plus another repeating space of pitch 2p and 
+transmittance −1, shifted by p. Applying the superposition and the shifting theorems of 
+the Fourier transform, the diffraction pattern will be
+Tf jw p
+j f j
+p
+jw p xx
+j
+i fpx
+m
+/
+e
+/ () = sin( ) sin( ) π
+π
+δ 2 π π
+2
+2 2 − 
+
+ 
+
+ − =−∞
+∞
+∑ j f j
+p
+jw p
+j f jp
+x
+j
+j x
+π
+δ
+π
+π
+δ
+− 
+
+ 
+
+
+[] −− − 
+
+ 
+
+
+=−∞
+∞
+∑ 2
+2 11
+2 = sin( ) () /
+j=−∞
+∞
+∑
+ (10.7)
+When j is even, the diffraction order from the shifted space exactly cancels out the 
+diffraction order from the unshifted space. Thus, only the odd orders survive, giving
+Tf a f j
+p
+x jx
+j
+m() = δ − 
+
+ 
+
+ =−∞
+∞
+∑ 2 (10.8)
+where
+a jw p
+j
+j even
+j odd j =
+0,
+/ , 22 sin( ) π
+π
+=
+=
+
+
+
+
+
+The resulting mask is called an alternating phase-shift mask8 (also called a Levenson 
+PSM or abbreviated Alt-PSM), as depicted in Figure 10.24b. For small pitch patterns, the 
+image is obtained from the interference of the two fi rst diffraction orders, located at the 
+spatial frequencies of ±1/2p. For coherent TE illumination, the image is
+I x a xp a wp ( ) ( cos( )) sin( ) =+ 21 2 22 1
+2 π 1
+π
+π
+/, / = (10.9)
+The resolution limit is again obtained when these fi rst diffracted orders just barely pass 
+through the edge of the lens, making the minimum resolvable pitch equal to 0.5l/NA. 
+Thus, the use of an alternating phase-shift mask leads to two-beam imaging with its 
+potential for improved resolution and better DOF. Unlike off-axis illumination, however, 
+the resulting diffraction pattern provides optimum defocus performance for all pitches, 
+since the two diffraction orders will always be equally spaced about the center of the lens, 
+regardless of pitch. Also, the two orders will always be of equal magnitude, a condition 
+that results in the maximum image log-slope for two-beam imaging.
+While the example given above is for a repeating pattern of lines and spaces, alternating 
+PSM can be applied to the printing of any narrow, dark feature by shifting the phase of 
+light on one side of the feature compared to the other side. Consider an isolated line of 
+
+
+## Page 27
+
+ Resolution Enhancement Technologies 437
+width w, where the clear region on the right side of the feature is phase-shifted by 180 ° 
+relative to the transmittance on the left side of the feature (Figure 10.25). The diffraction 
+pattern for this phase-shifted, isolated line is
+Tf i fw
+f x
+x
+x
+m() = cos( ) π
+π
+ (10.10)
+For coherent TE illumination, the resulting aerial image can be expressed in terms of 
+sine integrals:
+Ix NAxw
+NA () ( ) ( ) =+ xw 
+
+
+ +− 
+
+
+
+
+
+ 
+
+
+12 2 2 2 2
+2
+π
+π
+λ
+π
+λ Si / Si / (10.11)
+where
+ .
+Si d () sin θ
+θ
+= ∫ z
+z
+z
+0
+It is interesting to examine the behavior of this image as w goes to zero. For an unshifted 
+line, of course, the image would disappear as the chrome linewidth went to zero. But as 
+Figure 10.26 shows, as the chrome width goes to zero the aerial image width approaches 
+Figure 10.25 Cross section of a mask of an isolated phase-shifted line
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.0 0.2 0.4 0.6 0.8 1.0
+Mask Chrome CD*NA/l
+Image CD*NA/l
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+1.6
+–1.5 –1.0 –0.5 0.0 0.5 1.0 1.5
+Horizontal Position*NA/l
+Relative Intensity
+( (b) a)
+Figure 10.26 Behavior of an isolated phase-shifted line as a function of the chrome line 
+width: (a) coherent aerial images for w = 0 and 50nm, and (b) the aerial image width (at 
+an intensity threshold of 0.25) as a function of the mask chrome width
+
+
+## Page 28
+
+438 Fundamental Principles of Optical Lithography
+a constant value of about 0.26l/NA (see section 10.5.3). Setting w = 0 in Equation (10.11), 
+we obtain the coherent TE aerial image for this isolated phase edge:9
+Ix NAx () = 
+
+
+
+42
+2 π
+π
+λ Si2 (10.12)
+As Figure 10.26 and Equation (10.12) show, a 0–180 ° phase edge will print as a 
+narrow dark line (in fact, the class of strong phase-shifting masks can be defi ned as those 
+masks that use a phase edge to print a dark line). While this can be very good if a narrow 
+dark line is desired, it can be very bad if the phase edge occurs incidentally and a 
+dark line is not desired at that point. As will be discussed in the following section, it can 
+be very diffi cult to ensure that no unwanted phase edges appear in a phase-shifted 
+layout.
+10.4.2 Phase Confl icts
+‘Strong’ phase-shift masks, such as alternating PSM, have seen only limited use in manufacturing, despite their potential for nearly doubling resolution and extending DOF by 
+even more. Strong shifters invariably use etched quartz to create the phase shift and 
+require two mask writing steps (including an alignment in between). While the much 
+greater complexity and expense of making alternating PSMs have certainly been an 
+impediment to their adoption, it is not the mask manufacturing that is the biggest problem, 
+but the mask design. Alternating PSM works by shifting the phase of the clear region to 
+one side of a small line by 180 ° relative to the phase of the light coming from the other 
+side of the line. While simple in concept, attempting to phase-shift an arbitrary layout of 
+lines will invariable lead to phase confl icts.
+There are two basics types of phase confl icts, as seen in Figure 10.27: no phase shift 
+where you want it, and a phase shift where you don’t want it. The fi rst type (Figure 10.27a) 
+results in a lack of phase shift across a critical feature when there is an odd wrapping of 
+phase assignments. This ‘nonshifted’ feature will not properly print. The second type 
+(Figure 10.27b) is also called the termination problem since it usually occurs at the end 
+of a line. Alternating phase across each side of a line will result in those two phases 
+0 18 0 º º 180º
+Unwanted
+Phase
+Edge
+0º 180º
+180º 180º
+0º 180º
+180º 180º
+No
+Phase
+Shift
+(a)(b)
+Figure 10.27 Types of phase confl icts: (a) no phase shift across a critical pattern, and (b) 
+the phase termination problem producing an unwanted phase edge
+
+
+## Page 29
+
+ Resolution Enhancement Technologies 439
+meeting at the line end. Whenever two opposing phases meet, a dark interference line is 
+created causing a resist line to print. (In fact, as seen in the previous section, when printing small lines, the use of chrome is almost superfl uous – it is the 0 to 180 ° phase transition that causes the dark lines to print.)
+The phase confl ict problems do not have an obvious solution. Taking an arbitrary layout 
+and coloring the clear regions with two phase colors will lead to numerous confl icts in 
+all but a few special cases. One solution, though not yet proven, is to force the original 
+layout to be ‘phase friendly’, a layout where no phase confl icts can occur. It is unclear 
+whether such a solution can in fact be developed and if so, what the design trade-offs will 
+be. The alternative is costly but more practical: use two exposures from two masks. The 
+phase-shift mask is used to defi ne the critical features using a dark-fi eld background to 
+avoid phase confl icts. A second exposure uses a second bright-fi eld mask that prints the 
+noncritical features as well as the open areas not exposed with the fi rst dark-fi eld mask 
+(Figure 10.28). Besides the obvious cost disadvantage due to the lower lithography tool 
+throughput, this double-exposure approach also tends to have less-than-optimal transistor 
+density (small lines can be printed, but not as close together as desired), and has not been 
+proven to be practical on all critical levels. The double-exposure PSM process has been 
+used successfully for polysilicon gate layers on microprocessors, where gate CD control 
+has a profound effect on the value of the device.
+10.4.3 Phase and Intensity Imbalance
+The most obvious way of shifting the phase of light on a photomask is to change the 
+thickness of quartz that one ray of light must pass through compared to another ray. This 
+is most easily done by etching the quartz under one space by a set depth d while leaving 
+the quartz of an adjacent space unetched (Figure 10.29). Equation (10.5) tells us the 
+amount of phase shift as a function of the etch depth of this trench. This equation can 
+also tell us how an error in etch depth turns into an error is phase. For 193-nm lithography, 
+that translates into about 0.9 ° phase error per nanometer etch depth error.
+These previous equations relating phase change to etch depth make an important 
+assumption – that the light is traveling vertically. However, as light goes through the 
+etched quartz hole, it begins to diffract at the bottom of the hole and its directions deviate 
+0 180
+Glass
+Chrome
+Exposure #1 Exposure #2
++ =
+Figure 10.28 Simple example of a double-exposure alternating phase-shift mask approach 
+to gate-level patterning
+
+
+## Page 30
+
+440 Fundamental Principles of Optical Lithography
+Cr
+Quartz
+Cr
+d
+Figure 10.29 Example of a simple alternating phase-shift mask manufacturing approach
+from a straight line. The smaller the hole, the greater this diffraction effect. This causes 
+a difference in the actual phase of the light compared to the geometric ‘straight line’ 
+approximation, and this difference is a function of the size of the etched space. Diffraction 
+through the etched space causes a second problem: some of the diffracted light doesn’t 
+make it out of the hole. As a result, the etched quartz space appears dimmer than the 
+unetched space, creating an intensity imbalance in addition to the phase error (Figure 
+10.30). As with the phase error, the degree of intensity imbalance is spacewidth 
+dependent.
+The real, physical effects of trying to create a 180 ° phase shift by etching the quartz 
+as described above are detrimental to lithography. The intensity imbalance causes the two 
+adjacent spaces to print as different linewidths, and the phase imbalances cause these 
+spaces to have different best-focus settings. There are a number of possible ways to fi x 
+x (nm)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+–200
+Image Intensity
+–300 –100 100 200 300 0
+Figure 10.30 Intensity imbalance shown for an alternating phase-shift mask of equal lines 
+and spaces
+
+
+## Page 31
+
+ Resolution Enhancement Technologies 441
+these problems. In the dual trench method (Figure 10.31a), both the unshifted and shifted 
+spaces are fi rst etched to some depth, then the shifted space is further etched to create the 
+desired phase shift. This approach can reduce both the phase errors and the intensity 
+imbalance, though not perfectly for all space widths, and it complicates the mask-making 
+process. In the undercut etch method (Figure 10.31b), the shifted space is etched somewhat isotropically, causing some undercut of the chrome. This widening of the etched 
+space reduces the intensity imbalance appreciably. However, to get the intensity imbalance to approach zero, the amount of undercut can become excessive, causing possible 
+reliability problems with the overhanging chrome. Finally, the biased space approach 
+(Figure 10.31c) uses an OPC tool to bias the etched space larger in order to eliminate the 
+intensity imbalance. This bias can be adjusted as a function of the space size and pitch 
+in order to eliminate intensity imbalance across the full range of features. In general, none 
+of these approaches is perfect at eliminating the phase error as a function of size and 
+pitch.
+The most common approach to alternating PSM manufacturing is to combine the biased 
+space approach with a small amount of undercut. While not perfect, it can provide very 
+good intensity balance and minimum phase error across all pitches.
+10.4.4 Attenuated PSM
+Consider a general repeating line/space transmittance function (with pitch p) where the 
+fi rst feature (width w1) has amplitude and phase transmittance of t1 and f1, respectively, 
+and the second feature (width w2 = p − w1) has amplitude and phase transmittance of t2
+and f2 (see Figure 10.32). The resulting diffraction pattern will be
+Tf a f j
+p
+x jx
+j
+m() = δ − 
+
+ 
+
+ =−∞
+∞
+∑ (10.13)
+( (b) a)
+(c)
+Figure 10.31 Different approaches for fi xing the phase error and intensity imbalance in 
+alternating PSM: (a) dual trench, (b) undercut etch and (c) biased space
+
+
+## Page 32
+
+442 Fundamental Principles of Optical Lithography
+where
+at jwp
+j
+t jwp
+j j
+i ij = 
+
+ 
+
+ +− 
+
+ 
+ 1
+1
+2
+2 12 e 1 /
+e
+/ φφ π
+π
+π
+π
+sin( ) () sin( ) (10.14)
+or,
+at t
+w
+p
+t
+at t j
+ii i
+j ii
+01 2
+1
+2
+12
+12 2
+12
+=− 
+
+ 
+
+ +
+=−
+()
+() sin(
+ee e
+ee
+φφ φ
+φφ πwp
+j j 1 0 / , )π
+
+
+ 
+
+ ≠
+ (10.15)
+Without loss of generality, it will be convenient to let f1 = 0 so that f2 represents the 
+phase difference between the two features. If t1 = 1 and t2 = 0, we have the conventional 
+chrome-on-glass result. If we let t1 = 1 but allow t2 > 0, the phase of this second feature 
+will now matter. Given our experience above, we will let this phase shift be 180 °. Thus, 
+the diffraction orders are
+at
+w
+p
+t
+aa t jwp
+j j jj
+02
+1
+2
+2
+1
+1
+10
+=+ 
+
+ 
+
+ −
+= =+ 
+
+ 
+ −  ≠
+()
+() sin( ) , π
+π
+/ (10.16)
+A mask of this type is called an attenuated PSM (also known as an embedded PSM, or 
+EPSM, and sometimes called a half-tone PSM).
+Equation (10.16) shows the impact of allowing the nominally dark feature to transmit 
+some light that is phase-shifted compared to the bright feature: the zero order is decreased, 
+the fi rst order is increased. Consider the simple case of coherent three-beam imaging 
+where the aerial image (for TE illumination) is
+I x a a aa xp a xp ( ) cos( ) cos( ) =+ + + 0
+2 12 01 12 24 2 2 4 ππ // (10.17)
+For the case of equal lines and spaces, the NILS at the nominal line edge is
+NILS a
+a = 4 1
+0
+π (10.18)
+Mask Substrate
+Light of wavelength l
+φ1 i
+e t 2 t2 t1
+iφe t
+Attenuating PSM 
+Material
+Figure 10.32 Cross section of an attenuated PSM showing how the transmitted amplitude 
+and phase of the light is modifi ed by the attenuating material
+
+
+## Page 33
+
+ Resolution Enhancement Technologies 443
+For an attenuated PSM, using Equation (10.16) evaluated for equal lines and spaces, the 
+NILS becomes
+NILS t
+t = +−
+
+
+ 
+ 8  1
+1
+2
+2
+ (10.19)
+As the transmittance of the attenuated line increases, the NILS increases as well.
+While the discussion above shows the advantages of an attenuated PSM for three-beam 
+imaging, a high-resolution lithography process will often use off-axis illumination in order 
+to improve depth of focus for small pitch patterns. For this case, a coherent two-beam 
+image (for TE illumination) is
+I x a a aa xp ( ) cos( ) =++ 0
+2 12 22 01 π / (10.20)
+For the case of equal lines and spaces, the NILS at the nominal line edge is
+NILS aa
+aa = +
+2 01
+0
+2 12 π (10.21)
+For the attenuated PSM case,
+NILS tt
+tt = −+− ++
+( )( )
+( )( )
+11
+1
+4
+1
+22
+2 2 2 2
+2 π
+ (10.22)
+For the three-beam imaging case, the best NILS is obtained by making the 0th order 
+small and the 1st order big. For the two-beam case, maximum NILS comes from making 
+the two orders equal in amplitude. To achieve this maximum,
+( )( ) . 1
+2
+12
+2
+0 222 22
+2
+− = + = −
++ ≈ tt
+t
+π
+π
+π
+or (10.23)
+The above equations relate diffraction orders, images and the NILS to the electric fi eld 
+transmittance of the attenuated PSM material. It is common, however, to specify an 
+attenuated PSM by its intensity transmittance, equal to (t2)
+2
+. Thus, for the two-beam 
+imaging equal line/space patterns, the optimum intensity transmittance of the PSM is 
+4.93 %.
+Note that the transmittance used in the above equations was set to 1.0 for the transmittance of the mask substrate. Thus, the attenuated material transmittance is defi ned relative 
+to the transmittance of the mask substrate. It is common, however, for the manufacturers 
+of mask blanks to specify the transmittance of the EPSM blank in absolute terms. Letting 
+tblank be the transmittance of the EPSM coated substrate, and tglass the transmittance of the 
+glass or fused silica substrate without EPSM material, then
+t
+t
+t 2 = blank
+glass
+ (10.24)
+For example, a common commercially available EPSM blank has an intensity transmittance of 6 %. The fused silica substrate itself has a transmittance of approximate 
+92 % at 248 nm and about 91 % at 193 nm. Thus, the relative intensity transmittance 
+
+
+## Page 34
+
+444 Fundamental Principles of Optical Lithography
+of the EPSM features is actually 6.5 and 6.6 % for 248- and 193-nm wavelengths, 
+respectively.
+Attenuated PSM has been very widely adopted for contact and via printing, and is fairly 
+mainstream for other critical lithography layers as well. This type of PSM is generally 
+called a ‘weak’ shifter – it uses phase-shifting to improve the image at the edge, but does 
+not defi ne the edge by a 0–180 ° phase transition. Its great advantage is the simplicity and 
+low cost of replacing chrome-on-glass (COG) masks, the nonphase-shift alternative. 
+Essentially, an existing design based on COG can be converted to an EPSM by simply 
+recalibrating the optical proximity correction models used to apply OPC to the design. 
+Mask manufacturing, while certainly more diffi cult than COG, is not dramatically different (the chrome is replaced by a more complex absorber such as molybdenum silicon) 
+and only somewhat more costly. Attenuated PSM does not suffer from phase confl icts 
+and exhibits much reduced phase and intensity variation as a function of feature size as 
+compared to alternating PSM. When coupled with off-axis illumination and SRAFs, it 
+can provide most of the benefi t of the much more diffi cult and expensive alternating PSM 
+alternative.
+One problem with the use of attenuated PSM is the occurrence of sidelobes. Figure 
+10.33 shows an image of an isolated space (k1 = 0.48) using a 6 % attenuated PSM. Interference between light from the space and light from the background EPSM material 
+cancels out near the space edge to make the intensity go to zero and sharpen the image 
+near the edge (i.e. increase the NILS). However, away from the edge diffracted light from 
+the unshifted space can add constructively with the EPSM transmission to give a bright 
+region called a sidelobe. Even though the intensity transmittance in this attenuated area 
+is only 6 %, the brightness of this sidelobe is 17 % (in this case). A higher level of EPSM 
+transmittance is likely to cause the sidelobe to print, resulting in catastrophic failure. 
+Sidelobes can be suppressed, however, using strategically placed assist slots. Since the 
+phase of the sidelobe electric fi eld is about 180 ° with respect to the unshifted transmittance of a space, placing an unshifted assist space (small enough in size so that it won’t 
+print) at the location of the sidelobe will have the paradoxical effect of reducing the 
+intensity at that point.
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+–300 –200 –100 0 100 200 300
+Horizontal Position (nm)
+Relative Intensity
+Figure 10.33 An isolated space (100nm, NA = 0.93, l = 193nm, s = 0.5) imaged from a 
+6 % attenuated PSM mask showing sidelobes
+
+
+## Page 35
+
+ Resolution Enhancement Technologies 445
+10.4.5 Impact of Phase Errors
+All of the analyses of phase-shifting masks above assume that the mask was designed 
+and manufactured to give the ideal 180 ° phase shift. However, in practice there will 
+invariably be phase errors. It will be important to understand the impact of phase errors 
+on lithographic performance and the magnitude of these errors that can be tolerated. To 
+investigate the impact of phase errors, the three analytical cases described in the previous 
+sections (an isolated phase edge, an alternating PSM of lines and spaces, and an attenuated PSM pattern of lines and spaces) will be analyzed.
+Consider an arbitrary isolated edge pattern oriented in the y-direction that has left and 
+right sides with amplitude and phase transmittances of t1, f1 and t2, f2, respectively. 
+Looking fi rst at the simple case of coherent illumination, the resulting aerial image electric 
+fi eld will be
+Ex t t t t NAx ii ii edge() ( ) ( ) = ++ − e e e e Si
+
+
+
+1
+2
+12 12 12 φφ φφ 12 12
+π
+π
+λ (10.25)
+where x = 0 is the position of the edge. For an ideal phase edge, t1 = t2 = 1, f1 = 0, and 
+f2 = p (180 °). For a phase edge with phase error, we can let f2 = p + ∆f. Using these 
+values in Equation (10.25) and squaring the magnitude of the electric fi eld to obtain the 
+intensity of the aerial image,
+Ix NAx
+phase edge 2 Si − = − ++ 
+
+
+ ( ) ( cos ) ( cos ) 1
+2
+11 22
+2 ∆∆ φφ
+π
+π
+λ (10.26)
+For small phase errors, the small angle approximation to the cosine can be used,
+cos∆ ∆ φ φ ≈−1
+2
+2
+ (10.27)
+giving
+Ix NAx
+phase edge 2 Si − = +− 
+
+ 
+
+ 
+
+
+ () ∆∆ φφ
+π
+π
+λ
+22
+2 4
+1
+4
+42 (10.28)
+Looking closely at Equation (10.28), it is interesting to observe that the effect of the phase 
+error is to take the ideal image (when ∆f = 0) and add a uniform (d.c.) fl are (see Chapter 
+3) in the amount of ∆f2
+/4. Like fl are, a phase error for this feature will add a background 
+dose, in this case caused by the incomplete cancellation of the out-of-phase light across 
+the edge.
+To put some numerical relevance to this relationship, an 11.5 ° phase error is equivalent 
+to a 1 % fl are level. Since fl are levels of 1 % or more are commonly tolerated in lithographic projection tools, one would expect phase errors of 11.5 ° or more should be easily 
+tolerated. While the above analysis assumes coherent illumination, simulation of partially 
+coherent imaging of the same mask feature has shown the same relationship between 
+phase error and fl are (see Figure 10.34).
+It is well known that phase errors also cause a change in the response of a phase-mask 
+feature to focus errors. Again using simulation, the effect of phase errors on the process 
+
+
+## Page 36
+
+446 Fundamental Principles of Optical Lithography
+window of an isolated phase edge is no different than the effect of fl are on the process 
+window. However, a new effect is introduced. When the phase error is not zero, going 
+out of focus produces an asymmetry in the image that results in an effective image placement error. This image placement error varies linearly with defocus, acting just like a 
+telecentricity error. Over the full range of focus within the process window, the impact 
+on image placement error is about ±5 nm for a 10 ° phase error.
+Consider now an alternating PSM pattern of lines and spaces with spacewidth ws and 
+linewidth wl. Assuming that the lines have zero transmittance, we shall let two adjacent 
+spaces have arbitrary transmittances and phases of t1, f1 and t2, f2, respectively. For highresolution patterns, only the zero and fi rst diffracted orders will pass through the lens and 
+be used to generate the aerial image. Defi ning a coordinate system with x = 0 at the center 
+of the fi rst space and letting p = ws + wl = the pitch, the amplitude of the zero and fi rst 
+diffraction orders will be given by
+a
+w
+p
+tt
+aa wp tt
+ii
+ii
+0 12
+11 1 2
+2
+2
+12
+12
+=+
+== − −
+s
+s
+ee
+/
+ee
+()
+sin( ) ()
+φφ
+π φφ
+π
+ (10.29)
+The electric fi eld of the aerial image (assuming coherent illumination for simplicity) 
+will be
+E x a a xp ( ) cos( ) =+01 2 π / (10.30)
+For an ideal alternating PSM, t1 = t2 = 1, f1 = 0, and f2 = p (180 °). For a mask with 
+phase error, we can let f2 = p + ∆f. Using these values in Equation (10.29),
+a
+w
+p
+i w
+p
+a wp
+i
+i
+0
+1
+2
+1
+2
+2 1 2
+= − ≈− 
+
+ 
+
+
+= +≈
+ss
+s
+e
+/
+e
+()
+sin( ) () sin
+∆
+∆
+∆ φ
+φ
+φ
+π
+π
+() π
+π
+wp i s/2 φ 1
+2
++ 
+
+
+
+∆ (10.31)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+1.6
+–300 –200 –100 0 100 200 300
+Horizontal Position (nm)
+Relative Intensity
+φ2 = 160°
+φ2 = 180°
+Figure 10.34 Impact of a 20 ° phase error on the aerial image of an isolated phase edge 
+(l = 248nm, NA = 0.75, s = 0.5)
+
+
+## Page 37
+
+ Resolution Enhancement Technologies 447
+where the approximate relations on the right make use of a small angle approximation. 
+Using these values in Equation (10.30) and squaring the magnitude of the electric fi eld 
+to obtain the intensity of the aerial image,
+I x Ix w
+p Alt PSM ideal
+s
+− ≈− 
+
+ 
+
+ + 
+
+ 
+
+ () () 1
+42
+2
+2
+2 ∆ ∆ φ φ (10.32)
+where Iideal is the image of the alternating PSM for no phase error. Just as in the case of 
+the phase edge discussed above, the impact of phase error on the image of an alternating 
+PSM looks just like the addition of fl are to the image. In this case, however, the amount 
+of effective fl are is reduced by the square of the shifted space duty ratio of the mask 
+(ws/2p). For equal lines and spaces, ws/2p = 1/4 so that the effective fl are for this Alt-PSM 
+pattern is four times smaller than the effective fl are for an isolated phase edge.
+It would seem, then, that the wonderful properties of the alternating phase-shifting 
+mask make them relatively immune to the small phase errors that will inevitably occur 
+during mask fabrication. Unfortunately, a closer look reveals a more insidious problem. 
+When the image goes out of focus, any phase error in the mask will interact with the 
+defocus to cause an asymmetry between the shifted and unshifted spaces. The culprit lies 
+in the zero order.
+For no phase error, the zero order is completely missing (a0 = 0). As a result, the image 
+is formed completely by the interference of the two fi rst orders. Since these orders are 
+evenly spaced about the center of the lens, they have a natural immunity to focus errors, 
+making improved depth of focus one of the most attractive qualities of the alternating 
+phase mask. As the zero order grows (with increased phase error on the mask), this third 
+beam ruins the natural symmetry of the fi rst orders and adds a focus dependency. Again 
+for the case of coherent illumination and assuming small phase errors, the aerial image 
+when out of focus will be
+I xI x w
+p out of focus in focus Ex s
+ideal , −− − ≈+ 
+
+ 
+
+ ( ) ( ) ( )sin( δφ 2
+2
+∆ πδλ/p2 ) (10.33)
+where Eideal is the electric fi eld for the no phase error, no defocus case [i.e. Equation 
+(10.30) with ∆f = 0].
+Obviously, the interaction of phase error ∆f and defocus distance d adds an error term 
+to the in-focus aerial image as shown in Equation (10.33). The nature of this error term 
+lies in the nature of the electric fi eld Eideal. Unlike the intensity, the electric fi eld can be 
+negative. In fact, the electric fi eld will be negative under the phase-shifted spaces and 
+will be positive under the unshifted spaces. Thus, for a positive focus error (d > 0) and 
+phase error (∆f > 0), the error term in Equation (10.33) will make the shifted space 
+dimmer and the unshifted space brighter. For a negative focus error, the opposite will be 
+true. This effect is largest for smallest pitches p as can be seen from the argument of the 
+sine term. This asymmetry between adjacent spaces through focus is the most detrimental 
+effect of phase errors for an alternating phase-shifted mask and is illustrated in Figure 
+10.35.
+The lithographic consequences of this intensity imbalance of adjacent spaces through 
+focus are quite interesting. From the perspective of the space, the brighter space will print 
+
+
+## Page 38
+
+448 Fundamental Principles of Optical Lithography
+wider (assuming a positive resist), so that one space will be wider on one side of focus 
+while its neighbor will be wider on the other side of focus. Things look quite different 
+from the perspective of the line, however. As the space to one side of the line gets wider 
+with a focus error, the space to the other side of the line will get narrower. As a result, 
+the linewidth remains about constant but its position shifts away from the brighter space 
+and toward the dimmer space. Thus, the impact of the interaction of phase and defocus 
+errors for an alternating PSM can be seen as an error in the placement of the line in the 
+PSM array. When both transmission and phase errors are present, the two effects on space 
+image brightness can cancel at some defocus. The resist image with the best fi delity would 
+then appear out of focus.
+While alternating aperture PSMs are important, the overwhelming majority of phaseshift masks used today are attenuated PSMs. How does a small phase error affect the 
+lithographic performance of an attenuated PSM? Consider an equal line/space pattern 
+where the line has an electric fi eld amplitude and phase transmittance of t and f, respectively. For a mask with phase error, we can let f = p + ∆f. Using this value in Equation 
+(10.15), and assuming that the phase error is small,
+a t t it t t i 0
+2 1
+2
+1 1
+2
+1 1
+2
+1
+2
+1
+2
+= − = − − ≈ −+ 
+
+ 
+ ( ) ( cos( )) sin( ) e ∆ ∆∆ φ ∆ φφ φ  −
+= = + ≈ +− 
+
+ 
+ −  +
+it
+aa t t
+t it i
+1
+2
+1 1 1 1
+2
+1 11
+2
+∆
+∆ ∆ ∆
+φ
+ππ
+φ
+π
+φ φ () e
+ (10.34)
+Calculating the magnitude and the phase of each diffraction order,
+aa
+t
+t
+a
+t
+t
+00
+2
+0
+41
+1
+≈+ −
+
+
+
+
+∠ ≈− −
+
+ 
+ideal
+∆
+∆
+φ
+φ
+ (10.35)
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+–200 –150 –100 –50 0 50 100 150 200
+Horizontal Position (nm)
+Relative Intensity
+–400-nm Defocus
+No Defocus
++400-nm Defocus
+Figure 10.35 Aerial images for an alternating phase-shifting mask with a 10 ° phase error 
+for +400nm defocus (dots), no defocus (solid), and −400nm of defocus (dashed). (100-nm 
+lines and spaces with l = 248nm, coherent illumination, 0.25 < k1 < 0.5)
+
+
+## Page 39
+
+ Resolution Enhancement Technologies 449
+aa
+t
+t
+a
+t
+t
+11
+2
+1
+21
+1
+≈− +
+
+
+
+
+∠≈
++
+
+
+
+
+ideal
+∆
+∆
+φ
+π
+φ
+ (10.36)
+Let’s investigate the impact of the changes in the magnitude and phase of each diffracted 
+order separately. As shown in Equations (10.35) and (10.36), the magnitudes of the orders 
+vary as the phase error squared (and so should be quite small for small errors). As an 
+example, for a 6 % EPSM with a 10 ° phase error, the magnitudes of the zero and fi rst 
+orders change by only +0.7 and −0.2 %, respectively. The resulting impact on the aerial 
+image is quite small, less than 0.2 % intensity difference in most cases.
+The phase of the diffraction orders, on the other hand, varies directly as the EPSM 
+phase error. In fact, the phase difference between the zero and fi rst orders, which ideally 
+would be zero, becomes in the presence of EPSM phase error
+∠ −∠ ≈
++
+aa
+t
+t 10 2
+2
+1
+∆φ (10.37)
+What is the impact of such a change in the phase difference between the diffraction 
+orders? Focus also causes a phase difference between the zero and fi rst orders. For the 
+simple case of coherent illumination (that is, three-beam imaging), a defocus of d causes 
+a phase difference of
+∠ −∠ ≈ aa
+p 10 2
+πδλ (10.38)
+Thus, the effect of the EPSM phase error will be to shift best focus by an amount 
+given by
+δ φ
+πλ shift ≈ +
+2
+1
+2
+2
+pt
+t
+∆
+() (10.39)
+Possibly a more useful expression for this effective focal shift is as a function of the depth 
+of focus. Using the simple Rayleigh criterion for DOF,
+DOF k p ≈ 2
+2
+λ (10.40)
+where k2 is some number less than 1 (0.7 is reasonable). Combining these expressions, 
+and assuming that t
+2 << 1,
+δ
+π shift ≈≈ φφ 2
+k2
+∆∆ tDOF tDOF (10.41)
+For a 6 % EPSM, focus will shift by about 0.4 % of the DOF per degree of EPSM phase 
+error. Remembering that Equation (10.39) was derived under the simple assumption of 
+coherent illumination, full image simulations show that the use of partial coherence can 
+double or triple the focus shift compared to the coherent case. Thus, a 10 ° phase error 
+
+
+## Page 40
+
+450 Fundamental Principles of Optical Lithography
+might cause best focus to shift by 10 % of the DOF, potentially causing a 20 % loss in 
+DOF. Off-axis illumination, however, tends to lower this effect since this illumination is 
+specifi cally intended to minimize the impact of phase errors between the zero and fi rst 
+orders. Figure 10.36 illustrates this focus-shift effect for three-beam imaging, showing 
+also that unlike alternating PSM, there is no pattern placement change through focus in 
+the presence of an EPSM phase error.
+In general, attenuated phase-shift masks are much less sensitive to phase errors than 
+alternating phase-shift masks. The major impact of small phase errors is a focus shift, so 
+the biggest worry would be a variation of EPSM phase across a reticle rather than a mean 
+to target error. Since cleaning can cause phase errors in an EPSM mask, understanding 
+the impact of these errors is quite important.
+10.5 Natural Resolutions
+The discussion above defi ned feature resolution with respect to CD control, (using depthof-focus as the metric of CD control) and pitch resolution with respect to the frequency 
+cutoff of the imaging lens. There are, however, three special purpose metrics of resolution 
+that can also be used to defi ne the ultimate capabilities of an imaging system. These 
+special metrics, though defi ned for very specifi c mask features, have almost universal 
+appeal as ‘natural’ metrics of imaging resolution.
+10.5.1 Contact Holes and the Point Spread Function
+The fi rst metric concerns the smallest possible contact hole that can be printed. Consider 
+a mask pattern of an isolated contact hole in a chrome (totally dark) background. Now 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+–200 –100 0 100 200
+Horizontal Position (nm)
+Relative Intensity
+NoPhase Error
+–10 Degree Error
++10 Degree Error
+Figure 10.36 A small phase error in an EPSM mask changes the aerial image in the same 
+way as a small shift in focus. Here, ±10 ° phase error moves the image closer and farther 
+away from best focus (wavelength = 248nm, NA = 0.8, 180-nm lines/space pattern, coherent 
+illumination, 150-nm defocus). For this case, a 10 ° phase error shifts best focus by about 
+14nm
+
+
+## Page 41
+
+ Resolution Enhancement Technologies 451
+let that hole shrink to an infi nitesimal pinhole. If this small pinhole could be imaged 
+in a positive resist, how big would the resist hole be? Of course, there is a practical 
+problem with experimentally determining this ‘resolution’: as the pinhole shrinks, the 
+intensity of light reaching the wafer becomes infi nitesimally small, making the required 
+exposure time for the resist grow to infi nity. However, from a theoretical perspective, we 
+can avoid this problem by assuming we are very patient and calculating the printed 
+result.
+Thinking fi rst of just the imaging tool, what would be the aerial image resulting from 
+this infi nitely small pinhole? We will normalize our aerial image coming from the pinhole 
+to have a peak intensity of 1.0 when in-focus for an ideal, aberration-free optical system. 
+The aerial image of a pinhole, when normalized in this way, is called the point spread 
+function (PSF) of the optical system (see Chapter 2). The PSF is a widely used metric of 
+imaging quality for optical system design and manufacture, and is commonly calculated 
+for lens designs and measured on fabricated lenses using special benchtop equipment. 
+For classical imaging applications, the PSF can be calculated as the square of the magnitude of the Fourier transform of the imaging tool exit pupil. For an in-focus, aberrationfree system of wavelength l, the pupil function is just a circle whose radius is given by 
+the numerical aperture NA, and the PSF becomes
+PSF J ideal = 1
+2 () 2πρ
+πρ
+ (10.42)
+where J1 is the Bessel function of the fi rst kind, order one, and r is the radial distance 
+from the center of the image normalized by multiplying by NA/l.
+How wide is the PSF? For large contact holes, the normalized intensity at a position 
+corresponding to the mask edge (that is, at the desired contact hole width) is about 0.25–
+0.3. If we use this intensity range to measure the width of the PSF, the result is a contact 
+hole between 0.66 and 0.70l/NA wide. Thus, this width represents the smallest possible 
+contact hole that could be imaged with a conventional chrome-on-glass (i.e. not phaseshifted) mask. If the contact hole size on the mask approaches or is made smaller than 
+this value, the printed image is controlled by the PSF, not by the dimensions of the mask. 
+Making the contact size on the mask smaller only reduces the intensity of the image peak. 
+Thus, this width of the PSF, the ultimate resolution of a chrome-on-glass contact hole, is 
+a natural resolution of the imaging system.
+If instead of using a chrome-on-glass mask when making our conceptual pinhole an 
+attenuated PSM is used, the width of the resulting PSM is decreased. Assuming that the 
+mask background electric fi eld transmittance is t and the phase shift is exactly 180 °, the 
+resulting PSF is
+PSF
+J
+t
+t ideal =
+−
+−
+1
+2 2
+1
+() πρ
+πρ (10.43)
+A graph of this PSF for t = 0.245 (a 6 % intensity transmittance ESPM) compared to 
+t = 0 (a chrome-on-glass mask) is shown in Figure 10.37. At an intensity threshold of 
+
+
+## Page 42
+
+452 Fundamental Principles of Optical Lithography
+0.25, the COG PSF has a width of about 0.705l/NA, whereas the EPSM mask produces 
+a PSF with a width of 0.595l/NA (16 % narrower). Note that the narrowing of the PSF 
+comes at the expense of increased sidelobes, which reach an intensity of nearly 0.25 for 
+this 6 % EPSM mask. Thus, 6 % intensity transmittance represents about the maximum 
+practical transmittance level when printing isolated contact holes unless some sort of 
+sidelobe suppression (in the form of strategically placed assist slots) is employed.
+10.5.2 The Coherent Line Spread Function (LSF)
+If instead of an infi nitely small pinhole in a dark background an infi nitely narrow space 
+is used, the resulting image is called the line spread function (LSF). Unlike the PSF, 
+however, the LSF image will depend on the illumination used. For coherent illumination, 
+the LSF can be calculated as an integral over one dimension of the coherent PSF:
+LSF x
+J NAxy
+NA
+xy
+() = y
++ 
+ 
+−∞ +
+∞
+∫
+1 22
+22
+2π
+λ
+π
+λ
+d (10.44)
+For incoherent illumination,
+LSF x
+J NAxy
+NA
+xy
+() = y
++ 
+ 
+−∞ +
+∞
+∫ 1 22
+22
+2 2π
+λ
+π
+λ
+d (10.45)
+Alternately, the coherent LSF can be calculated using the image of an isolated space. 
+From Chapter 2, the TE coherent image of an isolated space of width w is
+Ix NAxw
+NA () ( ) ( ) =+ xw 
+
+
+ −− 
+
+
+
+
+ 
+
+
+12 2 2 2 2
+2
+π
+π
+λ
+π
+λ Si / Si / (10.46)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+–1.5 –1.0 –0.5 0.0 0.5 1.0 1.5
+Normalized Radius
+Normalized Intensity
+COG Mask EPSM
+Figure 10.37 Comparison of the ideal PSM from a chrome-on-glass (COG) mask and a 6 % 
+intensity transmittance embedded phase-shifting mask (EPSM)
+
+
+## Page 43
+
+ Resolution Enhancement Technologies 453
+Normalizing this image so that the peak intensity is 1,
+Ix
+I
+NA
+xw
+NA
+xw
+NA
+w
+()
+()
+() ()
+0
+2 2 2 2
+=
++ 
+  −−  
+
+ 
+Si / Si /
+2Si
+π
+λ
+π
+λ
+π
+λ
+
+
+
+
+
+
+
+
+
+
+2
+ (10.47)
+Taking the limit of Equation (10.47) as w goes to zero (by applying L’Hopital’s rule and 
+realizing that the derivative of the sine integral is just the sinc function),
+LSF x Ix
+I
+NAx
+w NAx ( ) lim ()
+() == 
+
+ 
+ →0 
+2
+0
+2
+2
+sin( / )
+/
+πλ
+πλ (10.48)
+Using an intensity threshold of 0.25, the coherent illumination LSF has a width of 0.603l/
+NA, and is thus 15 % narrower than the PSF. The LSF is a natural resolution limit of an 
+isolated space.
+10.5.3 The Isolated Phase Edge
+Another special mask feature which exhibits a similar natural resolution behavior is the 
+180 ° phase edge, as described previously in section 10.4.1. Consider a chromeless mask 
+with a large region shifted by 180 ° to produce a long, straight boundary between the 0 ° 
+and the 180 ° regions. Since light transmitted to either side of this edge will have a 180 ° 
+phase difference, the light that diffracts and interferes under the edge will cancel out, 
+producing a dark line centered under the phase edge. As a result, this isolated 180 ° phase 
+edge will print as a narrow line in a positive photoresist.
+For coherent TE illumination, the in-focus image of an isolated phase edge was given 
+in Equation (10.12). Figure 10.38 shows a graph of this equation. The width of this image Relative Intensity
+Normalized Position (×NA/l)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+–2.0 –1.0 0 1.0 2.0
+Figure 10.38 The aerial image of an isolated 180 ° phase edge (shown here using coherent 
+illumination) will produce a narrow line in a positive resist
+
+
+## Page 44
+
+454 Fundamental Principles of Optical Lithography
+can be estimated in the same way as the PSF. Assuming an intensity level between 0.25 
+and 0.3, the width of the phase edge line is between 0.26 and 0.29l/NA. The use of partially coherent illumination does not appreciably change this width.
+What controls the width of the image of an isolated phase edge? Obviously the edge 
+itself does not have a ‘width’. Like the PSF and the LSF, the width of the phase edge 
+image is in fact an inherent property of the imaging system, controlled by its numerical 
+aperture and wavelength. In fact, analogous to the LSF, the image of Equation (10.12) 
+could be called the phase edge line spread function. The size of this tiny line is the 
+‘natural’ resolution of any 180 ° phase edge. But its importance goes beyond just the 
+printing of small isolated lines. A phase-shifted mask can be thought of as a collection of 
+0–180 ° phase transitions. Each transition has a tendency to print at its natural linewidth 
+of about 0.26l/NA. Much insight can be gained by approaching phase-shifting mask 
+design with this natural linewidth in mind.
+For the special types of mask features described here, the resolution of that feature 
+becomes a function only of the properties of the imaging system and, strangely, becomes 
+independent of the size of the feature on the mask. I call these resolution properties the 
+‘natural’ resolutions of the imaging tool.
+Problems
+10.1. Figure 10.1 shows an example of how the depth of focus varies with feature size. 
+Generate an equivalent plot using the Rayleigh DOF criterion. Assume equal lines 
+and spaces, coherent three-beam imaging, and k2 = 0.8.
+10.2. Derive the diffraction pattern of a semi-dense line (width w, pitch p) with single 
+SRAFs (width wSRAF) placed in the center of the spaces:
+0
+1
+p
+tm(x)
+w
+x = 0
+w
+wSRAF
+10.3. Considering the FEM plots of Figure 10.14 to be typical of dense and isolated 
+lines, how does the iso-dense bias vary with focus?
+10.4. What is the smallest value of kpitch possible under the following scenarios:
+(a) COG mask and conventional illumination as s goes to zero (i.e. coherent 
+illumination)
+(b) Alt-PSM mask and conventional illumination as s goes to zero (i.e. coherent 
+illumination)
+(c) COG mask and dipole illumination with very small poles
+(d) COG mask and quadrupole illumination with very small poles
+10.5. Explain the main advantage of dipole illumination compared to quadrupole illumination. Explain the main disadvantage of dipole illumination compared to 
+quadrupole illumination.
+
+
+## Page 45
+
+ Resolution Enhancement Technologies 455
+10.6. For an optimized dipole illuminator, a two-beam aerial image results:
+I x a a aa xp ( ) cos( / ) =++ 0
+2 12 22 01 π
+Since the dipole can only print small-pitch patterns oriented in one direction, one 
+possible solution is to add a second dipole rotated by 90 ° to obtain an illuminator 
+called a cross-quadrupole:
+Crossquadrupole
+Illuminator
+When printing at the pitch for which the dipole and quadrupole are optimized, 
+derive the resulting in-focus aerial image (assume TE illumination) for a 
+cross-quadrupole.
+10.7. The coherent two-beam aerial image for an alternating PSM mask is given in 
+Equation (10.9). From this, derive the image for a chromeless repeating line/space 
+pattern by letting the width of the chrome line in the alternating PSM mask go to 
+zero. Qualitatively, what is the effect of reducing the chrome width?
+10.8. Derive Equation (10.10), the diffraction pattern for an isolated phase-shifted 
+line.
+10.9. Derive Equation (10.11), the coherent aerial image for an isolated phase-shifted 
+line.
+10.10. Derive Equation (10.15) from Equation (10.14).
+10.11. Equations (10.16) and (10.17) give the coherent (TE) image for an attenuated PSM 
+pattern of lines and spaces. What happens to this image as t2 goes to 1? (Such a 
+mask is called a chromeless PSM.)
+10.12. Derive an equation for the coherent LSF when using an attenuated PSM. What is 
+the maximum sidelobe intensity for the LSF for a 6 % attenuating PSM?
+10.13. Derive an expression for the normalized image log-slope of the isolated phase 
+edge, assuming the nominal feature size is at an intensity threshold of 0.25.
+References
+1 Levenson, M.D., 1993, Wavefront engineering for photolithography, Physics Today, 46, 
+28–36.
+2 Fukuda, H., Imai, A., Terasawa, T. and Okazaki, S., 1991, New approach to resolution limit and 
+advanced image formation techniques in optical lithography, IEEE Transactions on Electron 
+Devices, 38, 67–75.
+3 Arthur, G. and Martin, B., 1995, Investigation of photoresist-specifi c optical proximity effect, 
+Micro- and Nano-Engineering ‘95, Aix-en-Provence, France.
+4 Chen, J.F., Laidig, T., Wampler, K. and Caldwell, R., 1997, Optical proximity correction for 
+intermediate-pitch features using sub-resolution scattering bars, Journal of Vacuum Science and 
+Technology B, 15, 2426–2433.
+
+
+## Page 46
+
+456 Fundamental Principles of Optical Lithography
+5 Mack, C.A., 1989, Optimum stepper performance through image manipulation, KTI Microelectronics Seminar, Proceedings, 209–215.
+6 Fehrs, D.L., Lovering, H.B. and Scruton, R.T., 1989, Illuminator modifi cation of an optical 
+aligner, KTI Microelectronics Seminar, Proceedings, 217–230.
+7 Socha, R., Dusa, M., Capodieci, L., Finders, J., Fung Chen, J., Flagello, D. and Cummings, K., 
+2000, Forbidden pitches for 130-nm lithography and below, Proceedings of SPIE: Optical 
+Microlithography XIII, 4000, 1140–1155.
+8 Levenson, M.D., Viswanathan, N.S. and Simpson, R.A., 1982, Improving resolution in photolithography with a phase-shifting mask, IEEE Transactions on Electron Devices, ED-29, 
+1828–1836.
+9 Mack, C.A., 1991, Fundamental issues in phase-shifting mask technology, KTI Microlithography Seminar Interface ‘91, Proceedings, 23–35.

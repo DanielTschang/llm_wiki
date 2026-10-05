@@ -1,0 +1,2968 @@
+## Page 1
+
+3
+Aerial Image Formation – 
+The Details
+The impact of aberrations and defocus must now be added to the description of image 
+formation provided in the previous chapter. The unique aspects of imaging while scanning 
+the mask and wafer past the stationary imaging lens will also be included. Next, a discussion of the vector nature of light and the impact of polarization on imaging will be added 
+and immersion lithography will be described. Finally, a preliminary discussion of image 
+quality will conclude this chapter.
+3.1 Aberrations
+According to Webster, an aberration is ‘. . . a departure from what is right, true or correct’. 
+In optical imaging, ‘right, true or correct’ can be thought of as the ideal, ‘diffractionlimited’ imaging performance of a lens (which was rigorously defi ned in the previous 
+chapter using Fourier optics). Thus, a lens aberration is any deviation of the real performance of that lens from its ideal performance. As one might imagine, aberrations are 
+undesirable intrusions of reality into our attempts to achieve imaging perfection.
+3.1.1 The Causes of Aberrations
+In practice, aberrations come from three sources – aberrations of design, aberrations of 
+construction and aberrations of use. Aberrations of construction are probably the most 
+tangible sources of errors and include incorrect shapes and thickness of the glass elements 
+that make up the lens, inhomogeneous glass used in their construction, improper mounting, spacings or tilts of the various lens elements, or other imperfections in the manufacture of the lens (Figure 3.1). Aberrations of use include all ways in which improper 
+use of the lens degrades its performance: using the wrong wavelength or wavelength 
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+76 Fundamental Principles of Optical Lithography
+spectrum, tilt of the mask or wafer plane, or incorrect environmental conditions (e.g. 
+changes in the refractive index of air due to changes in temperature, humidity or barometric pressure). But in a sense, it is the aberrations of design which are the fundamental 
+problem for lithographic lenses.
+An ‘aberration of design’ does not mean mistakes or problems caused by the designer 
+of the lens. In fact, it means quite the opposite. Aberrations are fundamental to the nature 
+of imaging and it is the goal of the lens designer to ‘design out’ as many of these aberrations as possible. The aberrations of design are those aberrations, inserted into the imaging 
+system by nature, that the designer was not able to extract. The root cause of these 
+aberrations for refractive optical elements is the nonlinear nature of Snell’s law.
+Snell’s law describes the refraction of light as it passes from one material to another. 
+Light incident at the boundary of two materials at an angle q1 with respect to the normal 
+will refract to a new angle q2 in material 2 given by Snell’s law:
+nn 1 12 2 sin sin θθ = (3.1)
+where n1 and n2 are the refractive indices of the two materials. It is this refraction between 
+air and glass that allows a curved glass surface to focus light. In terms of refraction, the 
+goal of imaging can be stated very simply: light emanating in all directions from some 
+point on the object should be collected by the lens and focused to its ideal image point. 
+Thus, a ray of light coming from the object point should pass through the lens and arrive 
+at the image point, regardless of its angle.
+Does Snell’s law permit this ideal behavior? For a lens made of a single element (i.e. 
+a single piece of glass) with spherical front and back surfaces, it is not diffi cult to show 
+that ideal imaging behavior would be obtained only if Snell’s law were linear: n1q1 = n2q2. 
+Thus, it is the nonlinear nature of the refraction of light that causes nonideal imaging 
+behavior. In the limit of small angles, Snell’s law does behave about linearly (sin q ≈ q
+for small q). When all the angles of light passing through the imaging system are small 
+enough so that Snell’s law is approximately linear, we fi nd that the lens behaves ideally 
+in this paraxial (near the axis) approximation. Although a spherically shaped lens was 
+used as an example, there is no single shape for a lens surface that provides ideal imaging 
+for many different object points. Thus, fundamentally, the nonlinear nature of Snell’s law 
+results in nonideal imaging behavior (i.e. aberrations) for any single lens element.
+Rough Surfaces
+Incorrect Spacing or Thickness
+Tilt
+Decentered
+Incorrect Curvature Glass Inhomogeneity or Strain
+.
+.
+.
+.
+.
+.
+.. .
+. ..
+. .. .
+.
+.
+.
+.
+.
+.. .
+. .. . ..
+.
+.
+.
+.
+.
+.
+.. .
+. ..
+. ..
+Figure 3.1 Examples of typical aberrations of construction
+
+
+## Page 3
+
+ Aerial Image Formation – The Details 77
+If aberrations are fundamental to the nature of imaging, how can we make a lens that 
+approaches the ideal imaging behavior? Since each lens element has aberrations by its 
+very nature, these aberrations are corrected by combining different lens elements with 
+differing aberrations. If two lens elements are brought together that have aberrations of 
+similar magnitude but in opposite directions, the combination will have smaller aberrations than either individual lens element. A simple example is a pair of eyeglasses. One 
+lens, your eye, has aberrations of a certain magnitude and direction. A second lens, in the 
+glasses, is designed to have aberrations of about the same magnitude but in the opposite 
+direction. The combination yields residual aberrations that are small enough to be acceptable. One of the simplest examples of aberration correction through lens design is a 
+cemented doublet of positive and negative elements made from two different types of 
+glass, which has the added advantage of reducing chromatic aberrations – the variation 
+of imaging behavior with wavelength (Figure 3.2).
+The combination of two lens elements can reduce the aberrations of the overall lens 
+system, but not eliminate them. If a third element is added, the total amount of aberrations 
+can be reduced further. Each lens element, with its two curved surfaces, thickness, position and type of glass, adds more degrees of freedom to the design to allow the overall 
+level of aberrations to be reduced. Thus, the lens designer uses these degrees of freedom 
+(in addition to the position of an aperture stop) to ‘design out’ the aberrations that nature 
+has embedded into the behavior of a single element (see Figure 3.3 for an example of a 
+modern lithographic lens). An aberration free lens system, however, is an ideal that can 
+never be achieved in practice. It would take an infi nite number of lens elements to make 
+the designed behavior perfect. Before this point is reached, however, aberrations of construction would begin to dominate. The optimum number of elements is reached when 
+the addition of one more lens element adds more aberrations of construction than it 
+reduces the aberrations of design.
+Figure 3.2 The reduction of spherical aberration by the use of a cemented doublet
+Figure 3.3 Example of a simple NA = 0.8, 248-nm lens design1
+
+
+## Page 4
+
+78 Fundamental Principles of Optical Lithography
+Since the nonlinear nature of Snell’s law leads to aberrations, larger angles passing 
+through the lens produce greater nonideal behavior. Thus, for a given lens design, increases 
+in numerical aperture (NA) or fi eld size result in large increases in aberrations. In fact, 
+however, new generations of lithographic lenses with higher NAs always seem to exhibit 
+lower levels of aberrations compared to previous generations due to improvements in lens 
+design and manufacturing. The increasing use of aspherical lens elements, with their 
+greater degrees of freedom for the lens design, has helped to keep the number of lens 
+elements lower than would be otherwise required (though at a cost of increased manufacturing complexity). Still, lens size and weight grow considerably for each generation 
+of lithographic tool, with 500-kg lenses more than 2 m tall now common.
+Unfortunately, even the low levels of aberrations found in a state-of-the-art lens are 
+not small enough to be ignored. Invariably, the high NA lens is used to print ever smaller 
+features that are increasingly sensitive to even the slightest deviation from perfection. The 
+impact of these aberrations is a reduction of image quality, and ultimately a loss of critical 
+dimension (CD) control and overlay performance (see Chapter 8). A thorough understanding of the aberration behavior of a lens is a necessity for those seeking to push the limits 
+of their lithography tools.
+3.1.2 Describing Aberrations: the Zernike Polynomial
+How are aberrations characterized? In the simple geometrical optics approach, optical 
+rays represent the propagation of light through the optical system. By tracing the paths 
+of the light through a lens (using a lens design software program, for example), the deviations in the actual paths of the rays from the ideal paths tell us the magnitude of the 
+aberration (Figure 3.4). The magnitude of the aberration can be expressed as an optical 
+path difference (OPD) between the ideal and actual rays. Rays point in the direction that 
+light is traveling and are thus perpendicular to the wavefront of the light, a surface of 
+constant phase. By propagating these wavefronts through the lens, the deviation of the 
+ideal wavefront from the real wavefront can also be used to express the magnitude of the 
+Image
+Point
+Coma
+Object
+Point
+(a) (b)
+Figure 3.4 Ray tracing shows that (a) for an ideal lens, light coming from the object point 
+will converge to the ideal image point for all angles, while (b) for a real lens, the rays do not 
+converge to the ideal image point
+
+
+## Page 5
+
+ Aerial Image Formation – The Details 79
+aberration (Figure 3.5). The two descriptions are completely equivalent since light undergoes a phase change of 2p every time it travels a distance of one wavelength, providing 
+a simple conversion between OPD and phase error.
+The aberration behavior of a lens can be predicted using lens design software, or measured using interferometry. In both cases, the result is a map of the phase error (or OPD) 
+of the light exiting from the lens for a given point in the fi eld. It is important to note that 
+the aberrations will vary as a function of fi eld position (center of the fi eld versus the upper 
+left corner, for example). It typically takes 25 to 50 measurements across the fi eld to fully 
+characterize how these aberrations vary for a typical lithographic lens.
+A map of the phase error across the exit pupil of the lens is a useful, but potentially 
+large, set of data. One of the most common ways to better understand such data is to 
+curve fi t the data to a function, typically a high-order polynomial. In that way, this large 
+set of experimental data can be represented by relatively few polynomial coeffi cients. 
+Further, by carefully choosing the form of the polynomial fi tting function, the coeffi cients 
+themselves can take on physically meaningful interpretations. By far the most common 
+such polynomial is the Zernike polynomial, named for Frits Zernike, the 1953 Nobel prize 
+winning physicist. This orthogonal polynomial series has an infi nite number of terms, but 
+is typically cut off after 36 terms, with powers of the relative radial pupil position R and 
+trigonometric functions of the polar angle f. Thus, knowing the numerical values of the 
+36 Zernike coeffi cients allows one to describe to a reasonable level of accuracy the 
+aberration behavior of a lens at a single fi eld point.
+The Zernike polynomial can be arranged in many ways, but most lens design software 
+and lens measuring equipment employ the fringe or circle Zernike polynomial, defi ned as
+WR OPD ZF R ii
+i
+() () ,, φ λ == φ =
+∞
+∑0
+ (3.2)
+where W(R,f) is the optical path difference relative to the wavelength, Zi is called the 
+ith Zernike coeffi cient, and Fi(R,f) are the polynomial terms, defi ned in Table 3.1. The 
+(a) (b)
+Image
+Point
+Object
+Point
+Figure 3.5 Wavefronts showing the propagation of light (a) for an ideal lens and (b) for a 
+lens with aberrations
+
+
+## Page 6
+
+80 Fundamental Principles of Optical Lithography
+phase error due to aberrations will be simply 2pW(R,f). The polar coordinates on the unit 
+circle (R,f) are related to the Cartesian spatial frequency coordinates by
+f NA Rf NA xy == R λ φ λ cos sin , φ (3.3)
+Table 3.1 Polynomial functions and common names for the fi rst 36 terms in the Fringe 
+Zernike polynomial
+Term Fringe Zernike Formula, Fi Common Name
+Z0 1 Piston
+Z1 Rcosf x-Tilt
+Z2 Rsinf y-Tilt
+Z3 2R2 − 1 Power (paraxial focus)
+Z4 R2
+cos2f 3rd Order Astigmatism
+Z5 R2
+sin2f 3rd Order 45° Astigmatism
+Z6 (3R2 − 2)Rcosf 3rd Order x-Coma
+Z7 (3R2 − 2)Rsinf 3rd Order y-Coma
+Z8 6R4 − 6R2 + 1 3rd Order Spherical
+Z9 R3
+cos3f Trefoil (3rd Order 3-Point)
+Z10 R3
+sin3f 45° Trefoil
+Z11 (4R2 − 3)R2
+cos2f 5th Order Astigmatism
+Z12 (4R2 − 3)R2
+sin2f 5th Order 45° Astigmatism
+Z13 (10R4 − 12R2 + 3)Rcosf 5th Order x-Coma
+Z14 (10R4 − 12R2 + 3)Rsinf 5th Order y-Coma
+Z15 20R6 − 30R4 + 12R2 − 1 5th Order Spherical
+Z16 R4
+cos4f Quadrafoil (3rd Order 4-Point)
+Z17 R4
+sin4f 45° Quadrafoil
+Z18 (5R2 − 4)R3
+cos3f 5th Order Trefoil (5th Order 
+3-Point)
+Z19 (5R2 − 4)R3
+sin3f 5th Order 45° Trefoil
+Z20 (15R4 − 20R2 + 6)R2
+cos2f 7th Order Astigmatism
+Z21 (15R4 − 20R2 + 6)R2
+sin2f 7th Order 45° Astigmatism
+Z22 (35R6 − 60R4 + 30R2 − 4)Rcosf 7th Order x-Coma
+Z23 (35R6 − 60R4 + 30R2 − 4)Rsinf 7th Order y-Coma
+Z24 70R8 − 140R6 + 90R4 − 20R2 + 1 7th Order Spherical
+Z25 R5
+cos5f Pentafoil (3rd Order 5-Point)
+Z26 R5
+sin5f 45° Pentafoil
+Z27 (6R2 − 5)R4
+cos4f 5th Order Quadrafoil (5th 
+Order 4-Point)
+Z28 (6R2 − 5)R4
+sin4f 5th Order 45° Quadrafoil
+Z29 (21R4 − 30R2 + 10)R3
+cos3f 7th Order Trefoil (7th Order 
+3-Point)
+Z30 (21R4 − 30R2 + 10)R3
+sin3f 7th Order 45° Trefoil
+Z31 (56R6 − 105R4 + 60R2 − 10)R2
+cos2f 9th Order Astigmatism
+Z32 (56R6 − 105R4 + 60R2 − 10)R2
+sin2f 9th Order 45° Astigmatism
+Z33 (126R8 − 280R6 + 210R4 − 60R2 + 5)Rcosf 9th Order x-Coma
+Z34 (126R8 − 280R6 + 210R4 − 60R2 + 5)Rsinf 9th Order y-Coma
+Z35 252R10 − 630R8 + 560R6 − 210R4 + 30R2 − 1 9th Order Spherical
+Z36 924R12 − 2772R10 + 3150R8 − 1680R6 +
+420R4 − 42R2 + 1
+11th Order Spherical
+
+
+## Page 7
+
+ Aerial Image Formation – The Details 81
+It is the magnitude of the Zernike coeffi cients that determines the aberration behavior of 
+a lens. They have units of optical path length relative to the wavelength. (Note that different notational schemes are in use for the Zernike coeffi cients. Another popular scheme 
+labels the piston term Z1 rather than Z0, so that all the indices differ by 1. Unfortunately, 
+there is no universal standard and naming conventions can vary.)
+Zernike polynomials have some important properties that make their use extremely 
+attractive. First, they form a complete set over the unit circle, meaning that any piecewisecontinuous function can be fi tted exactly within this unit circle with an infi nite-order 
+Zernike polynomial. Second, they are orthogonal over the unit circle. Mathematically, 
+this means that the product of two different polynomial terms, when integrated over the 
+pupil, will always be zero, whereas the integral of one polynomial term squared will be 
+nonzero. Practically, this means that each polynomial term behaves independently of the 
+others, so that the addition or removal of one polynomial term does not affect the best-fi t 
+coeffi cients of the other polynomial terms. Third, the Zernike polynomial terms are separable into functions of R multiplied by functions of f, providing rotational symmetry. The 
+f functions are trigonometric, so that a rotation of the x-axis (defi ning f) does not change 
+the form of the equation.
+The impact of aberrations on the aerial image can be calculated by modifying the pupil 
+function of the lens given in Chapter 2 to include the phase error due to aberrations.
+Pf f P f f xy xy i WR ( ) (,) () ,e ideal , = 2πφ (3.4)
+Figure 3.6 shows several examples of plots of W(R,f) for different simple combinations 
+of third-order Zernike terms. Implicit in the use of Equation (3.4) is that this lens pupil 
+function is also a function of fi eld position and wavelength. The wavelength dependence 
+is discussed in section 3.1.6. While the fi eld dependence of the pupil function is sometimes 
+modeled mathematically (the Seidel aberration equations being the most common), in 
+lithography applications the most common approach is to characterize each fi eld position 
+with its own pupil function.
+Although the phase variation across the pupil of a typical lithographic lens can be quite 
+complicated, there are a few simple examples that can be used to describe the majority 
+of the lithographic effects due to aberrations. It is also important to note that the impact 
+of a given aberrated lens on the printing of a mask feature is a strong function of the 
+feature itself. The reason is quite simple: different mask features diffract light differently, 
+sending light through different parts of the lens. As an example, a pattern of equal lines 
+and spaces illuminated with coherent (single direction) light will result in a diffraction 
+pattern of discrete diffraction ‘orders’, rays of light passing through the lens at certain 
+distinct points. Changing the pitch of the line/space pattern changes the position within 
+the lens that the diffraction orders will pass (Figure 3.7). We can think of the diffraction 
+patterning as ‘sampling’ the lens differently depending on the mask pattern. In general, 
+the phase error seen by these different mask patterns will be different, giving rise to feature 
+type, size and orientation dependencies to the effects of aberrations.
+3.1.3 Aberration Example – Tilt
+One of the simplest forms of an aberration is tilt, a linear variation of phase from one 
+side of the lens to the other as given by the Zernike terms Z1 and Z2 (Figure 3.8a). As the 
+
+
+## Page 8
+
+) 4 ) 3rd Order 90º Astigmatism (Z 3 Power/Defocus(Z
+)6 ) 3rd Order x-Coma (Z 5 3rd Order 45º Astigmatism (Z
+) 8 3rd Order y-Coma (Z7 ) 3rd Order S pherical (Z
+ Mixture (Z4+Z5+Z6+Z7+Z8) Mixture (Z4-Z5+Z6-Z7-Z8) 
+Figure 3.6 Example plots of aberrations (phase error across the pupil)
+Mask
+Lens
+Mask
+Lens
+(a) (b)
+Figure 3.7 Diffraction patterns from (a) a small pitch, and (b) a larger pitch pattern of lines 
+and spaces will result in light passing through a lens at different points in the pupil. Note also 
+that y-oriented line/space features result in a diffraction pattern that samples the lens pupil 
+only along the x-direction
+
+
+## Page 9
+
+ Aerial Image Formation – The Details 83
+name implies, the aberration of tilt will ‘tilt’ the wavefront exiting the lens, changing 
+the direction of the light. The result is a simple shift in the position of the fi nal printed 
+feature (as can be easily shown using the shift property of the Fourier transform). For 
+pure tilt, the resulting positional error of the pattern is independent of feature size and 
+type, but is very dependent on the orientation of the pattern. As an example, a pattern 
+of lines and spaces oriented in the y-direction will give rise to a diffraction pattern with 
+diffraction orders spread out in the x-direction (Figure 3.7). The resulting placement 
+error (the amount that the image has shifted in x with respect to the unaberrated image) 
+will be
+placement error Z
+NA =− 1λ (3.5)
+In this case, an x-tilted phase variation will cause a pattern placement error for the features, 
+whereas a y-tilt aberration (given by the coeffi cient Z2) will have no effect.
+The variation of the tilt Zernike coeffi cients with fi eld position is called distortion. 
+Since tilt causes the same image placement error for all features, distortion is independent 
+of feature size and type. As will be seen below in the section on coma, higher-order odd 
+aberrations will cause pattern placement errors as well, but with varying placement error 
+as a function of feature size and type.
+3.1.4 Aberration Example – Defocus, Spherical and Astigmatism
+The next simplest form of an aberration is called paraxial defocus (also called power), a 
+parabolic variation in phase about the center of the lens (Figure 3.8b). Since this aberration is radially symmetric, all feature orientations will behave the same way. However, 
+smaller features, with the diffraction orders farther out toward the edge of the lens, will 
+have a greater amount of phase error. Thus, small features are more sensitive to the 
+(a) (b)
+–1.0
+–0.8
+–0.6
+–0.4
+–0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+–1.0 –0.8 –0.6 –0.4 –0.2 0.0 0.2 0.4 0.6 0.8 1.0
+Relative Pupil Position
+Wavefront Error (arb. units)
+Spherical
+Defocus
+–1.0
+–0.8
+–0.6
+–0.4
+–0.2
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+–1.0 –0.8 –0.6 –0.4 –0.2 0.0 0.2 0.4 0.6 0.8 1.0
+Relative Pupil Position
+Wavefront Error (arb. units)
+Coma
+Tilt
+Figure 3.8 Phase error across the diameter of a lens for several simple forms of aberrations: 
+(a) the odd aberrations of tilt and coma, and (b) the even aberrations of defocus and 
+spherical
+
+
+## Page 10
+
+84 Fundamental Principles of Optical Lithography
+aberration of defocus. More details of the effects of defocus are given in section 3.4. 
+Further explanation of the lithographic impact of focus errors is given in Chapter 8.
+There is a whole class of aberrations that behave somewhat like defocus across a given 
+radial cut through the lens pupil. These aberrations, called even aberrations, have the same 
+phase error at either side of the center of the lens along any given diagonal (that is, for a 
+fi xed f). For even aberrations, the primary effect on a single feature size and orientation 
+is basically a shift in best focus. In general, different feature sizes and orientations will 
+experience a different amount of the even aberration phase error, giving different focal 
+shifts. Spherical aberration can be thought of as causing a focus error that varies with 
+pitch. As Figure 3.8b shows, different pitches, which will give different positions of the 
+fi rst diffraction order, will experience different phase errors and thus different effective 
+focus errors (see Problem 3.5).
+A variation in best focus as a function of the orientation of the features is called astigmatism. Examining the Zernike terms 4 and 5, for a given orientation of line (and thus a 
+given f), the variation of phase with R is quadratic. Thus, for a given orientation, astigmatism adds a phase error identical to paraxial defocus. But the amount of effective 
+defocus error due to astigmatism will depend on the orientation of the line (that is, on f). 
+One of the major consequences of the presence of astigmatism is a focus-dependent horizontal–vertical (H–V) bias, a difference in linewidth between horizontally oriented and 
+vertically oriented patterns. More on H–V bias will be given in Chapter 8.
+3.1.5 Aberration Example – Coma
+Finally, odd aberrations are those that do not have radial symmetry about the center of 
+the lens. Coma is a common example of an odd aberration (see Figure 3.8). Consider, for 
+example, the sixth term in the Zernike polynomial, representing x-oriented 3rd order 
+coma:
+ZR R 6 2 ( ) cos 32 − φ (3.6)
+y-oriented coma (Zernike term number 7) has the same form as the above expression, but 
+with a sin f instead of the cosine term. The combination of these two terms can defi ne 
+any amount of 3rd order coma directed in any orientation. For simplicity, then, we can 
+consider coma in the direction of maximum magnitude as given by the above equation 
+with the angle equal to zero.
+What are the main lithographic effects of 3rd order coma? One important effect is a 
+feature-size dependent pattern placement error. Since the x-tilt Zernike term takes the 
+form Z1Rcos f, comparison with Equation (3.6) shows that coma acts as an effective tilt 
+with coeffi cient Z6(3R2 − 2). Consider a pattern of lines and spaces of pitch p. Diffraction 
+will produce discrete orders (directions) of light traveling through the lens, the zero order 
+going straight through the lens and the plus and minus fi rst orders entering the lens at 
+relative radial positions of R = ±l/pNA. For coherent illumination, the pattern placement 
+error can be derived directly from the above expressions for x-tilt and 3rd order 
+x-coma.
+placement error Z
+NA pNA =− 
+
+ 
+
+ − 
+
+
+
+
+ 6
+2
+32 λλ (3.7)
+
+
+## Page 11
+
+ Aerial Image Formation – The Details 85
+It is important to note that the above expression only applies to line/space patterns when 
+l/NA < p < 3l/NA and for coherent illumination. The effect of partially coherent illumination is to spread out the orders in a circle centered about each coherent diffraction order, 
+thus averaging out some of the tilt caused by the coma. Figure 3.9 shows how pattern 
+placement error varies with pitch for a pattern of equal lines and spaces in the presence 
+of coma for different amounts of partial coherence. One can observe a general, though 
+not universal, trend: lower partial coherence increases the sensitivity to aberrations.
+A second important effect of coma is asymmetric linewidth errors. A single isolated 
+line, printed in the presence of coma, will show an asymmetry of the right to left side of 
+the photoresist profi le. An even greater effect, however, is the difference in linewidth 
+between the rightmost and leftmost lines of a fi ve-bar pattern. Figure 3.10 shows how the 
+difference between right and left linewidths varies almost linearly with the amount of 
+coma, with smaller features more sensitive to a given amount of coma. In fact, this 
+lithographic measurement can be used as a test for the amount of coma in a lens.
+The third important impact of coma is a change in the shape of the fi nal resist profi le, 
+especially through focus. Coma causes an asymmetric degradation of the resist profi le, 
+affecting one side of the feature more than the other, as seen in Figure 3.11. At best focus, 
+this degradation in profi le shape is usually not noticeable. But out of focus, there is a 
+characteristic loss of resist off one side of the profi le at the part of the profi le that is 
+farthest away from the plane of best focus. The reason for this behavior can be seen 
+from aerial image isophotes (contours of constant intensity through focus and horizontal 
+position) in the presence of coma, as shown in Figure 3.12.
+3.1.6 Chromatic Aberrations
+An assumption of the Zernike description of aberrations is that the light being used is 
+monochromatic. The phase error of light transmitted through a lens applies to a specifi c 
+–1.0
+–0.5
+0.0
+0.5
+1.0
+1.5
+2.0
+1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6 2.8
+Pitch * NA/
+Placement Error * (NA/ Z6)
+= 0.3
+= 0
+= 0.6
+= 0.9
+l
+l
+s
+s
+s
+s
+Figure 3.9 The effect of coma on the pattern placement error of a pattern of equal lines 
+and spaces (relative to the magnitude of the 3rd order x-coma Zernike coeffi cient Z6) is 
+reduced by the averaging effect of partial coherence
+
+
+## Page 12
+
+86 Fundamental Principles of Optical Lithography
+–80
+–60
+–40
+–20
+0
+20
+40
+60
+80
+–0.15 –0.10 –0.05 0 0.05 0.10 0.15
+Z6, 3rd Order x-Coma (waves)
+Right - Left CD (nm)
+k1 = 0.710
+0.657
+k1 = 0.575
+Right CD
+Left CD
+Figure 3.10 The impact of coma on the difference in linewidth between the rightmost and 
+leftmost lines of a fi ve bar pattern (simulated for i-line, NA = 0.6, sigma = 0.5). Note that the 
+y-oriented lines used here are most affected by x-coma. Feature sizes (350, 400 and 450nm) 
+are expressed as k1 = linewidth *NA/l
+− Focus Best Focus + Focus
+Figure 3.11 Variation of the resist profi le shape through focus in the presence of coma
+(a) (b)
+0 200
+0
+200
+400
+–200
+–200 –200
+–400
+–200
+–400
+z-Position (nm)
+x-Position (nm) x-Position (nm)
+0 200
+0
+200
+400
+z-Position (nm)
+Figure 3.12 Examples of isophotes (contours of constant intensity through focus and horizontal position) for (a) no aberrations, and (b) 100ml of 3rd order coma. (NA = 0.85, l =
+248nm, s = 0.5, 150-nm space on a 500-nm pitch)
+
+
+## Page 13
+
+ Aerial Image Formation – The Details 87
+wavelength. One expects this phase error, and thus the coeffi cients of the resulting Zernike 
+polynomial, to vary with the wavelength of the light used. The property of a lens element 
+that allows light to bend is the index of refraction of the lens material. Since the index 
+of refraction of all materials varies with wavelength (a property called dispersion), lens 
+elements will focus different wavelengths differently. This fundamental problem, called 
+chromatic aberration, can be alleviated by using two different glass materials with 
+different dispersions such that the chromatic aberrations of one lens element cancel 
+the chromatic aberrations of the other. The cemented doublet of Figure 3.2 is the simplest 
+example of a chromatic-corrected lens (called an achromat) where each element is made 
+from a glass with different dispersion characteristics. As with all aberrations, this cancellation is not perfect, meaning that all lenses will have some level of residual chromatic 
+aberrations.
+The effects of chromatic aberrations depend on two things: the degree to which the 
+Zernike polynomial coeffi cients vary with wavelength (the magnitude of the chromatic 
+aberrations), and the range of wavelengths used by the imaging tool. For example, a 
+typical i-line stepper might use a range of wavelengths on the order of 5–10 nm, whereas 
+a KrF excimer laser-based deep-UV stepper may illuminate the mask using light with 
+a wavelength range of less than 1 pm. The obvious difference in the magnitude of the 
+wavelength ranges between these two light sources does not mean, however, that chromatic aberrations are a problem for i-line but not for deep-UV. i-line lenses are designed 
+to use the (relatively) wide range of wavelengths by chromatically correcting the lens 
+with several different types of glass. A typical deep-UV lens, on the other hand, makes 
+no attempt at chromatic correction since only fused silica is used for all the elements in 
+the lens (due to a lack of suitable alternative materials). As a result, chromatic aberrations 
+are a concern in deep-UV lithographic lenses even when extremely narrow bandwidth 
+light sources are used.
+In principle, every Zernike coeffi cient is a function of wavelength. In practice, for 
+lenses with no chromatic corrections (i.e. where every lens element is made from the 
+same material), one Zernike term dominates: the term that describes defocus. The plane 
+of best focus shifts with changes in wavelength in a nearly linear fashion, a phenomenon 
+called longitudinal chromatic aberration. This can be seen quite readily by considering 
+an ideal thin lens in air. Such a lens is made of glass of index n and has front and back 
+radii of curvature R1 and R2. The focal length f, reduction ratio R, and distances from the 
+lens to the object and image, do and di, respectively, are all related by the thin-lens 
+equations:
+1 1 11 11
+12 f n RR d d
+R d
+d =− − 
+
+ 
+ ()  =+ = oi
+o
+i
+, (3.8)
+A change in refractive index of the lens (with wavelength, for example) results in a change 
+in focal length. For a fi xed object distance and reduction ratio, a change in focal length 
+changes the image distance, that is, focus. Taking the derivative with respect to 
+wavelength,
+∆
+∆
+focus d d
+n
+n
+λλ λ = =− −
+d
+d
+d
+d
+ii ()
+()1 (3.9)
+
+
+## Page 14
+
+88 Fundamental Principles of Optical Lithography
+The term dn/dl is called the dispersion of the lens material. For KrF-grade fused silica 
+at 248.3 nm, n = 1.508 and the dispersion is about −5.6 × 10−7/pm. As an example, a thin 
+lens of fused silica with an image distance of 0.2 m would result in a change in focus per 
+change in wavelength of 0.22 mm/pm. Of course, more complicated lens systems would 
+have an effective image distance different from the physical image distance, but the basic 
+trend and magnitude for a lens with no chromatic correction is similar. For immersion 
+lithography, the slope of the focus versus wavelength dependence will increase by the 
+fl uid refractive index.
+Since the center wavelength of most excimer lasers is easily adjustable over a reasonably large range, this effect can be readily measured for any given stepper. Figure 3.13a 
+shows a typical example.2
+ To account for this behavior, the Zernike term Z3 (the paraxial 
+defocus term) can be used. The coeffi cient of the third Zernike term Z3 can be related to 
+a focus shift ∆d by
+Z NA 3
+2
+4 0
+=∆δ λ (3.10)
+where l0 is the center wavelength of the illumination spectrum. Each wavelength produces 
+a different focus shift ∆d, which leads to a different value of Z3. Higher-order focus terms 
+could be added as well.
+A typical defocus/wavelength behavior for a KrF (248 nm) lens is shown in Figure 
+3.13a. An excimer laser light source will emit light over a range of wavelengths with a 
+characteristic spectrum (output intensity versus wavelength) that can be roughly approximated as somewhere between a Gaussian shape and a Lorentzian shape. The full width 
+half maximum (FWHM) of the laser output spectrum is called the bandwidth of the laser, 
+with typical line-narrowed KrF and ArF lasers having less than 1-pm bandwidths. Each 
+wavelength in the laser spectrum will be projected through the imaging lens, forming an 
+aerial image shifted in focus according to the wavelength response characteristic for that 
+(a) (b) Aerial Image Intensity 
+Horizontal Position (nm)
+∆ = 0 pm 
+–200 –100 0 100 200
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+∆ = 3 pm 
+∆ = 1 pm 
+–3
+–2
+–1
+0
+1
+2
+3
+–15 –10 – 5 0 5 10 15
+Wavelength Shift (pm)
+Best Focus (microns)
+l
+l
+l
+Figure 3.13 Chromatic aberrations: (a) measurement of best focus as a function of center 
+wavelength shows a linear relationship with slope 0.255mm/pm for this 0.6 NA lens; (b) 
+degradation of the aerial image of a 180-nm line (500-nm pitch) with increasing illumination 
+bandwidth for a chromatic aberration response of 0.255mm/pm
+
+
+## Page 15
+
+ Aerial Image Formation – The Details 89
+lens. The total aerial image will be the sum of all the images from all the wavelengths in 
+the source, resulting in a fi nal aerial image that is somewhat smeared through focus.
+Figure 3.13b shows a typical example. For this 180-nm image, the 1-pm bandwidth 
+shows a slight degradation of the aerial image, but the 3-pm bandwidth is clearly unacceptable. As one might expect, smaller features will be more sensitive to the effects of 
+chromatic aberrations than larger features. Thus, as features are pushed to smaller sizes, 
+even these seemingly miniscule sub-picometer excimer bandwidths will require careful 
+consideration as to their chromatic aberration effects. Also, since dense line/space features 
+tend to respond very differently to focus errors compared to isolated lines, changes in 
+laser bandwidth can result in noticeable changes in iso-dense bias, the difference in resist 
+linewidth between an isolated and a dense feature of the same mask width.
+For rigorous treatment of chromatic aberrations, a mathematical description of the light 
+source spectral output is required. A modifi ed Lorentzian distribution has been shown to 
+match measured excimer laser spectrums quite well.3
+ Letting Irso be the relative spectral 
+output intensity,
+I
+n
+nn rso() [ ( )]
+λ λλ = +−
+Γ
+Γ 2 0
+ (3.11)
+where l0 is the center wavelength, G is the bandwidth, and n is an empirically determined 
+parameter that is typically between 2 and 3. Figure 3.14 shows a typical example from a 
+KrF laser.
+One very simple way to avoid the problem of chromatic aberrations is to use mirrors 
+for the imaging elements. Since mirrors refl ect light in about the same way for a wide 
+range of wavelengths, near-perfect chromatic correction is possible. However, mirror 
+optical systems pose many other challenges, not the least of which is the extreme diffi culty 
+of using multiple focusing mirrors without those mirrors getting in the way of each 
+other.
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+–2.0 –1.5 –1.0 –0.5 0.0 0.5 1.0 1.5 2.0
+λ − λ0 (pm) 
+Relative Intensity
+Figure 3.14 Measured KrF laser spectral output1 and best-fi t modifi ed Lorentzian (Γ =
+0.34pm, n = 2.17, l0 = 248.3271nm)
+
+
+## Page 16
+
+90 Fundamental Principles of Optical Lithography
+3.1.7 Strehl Ratio
+The overall level of the aberrations of a lens can be characterized in several ways. The 
+peak wavefront deviation is the maximum phase difference (or OPD) between any two 
+points in the pupil (sometimes called the peak-to-valley wavefront error). The RMS (root 
+mean square) wavefront deviation provides an average level of phase error or OPD across 
+the pupil. Another approach is to look at the degradation of the point spread function 
+(PSF) caused by the aberrations. Since the PSF samples the imaging lens pupil evenly, 
+its degradation provides an overall measure of how aberrations might affect image quality. 
+Since the ideal PSF is normalized to have a peak value of 1, the Strehl ratio is defi ned 
+as the peak intensity of the PSF of the real lens at best focus, a value that is always less 
+than 1. For anything but the highest levels of aberrations, the Strehl ratio can be related 
+directly to the RMS wavefront deviation:
+Strehl Ratio W = − e () 2 RMS 2 π (3.12)
+where WRMS is the RMS wavefront error in waves. For small levels of aberrations 
+(certainly an applicable constraint for lithographic lenses), the Strehl ratio becomes
+Strehl Ratio W ≈−12 2 () π RMS (3.13)
+As an example, a Strehl ratio of 0.9 corresponds to an RMS wavefront error of 50 
+milliwaves. For a Strehl ratio of 0.95, the RMS wavefront error is 35 milliwaves. Stateof-the-art lithographic lenses will have Strehl ratios greater than 0.95, with the best lenses 
+having RMS wavefront errors of less than 10 milliwaves.
+3.2 Pupil Filters and Lens Apodization
+Pupil fi lters are special fi lters placed inside the objective lens in order to purposely modify 
+the pupil function P(fx, fy). In general, the ideal pupil function will provide the best overall 
+imaging capabilities. However, under special circumstances (for example, when imaging 
+one specifi c mask pattern), a change in the pupil function may result in desirable imaging 
+properties such as enhanced depth of focus. A pupil fi lter can be described by a pupil 
+fi lter function F(fx, fy) that can have both a variation in transmission (T) and phase (q) 
+across the pupil:
+Ff f Tf f xy xy
+i ff xy ( )( ) () , ,e , = θ (3.14)
+The fi nal pupil function is then the pupil function given by Equation (3.4) multiplied by 
+the fi lter function given in Equation (3.14).
+In general, lithographic tools used for integrated circuit (IC) production do not allow 
+the insertion of pupil fi lters. However, the pupil fi lter function of Equation (3.14) can also 
+be used to describe variations in pupil amplitude transmittance, whether intentionally 
+induced or not, that impact imaging but are not intended for ‘fi ltering’ purposes. For 
+example, some imaging tools introduce a central obscuration into the pupil in order to 
+extract light for use in through-the-lens alignment systems. Such an obscuration blocks 
+all light transmitted through the central portion of the lens, for example, when the sine 
+of the diffracted angle is less than ±0.05. 1× steppers made by Ultratech Stepper and early 
+
+
+## Page 17
+
+ Aerial Image Formation – The Details 91
+steppers made by ASML include such central obscurations for through-the-lens alignment 
+purposes.
+Additionally, nonideal lens antirefl ection coatings can lower the transmittance of the 
+lens at the highest spatial frequencies, sometimes by as much as 5–10 %. Such nonideal 
+transmittances can be empirically described by a high-order Gaussian:
+Tf f xy
+f f NA xy q
+() [( ) ] ,e / = −+22 2 (3.15)
+where the power q might be on the order of 5–10. In general, a lowering of the transmittance of a lens at high spatial frequencies is called apodization. Such transmission errors 
+can also be described using the Jones pupil, as defi ned below in section 3.6.4.
+3.3 Flare
+The goal of an imaging lens is to collect diffracted light, spreading out away from an 
+object, and focus that light down to an imaging plane, creating an image that resembles 
+the original object. A typical lens performs this task through the use of curved surfaces 
+of materials with indices of refraction different than air, relying on the principle of refraction. Implicit in this description is the idea that light travels in only one general direction: 
+from the object to the image. The astute student of optics, however, might detect a 
+problem: the difference in index of refraction between two media (such as air and glass) 
+that gives rise to refraction will also give rise to an unwanted phenomenon – refl ection.
+The design of a lens, including the ray tracing algorithms used to optimize the individual shapes and sizes of each glass or fused silica element in the lens, makes use of 
+the assumption that all light traveling through the lens continues to travel from object 
+to image without any refl ections. How is this achieved in practice? One of the hidden 
+technologies of lens manufacturing is the use of antirefl ection coatings on nearly every 
+glass surface in a lens. These lens coatings are designed to maximize the transmittance 
+of light at the interface between materials through interference (a subject that will be 
+treated extensively in Chapter 4). These coatings, usually made of two layers, have 
+specifi cally designed thicknesses and refractive indices that reduce refl ections through 
+interference among several refl ected beams. The coatings are quite effective at reducing 
+refl ections at a specifi c wavelength and over a range of incident angles. They had 
+better be, since a typical microlithographic lens will have over 50 surfaces requiring 
+coatings.
+Although the lens coatings used in lithography tools are quite good, they are not perfect. 
+As a result, unwanted refl ections, though small in magnitude, are inevitably causing light 
+to bounce around within a lens. Eventually some of this light will make its way to the 
+wafer. For the most part, these spurious refl ections are reasonably random, resulting in a 
+nearly uniform background light level exposing the wafer called fl are. Flare is defi ned as 
+the fraction of the total light energy reaching the wafer that comes from unwanted refl ections and scatterings within the lens.
+Lens coating nonideality is not the only source of fl are. Flare is caused by anything 
+that causes the light to travel in a ‘nonray trace’ direction. In other words, refl ections at 
+an interface, scattering caused by particles or surface roughness, or scattering caused by 
+glass inhomogeneity all result in stray light called fl are (Figure 3.15). Defects such as 
+
+
+## Page 18
+
+92 Fundamental Principles of Optical Lithography
+Surface
+Scattering Reflections
+Inhomogeneity
+Figure 3.15 Flare is the result of unwanted scattering and refl ections as light travels through 
+an optical system
+these can be built into the lens during manufacturing, or can arise due to lens degradation 
+(aging, contamination, etc.). External sources of fl are, such as light that refl ects off the 
+wafer, travels up through the lens and refl ects off the backside of the chrome mask, can 
+also contribute. The lithographic consequence of this stray light is probably obvious: 
+degradation of image quality. Since fl are is a nearly uniform background light level exposing the wafer, it provides exposure to nominally dark features (such as a line), reducing 
+their quality.
+While mirrors do not suffer from the problems of nonideal antirefl ection coatings inherent in refractive optical elements, they are far more sensitive to surface roughness scattering. For a given RMS surface roughness, a mirror will scatter greater than one order 
+of magnitude more light than an equally rough refractive lens surface.
+3.3.1 Measuring Flare
+Of course, it is the goal of lens manufacturing and maintenance to produce lenses with 
+very low levels of fl are. How can one tell if fl are poses a problem for a particular stepper 
+or scanner? Fortunately, measuring fl are is reasonably straightforward. Consider the 
+imaging of an island feature whose dimension is extremely large compared to the resolution limits of the imaging tool (say, a 100-mm square island in positive resist). In the 
+absence of fl are, the imaging of such a large feature will result in very nearly zero light 
+energy at the center of the image of the island. The presence of fl are, on the other hand, 
+will provide light to this otherwise dark region on the wafer (Figure 3.16). A positive 
+photoresist can be used as a very sensitive detector for low levels of fl are.
+The dose-to-clear (E0) is defi ned as the minimum dose required to completely remove 
+the photoresist during development for a large open-frame exposure. A related concept is 
+the island dose-to-clear (E0-island), the minimum dose required to completely wash away a 
+large island structure during a normal development process. In the absence of fl are, a 
+large island would take nearly an infi nite dose to produce enough exposure at its center 
+to make the resist soluble in developer. With fl are present, however, this dose is reduced 
+considerably. In fact, by measuring the normal dose-to-clear and the dose-to-clear for the 
+large island, the amount of fl are can be determined as4
+
+
+## Page 19
+
+ Aerial Image Formation – The Details 93
+Flare E
+E = −
+0
+0 island
+ (3.16)
+For example, if the dose-to-clear of a resist is 35 mJ/cm2, then an imaging tool with 5 % 
+fl are would mean that a large island will clear with a dose of 700 mJ/cm2.
+Although fl are is a characteristic of an imaging tool, it is also a function of how that 
+tool is used. For example, the amount of fl are experienced by any given feature is a function of both the local environment around that feature (short range fl are) and the total 
+amount of energy going through the lens (long range fl are).5
+ A dark fi eld reticle produces 
+images with almost no fl are, whereas a reticle which is almost 100 % clear will result in 
+the maximum possible fl are. The data in Figure 3.17 shows the two distinct regions 
+clearly. Here, a clear fi eld reticle was used with one fl are target placed in the middle of 
+the fi eld. Framing blades were used to change the fi eld size and thus the total clear area 
+of the exposure fi eld. As can be seen, fl are quickly rises to a level of about 1 %, then 
+y = 0.02x + 1.1
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+0 20 40 60 80 100 120
+Clear Die Area (mm2)
+Flare (%)
+Aerial Image 
+with No Flare 
+x
+I(x)
+x
+Stray Light 
+Aerial Image 
+with Flare 
+I(x)
+Figure 3.16 Plots of the aerial image intensity I(x) for a large island mask pattern with and 
+without fl are
+Figure 3.17 Using framing blades to change the fi eld size (and thus total clear area of the 
+reticle), fl are was measured at the center of the fi eld (from Mack and Kaufman4
+)
+
+
+## Page 20
+
+94 Fundamental Principles of Optical Lithography
+grows approximately linearly with clear area of the fi eld. The y-intercept of the linear 
+portion of the curve can be thought of as the short range contribution to the total fl are.
+Flare is also a function of fi eld position, with points in the center of the fi eld often 
+experiencing fl are levels 50 % higher than points near the edge of the fi eld. This phenomenon may be thought of as a side effect of the long-range versus short-range scattering 
+discussed above. At the edge of the fi eld, the local clear area is half of that at the center 
+of the fi eld. Finally, fl are is also increased when a refl ective wafer is exposed. Light 
+refl ected back up into the optical system can scatter and fi nd its way back to the wafer 
+as stray light.
+3.3.2 Modeling Flare
+Consider a simple mechanism for the generation of DC (long range) fl are. Light passing 
+through the lens is scattered by one or more of the mechanisms shown in Figure 3.15. In 
+its simplest manifestation, fl are would cause all light to scatter in equal proportion regardless of its spatial frequency and fi eld position (angle and position with which it enters the 
+lens). In this case, scattering will result in a uniform reduction in the energy that coherently interacts to from the image. If SF represents the scatter fraction, the fraction of the 
+light energy (or intensity) that scatters and thus does not contribute to the coherent creation of the image, the resulting image would be (1−SF)I0(x,y) where I0(x,y) is the image 
+that would result if there were no scattering. But where does this scattered light go? 
+Another simple approximation for uniform DC fl are would be that the scattered light is 
+uniformly spread over the exposure fi eld. Thus, a DC or background dose would be added 
+to the aerial image. But while scattering reduces the intensity of the image locally, the 
+background dose is added globally. Thus, the additional background dose would be equal 
+to the scatter fraction multiplied by the total energy passing through the lens:
+I x y SF EF SF I x y ( ) ( )( ) ,, = ⋅ +−1 0 (3.17)
+where EF is the energy fraction of the reticle, the ratio of the total energy reaching the 
+wafer for this reticle compared to the energy that would reach the wafer for a perfectly 
+clear reticle. As a reasonable approximation, the total energy passing through the lens is 
+proportional to the clear area of the reticle. (Because of diffraction, only a portion of the 
+energy passing through the reticle actually passes through the lens. For example, for a 
+mask pattern of equal lines and spaces where only the zero and ±1 fi rst orders pass through 
+the lens, the energy going through the lens is about 90 % of the energy that passes though 
+the mask.) Thus, a simple but still quite accurate DC fl are model would be
+I x y SF CF SF I x y ( ) ( )( ) ,, = ⋅ +−1 0 (3.18)
+where CF is the clear area fraction for the fi eld.
+For a 100 % clear area full-fi eld mask, the standard measurement of fl are for a 
+clear fi eld reticle would yield the scatter fraction used in Equation (3.18). Since the clear 
+area fraction is generally known (at least approximately) for any mask, the DC fl are 
+can be calculated for any mask once the scatter fraction for the lens has been measured. 
+For a dark fi eld mask, as the clear area fraction goes to zero, the effect of fl are is just a 
+loss of dose for the image. It is doubtful that this dose loss is observable in normal 
+
+
+## Page 21
+
+ Aerial Image Formation – The Details 95
+lithographic practice since dark fi eld exposure layers (such as contacts and vias) generally 
+operate at different numerical aperture/partial coherence combinations than clear fi eld 
+reticles, and dose calibration is not consistent across different stepper lens and illumination settings.
+A slight correction to Equation (3.18) would occur if some fraction of the scattered 
+light was assumed to be lost (absorbed into the lens housing, for example). However, for 
+the low levels of fl are expected for normal lithographic imaging tools (much less than 
+10 %), the effect of some of the scatter fraction being lost and not reaching the wafer 
+would be a simple dose recalibration and would not be observable.
+Equation (3.18) does not take into account the impact of short-range fl are effects, as 
+observed in Figure 3.17. The scattering PSF approach6
+ can account for these short-range 
+fl are effects. The local scattered light is described as the convolution of the local light 
+intensity (the aerial image) with a scattering point spread function, PSFscat.
+I x y PSF x y I x y scat scat () () () , ,, =∗ 0 (3.19)
+Note that if the scattering PSF is a constant, then the convolution becomes a calculation 
+of the total energy of the aerial image and the scattered intensity is equivalent to the scatter 
+fraction times the energy fraction. Generally this global scattering is removed from the 
+PSFscat and treated separately. A typical scattering PSF is a Gaussian, with standard deviations in the range of 10–20 mm, though other functional forms are used as well.
+3.4 Defocus
+The inverse Fourier transform expression for calculating the aerial image (see Chapter 2) 
+applies only to the image at the focal plane. What happens when the imaging system is 
+out of focus, i.e. what is the image intensity distribution some small distance away from 
+the plane of best focus?
+3.4.1 Defocus as an Aberration
+The impact of focus errors on the resulting aerial image can be described as an aberration 
+of a sort. Consider a perfect spherical wave converging (i.e. focusing) down to a point. 
+An ideal projection system will create such a wave coming out of the lens aperture (called 
+the exit pupil), as shown in Figure 3.18a. If the wafer to be printed were placed in the 
+same plane as the focal point of this wave, we would say that the wafer was in focus. 
+What happens if the wafer were removed from this plane by some distance d, called the 
+defocus distance? Figure 3.18b shows such a situation. The spherical wave with the solid 
+line represents the actual wave focused to a point a distance d away from the wafer (this 
+defocus distance is arbitrarily defi ned to be positive when the wafer is moved away from 
+the lens). If, however, the wave had a different shape, as given by the dotted curve, then 
+the wafer would be in focus. Note that the only difference between these two different 
+waves is the radius of curvature of the wavefront. Since the dotted curve is the wavefront 
+we want for the given wafer position, we can say that the actual wavefront is in error 
+because it does not focus where the wafer is located. (This is just a variation of ‘the 
+
+
+## Page 22
+
+96 Fundamental Principles of Optical Lithography
+customer is always right’ attitude – the wafer is always right; it is the optical wavefront 
+that is out of focus.)
+By viewing the actual wavefront as having an error in curvature relative to the 
+desired wavefront (i.e. the one that focuses on the wafer), we can quantify the effect of 
+defocus. Looking at Figure 3.18b, it is apparent that the distance from the desired to the 
+‘defocused’ wavefront goes from zero at the center of the exit pupil and increases as we 
+approach the edge of the pupil. This distance between wavefronts is called the optical 
+path difference (OPD). The OPD is a function of the defocus distance and the position 
+within the pupil and can be obtained from the geometry shown in Figure 3.18b. Describing the position within the exit pupil by the light propagation angle q, the OPD (assuming 
+li >> d) is given by
+OPD n =− δθ ( cos ) 1 (3.20)
+where n is the refractive index of the medium between the lens and the wafer (generally 
+air, though possibly an immersion fl uid, as discussed in section 3.7).
+As we have seen before, the spatial frequency and the NA defi ne positions within the 
+pupil as the sine of an angle. Thus, the above expression for OPD will be more useful if 
+expressed as a function of sin q:
+OPD n n = − = −− δ θδ θ ( cos ) sin 1 11 () 2 (3.21)
+Expanding the square root as a Taylor series,
+OPD n n = +++ 
+
+ 
+
+ ≈ 1
+2 48
+1
+2
+2
+46
+2 δθ θθ sin δθ sin sin . . . sin (3.22)
+where the fi nal approximation is accurate only for relatively small angles. Figure 3.19 
+shows the accuracy of this approximation as a function of the angle q.
+So how does this OPD affect the formation of an image? The OPD acts just like an 
+aberration, modifying the pupil function of the lens. For light, this path length traveled 
+(a) (b)
+Exit Pupil Wafer Wafer
+δ
+OPD
+li
+q
+Figure 3.18 Focusing of light can be thought of as a converging spherical wave: (a) in focus, 
+and (b) out of focus by a distance d. The optical path difference (OPD) can be related to 
+the defocus distance d, the angle q and the radius of curvature of the converging wave (also 
+called the image distance) li
+
+
+## Page 23
+
+ Aerial Image Formation – The Details 97
+(the OPD) is equivalent to a change in phase. Thus, the OPD can be expressed as a phase 
+error, ∆Φ, due to defocus:
+P ff P ff P ff xy xy i OPD xy i defocus ideal / ideal () () () , ,e ,e == 2πλ ∆Φ
+∆Φ = =− ≈ 2 21 2 π λ π δ θ λ π δ θλ OPD n n / // ( cos ) sin
+ (3.23)
+where again, the fi nal approximation is only valid for small angles. We are now ready to 
+see how defocus affects the diffraction pattern and the resulting image. Our interpretation 
+of defocus is that it causes a phase error as a function of radial position within the aperture. 
+Light in the center of the aperture has no error; light at the edge of the aperture has the 
+greatest phase error. This is very important when we remember what a diffraction pattern 
+looks like as it enters the lens aperture. Recall that diffraction by periodic patterns results 
+in discrete diffraction orders – the zero order is the undiffracted light passing through the 
+center of the lens; higher orders contain information necessary to reconstruct the image. 
+Thus, the effect of defocus is to add a phase error to the higher-order diffracted light relative to the zero order. When the lens recombines these orders to form an image, this phase 
+error will result in a degraded image (Figure 3.20).
+Considering defocus as an aberration, the pupil error due to defocus [Equation (3.21)] 
+can be expressed in the terms of a Zernike polynomial. In the paraxial approximation 
+(small angles), there is a simple correspondence to the third term in the polynomial 
+expression (3.2).
+Z NA 3
+2
+4 ≈ δλ (3.24)
+If the exact defocus expression is used, higher-order Zernike defocus terms are required 
+(Z8, Z15, Z24, etc.).
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0 0.2 0.4 0.6 0.8 1.0
+sin(angle)
+OPD/
+1-cos
+1% Error
+5% Error
+½sin2
+q
+q
+10% Error
+d
+Figure 3.19 Comparison of the exact and approximate expressions for the defocus optical 
+path difference (OPD) shows an increasing error as the angle increases. An angle of 37°
+(corresponding to the edge of an NA = 0.6 lens) shows an error of 10% for the approximate 
+expression. At an NA of 0.93, the error in the approximate expression is 32%
+
+
+## Page 24
+
+98 Fundamental Principles of Optical Lithography
+3.4.2 Defocus Example: Dense Lines and Spaces and Three-Beam Imaging
+As an example of using Equation (3.23) when calculating an aerial image, consider a 
+pattern of small lines and spaces so that only the 0 and ±1 diffraction orders are used to 
+form the image (that is, three-beam imaging). For coherent illumination, the zero order 
+will pass through the center of the lens and undergo no phase error due to defocus. The 
+fi rst diffracted orders will pass through the pupil at spatial frequencies of ±1/p and 
+experience a phase error of
+∆Φ = − − 2 11 2 πδ λ λ n np ( ( )) / (3.25)
+Calculating the electric fi eld image including the pupil function defocus,
+Ex a f j
+p
+f
+Ex a a
+j
+j
+x i i fx x
+i
+x ()
+()
+=− 
+
+ 
+
+
+=+
+−∞ =−
+∞
+∫ ∑1
+1
+2
+01 2
+δ π ee d
+e
+∆Φ
+∆Φ cos( ) 2π xp/
+ (3.26)
+The intensity image becomes
+I x a aa xp a xp ( ) cos( )cos( ) [ cos( )] =+ + + 0
+2 01 12 4 2 21 4 ∆Φ ππ // (3.27)
+The impact of defocus is to reduce the magnitude of the main cosine term in the image. 
+In other words, as the fi rst orders go out of phase with respect to the zero order, the 
+interference between the zero and fi rst orders decreases. When ∆Φ = 90°, there is no 
+interference and the cos(2px/p) term disappears.
+Partial coherence can signifi cantly change the focus response of an aerial image. The 
+effect of partial coherence is to spread the diffraction order points into larger spots, the 
+shape of each order’s spot being determined by the shape of the source. Each point on 
+the source is independent, i.e. incoherent, with no fi xed phase relationship to any other 
+source point. Each source point produces a coherent aerial image, the total image 
+–0.80 –0.48 –0.16 0.16 0.48 0.80
+0.0
+0.3
+0.6
+0.9
+1.2
+Aerial Image Intensity
+Horizontal Position (×NA/)
+In Focus
+Out of Focus
+l
+Figure 3.20 Aerial image intensity of a 0.8l/NA line and space pattern as focus is 
+changed
+
+
+## Page 25
+
+ Aerial Image Formation – The Details 99
+being the (incoherent) sum of all the intensity images from each source point. Since only 
+the exact center source point produces an image affected by focus in the way described 
+by Equation (3.27), a more thorough treatment is required for partially coherent 
+imaging.
+Consider the case, as we did above, where only the fi rst diffraction orders make it 
+through the lens and that these orders are completely inside the lens (not clipped by the 
+aperture). This occurs when
+λ
+σ
+λ
+NA σ
+p () () 1 NA
+3
+− 1
+<<
++
+ (3.28)
+A quick look at this constraint shows that it can possibly be true only when s < 0.5. Thus, 
+while our example here will not be applicable to many situations, it will still be informative. Second, we shall use the paraxial approximation for the effects of focus, so that the 
+OPD due to a defocus error d will be a quadratic function of the sine of the incident angle 
+or the spatial frequency.
+Now the aerial image in the presence of defocus can be calculated analytically by 
+integrating over the source. Considering only equal lines and spaces for the sake of 
+simplicity,
+I x a aa Ja
+a
+xp a
+Ja
+a
+( ) cos( ) () cos( ) () =+ + + cos( 0
+2 01
+1
+1
+2 1 4 2 2 21 2 ∆Φ ππ / 4 xp/) 
+
+ 
+
+ (3.29)
+where a = 2pdsNA/p and J1 is the Bessel function of the fi rst kind, order one. This defocus 
+function 2J1(a)/a is plotted in Figure 3.21 and has the familiar Airy disk form. Comparing 
+Equations (3.27) and (3.29), the effect of partial coherence is to cause a faster decline in 
+the main cosine interference term [the Airy disk falloff is on top of the cos(∆Φ) falloff 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+0.0 0.1 0.2 0.3 0.4 0.5 0.6
+δσNA/p
+2J1(a)/a
+Figure 3.21 The Airy disk function as it falls off with defocus
+
+
+## Page 26
+
+100 Fundamental Principles of Optical Lithography
+that occurs for coherent illumination] and to add a degradation to the higher-order interference of the + fi rst and − fi rst orders.
+It can be useful to simplify the above aerial image Equation (3.29) for the case of small 
+amounts of defocus. Both the cosine term and the Airy disk terms can be expanded as 
+series approximations, keeping only the low-order terms:
+cos( )
+()
+∆Φ ∆Φ ≈−
+≈−
+1
+2
+2 1
+8
+2
+1 2 Ja
+a
+a
+ (3.30)
+Using these approximations, and keeping only terms out to second order in defocus,
+I x I x aa xp a ( ) ( ) cos( ) cos( ) ,, / / δπ π ≈− + a xpa 
+
+ 
+ 02 2  − 4 01 4 2
+2
+1
+22 ∆Φ
+=− 
+
+ 
+
+ + 
+
+
+
+
+
+
+
+
+ − 
+
+ Ix
+p
+aa xp
+NAp ( ) cos( ) ,/ 0 2 21 2
+2
+01
+2 πδλ
+π
+σ
+λ
+44 1
+2
+2
+a xp
+NAp cos( ) πσ
+λ / 
+
+
+
+
+
+
+ (3.31)
+Thus, the fi nal result is an example where the effects of defocus can be put into a separable 
+form as
+Ix Ix fx ( ) ( ) () ,, δδ ≈− 0 2 (3.32)
+Most images can be put into such a form for small amounts of defocus.
+3.4.3 Defocus Example: Dense Lines and Spaces and Two-Beam Imaging
+Consider the case of coherent off-axis illumination of a dense line/space pattern. In particular, let’s assume that the illumination is a plane wave tilted such that the diffraction 
+pattern is shifted by f ′x and only the zero and −1st diffraction orders pass through the 
+lens. The portion of the diffraction pattern passing through the lens will be
+T f Pf a f f a f
+p
+f m x x xx x x ( )( ) =− ()′ + +− ′ 
+
+ 
+ 01  1 δδ (3.33)
+With defocus included in the pupil function, the electric fi eld image becomes
+Ex a a i i f x i i xp i f x
+i i fx
+xx
+x
+() =+
+=
+′ − ′
+′
+0 2 1 22
+2
+01
+0
+ee ee e
+ee
+∆Φ ∆Φ /
+∆Φ
+π ππ
+π aa i i xp 01 10 2 [] + −− ee () ∆Φ ∆Φ π /
+ (3.34)
+where the phase errors for the zero and fi rst orders are, respectively,
+∆Φ ∆Φ 0
+2
+1
+2
+2 11 2 11 1 = −− ( ()′ ) = −− − ′ 
+
+ 
+
+ 
+
+ 
+
+
+
+
+ πδ λ λ πδ λ nf n
+p
+f xx , 
+
+ λ (3.35)
+
+
+## Page 27
+
+ Aerial Image Formation – The Details 101
+The intensity image is
+I x a a a a aa xp i i xp ( ) cos( () = + =++ − + −− 01 2 2
+0
+2 12 01 1 10 ee / 22 ∆Φ ∆Φ / ∆Φ π π ∆Φ0 ) (3.36)
+Note that the fi nal image depends only on the difference in phase between the zero and 
+fi rst orders.
+The impact of defocus on this tilted-illumination image is clear from Equation (3.36): 
+focus errors cause a shift in the position of the sinusoidal image. Such a focus-dependent 
+pattern placement error is called nontelecentricity. Telecentricity, on the other hand, 
+means that the resulting image will not shift in position as the wafer goes out of focus. 
+Wafer-side telecentricity is a requirement for lithographic imaging. Telecentricity can be 
+recovered by adding a second illumination angle, causing the same shift in the diffraction 
+pattern but in the opposite direction (that is, a shift of − f ′x ). The resulting image will be 
+the same as that given by Equation (3.36), except with the opposite sign of the phase 
+error. The average of the two aerial images coming from these two symmetrically tilted 
+plane waves will be
+Ix Ixf Ix f a a aa x xx () ( )( ) = cos( )cos( ′ +− ′ =++ − ,, /
+2 0 22 2 1
+2 01 1 0 ∆Φ ∆Φ π p) (3.37)
+Consider now a very special case, where the tilt of the illumination is chosen to be 
+fp x′ =±12/. For this case, the zero order and the fi rst order will be evenly spaced about 
+the center of the lens and the phase error due to defocus will be the same for both orders. 
+Thus, the resulting intensity image is
+I x a a aa xp ( ) cos( ) =++ 0
+2 12 22 01 π / (3.38)
+Remarkably, this is the same image that is obtained when at best focus. That is, defocus 
+has no impact on the fi nal aerial image for this special case of coherent two-beam imaging 
+where the zero and fi rst orders are evenly spaced about the center of the lens. The 
+possibility of essentially infi nite depth of focus when the tilt is adjusted properly for a 
+specifi c pitch is the reason why off-axis illumination is so popular for high-resolution 
+imaging.
+In reality, the infi nite depth of focus promised by Equation (3.38) is never realized 
+because real illumination sources are not coherent – they are partially coherent. Thus, 
+instead of two point sources separated by ± f ′x , a real source would be two disks centered 
+at these spatial frequencies. The resulting illumination is called dipole illumination. The 
+image from such a dipole source, assuming that all of the zero order and one fi rst order 
+go through the lens, would be the integral of Equation (3.37) over the range of spatial 
+frequency shifts corresponding to the full shape of the source. Using the paraxial approximation for the effects of focus, so that the OPD due to a defocus error d will be a quadratic 
+function of the sine of the incident angle or the spatial frequency, the phase difference 
+from zero to fi rst orders for any given source point is
+∆Φ ∆Φ 10
+2 11 2 −≈ − ′ 2 
+
+ 
+
+ − ′ 
+
+ 
+
+ =− ′ 
+
+ 
+
+ π δλ π δλ n p
+ff n
+pp
+f xx x (3.39)
+
+
+## Page 28
+
+102 Fundamental Principles of Optical Lithography
+Since each dipole disk is centered at fp x′ =±12/, let a point on this source be expressed 
+as f pf ′ =− ′ xx 12/: ∆
+∆Φ ∆Φ ∆ ∆ 10
+22 −= ′ = π δλ π δ
+σ n
+p
+f n NA
+p xx (3.40)
+where the fi nal expression comes from converting spatial frequencies into sigma 
+coordinates.
+Using Equation (3.40) in Equation (3.37) and integrating over the source, where each 
+disk has a radius of s, the resulting two-beam image through focus becomes
+I x a a aa Ja
+a
+() xp
+() =++ cos( ) 0
+2 12 01
+1 2 2 2π / (3.41)
+where a = 2pdsNA/p and J1 is the Bessel function of the fi rst kind, order one. Referring 
+again to Figure 3.21, one can see that when the size of the dipole disk is bigger than zero, 
+defocus will cause a degradation in the quality of the aerial image. Note from the defi nition of the term a that the sensitivity to defocus is in direct proportion to s, the radius of 
+the dipole disk.
+3.4.4 Image Isofocal Point
+Figure 3.20 shows an interesting phenomenon where at a particular horizontal position, 
+the aerial image curves cross. In other words, at some x-position for this 1D image, the 
+intensity is not a function of focus (although in general this is only approximately true). 
+The point at which intensity does not depend of focus is called the image isofocal point. 
+Mathematically, it is the value of x at which
+∂
+∂ = Iδ
+0 (3.42)
+Consider the coherent three-beam image case of Equation (3.27). The isofocal point is 
+given by
+∂
+∂ =− − − () () = I
+aa xp n p δ4 2 211 0 01 π π λλ 2 cos( )sin( ) ( ) // ∆Φ (3.43)
+Solving for x, the isofocal point is ±jp/4. where j is any odd number. Examining the partially coherent dipole two-beam image of Equation (3.41), the same isofocal point is 
+obtained. In fact, this same isofocal point always results whenever the image is made up 
+of 2-beam or a combination of 1-beam and 2-beam imaging.
+For the partially coherent three-beam image case, the result is far more complicated. 
+However, a reasonably simple answer comes from looking for the isofocal point for small 
+amounts of defocus, so that Equation (3.31) can be used. Setting the term in this equation 
+that multiplies the defocus to zero,
+2 21 44 01
+2
+1
+2 aa xp NAp a xp NAp cos( ) cos( ) π
+σ
+λ π
+σ
+λ // + 
+
+
+
+
+
+
+
+
+ =− 
+
+
+
+2
+ (3.44)
+cos( )
+cos( )
+4
+22
+1 0
+1
+2 π
+π
+λ
+σ
+xp
+xp
+a
+a NAp
+/
+/
+=− + 
+
+ 
+
+ 
+
+
+
+
+ (3.45)
+
+
+## Page 29
+
+ Aerial Image Formation – The Details 103
+Consider the case of equal lines and spaces, so that the isofocal value for x can be defi ned 
+as p/4 + ∆x. Assuming that ∆x will be small,
+cos( )
+cos( )
+cos( )
+sin( )
+4
+2
+4
+22
+π
+π
+π
+ππ
+xp
+xp
+xp
+xp
+p
+x
+/
+/
+/
+/ =≈ ∆
+∆∆ (3.46)
+Thus, the isofocal point will be approximately at
+∆x p
+NAp
+≈− + 
+
+ 
+
+ 
+
+
+
+
+
+−
+2 1 2
+2 1
+π
+λ
+σ
+ (3.47)
+Recall that this approximate position of the image isofocal point applies to threebeam imaging of equal lines and spaces under conventional illumination such that the 
+pupil does not clip any of the fi rst orders. The minus sign shows that the image isofocal 
+point will occur in the space region of the image (since x = 0 is the center of the 
+space).
+3.4.5 Focus Averaging
+Frequently, the fi nal aerial image is an average of the aerial image through some range 
+of focus, a phenomenon called focus averaging (also called focus drilling, and sometimes 
+known by the confusing term ‘focus blur’). Chromatic aberrations, discussed in section 
+3.1.6 produce just such a result, as do stage scanning errors, to be discussed in section 
+3.5 below. Occasionally, such focus averaging is intentionally induced in order to extend 
+the tolerable range of focus.7
+The impact of focus averaging can be seen in an approximate form using the separable 
+defocus image expression of Equation (3.32), which is appropriate for small levels of 
+defocus. If P(d) is the probability distribution of a defocus error d, the focus-averaged 
+image will be
+Ix Ix fx P ( ) ( ) () () ,, d δ δ δδ ≈−
+−∞
+∞
+∫ 0 2 (3.48)
+Consider a uniform probability distribution over a range of focus from dmin to dmax. The 
+resulting image will be
+Ix Ix fx () ( ) () ()
+max min
+max min
+≈− −
+−
+
+
+ 
+
+ ,0 3
+33 δδ
+δδ (3.49)
+If the focus averaging range is symmetric about best focus (so that dmin = −dmax),
+Ix Ix fx () ( ) () max ≈− 
+
+ 
+
+ ,0 3
+2 δ (3.50)
+If now some unintentional focus error d is added,
+Ix Ix fx ( ) ( ) () max ,, δ δ≈− +δ 
+
+ 
+
+ 0
+3
+2
+2 (3.51)
+
+
+## Page 30
+
+104 Fundamental Principles of Optical Lithography
+Another common probability distribution for focus averaging is a Gaussian with standard deviation sF. The resulting image, including unintentional focus error d, is
+Ix Ix fx ( ) ( ) ( )[ ] ,, δ σδ ≈− + 0 F
+22 (3.52)
+For an arbitrary focus averaging function, an effective defocus error (assuming small 
+focus errors) can be defi ned by
+δ σδ eff F
+2 22 ≈+ (3.53)
+where σF
+2
+ is the variance of the focus averaging probability distribution.
+3.4.6 Reticle Defocus
+While the main focus problem in optical lithography may be controlling the focal position 
+of the wafer, it is certainly possible for the reticle to be out of focus as well. Like the 
+wafer, reticle focus errors can be described as an OPD with essentially the same form as 
+for wafer focus errors:
+OPD n n =−≈ mm m mm m δ θ δθ ( cos ) sin 1 1
+2
+2 (3.54)
+where the subscript ‘m’ refers to the mask side. Because of the reduction ratio, angles on 
+the mask side are much lower than on the wafer side, and so the paraxial approximation 
+for the OPD on the right-hand side of Equation (3.54) will be quite accurate. As discussed 
+in Chapter 2, angles on the mask side can be related to angles on the wafer side by
+Rn n m mw w sin sin θθ = (3.55)
+Thus, the OPD caused by the mask defocus can be described in terms of the wafer-side 
+angles:
+OPD
+R
+n
+n ≈ n 
+
+
+
+
+
+ 
+
+ 1
+2 2
+δ 2 θ mw
+m
+wm sin (3.56)
+Comparing this expression to the paraxial effect of wafer defocus, the equivalent wafer 
+defocus to cause this same amount of OPD would be
+δ δ w
+mw
+m
+≈ 
+
+
+
+
+
+ 
+
+ R
+n
+n 2 (3.57)
+For imaging in air, where both the wafer-side and mask-side refractive indices are 1, 
+focus errors of the reticle are like focus errors on the wafer, but reduced by the reduction 
+ratio squared. For a typical reduction ratio of 4, this means that the image is 16 times less 
+sensitive to reticle focus errors than to wafer focus errors. (We often say that the longitudinal magnifi cation is equal to the lateral magnifi cation squared.) Of course, this relationship is only approximate since wafer focus errors are not accurately described by the 
+paraxial form of the OPD for reasonably large numerical apertures. However, reticle focus 
+errors can be readily accounted for using the Zernike third-order defocus term:
+Z
+R
+NA 3 2
+2
+4 = 
+
+
+
+δ
+λ
+m (3.58)
+
+
+## Page 31
+
+ Aerial Image Formation – The Details 105
+3.4.7 Rayleigh Depth of Focus
+Depth of Focus (DOF) is defi ned as the range of focus that can be tolerated, before the 
+image quality is degraded beyond usefulness. Lord Rayleigh, more than 100 years ago, 
+gave us a simple approach to estimate depth of focus in an imaging system. Here we’ll 
+express his method and results in modern lithographic terms. We’ll consider the coherent 
+imaging of an array of small lines and spaces so that only the zero and the plus and minus 
+fi rst diffraction orders pass through the lens to form the image.
+As discussed above in section 3.4.1, a common way of thinking about the effect of 
+defocus on an image is to consider the defocusing of a wafer as equivalent to causing an 
+aberration – an error in curvature of the actual wavefront relative to the desired wavefront 
+(i.e. the one that focuses on the wafer). Equations (3.20)–(3.22) show how the OPD varies 
+across the pupil for a given amount of defocus. How much OPD can our line/space pattern 
+tolerate? Consider the extreme case. If the OPD of the fi rst diffraction orders were set to 
+a quarter of the wavelength, the zero and fi rst diffracted orders would be exactly 90° out 
+of phase with each other. At this much OPD, the zero order would not interfere with the 
+fi rst orders at all and no pattern would be formed. The true amount of tolerable OPD must 
+be less than this amount:
+OPD k k max =< 22 4
+1 λ , where (3.59)
+Substituting this maximum permissible OPD into Equation (3.20), we can fi nd the 
+DOF.
+DOF k
+n == − 221
+2 δ λ
+θ max ( cos ) (3.60)
+At the time of Lord Rayleigh, lens numerical apertures were relatively small and the 
+medium of imaging was air, so that n = 1. Thus, the largest angles going through the lens 
+were also quite small and the cosine term could be approximated in terms of sinq:
+DOF k k p ≈= 2 2 2
+2 λ
+sin θλ (3.61)
+This paraxial form is reasonably accurate for numerical apertures below 0.5. At this point, 
+Lord Rayleigh made a crucial application of this formula that is often forgotten. While 
+Equation (3.61) would apply to any small pattern of lines and spaces, Lord Rayleigh 
+essentially looked at the extreme case of the smallest pitch that could be imaged – the 
+resolution limit. The smallest pitch that can be printed would put the fi rst diffracted order 
+at the largest angle that could pass through the lens, defi ned by the numerical aperture, 
+NA. For this one pattern, the general expression [Equation (3.61)] becomes the more 
+familiar and specifi c Rayleigh DOF criterion:
+DOF k
+NA = 2 2
+λ (3.62)
+The Rayleigh depth of focus criterion, as usually expressed in Equation (3.62), is rife 
+with caveats. It was derived for a pattern of equal lines and spaces imaged under coherent 
+
+
+## Page 32
+
+106 Fundamental Principles of Optical Lithography
+illumination, assumed that the feature was at the resolution limit, and made the paraxial 
+approximation, which is not very accurate at numerical apertures in common lithographic 
+use. In general, it does a very poor job of predicting the DOF observed in lithographic 
+tools.
+3.5 Imaging with Scanners Versus Steppers
+In general, increasing the numerical aperture of a lens while keeping the fi eld size constant 
+requires signifi cant improvements in lens design and manufacturing in order to keep 
+aberration levels low (or better yet, to reduce them). A lens with a smaller fi eld size will 
+always be easier to design and manufacture. However, the fi eld size must be at least the 
+size of the largest chip to be manufactured, and larger fi eld sizes provide for higher 
+imaging productivity since throughput is improved if multiple chips can be imaged at 
+once. This tension between smaller fi eld sizes to improve aberration performance and 
+larger fi eld sizes to improve manufacturing productivity has led to a transition from 
+steppers to step-and-scan tools.
+A step-and-repeat camera (stepper) images a single fi eld (for example, 20 × 20 mm in 
+size on the wafer) while the mask and wafer are stationary, then steps the wafer to a new 
+location and repeats the exposure. Eventually the whole wafer is covered with exposed 
+fi elds. A scanner, on the other hand, will scan the mask and wafer simultaneously past an 
+illuminated exposure fi eld (in the shape of a slit), allowing for an exposure area limited 
+only by the length of the slit and the travel of the mask and wafer. Step-and-scan tools 
+are a hybrid between these two approaches. The mask and wafer are scanned past a small 
+slit (for example, 26 × 8 mm) until the full mask is exposed (up to 26 × 33 mm at wafer 
+dimensions). The wafer is then stepped to a new location and the scanning is repeated 
+(Figure 3.22). The smaller image fi eld (the slit) makes the imaging system simpler, though 
+at the expense of more complicated mechanical mask and wafer motion. Thus, scanning 
+can be considered a compromise between throughput, stage complexity and lens complexity for large-fi eld imaging.
+Wafer 
+Pattern of 
+Exposure
+Fields
+Scan
+Direction
+Slit
+Single Exposure Field
+Figure 3.22 A wafer is made up of many exposure fi elds (with a maximum size that is typically 26 × 33mm), each with one or more die. The fi eld is exposed by scanning a slit that is 
+about 26 × 8mm across the exposure fi eld
+
+
+## Page 33
+
+ Aerial Image Formation – The Details 107
+For scanners, exposure dose is controlled by the scan speed. Since step-and-scan tools 
+generally use excimer laser light sources, which emit light in short pulses, the scan speed 
+V needed to achieve a specifi c dose is given by
+VW f
+n = s (3.63)
+where Ws is the slit width, f is the repetition rate of the laser and n is the number of pulses 
+needed to achieve the proper dose. The pulse-to-pulse dose repeatability of a good excimer 
+laser is a few percent. Since the overall dose repeatability is improved by a factor of n
+(assuming each pulse is independent), to achieve a dose control of a few tenths of a 
+percent the number of pulses must be on the order of 100. For a slit width of 8 mm, a 
+laser repetition rate of 2 kHz, and 50 pulses required, the wafer stage velocity would need 
+to be 0.32 m/s (the reticle stage must move at exactly 4× this speed for a 4× reduction 
+system). Improved laser repetition rates and reduced pulse-to-pulse variability allow for 
+faster scan speeds and thus better throughput.
+Besides all of the practical differences between the operation of steppers and stepand-scan tools, there are differences in imaging performance as well. Lenses are fabricated 
+to be circularly symmetric, while chips are necessarily rectangular in shape. Thus, 
+different-sized rectangular fi elds are possible for a given diameter lens. If the fi eld size 
+has a diameter of 28 mm, the maximum square fi eld (for a stepper, for example), is just 
+under 20 mm square. The same lens, however, can accommodate a 26 × 8 mm slit in a 
+step-and-scan confi guration, allowing for larger die sizes and/or more productive printing 
+of multiple die in the larger fi eld. In addition, the lens can be rotated during testing and 
+assembly to fi nd the 26 × 8 mm slice of the circular fi eld that provides the best imaging 
+quality.
+As was discussed in sections 3.1 and 3.3, the nonideal imaging behavior of a lens 
+(aberrations, fl are) varies as a function of fi eld position. The result is an unwanted variation in the dimensions and placements of the printed patterns as a function of fi eld position. Scanning can signifi cantly change the nature of this spatial variation across the fi eld. 
+When scanning the mask and wafer across the stationary slit, each point on the wafer is 
+exposed by an average of aerial images – one for each fi eld position along the scan direction of the slit. In other words, any variations in aberrations or fl are across the fi eld in 
+the scan direction will be averaged out. Thus, the variations in feature size and overlay 
+are signifi cantly reduced in the scan direction. Of course, in the slit direction there is no 
+such averaging and so the full spatial variation of lithographic results will remain in this 
+direction (see Chapter 8 for a more detailed discussion of spatial CD variations).
+The benefi cial effects of aberration averaging mean that step-and-scan tools generally 
+exhibit improved CD control compared to steppers. However, scanners also introduce 
+new sources of process variation that, if not properly controlled, could erase these CD 
+uniformity benefi ts. Scanning the mask and wafer past the imaging slit requires extremely 
+precise synchronization of the mask and wafer position during the scan. Scan synchronization errors act exactly like wafer vibrations during a stepper exposure. The result is a 
+blurring of the projected image, sometimes described as ‘image fading’. While systematic 
+synchronization errors are possible, random errors are more common and are characterized by a moving standard deviation (MSD) of the stage position (see Figure 3.23). The 
+
+
+## Page 34
+
+108 Fundamental Principles of Optical Lithography
+resulting ‘averaged’ image is the convolution of the static image with a Gaussian of this 
+standard deviation. Additionally, focus variations during the scan produce an averaging 
+of the aerial image through focus, which will degrade image quality at best focus.
+3.6 Vector Nature of Light
+As James Clerk Maxwell has shown us, light is an electromagnetic wave. Electric and 
+magnetic fi elds oscillate at some characteristic frequency while traveling at the speed of 
+light. These fi elds have a magnitude, phase and direction. It is the direction (also called 
+the polarization) of the electric fi eld that defi nes its vector nature, and a key property of 
+an electromagnetic wave is that its electric and magnetic fi eld vectors are at right angles 
+to each other, and at right angles to the direction of propagation. Figure 3.24 shows a 
+standard textbook picture of a traveling ray of electromagnetic energy.
+The direction of the electric fi eld plays a critical role in the phenomenon of interference. 
+Two plane waves, approaching a wafer at different angles, will interfere to form fringe 
+patterns of light and dark making the simplest of lithographic patterns – an array of lines 
+and spaces. This phenomenon of interference is the key to pattern formation. Without it, 
+light hitting the wafer from different directions would simply add up to give a uniform 
+intensity. We can see mathematically the effect of interference by examining how two 
+electric fi elds combine to form a resultant electric fi eld and intensity. Ignoring the refractive index of the medium, the intensity I is the square of the magnitude of the electric 
+fi eld E. If two electric fi elds are combined, what is the intensity of the combination? If 
+the two electric fi elds do not interfere, the total intensity is the sum of the individual 
+intensities.
+IE E =+ 1
+2
+2
+2 (3.64)
+If, however, the two electric fi elds interfere completely, the total intensity will be
+IEE =+12
+2
+ (3.65)
+–8
+–6
+–4
+–2
+0
+2
+4
+6
+0 20 40 60 80 100 120
+Time (arb. units)
+Stage Displacement (nm)
+Figure 3.23 Example stage synchronization error (only one dimension is shown), with an 
+MSD of 2.1nm
+
+
+## Page 35
+
+ Aerial Image Formation – The Details 109
+Two electric fi elds interfere with each other only to the extent that their electric fi elds 
+oscillate in the same direction. If the electric fi elds are at right angles to each other, there 
+will be no interference. Thus, to determine the amount of interference between two electric fi elds, one must fi rst determine the amount of directional overlap between them. 
+Vector mathematics gives us some simple tools to calculate directional overlap and thus 
+the amount of interference. Figure 3.25 shows the standard head-to-tail method of geometrically adding two vectors. In the top case, the two vectors are at right angles to each 
+other, so the head-to-tail construction forms a simple right triangle. Thus, the length of 
+the resultant vector is given by the familiar Pythagorean theorem: c2 = a2 + b2
+. If the 
+H
+z
+E
+x
+y
+Figure 3.24 A monochromatic plane wave traveling in the z-direction. The electric fi eld 
+vector is shown as E and the magnetic fi eld vector as H
+a
+b
+c a
+b
+a
+b
+c
+b a
+a
+b
+c
+a
+b
+Figure 3.25 Examples of the sum of two vectors a and b to give a result vector c, using the 
+geometric ‘head-to-tail’ method
+
+
+## Page 36
+
+110 Fundamental Principles of Optical Lithography
+vector lengths represent the magnitudes of the electric fi eld, the square of the length is 
+the intensity and the resultant intensity is identical to that given by Equation (3.64). In 
+other words, when the two electric fi elds are at 90° with respect to each other, they do 
+not interfere and the total intensity is just the sum of the individual intensities.
+At the other extreme (the middle example in Figure 3.25), two vectors in the same 
+direction add directly and the resultant length is c = a + b. Thus, the intensity of the sum 
+is given by Equation (3.65) and when the two electric fi elds are in the same direction, 
+they interfere completely. Finally, the bottom example in Figure 3.25 shows an intermediate case. Working through the trigonometry of the vector sum shows that the portion of 
+the two vectors that overlap will interfere, and the portion of the vectors that are at right 
+angles will add in quadrature (i.e. they won’t interfere, just add as intensities).
+When thinking of light as a scalar rather than a vector quantity, we ignore the subtleties 
+discussed above. Essentially, a scalar description of light always assumes that the electric 
+fi elds are 100 % overlapped and all electric fi elds add together as in Equation (3.65). Since 
+interference is what gives us the patterns we want, a scalar view of light is too optimistic. 
+The vector description of light says that, like the bottom case in Figure 3.25, there is 
+usually some fraction of the electric fi elds of our two vectors that don’t overlap and thus 
+don’t contribute to interference. The noninterfering light is still there, but it adds as a 
+uniform intensity that degrades the quality of the image.
+Consider the interference of two plane waves approaching the wafer at moderate angles, 
+as in Figure 3.26. How will the two electric fi elds interfere? The electric fi eld can point 
+in any direction perpendicular to the direction of propagation. This arbitrary direction can 
+in turn be expressed as the sum of any two orthogonal (basis) directions. The most convenient basis directions are called transverse electric or TE (the electric fi eld pointing out 
+of the page of the drawing) and transverse magnetic or TM (the electric fi eld pointing in 
+the page of the drawing). As Figure 3.26 shows, the TE case means that the electric fi elds 
+of the two planes wave are always 100 % overlapped regardless of the angle between the 
+plane waves. For the TM case, however, the extent of overlap between the two vectors 
+grows smaller as the angle between the plane waves grows larger. TM is the ‘bad’ polarization in lithography, especially at the very high numerical apertures that allow large 
+angles between light rays.
+1E 2 E 1E
+2 E 12
+TE or s-polarization TM or p-polarization
+Figure 3.26 Two plane waves with different polarizations will interfere very differently. For 
+transverse electric (TE) polarization (electric fi eld vectors pointing out of the page), the 
+electric fi elds of the two vectors overlap completely regardless of the angle between the 
+interfering beams
+
+
+## Page 37
+
+ Aerial Image Formation – The Details 111
+We can calculate how much the two electric fi elds for the TM case will interfere with 
+each other. Suppose that the two rays in Figure 3.26 are traveling at an angle q with 
+respect to the vertical direction (i.e. the direction normal to the wafer). The electric fi elds 
+E1 and E2 will have an angle between them of 2q. The amount of the electric fi eld vector 
+E2 that points in the same direction as E1 is just the geometric projection, E2cos(2q). Thus, 
+the intensity will be given by the coherent (electric fi eld) sum of the parts that overlap 
+plus the incoherent (intensity) sum of the parts that don’t overlap.
+IEE E =+ + 12
+2
+2
+2 cos( ) sin( ) 22 θθ (3.66)
+Note that for q = 0, this equation reverts to the perfectly coherent (interfering) sum of 
+Equation (3.65). For q = 45°, the two electric fi elds are perpendicular to each other and 
+Equation (3.66) becomes the perfectly incoherent (noninterfering) sum of Equation (3.64). 
+For typical photoresists (with refractive indices between 1.6 and 1.7), this 45° angle inside 
+the resist will be obtained for numerical apertures in the 1.15–1.2 range.
+3.6.1 Describing Polarization
+As we saw above, the behavior of a wave of light depends not only on the amplitude and 
+phase of the wave (its scalar properties), but on the direction that the electric fi eld is 
+pointing (its vector property). In particular, the amount of interference between two 
+electromagnetic waves depends on the relative directions of the two electric fi elds. If the 
+electric fi elds point in the same direction, they will interfere completely. If they are 
+orthogonal to one another, there will be no interference. The direction of the electric fi eld 
+of an electromagnetic wave, and how that direction varies in time or space, is called its 
+polarization. Recall that Maxwell’s equations require that the electric and magnetic fi elds 
+are always perpendicular to each other and both always point perpendicular to the direction of propagation. As a result, it is suffi cient to consider only the direction of the electric 
+fi eld.
+Since an electromagnetic wave travels through time and space, there are three important 
+ways of looking at (or thinking about) the direction of the electric fi eld. First, imagine 
+‘riding the wave’: a given point on the wave moves through time and space at the speed 
+of light. On this point on the wave, the electric fi eld stays pointing in a constant direction, 
+regardless of the type of polarization that the wave has. While an important conceptual 
+idea, this way of thinking about the wave doesn’t give us any information about its polarization. The second approach is to look at an instant of time, and see how the electric 
+fi eld direction is changing through space (this works best for simple harmonic waves, 
+such as a plane wave). Finally, the third viewpoint is a fi xed location in space, monitoring 
+the change in the direction of the electric fi eld through time. These last two perspectives 
+allow for equivalent descriptions of polarization: the variation of the electric fi eld direction in space at an instant in time, or the variation of the electric fi eld direction in time 
+at a fi xed point in space.
+With the above perspectives in mind, how can light be polarized? The simplest type 
+of polarization is called linear polarization, shown in Figure 3.27. At an instant in 
+time, the electric fi eld E is always pointing in one direction (in this case, the y-direction, 
+though in both positive and negative directions) for all points in space (Figure 3.27a). At 
+one point in space, the electric fi eld changes magnitude sinusoidally through time, but 
+
+
+## Page 38
+
+112 Fundamental Principles of Optical Lithography
+(a) (b)
+y
+x
+E
+E
+y
+x
+z
+k
+(a) (b)
+z
+x
+y
+k x
+y
+E
+E
+always points in the same direction (Figure 3.27b). A second type of polarization is 
+called circular polarization, as shown in Figure 3.28. Here, the electric fi eld direction 
+takes on a spiral form through space at a given instant in time (Figure 3.28a). At a given 
+point in space, the electric fi eld direction rotates through a circle, keeping a constant 
+magnitude (Figure 3.28b). Both right-circular and left-circular polarization are possible, 
+depending on the direction of rotation of the polarization. Note that the name given to 
+the polarization comes from the shape traced out by the electric fi eld through time at a 
+given point in space. It is this viewpoint that is usually the easiest one to picture and 
+understand.
+Figure 3.29 compares some common types of polarization. Besides linear and circular 
+polarization, elliptical polarization is somewhere in between the two. Random polarization is by far the most common type of polarization available for light sources, and until 
+recently the only polarization available to lithographers. (Note that the common name for 
+this type of polarization, unpolarized light, is actually a misnomer since light always has 
+a polarization, even if it is random.) Here, the electric fi eld direction changes randomly 
+Figure 3.27 Linear polarization of a plane wave showing (a) the electric fi eld direction 
+through space at an instant in time, and (b) the electric fi eld direction through time at a point 
+in space. The k vector points in the direction of propagation of the wave
+Figure 3.28 Right circular polarization of a plane wave showing (a) the electric fi eld direction through space at an instant in time, and (b) the electric fi eld direction through time at 
+a point in space
+
+
+## Page 39
+
+ Aerial Image Formation – The Details 113
+(and quickly) through time. When two waves of random polarization interfere with each 
+other, some statistical average of amounts of electric fi eld overlap must be used. Fortunately, a rigorous analysis provides a simple result: the intensity resulting from the interference of two randomly polarized waves can be calculated by breaking each wave into 
+two linearly polarized orthogonal waves (for example, TE and TM polarizations), interfering each polarization separately, and summing the two resulting intensities.
+In reality, none of the polarizations described above are achieved perfectly in practice. 
+Practical light sources almost always produce some combination of polarized light and 
+unpolarized light. To quantify the degree to which a light source supplies properly polarized illumination, a metric called degree of polarization (DOP) is used:
+DOP
+II
+II = −+
+good pol bad pol
+good pol bad pol
+ (3.67)
+where Igood pol is the desired polarization and Ibad pol is the undesired polarization. If one 
+is trying to make linear TE polarized light, for example, the good polarization is TE 
+and the bad polarization is TM. Perfectly polarized light would have a DOP of 1.0. 
+Randomly polarized light, being made up of equal parts TE and TM on average, will 
+have a DOP of zero. Polarized light sources for use in lithography are expected to have 
+DOPs ≥ 0.9.
+Mathematically, the polarization of a plane wave can be characterized by the phase 
+difference between orthogonal components of the electric fi eld. For example, consider a 
+plane wave traveling in the z-direction with electric fi eld components in the x- and ydirections. If the difference in phase between the x- and y-components of the electric fi eld 
+(∆f) is a multiple of p, the plane wave will be linearly polarized. If ∆f is an odd multiple 
+of p/2, the wave will be circularly polarized. For other fi xed phase differences, the wave 
+will be elliptically polarized.
+3.6.2 Polarization Example: TE Versus TM Image of Lines and Spaces
+For TE illumination of line/space patterns, the electric fi elds of each of the diffracted 
+orders overlap completely so that the vector sum of the electric fi elds equals the scalar 
+sum. An example of a coherent illumination aerial image where only the zero and fi rst 
+diffracted orders are used was given in Chapter 2. If the lines are oriented in the ydirection, the only electric fi eld component for this polarization will be in the y-direction 
+as well:
+E x a a xp y( ) cos( ) =+01 22π / (3.68)
+E E
+E
+E
+Linear Circular Elliptical Random 
+Figure 3.29 Examples of several types of polarizations (plotting the electric fi eld direction 
+through time at a point in space)
+
+
+## Page 40
+
+114 Fundamental Principles of Optical Lithography
+giving an intensity image of
+I x E x a a aa xp a xp y ( ) ( ) cos( ) cos( ) = =+ + + 2
+0
+2 12 01 12 24 2 2 4 ππ // (3.69)
+A similar expression for TM illumination can also be derived. Here, the electric fi eld will 
+have both x and z components. If the diffraction angle of the fi rst diffracted orders is given 
+by sinq = l/p,
+E a a xp
+E a xp
+x
+z
+=+
+=
+01
+1
+22
+22
+cos cos( )
+sin sin( )
+θπ
+θπ
+/
+/
+ (3.70)
+giving
+Ix E x E x
+a a aa xp a
+xz () () ()
+cos cos( ) cos(
+=+
+=+ + +
+22
+0
+2 12 01 12 24 2 2 2 θπ θ /)cos( ) 4πxp/
+ (3.71)
+The effect of using the ‘bad’ polarization is to decrease the amount of interference by the 
+cosine of the angle between the interfering orders. Thus, the interference between the zero 
+and fi rst orders is lessened by the factor cosq and the interference between the plus 
+and minus fi rst orders is decreased by cos2q. For randomly polarized light, the fi nal 
+aerial image would be the average of the two images given above for TE and TM 
+polarization.
+The difference between TE and TM polarization, as shown in the above example, can 
+be quite large for small-pitch patterns. However, when considering only the aerial image 
+(that is, the image in air) this difference is greatly exaggerated. When the image propagates from the air to the resist, refraction will decrease the angle of the fi rst orders inside 
+the resist according to Snell’s law. The lower angles in the resist will have greater overlap 
+of the TM electric fi elds and thus a better quality image. For example, if the fi rst order 
+diffraction angle in air is sinq = 0.9, then cosq = 0.44 and the interference with the zero 
+order is less than 50 % effective. However, in resist the fi rst-order angle is reduced by the 
+refractive index (typically about 1.7), so that sinqresist = 0.53 and cosqresist = 0.85. The 
+image in resist will have far higher quality than the aerial image. And of course, it is 
+the image in resist that actually exposes the resist, not the aerial image. This topic will 
+be discussed in greater detail in Chapter 4.
+3.6.3 Polarization Example: The Vector PSF
+An interesting (and somewhat nonintuitive) consequence of the vector nature of light is 
+that linearly polarized illumination will produce an asymmetric PSF.8 A cross section of 
+the PSF in the direction of polarization is wider than in the perpendicular direction (30 % 
+greater for the case of NA = 0.866, see Figure 3.30).
+3.6.4 Polarization Aberrations and the Jones Pupil
+As discussed at the beginning of this chapter, aberrations are characterized by means of 
+the pupil function, defi ned as the ratio of the electric fi eld at the exit pupil to the electric 
+fi eld at the entrance pupil. When thinking of electric fi elds as decomposed into orthogonal 
+polarization components (TE and TM being the most convenient decomposition), an 
+interesting question arises: will the pupil function for TE light passing through the lens 
+
+
+## Page 41
+
+ Aerial Image Formation – The Details 115
+be the same as for TM light? Further, if TE light only enters the lens, will any of the light 
+exiting the lens be TM? To include the variation of pupil transmittance with polarization, 
+a more complete description of the pupil is required.
+If the electric fi eld entering the lens is broken down into TE and TM components, given 
+by EiTE and EiTM, respectively, and the electric fi eld at the exit pupil is given by EoTE and 
+EoTM, these electric fi elds can be expressed as Jones vectors:
+9
+E
+E
+E
+E
+iTE
+iTM
+oTE
+oTM
+and 
+
+ 
+
+ 
+
+ 
+
+ (3.72)
+Describing the transmittance of the lens by the Jones pupil matrix J, the input and output 
+Jones vectors are related by10,11
+E
+E
+JJ
+JJ
+E
+E
+oTE
+oTM
+iTE
+iTM
+
+
+ 
+
+ = 
+
+ 
+
+
+
+
+ 
+
+ 11 12
+21 22
+ (3.73)
+Note that if J12 = J21 = 0 and J11 = J12, then the Jones pupil description of the lens transmittance reverts to the scalar pupil description where J11 = J12 = P, the scalar pupil function. It is thus convenient to defi ne the scalar pupil function as the average of the diagonal 
+elements of the Jones pupil:
+P JJ = 11 22 +
+2 (3.74)
+Using this defi nition of the scalar pupil, a reduced Jones pupil 
+J can be defi ned by
+JJ == 
+
+ 
+
+ PP JJ
+JJ
+ 
+
+11 12
+21 22
+ (3.75)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+–8
+Radius*2πNA/
+PSF Relative Intensity
+–6 –4 –20 2 4 6 8 1.0
+1.1
+1.2
+1.3
+1.4
+1.5
+1.6
+0.0 0.2 0.4 0.6 0.8 1.0
+Numerical Aperture
+x-width/y-width
+l
+(a) (b)
+Figure 3.30 The point spread function (PSF) for linearly x-polarized illumination: (a) cross 
+sections of the PSF for NA = 0.866 (solid line is the PSF along the x-axis, dashed line is the 
+PSF along the y-axis); (b) ratio of the x-width to the y-width of the PSF as a function of 
+numerical aperture
+
+
+## Page 42
+
+116 Fundamental Principles of Optical Lithography
+For a lens that exhibits no polarization dependence, the reduced Jones matrix is simply 
+the identity matrix. For a reasonably well-behaved lens, then, 
+J11 and J22 are about equal 
+to 1, and 
+J12 and J21 are about equal to 0.
+There are two main physical causes for what are sometimes called polarization aberrations. When light hits an interface (such as the surface of a lens element) at an oblique 
+angle, the transmittance of that interface is different for TE and TM polarizations (a topic 
+that will be discussed in some detail in Chapter 4). Antirefl ection coatings reduce but 
+do not eliminate this difference. Thus, any lens that is a collection of refractive optical 
+elements can be thought of as a weakly polarizing optical component, since the overall 
+transmittance of the lens will depend on the incoming polarization and will vary with 
+spatial frequency (the outer edges of the lens showing the biggest differences). This difference in amplitude transmittance as a function of polarization is called diattenuation. 
+(A similar but less commonly observed phenomenon in lenses is dichroism, the variation 
+in the absorption of light by the lens as a function of polarization.)
+The second major cause of polarization effects in a lens is birefringence, a difference 
+in the refractive index of a material as a function of the direction of the electric fi eld 
+vector. Birefringence leads to the general observation of retardance, a difference in the 
+phase of the transmitted light as a function of its polarization. Some materials, most 
+notably certain crystals, exhibit intrinsic birefringence. Most optical materials become 
+at least somewhat birefringent when stressed. Common optical materials used in lithographic lenses exhibit small amounts of both intrinsic and stress-induced birefringence 
+at 193-nm wavelength, and relatively large amounts of birefringence at a wavelength of 
+157 nm. Lens antirefl ection coatings can also contribute to retardance. Birefringence is 
+usually expressed as the OPD experienced by two orthogonal polarizations per unit length 
+traveled through the material, with units of nm/cm.
+A useful mathematic decomposition of the Jones pupil expresses this matrix as linear 
+combination of Pauli spin matrices:
+
+J = 
+
+ 
+
+ + −
+
+
+ 
+
+ + 
+
+ 
+
+ +  −
+
+ 
+
+
+10
+01
+10
+01
+01
+10
+0
+0
+a aa 1 23
+i
+i (3.76)
+The magnitudes of a1, a2 and a3 then indicate the deviation of the reduced Jones pupil 
+from an identity matrix, and can be easily related to the elements of the reduced Jones 
+pupil matrix:
+a
+JJ
+a
+JJ
+a
+JJ
+i 1
+11 22
+2
+12 21
+3
+12 21
+222 = − = + = −
+−
+   ,, (3.77)
+These (complex number) coeffi cients have important physical interpretations. The real 
+parts of a1 and a2 describe the diattenuation of the lens along the axes and at 45° to the 
+axes, respectively. The imaginary parts of a1 and a2 describe the retardance of the lens 
+along the axes and at 45° to the axes, respectively. The coeffi cient a3 describes the 
+circularly directed diattenuation and retardance.
+All of these various forms for describing polarization-dependent pupil transmission 
+suffer from a common problem – the excess complication that comes from expanding a 
+scalar pupil (with its two pupil maps) into a vector pupil (with eight pupil maps). The 
+
+
+## Page 43
+
+ Aerial Image Formation – The Details 117
+reduced Jones pupil form of Equation (3.75) preserves the intuition and experience of the 
+scalar pupil, but does not reduce the overall level of complexity. Recently, Geh formulated 
+an alternate decomposition of the Jones pupil into a scalar pupil plus a partial polarizer 
+(producing diattenuation), a rotator (that simply rotates the polarization state), and a 
+retarder (giving birefringence).12 The resulting decomposition is signifi cantly more 
+intuitive.
+One should note that the Jones pupil cannot describe the phenomenon of depolarization, the decrease in the degree of polarization as light travels through a lens. Depolarization is generally due to scattering mechanisms – the same mechanisms that give rise to 
+fl are. However, in general the amount of scattering will be approximately the same for 
+each polarization. Thus, the mechanism used to account for fl are described in section 3.3 
+can be coupled with the Jones pupil description of the nonscattered light transmittance to 
+give a very reasonable and accurate description of lithographic imaging. The fl are (scattered light) reaching the wafer is then assumed to be randomly polarized, thus accounting 
+for depolarization.
+3.7 Immersion Lithography
+Although the scientifi c principles underlying immersion lithography have been known for 
+well over 100 years (immersion microscopes were in common use by 1880), only recently 
+has this technology attracted widespread attention in the semiconductor industry. Despite 
+this rather late start, the potential of immersion lithography for improved resolution and 
+depth of focus has changed the industry’s roadmap and is destined to extend the life of 
+optical lithography to new, smaller limits.
+From a practical perspective, immersion lithography at 193 nm uses ultrapure degassed 
+water, with refractive index of 1.437, as the immersion liquid. A small puddle of water 
+is kept between the lens and the wafer during wafer exposure (Figure 3.31). New water 
+is constantly pumped under the lens to keep the optical properties of the fl uid consistent, 
+and to prevent the buildup of contaminants. A special wafer chuck keeps the puddle intact 
+as the edge of the wafer is scanned under the puddle.
+Wafer
+Water
+Projection Lens
+Figure 3.31 Immersion lithography uses a small puddle of water between the stationary 
+lens and the moving wafer. Not shown is the water source and intake plumbing that keeps 
+a constantly fresh supply of immersion fl uid below the lens
+
+
+## Page 44
+
+118 Fundamental Principles of Optical Lithography
+3.7.1 The Optical Invariant and Hyper-NA Lithography
+The story of immersion lithography begins with Snell’s Law. Light traveling through 
+material 1 with refractive index n1 strikes a surface with angle q1 relative to the normal 
+to that surface. The light transmitted into material 2 (with index n2) will have an angle q2
+relative to that same normal as given by Snell’s law.
+nn 1 12 2 sin sin θθ = (3.78)
+Now picture this simple law applied to a fi lm stack made up of any number of thin parallel 
+layers (Figure 3.32a). As light travels through each layer, Snell’s law can be repeatedly 
+applied:
+nn n n n 1 12 23 34 4 sin sin sin sin . . . sin θθθθ θ = = = == kk (3.79)
+Thanks to Snell’s law, the quantity nsinq is invariant as a ray of light travels through this 
+stack of parallel fi lms. Interestingly, the presence or absence of any fi lm in the fi lm stack 
+in no way affects the angle of the light in other fi lms of the stack. If fi lms 2 and 3 were 
+removed from the stack in Figure 3.32a, for example, the angle of the light in fi lm 4 
+would be exactly the same.
+We fi nd another, related invariant when looking at how an imaging lens works. A wellmade imaging lens (with low levels of aberrations) will have a Lagrange invariant (often 
+just called the optical invariant) that relates the angles entering and exiting the lens to 
+reduction ratio of that lens, as described in Chapter 2:
+R n
+n = ww
+mm
+sin
+sin
+θ
+θ (3.80)
+where nm is the refractive index of the media on the mask side of the lens, qm is the angle 
+of a ray of light entering the lens relative to the optical axis, nw is the refractive index of 
+the media on the wafer side of the lens and qw is the angle of a ray of light exiting the 
+lens relative to the optical axis (Figure 3.32b). Note that, other than a scale factor given 
+by the magnifi cation of the imaging lens and a change in the sign of the angle to account 
+for the focusing property of the lens, the Lagrange invariant makes a lens seem like a 
+(a) (b)
+n1
+θ1
+n2
+n3
+n4
+θ2
+θm
+Entrance
+Pupil
+Aperture
+Stop
+Exit 
+Pupil
+θw
+Figure 3.32 Two examples of an ‘optical invariant’, (a) Snell’s law of refraction through a 
+fi lm stack, and (b) the Lagrange invariant of angles propagating through an imaging lens
+
+
+## Page 45
+
+ Aerial Image Formation – The Details 119
+thin fi lm obeying Snell’s law. (It is often convenient to imagine the imaging lens as 1×, 
+scaling all the object dimensions by the magnifi cation, thus allowing R = 1 and making 
+the Lagrange invariant look just like Snell’s law).
+These two invariants can be combined when thinking about how a photolithographic 
+imaging system works. Light diffracts from the mask at a particular angle. This diffracted 
+order propagates through the lens and emerges at an angle given by the Lagrange invariant. This light then propagates through the media between the lens and the wafer and 
+strikes the photoresist. Snell’s law dictates the angle of that ray in the resist, or any other 
+layers that might be coated on the wafer. Taking into account the magnifi cation scale 
+factor, the quantity nsinq for a diffracted order is constant from the time it leaves the 
+mask to the time it combines inside the resist with other diffraction orders to form an 
+image of the mask.
+If we replace the air between the lens and the wafer with water, the optical invariant 
+says that the angles of light inside the resist will be the same, presumably creating the 
+exact same image. The impact of immersion lithography comes from two sources: the 
+maximum possible angle of light that can reach the resist, and the phase of that light.
+Consider again the chain of angles through multiple materials as given by Equation 
+(3.79). Trigonometry will never allow the sine of an angle to be greater than 1. Thus, the 
+maximum value of the invariant will be limited by the material in the stack with the 
+smallest refractive index. If one of the layers is air (with a refractive index of 1.0), this 
+will become the material with the smallest refractive index and the maximum possible 
+value of the invariant will be 1.0. If we look then at the angles possible inside of the 
+photoresist, the maximum angle possible would be sinqmax,resist = 1 / nresist. Now suppose 
+that the air is replaced with a fl uid of a higher refractive index, but still smaller than the 
+index of the photoresist. In this case, the maximum possible angle of light inside the resist 
+will be greater: sinqmax,resist = nfl uid / nresist. At a wavelength of 193 nm, resists have refractive 
+indices of about 1.7 and water has a refractive index of about 1.44. The fl uid does not 
+make the angles of light larger, but it enables those angles to be larger. If one were to 
+design a lens to emit larger angles, immersion lithography will allow those angles to 
+propagate into the resist. The numerical aperture of the lens (defi ned as the maximum 
+value of the invariant nsinq that can pass through the lens) can be made to be much larger 
+using immersion lithography, with the resulting improvements in resolution one would 
+expect.
+Thus, by using an immersion fl uid between the lens and the wafer, numerical apertures 
+greater than 1 have been achieved. These so-called hyper-NA immersion lithography tools 
+are certainly not the fi rst NA > 1 imaging tools, since immersion microscopes have been 
+common for over 100 years. The challenges in making immersion practical for highvolume semiconductor manufacturing, however, are quite great, especially considering 
+the need for high-speed scanning of the wafer past the lens while immersed in the fl uid. 
+Practical numerical apertures for immersion systems are probably in the range of 93 % 
+of the refractive index of the fl uid. For water, with n = 1.44 at 193 nm, this means a 
+numerical aperture of up to 1.35. High-index fl uids (n = 1.65, for example) could enable 
+numerical apertures as high as 1.5. Beyond this level, the maximum angle is limited by 
+the refractive index of the photoresist, which would have to be raised to allow for further 
+increases in numerical aperture. From the lens perspective, the refractive index of the 
+various lens materials for 193-nm lithography is on the order of 1.5, so that concave lens 
+
+
+## Page 46
+
+120 Fundamental Principles of Optical Lithography
+elements would be required in order to couple light into a higher-index fl uid. Alternatively, 
+one could attempt to develop higher index glasses for use as lens elements. Both of these 
+possibilities pose quite challenging problems.
+The second way that an immersion fl uid changes the results of imaging comes from 
+manner in which the fl uid affects the phase of the light as it reaches the wafer. Light, 
+being a wave, undergoes a phase change as it travels. If light of (vacuum) wavelength l
+travels some distance ∆z through some material of refractive index n, it will undergo a 
+phase change ∆f given by
+∆∆ ϕπ λ = 2 nz/ (3.81)
+A phase change of 360° will result whenever the optical path length (the refractive index 
+times the distance traveled) reaches one wavelength. This is important in imaging when 
+light from many different angles combine to form one image. All of these rays of light 
+will be in phase only at one point – the plane of best focus. When out of focus, rays 
+traveling at larger angles will undergo a larger phase change than rays traveling at smaller 
+angles. As a result, the phase difference between these rays will result in a blurred 
+image.
+For a given diffraction order (and thus a given angle of the light inside the resist), the 
+angle of the light inside an immersion fl uid will be less than if air were used. These smaller 
+angles will result in smaller OPDs between the various diffracted orders when out of 
+focus, and thus a smaller degradation of the image for a given amount of defocus. In other 
+words, for a given feature being printed and a given numerical aperture, immersion 
+lithography will provide a greater depth of focus (DOF). A more thorough description of 
+the impact of immersion on DOF will be given in the following section.
+3.7.2 Immersion Lithography and the Depth of Focus
+From the derivation of the Rayleigh DOF criterion given above in section 3.4.7, we can 
+state the restrictions on this conventional expression of the Rayleigh DOF: relatively low 
+numerical apertures imaging a binary mask pattern of lines and spaces at the resolution 
+limit. Equation (3.60) can be thought of as the high-NA version of the Rayleigh DOF 
+criterion, which still assumes we are imaging a small binary pattern of lines and spaces, 
+but is appropriate at any numerical aperture. It also accounts for immersion lithography 
+through the refractive index n. The angle q can be related to the pitch by letting this angle 
+be that of the fi rst diffraction order.
+n psinθ λ = (3.82)
+Combining Equations (3.60) and (3.82), one can see how immersion will improve the 
+DOF of a given feature:
+DOF immersion
+DOF dry
+p
+nn p
+()
+() = −− ()
+−− ()
+11 2
+2 2
+λ
+λ
+/
+/
+ (3.83)
+As Figure 3.33 shows, the improvement in DOF is at least the refractive index of the 
+fl uid, and grows larger from there for the smallest pitches.
+
+
+## Page 47
+
+ Aerial Image Formation – The Details 121
+3.8 Image Quality
+While much of this chapter has focused on the nature of imaging and those factors that 
+affect the resulting aerial image, along the way we have had occasion to mention the 
+‘quality’ of the aerial image without actually defi ning what is meant by this term. While 
+it is intuitively easy to see how defocus and aberrations degrade the image, we will need 
+to defi ne a numerical metric of image quality in order to quantify these effects. While 
+much more will be said on this topic in Chapter 9, here we will simply defi ne a metric 
+related to the ability of the image to defi ne and control the position of the edge to be 
+printed in photoresist.
+3.8.1 Image CD
+The aerial image, when propagated into a photoresist, interacts with the resist to create a 
+fi nal feature of a certain width. It is often convenient to estimate the width of the fi nal 
+resist feature by the width of the aerial image. Consider an ideal, infi nite contrast positive 
+resist. For such a resist, any exposure above some threshold dose Eth will cause all of the 
+resist to be removed. Thus, for an aerial image I(x) and an exposure dose E, the critical 
+dimension (CD) will equal 2x when
+E EI x th = () (3.84)
+For a given dose, an image intensity threshold value can be defi ned as
+I E
+E th
+th = (3.85)
+1.4
+1.5
+1.6
+1.7
+1.8
+1.9
+2.0
+200 300 400 500 600
+Pitch (nm)
+DOF(immersion)/DOF(dry)
+Figure 3.33 For a given pattern of small lines and spaces, using immersion improves the 
+depth of focus (DOF) by at least the refractive index of the fl uid (in this example, l = 193nm, 
+nfl uid = 1.46)
+
+
+## Page 48
+
+122 Fundamental Principles of Optical Lithography
+The image CD is simply the width of the image evaluated at this intensity threshold 
+(Figure 3.34).
+This simple threshold model for estimating the resist CD can be signifi cantly improved 
+by including a ‘resist bias’. As Figure 3.20 shows and section 3.4.4 discusses, aerial 
+images exhibit an isofocal point, an x-position where the intensity varies the least with 
+defocus. Likewise, resist CD exhibits an isofocal value (as will be discussed in Chapter 
+8) where the CD is least sensitive to changes in focus. In general, the image isofocal point 
+will not occur at the same position as the resist isofocal point. The difference between 
+these points is called the resist bias.
+Our simple threshold model can be modifi ed to account for this empirical observation 
+by adding a bias to Equation (3.84):
+I Ix b th =+ () (3.86)
+where b is called the edge bias and the CD is still 2x for a symmetrical image. It should 
+be evident that the threshold intensity and the resist bias are not independent parameters, 
+but are related by the slope of the aerial image.
+d
+d
+d
+d
+I
+b
+I
+x
+th
+xb
+= +
+ (3.87)
+Integrating this relationship,
+II I
+x th th b d
+d
+=+0 (3.88)
+where Ith0 is the threshold one would obtain if the bias were zero.
+There are still only two independent parameters in Equation (3.88). If Ith0 and b are 
+used as the parameters, then the threshold intensity used to extract the edge position 
+from the image will vary as a function of the image slope. This is a simple form of a 
+variable threshold resist model. Adding a dose dependence, as in Equation (3.85), we 
+obtain
+I x CD I E
+E
+I
+x
+() = == + / b d
+d th
+th 2 0 (3.89)
+where the slope is evaluated at I = Ith. Since this requires knowing Ith before evaluating 
+the slope, either an iterative procedure must be used or one must assume that the slope 
+is constant over the range of values of b commonly encountered. A second form of the 
+Ith
+CD
+Figure 3.34 Defi ning image CD: the width of the image at a given threshold value Ith
+
+
+## Page 49
+
+ Aerial Image Formation – The Details 123
+model avoids this complication by using Ith0 (or Eth0) and Ith as the parameters. In this 
+case, the bias will vary as a function of the image slope and the result will be a variable 
+bias resist model. For the variable bias resist model,
+I Ix b b II
+Ix th
+th th , d /d
+=+ = − () 0 (3.90)
+where the slope is now evaluated at a constant I = Ith.
+3.8.2 Image Placement Error (Distortion)
+The threshold model used above to defi ne the width of an aerial image can also be used 
+to defi ne its center position, called the image placement. Since this center position is the 
+average of the two edge positions, a constant bias does not impact image placement. 
+However, a variable threshold or variable bias resist model, as discussed above, will 
+infl uence the center position whenever the image slope is different on the right and left 
+sides of the image.
+Any deviation in the image placement from the ideal (desired) position is called image 
+placement error (as described above in section 3.1.3). When image placement error does not 
+depend on the size or surroundings of the feature in question, this error is called distortion. 
+The most common cause of distortion is the aberration of tilt. Variation of image placement 
+error with feature size or type can be caused by any odd Zernike term other than tilt.
+3.8.3 Normalized Image Log-Slope (NILS)
+The slope of the image intensity I as of function of position x (dI/dx) measures the steepness of the image in the transition from bright to dark. However, for the slope to be useful 
+as a metric of image quality, the intensity must be normalized by dividing the slope by 
+the intensity at the point where the slope is being measured. The resulting metric is called 
+the image log-slope (ILS):
+Image Log Slope I
+I
+x
+I
+x − == 1d
+d
+d
+d
+ln( ) (3.91)
+where this log-slope is measured at the nominal (desired) line edge (Figure 3.35). Since 
+variations in the photoresist edge positions (linewidths) are typically expressed as a percentage of the nominal linewidth, the position coordinate x can also be normalized by 
+multiplying the log-slope by the nominal linewidth w, to give the normalized image logslope (NILS).
+NILS w I
+x = d
+d
+ln( ) (3.92)
+The normalized image log-slope can now be used to calculate the image quality of 
+various aerial images that we have discussed in this chapter. Consider fi rst a generic 1D 
+image of a line-space pattern of pitch p. This image can be represented as a Fourier series 
+
+
+## Page 50
+
+124 Fundamental Principles of Optical Lithography
+of some number of terms N (typically equal to twice the highest diffraction order number 
+that passes through the lens).
+I x jx p j
+j
+N
+( ) cos( ) = =
+∑βπ2 0
+/ (3.93)
+The NILS calculated at the edge position x = w/2 will be
+NILS w
+p
+j jw p
+jw p
+j
+j
+N
+j
+j
+N =− 
+
+ 
+
+ =
+=
+∑
+∑
+2 0
+0
+π
+βπ
+βπ
+sin( )
+cos( )
+/
+/
+ (3.94)
+For the special case of equal lines and spaces, so that w = p/2,
+NILS
+jj
+j
+j
+j
+N
+j
+j
+N =− =− −+−
+−
+=
+=
+∑
+∑
+π
+βπ
+βπ
+π βββ
+β
+sin( )
+cos( )
+... /
+/
+2
+2
+0
+0
+135
+0 ββ 24 +− ... (3.95)
+For small-pitch patterns, only a few diffraction orders make it through the lens. Near the 
+resolution limit, where the fi rst diffraction orders are the highest ones transmitted through 
+the lens, N = 2 and
+NILS =− − π β
+ββ
+1
+02
+ (3.96)
+One can see from this simple derivation that a high-magnitude NILS results from larger 
+amounts of high-order components (larger b1 and b2) and less zero-order component 
+(smaller b0).
+Note that NILS can be positive or negative, depending on whether the pattern is a line 
+or a space, and whether the right or the left edge of the pattern is being considered. As a 
+convention, the sign of the NILS expression is usually adjusted to produce a positive 
+value of NILS. Table 3.2 shows the calculated value of NILS for each of the equal line/
+space aerial images discussed in this chapter. Of the images shown, the coherent, in-focus 
+Mask
+Image
+Figure 3.35 Image Log-Slope (or the Normalized Image Log-Slope, NILS) is the best single 
+metric of image quality for lithographic applications
+
+
+## Page 51
+
+ Aerial Image Formation – The Details 125
+image from TE illumination produces the highest NILS (equal to 8). Defocus or the use 
+of TM illumination causes a decrease in the NILS, and thus a degradation of image 
+quality.
+In Chapter 2, the Kintner method was used to calculate the partially coherent in-focus 
+image of small lines and spaces as the weighted some of one-beam, two-beam and threebeam images. This Kintner formulation can also be put into the Fourier series form of 
+Equation (3.93). For TE illumination where only the zero and ±fi rst diffraction orders are 
+used,
+β
+β
+β
+002 1
+2 23
+1 01 2 3
+212 3
+2
+22
+2
+=+ +
+=+
+=
+a as s
+aa s s
+as
+()
+()
+()
+ (3.97)
+where s2 and s3 are the fractions of two-beam and three-beam imaging, respectively, as 
+given in Tables 2.3 or 2.4.
+3.8.4 Focus Dependence of Image Quality
+All of the image quality metrics described above – image CD, image placement and image 
+log-slope – will in general vary with focus. The variation of image CD with focus is 
+sometimes called isofocal bias, a topic that will be discussed at length in Chapter 8. The 
+variation of image log-slope with focus is a common focus characterization technique, 
+and is discussed extensively in Chapter 9. The variation of image placement with focus 
+is called telecentricity error, and is commonly due to asymmetric source shapes (discussed 
+briefl y in Chapter 8).
+Table 3.2 Calculation of NILS for various equal line/space images presented in this 
+chapter
+Image Type Equation b0 b1 b2 NILS
+Coherent, in 
+focus, TE
+(3.69) 1
+4
+2
+2 +
+π
+2
+π
+2
+2 π
+8
+Coherent, in 
+focus, TM
+(3.71) 1
+4
+2
+2 +
+π
+2
+π
+cosθ 2 2 2 πcos( ) θ 8
+1 8
+2
+2
+cos
+sin
+θ
+π
++ θ
+Coherent, out 
+of focus, TE
+(3.27) 1
+4
+2
+2 +
+π
+2
+π
+cos( ) ∆Φ 2
+2 π
+8cos (∆Φ)
+Partially 
+coherent, out 
+of focus, TE
+(3.29)
+1
+4
+2
+2 +
+π
+22 1
+π
+cos( ) () ∆Φ Ja
+a
+22
+2
+1
+π
+Ja
+a
+()
+8 2
+1 8 1 2
+1
+2
+1
+cos( ) ()
+()
+∆Φ Ja
+a
+Ja
+a +− () π
+Incoherent, in 
+focus, TE
+See Chapter 2 1
+2
+2 1
+π
+MTF p () /
+0 4MTF(1/p)
+
+
+## Page 52
+
+126 Fundamental Principles of Optical Lithography
+Problems
+ 3.1. Derive Equation (3.5).
+ 3.2. Equation (3.7), which was derived for coherent illumination, predicts that coma 
+will result in a positive placement error for lines and spaces when the pitch is less 
+than 15. λ NA, a negative placement error for pitches greater than this amount, 
+and no placement error when the pitch equals 15. λ NA. Show why this is true 
+using pictures of the wavefront error and the diffraction pattern.
+ 3.3. Using the Zernike polynomial term F4, explain the effect of 3rd-order astigmatism 
+on x-oriented lines and spaces versus y-oriented lines and spaces.
+ 3.4. Calculate the RMS wavefront error, WRMS, and the resulting Strehl ratio for the case 
+when
+(a) Only 3rd-order spherical aberration is present
+(b) Only 3rd-order x-coma is present
+Note that W W R RR RMS , dd 22
+0
+2
+0
+1 1 = ∫ ∫ π
+φφ
+π
+()
+ 3.5. Consider coherent imaging of equal lines and spaces where only the zero and ±fi rst 
+diffraction orders enter the lens. Derive an expression, similar to Equation (3.24), 
+that shows how spherical aberration results in a pitch-dependent paraxial focus 
+error.
+ 3.6. Calculate the impact of long-range fl are on the image log-slope.
+ 3.7. Consider the case of dense equal lines and spaces (only the 0 and ±1st orders are 
+used) imaged with coherent illumination. Show that the peak intensity of the image 
+in the middle of the space falls off approximately quadratically with defocus for 
+small amounts of defocus.
+ 3.8. Using the geometry of Figure 3.18b, derive Equation (3.20).
+ 3.9. Compare the depth of focus predictions of the high-NA version of the Rayleigh 
+equation [Equation (3.60)] to the paraxial version of Equation (3.61) by plotting 
+predicted DOF versus pitch (use k2 = 0.6, l = 248 nm, pitch in the range from 250 
+to 500 nm, and assume imaging in air).
+3.10. Consider two unit-amplitude plane waves traveling in air at angles ±q with respect 
+to the z-axis (as in Figure 3.26). Show that the resulting interference patterns, 
+depending on the polarizations of the two beams, will be
+TE-polarization: I(x) = 2 + 2 cos(4px sin(q) / l)
+TM-polarization: I(x) = 2 + 2 cos(2q) cos(4px sin(q) / l)
+ What is the pitch of the resulting line/space image?
+3.11. Derive Equation (3.83). What is the limit of this equation for p >> l?
+3.12. Consider a coherent, three-beam image of a line/space pattern under TE illumination (NA = 0.93, l = 193 nm, linewidth = 100 nm, pitch = 250 nm). Plot the resulting 
+aerial image at best focus and at defocus values of 50 and 100 nm for:
+(a) imaging in air
+(b) immersion imaging (nfl uid = 1.44)
+
+
+## Page 53
+
+ Aerial Image Formation – The Details 127
+3.13. Consider an in-focus, TE image where only the zero order and one of the fi rst orders 
+pass through the lens. For this image, what are the values of b0, b1 and b2 in Equation (3.93)? What is the value of the NILS for the case of equal lines and spaces?
+3.14. For the line/space image of Equation (3.93):
+(a) derive an equation for the image contrast, defi ned as
+Image Contrast II
+II = −
++
+max min
+max min
+ For simplicity, assume the maximum intensity occurs in the middle of the 
+space, and the minimum intensity occurs in the middle of the line.
+(b) For the case where the second harmonic is the largest harmonic in the image 
+(i.e. when N = 2), compare the resulting image contrast to the NILS of Equation 
+(3.96).
+3.15. Consider an in-focus, coherent, three-beam image of an equal line/space pattern 
+under TE illumination (NA = 0.93, l = 193 nm, linewidth = 130 nm, pitch = 260 nm). 
+Use a threshold model (Eth = 20 mJ/cm2
+) to plot the resulting line CD versus dose. 
+What dose produces the nominal feature size?
+References
+ 1 Ulrich, W., Rostalski, H.-J. and Hudyma, R., 2004, Development of dioptric projection lenses 
+for deep ultraviolet lithography at Carl Zeiss, Journal of Microlithography, Microfabrication, 
+and Microsystems, 3, 87–96.
+ 2 Kroyan, A., Bendik, J., Semprez, O., Farrar, N., Rowan, C. and Mack, C.A., 2000, Modeling 
+the effects of excimer laser bandwidths on lithographic performance, Proceedings of SPIE:
+Optical Microlithography XIII, 4000, 658–664.
+ 3 Lai, K., Lalovic, I., Fair, B., Kroyan, A., Progler, C., Farrar, N., Ames, D. and Ahmed, K., 
+2003, Understanding chromatic aberration impacts on lithographic imaging, Journal of Microlithography, Microfabrication, and Microsystems (JM3), 2, 105–111.
+ 4 Flagello, D.G. and Pomerene, A.T.S., 1987, Practical characterization of 0.5 mm optical lithography, Proceedings of SPIE: Optical Microlithography VI, 772, 6–20.
+ 5 Mack, C.A. and Kaufman, P.M., 1988, Mask bias in submicron optical lithography, Journal 
+of Vacuum Science & Technology B, B6, 2213–2220.
+ 6 Lai, K., Wu, C. and Progler, C., 2001, Scattered light: the increasing problem for 193 nm exposure tools and beyond, Proceedings of SPIE: Optical Microlithography XIV, 772, 1424–1435.
+ 7 Fukuda, H., Hasegawa, N., Tanaka, T. and Hayashida, T., 1987, A new method for enhancing 
+focus latitude in optical lithography: FLEX, IEEE Electron Device Letters, EDL-8, 
+179–180.
+ 8 Richards, B. and Wolf, E., 1959, Electromagnetic diffraction in optical systems. II. Structure 
+of the image fi eld in an aplanatic system, Proceedings of the Royal Society of London, Series 
+A, 253, 358–379.
+ 9 Jones, R.C., 1941, New calculus for the treatment of optical systems, Journal of the Optical 
+Society of America, 31, 488–493.
+10 Totzeck, M., Gräupner, P., Heil, T., Göhnermeier, A., Dittmann, O., Krähmer, D., Kamenov, 
+V., Ruoff, J. and Flagello, D., 2005, Polarization infl uence on imaging, Journal of Microlithography, Microfabrication, and Microsystems, 4, p. 031108.
+11 McIntyre, G., Kye, J., Levinson, H. and Neureuther, A., 2006, Polarization aberrations in 
+hyper-numerical aperture projection printing: a comparison of various representations, Journal 
+of Microlithography, Microfabrication, and Microsystems, 5, p. 033001.
+
+
+## Page 54
+
+128 Fundamental Principles of Optical Lithography
+12 Geh, B., Ruoff, J., Zimmermann, J., Gräupner P., Totzeck, M., Mengel, M., Hempelmann, U. 
+and Schmitt-Weaver, E., 2007, The impact of projection lens polarization properties on 
+lithographic process at hyper-NA, Proceedings of SPIE: Optical Microlithography 6520, 
+65200F.

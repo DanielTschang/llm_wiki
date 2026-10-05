@@ -1,0 +1,2823 @@
+## Page 1
+
+2
+Aerial Image Formation – 
+The Basics
+Projection printing means projecting the image of a photomask (also called a reticle) onto 
+a resist-coated wafer. Projection imaging tools are sophisticated reduction cameras with 
+stages that allow, through a combination of stepping or stepping and scanning motions, 
+exposure of many (reduced) copies of a mask pattern onto a large wafer. The image of 
+the mask that is projected into the photoresist defi nes the information content used by 
+the photoresist to form the fi nal resist image. Understanding the limits and capabilities 
+of projection imaging is the fi rst step in understanding the limits and capabilities of 
+lithography.
+The imaging process is a well-studied optical phenomenon. We will begin at the most 
+basic level with a mathematical description of light, followed by the theory of image 
+formation. The impact of partial coherence will then be added. In the following chapter, 
+nonideal and vector descriptions of image formation will be added to the basic description 
+provided here.
+2.1 Mathematical Description of Light
+A mathematical description of light must, of course, begin with Maxwell’s equations. 
+However, these fundamental equations can be quite cumbersome and general solutions 
+under diverse boundary conditions almost always entail detailed numerical calculations. 
+However, under some circumstances a simplifi ed form of Maxwell’s equations, in particular what is called the wave equation, can be used and often allows reasonably compact 
+solutions. In the case of imaging theory, decomposing an arbitrary wave into a summation 
+of plane waves provides the simplest approach for calculating the images projected into 
+a photoresist-coated wafer.
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+30 Fundamental Principles of Optical Lithography
+2.1.1 Maxwell’s Equations and the Wave Equation
+Light is an electromagnetic wave with coupled electric and magnetic fi elds traveling 
+through space and the materials that occupy that space. Maxwell’s equations describe two 
+fundamental, coupled fi elds, the electric fi eld E (units of volts per meter) and the magnetic 
+fi eld H (units of amperes per meter), both vector quantities. Further, the effect of these 
+fi elds on a material can give rise to four other quantities: three vectors, the electric displacement D (units of coulomb per square meter), the magnetic induction B (units of 
+tesla, or webers per square meter) and the electric current density J (units of amps per 
+square meter), and the scalar electric charge density r (units of coulomb per cubic meter). 
+These six quantities are related by the four Maxwell’s equations (shown here in MKS or 
+SI units):
+∇× − ∂
+∂ =
+∇× + ∂
+∂ =
+H D J
+E B
+t
+t
+()
+(
+Maxwell’s extension of Ampere’s law
+0d Faraay’s law of induction
+Gauss’s law
+)
+∇⋅ = ()
+∇⋅ =
+D
+B
+ρ
+0
+ (2.1)
+where the standard curl and divergence operators are used (see Appendix B). The fi rst 
+two equations above show how a time-varying electric fi eld (or displacement) causes a 
+change in the magnetic fi eld (or induction), and vice versa. The second two equations 
+show how static charge affects the electric and magnetic fi elds (the last equation set to 
+zero is a statement that there are no magnetic monopoles and therefore no net magnetic 
+charge). A combination of Ampere’s law and Gauss’s law leads to the continuity equation, 
+an expression of the conservation of electrical charge.
+Additionally, the properties of the materials involved provide relationships between the 
+current density and the electric fi eld, the electric displacement and the electric fi eld, and 
+the magnetic induction and the magnetic fi eld. In general, these relationships can be quite 
+complicated, but in many circumstances they become simple. If the material that the 
+electromagnetic radiation is propagating through is moving slowly relative to the speed 
+of light, and the fi elds involved are time-harmonic (a concept that will be defi ned below), 
+then the three material equations become
+JE
+DE
+BH
+=
+=
+=
+σ
+ε
+µ (2.2)
+where s is the conductivity of the material, e is its dielectric constant (sometimes called 
+the electrical permittivity) and m is its magnetic permeability, all of which are frequency 
+dependent. Over the range of electric and magnetic fi eld strengths of interest here, these 
+three material properties can be considered constants. The fi rst of the three material equations in Equation (2.2) is the differential form of Ohm’s law. Note that for perfectly 
+transparent materials (also called dielectrics), s = 0. Thus, absorption in a material is 
+
+
+## Page 3
+
+ Aerial Image Formation – The Basics 31
+related to the generation of current density under the infl uence of an electric fi eld (i.e. 
+conduction). Also, in general, the materials of interest to the lithographer are nonmagnetic, 
+and thus m = m0, the magnetic permeability of free space.
+Consider a further simplifi cation where the materials involved are homogeneous (the 
+three material properties are not a function of position). In that case, the three material 
+properties s, e and m, become simple numbers (scalars), rather than tensors. By using 
+these material relationships, the fi rst two Maxwell’s equations can be rewritten in terms 
+of electric and magnetic fi elds only.
+∇× − ∂
+∂ =
+∇× + ∂
+∂ =
+H E E
+E H
+εσ
+µ
+t
+t
+0
+ (2.3)
+The goal now will be to take these two coupled fi rst-order differential equations and create 
+two noncoupled second-order equations. When these materials are free of charge (r = 0), 
+∇ · E = 0 so that
+∇ = ∇ ∇⋅ − ∇ × ∇ × = −∇ × ∇ × 2EE E E () ( ) ( ) (2.4)
+Taking the curl of one of Equation (2.3) and substituting in the other,
+∇= ∂
+∂
++
+∂
+∂
+∇= ∂
+∂
++
+∂
+∂
+2
+2
+2
+2
+2
+2
+E EE
+H HH
+εµ µσ
+εµ µσ
+tt
+tt
+ (2.5)
+As a fi nal simplifi cation, for a nonabsorbing medium (s = 0), these equations become 
+classic wave equations:
+∇= ∂
+∂
+∇= ∂
+∂
+2
+2
+2
+2
+2
+2
+2
+2
+1
+1
+E E
+H H
+vt
+vt
+ (2.6)
+where v = 1 εµ , the velocity of the wave. Letting e0 and m0 be the values of these material properties in vacuum, the speed of light in vacuum is then c = 1 εµ00 . These constants have values of
+ c = 2.99792458 × 108
+ m/s
+ e0 = 8.8541878 × 10−12 farads/m (1 farad = 1 coulomb/volt) = 1/(4pc2) × 107 farads/m
+ m0 = 4p × 10−7 henries/m (1 henry = 1 weber/amp = 1 volt-second/amp)
+From this, the refractive index of a material can be defi ned as the ratio of the speed of 
+light in vacuum to that in the material:
+n c
+v ≡= εµ
+εµ00
+ (2.7)
+
+
+## Page 4
+
+32 Fundamental Principles of Optical Lithography
+It is sometimes useful to defi ne the dielectric constant and magnetic permeability relative 
+to the free-space values:
+ε
+ε
+ε
+µ µ
+µ rr ≡≡ ,
+00
+ (2.8)
+so that
+n = εµrr (2.9)
+And since we are mostly concerned with nonmagnetic materials with mr = 1, the refractive 
+index will generally be just the square root of the relative dielectric constant of the material (remembering that we have so far only looked at materials where s = 0).
+2.1.2 General Harmonic Fields and the Plane Wave in a Nonabsorbing Medium
+Since the electric and magnetic fi elds are related to each other (the magnetic fi eld is always 
+perpendicular to the electric fi eld and both fi elds are always perpendicular to the direction 
+of propagation, as will be proven in section 2.1.3) and since photoresist reacts chemically 
+to the magnitude of the electric fi eld only, we can usually describe light by considering 
+just the electric fi eld. A general harmonic electric fi eld vector E (due to monochromatic 
+light of frequency w) at any point P and time t can be described by a deceptively simplelooking sinusoidal equation:
+EA () Pt P t P , = ( )cos( ( )) ω +Φ (2.10)
+where A is the amplitude (like the electric fi eld, a vector) and Φ is the phase, both of 
+which are position dependent, in general, and will depend on initial and boundary conditions. As an example of one form of Equation (2.10), consider a ‘plane wave’ of light 
+traveling in the +z direction. The term plane wave refers to the shape of the wavefront, 
+i.e. the shape of the function Φ(P) = constant. Thus, a plane wave traveling in the +z
+direction would require a constant phase (and, consequently, a constant amplitude) in the 
+x–y plane. Such a plane wave would be described by the equation
+E P t A t kz () , = cos( ) ωδ −+ (2.11)
+where k is a constant called the propagation constant or the wave number and d is a phase 
+offset.
+How does the wave represented by Equation (2.11) propagate? We can think of the 
+wave as having a certain shape, and this shape travels through time. Thus, this wave will 
+have the given shape at all points in space and time such that wt − kz = constant, giving 
+the same electric fi eld. In other words, the wavefront (a plane in this case) travels through 
+space and time according to
+zz
+k − t 0 = ω (2.12)
+where z0 is a constant corresponding to the position of the plane wave at t = 0. This is 
+simply a plane of light traveling in the +z direction at speed w/k. Thus, since
+v
+c
+nk == ω (2.13)
+
+
+## Page 5
+
+ Aerial Image Formation – The Basics 33
+and since c = wl/2p (a general property of waves), we obtain
+kn == ω εµ π λ 2/ (2.14)
+where l remains the vacuum wavelength of the light. This relationship of the propagation 
+constant to refractive index assumes a nonabsorbing medium (s = 0). In the section below, 
+the propagation of a plane wave will be expanded to include absorption.
+2.1.3 Phasors and Wave Propagation in an Absorbing Medium
+Although Equation (2.10) completely describes an arbitrary time-harmonic electromagnetic fi eld, a more compact and convenient representation is possible based on 
+the assumption that the frequency of the light does not change (quite a good assumption under normal optical conditions). A sinusoid can be related to a complex 
+exponential by
+EA U () Pt P t P P it ,e = ( )cos( ( )) Re{ ( ) } ω ω += − Φ (2.15)
+where
+ U(P) = A(P)e−iΦ(P)
+and U(P) is called the phasor representation of the sinusoidal electric fi eld E(P,t). Notice 
+that this phasor representation shows no time dependence. Study of the basic behavior of 
+light has shown that the time dependence of the electric fi eld typically does not change 
+as light travels, interferes and interacts with matter. Thus, suppressing the time dependence and expressing the electric fi eld as a phasor have become quite common in the 
+mathematical analysis of optical systems. Fields that satisfy this assumption are called 
+time-harmonic fi elds.
+Separating out the time dependence for a time-harmonic wave makes evaluation of the 
+time derivatives in Maxwell’s equations straightforward. Using Equation (2.15) in Equation (2.5), and showing only the electric fi eld for simplicity,
+∇= ∂
+∂
++
+∂
+∂ =− − 2
+2
+2
+2 E EE
+εµ µσ ω εµ ωµσ EE
+tt
+i (2.16)
+Since every term in this equation contains the oscillatory e−iwt
+, the time dependence can 
+be suppressed by dividing this term out.
+∇ =− − 22 U UU ω εµ ωµσ i (2.17)
+Finally, this equation can be put into a standard form, known as the Helmholtz 
+equation:
+∇+ = 22 UU () () Pk P 0 (2.18)
+where
+k2 = w2em + iwms
+The use of the symbol k in the Helmholtz equation is not coincidental. If s = 0 (no 
+absorption), k becomes the propagation constant defi ned in Equation (2.14). Thus, the 
+
+
+## Page 6
+
+34 Fundamental Principles of Optical Lithography
+Helmholtz equation defi nes a complex propagation constant that accounts for absorption. 
+Likewise, a complex refractive index can be defi ned.
+n2
+22
+2
+22
+2
+2
+2
+2
+44 4
+== + = + 
+
+
+
+k i ci λ
+π
+ω εµλ
+π
+ωµσλ
+π
+µε
+σ
+ω
+ (2.19)
+Defi ning the complex refractive index in terms of real and imaginary parts,
+n =+niκ (2.20)
+allows for the real and imaginary parts of the refractive index to be expressed in terms 
+of the electrical and magnetic properties of the material as well as the frequency of 
+oscillation:
+nc
+c
+22
+2
+22
+2
+1
+2
+11
+1
+2
+11
+=+ 
+
+
+ + 
+
+
+
+
+
+=+ 
+
+
+ − 
+
+
+
+
+
+µε
+σ
+εω
+κ µε
+σ
+εω
+ (2.21)
+Note that when s = 0, k = 0 and n = n. For weakly absorbing materials, s/ew << 1 and 
+Equations (2.21) can be approximated as
+nc
+c
+≈=
+≈ 
+
+
+ =
+µε µ ε
+κ
+σ
+ω
+µ
+ε
+λσ
+π
+µ
+ε
+rr
+1
+24
+ (2.22)
+Again assuming a nonmagnetic material, this weakly absorbing material will have an 
+imaginary part that will be well approximated as
+4 376 73 0
+0
+0
+0
+πκ
+λ
+σµ
+ε ≈ == Z
+n where . Z Ω (2.23)
+and Z0 is called the characteristic impedance of free space.
+Since converting back to the time domain involves taking the real part of the phasor, 
+the sign of the phase in U(P) and in the time-dependent term could just as easily have 
+been chosen to be positive rather than negative. This (arbitrary) sign convention is not 
+consistent among authors and there is no absolute standard. The sign convention represented by Equation (2.15) is used by Goodman1
+ and in other standard optics textbooks 
+dealing with imaging. Using this convention, a plane wave traveling in the +z direction 
+[i.e. Equation (2.11)] would be written as
+UP A ikz () = e (2.24)
+(where the phase offset d has been ignored). This negative phase sign convention of 
+Equation (2.15) is the most common for imaging applications. Unfortunately, many publications and textbooks in the area of thin fi lm interference effects and coatings use the 
+
+
+## Page 7
+
+ Aerial Image Formation – The Basics 35
+positive phase sign convention. For this thin fi lm sign convention, Equation (2.24) would 
+represent a plane wave traveling in the −z direction. Lithography requires both imaging 
+calculations and thin fi lm interference calculations. As such, both of these competing 
+‘standard’ sign conventions are often seen in lithography literature, though the negative 
+sign convention of Equation (2.15) will be used throughout this book.
+Equation (2.24) describes a plane wave traveling in the +z direction. Generalizing to 
+an arbitrary direction, let us fi rst defi ne the propagation vector k as the propagation constant multiplied by a unit vector pointing in the direction of propagation. Any point in 
+space (x,y,z) is described by its position vector r, a vector pointing from the origin to 
+the point (x,y,z). The phasor representation of the electric fi eld of the plane wave is then 
+given by
+U xyz A A i ik x y z () () ,, e e == kr⋅ αβγ ++ (2.25)
+where a, b and g are called the direction cosines of the propagation. As we shall see later 
+in this chapter, the z-axis will coincide with the optical axis of an imaging system, so that 
+the z-direction will be the main direction of light propagation. Thus, it will be convenient 
+to defi ne the direction of propagation using spherical coordinates about the z-axis. Letting 
+q be the direction k makes with the z-axis and f be the angle that the k–z plane makes 
+with the x-axis, the direction cosines become
+α θφ
+β θφ
+γ αβ θ
+=
+=
+=−− =
+sin cos
+sin sin
+1 cos 22
+ (2.26)
+Another interesting and common solution to the wave equation is the spherical wave. 
+For this wave, the wavefront is a sphere and the amplitude of the electric fi eld is inversely 
+proportional to the distance from the center of the sphere. In the equation below,
+Ur A
+r
+ikr
+() = e (2.27)
+the spherical waves are propagating outward from r = 0, so that the spherical wave can 
+be thought of as emanating from a point source of light located at r = 0.
+It is useful to derive some important properties of the plane wave. The time derivative 
+of the fi eld of a plane wave can be related to its spatial derivative with respect to the 
+direction of propagation. Considering a plane wave traveling in the +z direction, as given 
+by Equation (2.11), but applied to the magnetic fi eld:
+∂
+∂ − ∂∂ =− ∂∂
++
+∂
+∂
+
+
+ 
+
+ HH
+t kz k
+H
+z
+x
+H
+z
+y x y = ωω ˆˆ (2.28)
+Of course, an analogous equation applies to the electric fi eld as well. The curl of the 
+electric fi eld for this plane wave becomes
+∇× =− ∂
+∂
++
+∂
+∂
+E
+E
+z
+x
+E
+z
+y y x ˆˆ (2.29)
+
+
+## Page 8
+
+36 Fundamental Principles of Optical Lithography
+These two equations can now be inserted into the second Maxwell equation, using the 
+material property to relate B to H. The result, separated for each vector component, 
+becomes
+x
+E
+zk
+H
+z
+y
+E
+zk
+H
+z
+y x
+x y
+-component
+-component
+:
+:
+− ∂
+∂ − ∂
+∂ =
++
+∂
+∂ − ∂∂ =
+ωµ
+ωµ
+0
+0
+ (2.30)
+Equations (2.30) can be integrated directly. Ignoring the constant of integration (any 
+constant background electric or magnetic fi eld will not concern us here),
+E
+k
+H H ZH E
+k y x x xx y y y =− =− =− = = = H H ZH ωµ µ
+ε
+ωµ µ
+ε , (2.31)
+where Z is called the characteristic impedance of the material. This gives a very important 
+result. For a plane harmonic wave traveling through an isotropic material such that the 
+material equations (2.2) apply, the electric and magnetic fi elds are related to each other 
+by a multiplicative constant. Thus, knowing either one of these quantities is suffi cient to 
+determine the other. Moreover, it is the x-component of the magnetic fi eld that is related 
+to the y-component of the electric fi eld, and vice versa. In other words, the electric fi eld 
+is always perpendicular to the magnetic fi eld, and both are perpendicular to the direction 
+of propagation. If Z is real, meaning that there is no absorption, the electric and magnetic 
+fi elds will be in phase with each other.
+2.1.4 Intensity and the Poynting Vector
+When determining the intensity (also called irradiance†) transmitted into a material, it is 
+very important to understand the exact defi nition of intensity. By defi nition, the intensity
+of light I is the magnitude of the (time averaged) Poynting vector, the energy per second 
+crossing a unit area perpendicular to the direction of propagation of the light. The 
+Poynting vector S is given by
+SEH =× (2.32)
+where E is the electric fi eld, and H is the magnetic fi eld. (The derivation of this defi nition 
+of intensity, not presented here, calculates the work performed by the electric and magnetic fi elds on the electrons surrounding the atoms of the medium.2
+)
+For quasi-monochromatic time-harmonic fi elds, as represented by Equation (2.15), it 
+will be convenient to express them as
+E U UU
+HV
+( ) Re{ ( ) } [ ( ) ( ) ]
+( ) Re{ (
+Pt P P P
+Pt P
+it it it , e e *e
+,
+= =+
+=
+− −+ ω ωω 1
+2
+) } [() () ] e e *e − −+ =+ it it it PP ω ωω 1
+2
+VV
+ (2.33)
+†By international standard, intensity is defi ned as power per unit solid angle while irradiance is power per unit area. 
+However, the older nomenclature of intensity as power per unit area is still common (used in the classic textbook by Born and 
+Wolf, for example), and will be used throughout this book.
+
+
+## Page 9
+
+ Aerial Image Formation – The Basics 37
+where U* is the complex conjugate of U. Using these equations, the cross product of the 
+electric and magnetic fi elds becomes
+S E H UV U VUV U V =× = × + ×+× + ×
+1 −+
+4
+22 [] e * * * *e it it ωω (2.34)
+Taking the time average of the Poynting vector is straightforward. For times much longer 
+than the period of oscillation of the wave, the time harmonic terms will average to zero. 
+Thus,
+S U VUV UV = ×+× = ×
+1
+4
+1
+2 [ ] Re{ } ** * (2.35)
+To apply Equation (2.35) to a specifi c case, consider the monochromatic plane wave 
+traveling in the z-direction. Remembering that electric and magnetic fi elds are perpendicular to each other and the direction of propagation, and using the results of Equation (2.31),
+UV×= − = + * ( )( ) UV UV ** ** k xy yx x x y y UU UU
+ωµ
+zˆ zˆ (2.36)
+Using the phasor expression for the plane wave, Equation (2.24),
+UV U A ×= = * kz
+k
+z
+ωµ ωµ
+22 ˆˆ (2.37)
+Thus, replacing Re{w/k} with the speed of the wave from Equations (2.7) and (2.13), the 
+intensity of the plane wave becomes
+I n
+c == = S AA2
+1
+2
+22
+µ
+ε
+µ
+ (2.38)
+Since in general our media will be nonmagnetic (so that m = m0), this fi nal expression 
+for intensity says that the intensity, within a multiplicative factor, is equal to the magnitude 
+of the phasor electric fi eld squared times the real part of the refractive index of the 
+medium. Throughout this book, we will often have occasion to describe the intensity relative to some incoming wave, and so the multiplicative constant, 1/(2cm0), will most often 
+be ignored. And since throughout the rest of this book electric fi elds will always be 
+expressed in phasor form, our general form for intensity will become
+I nE = 2 (2.39)
+2.1.5 Intensity and Absorbed Electromagnetic Energy
+The Poynting vector describes the fl ow of electromagnetic energy density. But the true 
+purpose of knowing the intensity of light is to understand its impact on materials, which 
+in our case means the impact of light on a photoresist. While the photochemistry of resists 
+will be discussed in Chapters 5 and 6, suffi ce it to say here that the quantity of interest 
+will be the electromagnetic energy absorbed by a material. Consider a monochromatic 
+plane wave traveling through a uniform material of complex refractive index n. Separating 
+the real and imaginary parts of the refractive index,
+
+
+## Page 10
+
+38 Fundamental Principles of Optical Lithography
+EA A A ikz i z z i nz == = − ee e e 2 22 π λ πκ λ π λ n / // () (2.40)
+The intensity can then be written, from Equation (2.39),
+I nA I zz == 24−− 0 () ee πκ λ α / (2.41)
+where I0 = I(z = 0) and a is the absorption coeffi cient of the material, given by
+α
+πκ
+λ = 4 (2.42)
+Equation (2.41) is the familiar Lambert law of absorption, empirically verifi ed for homogeneous materials.
+The imaginary part of the refractive index was related previously to the electrical and 
+magnetic properties of the material in Equation (2.21). For a weakly absorbing material, 
+such as a photoresist, the absorption coeffi cient becomes, from Equation (2.23)
+α σµ
+ε ≈ == Zn Z 0
+0
+0
+0
+where . 376 73Ω (2.43)
+Thus, absorption of electromagnetic energy results from the conductivity of the material 
+at the frequency of the electromagnetic radiation. The electromagnetic wave gives energy 
+to the electrons of the atoms of the material in proportion to its conductivity, in the form 
+of absorbed photons of light.
+2.2 Basic Imaging Theory
+Using the basic understanding of light from the previous section, and especially the phasor 
+representation of a plane wave, we are now ready to examine the behavior of an optical 
+imaging system. Consider the generic projection system shown in Figure 2.1. It consists 
+of a light source, a condenser lens, the mask, the objective lens and fi nally the resistcoated wafer. The combination of the light source and the condenser lens is called the 
+illumination system. In optical design terms, a lens is a system of (possibly many) lens 
+elements. Each lens element is an individual piece of glass (refractive element) or a mirror 
+Light Source
+Condenser Lens
+Mask
+Objective Lens Wafer
+Figure 2.1 Block diagram of a generic projection imaging system
+
+
+## Page 11
+
+ Aerial Image Formation – The Basics 39
+(refl ective element) or other optical element. The purpose of the illumination system is 
+to deliver light to the mask (and eventually into the objective lens) with suffi cient intensity, the proper directionality and spectral characteristics, and adequate uniformity across 
+the fi eld (i.e. across the mask). The mask consists of a transparent substrate on which a 
+pattern has been formed. This pattern changes the transmittance of the light and in its 
+simplest form is just an opaque fi lm. The light then passes through the clear areas of the 
+mask and diffracts on its way to the objective lens. The purpose of the objective lens is 
+to pick up a portion of the diffraction pattern and project an image onto the wafer which, 
+one hopes, will resemble the mask pattern (or, more correctly, the desired pattern as 
+expressed in the original design data).
+2.2.1 Diffraction
+The fi rst and most basic phenomenon occurring in projection imaging is the diffraction 
+of light. Diffraction is usually thought of as the bending of light as it passes through an 
+aperture, which is certainly an appropriate description for diffraction by a lithographic 
+mask. More correctly, diffraction theory simply describes how light propagates, including 
+the effects of the surroundings (boundaries). Maxwell’s equations describe how electromagnetic waves propagate, but result in partial differential equations of vector quantities 
+which, for general boundary conditions, are extremely diffi cult to solve without the aid 
+of a powerful computer and sophisticated numerical algorithms. A simpler approach is 
+applicable to the propagation of light within a homogenous medium (for example, describing how light travels from the photomask to the objective lens of our imaging system). 
+This simple approach leads to the development of diffraction integrals derived from the 
+Helmholtz equation (2.18). While the derivation of these diffraction integrals will not 
+be presented here, some historical background will help to put their usefulness in 
+perspective.
+A simple interpretation of the physical principle behind diffraction is best captured by 
+Huygens’ principle. First described by the famous Dutch scientist Christian Huygens in 
+his 1690 Treatise on Light, any wavefront can be thought of as a collection of radiating 
+point sources (Figure 2.2). The new wavefront at some later time can be constructed by 
+summing up the wavefronts from all of the radiated spherical waves. As Figure 2.2 shows, 
+one result of these self-luminous wavefront points is the apparent bending of light around 
+an opaque edge – an example of diffraction. In 1818, Augustin-Jean Fresnel formed a 
+Plane Wave Propagation Diffraction by a Slit 
+Figure 2.2 Pictorial representation of Huygens’ principle, where any wavefront can be 
+thought of as a collection of point sources radiating spherical waves
+
+
+## Page 12
+
+40 Fundamental Principles of Optical Lithography
+mathematical theory of diffraction by turning this summation into an integral and accounting for the phase of the light when adding together the propagating spherical waves. He 
+also included an empirical obliquity factor to keep these radiating spherical waves from 
+propagating backwards as readily as forward. This scalar diffraction theory was put on a 
+more rigorous footing by the Prussian mathematician and physicist Gustav Kirchhoff in 
+1882, who required the diffracting waves to satisfy the Helmholtz equation and conservation of energy, thus deriving Fresnel’s previously empirical obliquity term. Fresnel’s diffraction integral is in fact a simplifi cation of Kirchhoff’s formulation for the case when 
+the distance away from the diffracting plane (that is, the distance from the mask to the 
+objective lens) is much greater than the wavelength of light. Finally, if the distance to the 
+objective lens is very large, or if the mask is illuminated by a spherical wave which 
+converges to a point at the entrance to the objective lens, Fresnel diffraction simplifi es 
+to Fraunhofer diffraction (named for Joseph von Fraunhofer, who used a lens to create 
+the far-fi eld diffraction pattern). Comparison of these different diffraction regions is given 
+in Figure 2.3.
+In order to establish a mathematical description of diffraction by a mask, we must fi rst 
+describe the electric fi eld transmittance of a mask pattern tm(x,y), where the mask is in 
+the x–y plane and tm(x,y) has in general a magnitude, phase and vector direction. An exact 
+calculation of the mask transmittance requires a solution to Maxwell’s equations for the 
+given materials and physical structure of the mask and for a specifi c incident light wave. 
+As we shall see in the sections below, any arbitrary incident illumination can be conveniently broken up into a summation of plane waves of different polarizations and propagation directions. Thus, the transmittance of different polarizations of incident light as a 
+function of the incident angle of light is required.
+In some circumstances, however, a simpler approach will prove adequate. For cases 
+where the feature sizes on the mask are larger than about 2l and where the topography 
+on the mask (for example, the thickness of a chrome absorber) is less than about l/2, it 
+is possible to ignore diffraction by the topography of the mask and simply assume that 
+the mask transmittance is a perfect shadow of the mask. In other words, the transmittance 
+directly below a specifi c feature on the mask is assumed to be the same as the transmittance under an infi nitely large area of that material. At an edge between two materials, 
+the transmittance of the boundary is assumed to be a step function between the transmittances of the two materials. This assumed transmittance function is called the Kirchhoff 
+Fresnel
+Diffraction 
+Region
+(z » w)
+Kirchhoff
+Diffraction Region
+(z > /2)
+Fraunhofer
+Diffraction 
+Region
+(z » w2 p /)
+l
+l
+Figure 2.3 Comparison of the diffraction ‘regions’ where various approximations become 
+accurate. Diffraction is for a slit of width w illuminated by light of wavelength l, and z is the 
+distance away from the mask
+
+
+## Page 13
+
+ Aerial Image Formation – The Basics 41
+boundary condition. Note that under this assumption, the transmittance for each polarization is assumed to be the same, so that incident polarization can be ignored when employing the Kirchhoff boundary condition. Also, the effect of incident angle can be treated 
+very simply in the case of the Kirchhoff boundary condition, as will be discussed in 
+section 2.3.
+For a simple chrome-glass mask, the mask E-fi eld transmittance for a normally incident 
+plane wave of illumination under the Kirchhoff boundary condition assumption is binary: 
+tm(x,y) is 1 under the glass and 0 under the chrome. Let the x′–y′ plane be the diffraction 
+plane, that is, the entrance to the objective lens, and let z be the distance from the mask 
+to this diffraction plane. We will also assume monochromatic light of wavelength l and 
+that the entire system is in a medium of refractive index n. Defi ning the spatial frequencies of the diffraction pattern (which are simply scaled coordinates in the x′–y′ plane) as 
+fx = nx′/(zl) and fy = ny′/(zl), the electric fi eld of our diffraction pattern, Tm(fx,fy), is given 
+by the Fraunhofer diffraction integral:
+T f f E xyt x y x y xy
+i fx fy xy
+m im
+2 ( ) () , , , e dd = () −+ ()
+−∞
+∞
+−∞
+∞
+∫ ∫ π (2.44)
+where Ei is the electric fi eld incident on the mask (and is just 1 for our unit amplitude, 
+normally incident plane wave). For many scientists and engineers, this equation should 
+be quite familiar – it is simply a Fourier transform. Thus, the diffraction pattern (i.e. the 
+electric fi eld distribution as it enters the objective lens) is just the Fourier transform of 
+the mask pattern transmittance (the electric fi eld directly under the mask). This is the 
+principle behind an extremely useful approach to imaging called Fourier optics (for more 
+information, consult Goodman’s classic textbook1).
+Figure 2.4 shows two mask patterns – one an isolated space, the other a series of equal 
+lines and spaces – both infi nitely long in the y-direction (the direction out of the page). 
+The resulting one-dimensional mask fi eld transmittance functions, tm(x), look like a square 
+pulse and a square wave, respectively. The Fourier transforms for normally incident plane 
+wave illumination (Ei = 1) are easily computed directly from Equation (2.44) or found in 
+tables or textbooks (see Problem 2.4) and are also shown in Figure 2.4. The isolated space 
+fx
+0 0
+Mask
+0
+1
+Tm(fx)
+tm(x)
+(a) (b)
+Figure 2.4 Two typical mask patterns, (a) an isolated space and (b) an array of equal lines 
+and spaces, and the resulting Fraunhofer diffraction patterns assuming normally incident 
+plane wave illumination. Both tm and Tm represent electric fi elds
+
+
+## Page 14
+
+42 Fundamental Principles of Optical Lithography
+gives rise to a sinc function (sin(x)/x) diffraction pattern, and the equal lines and spaces 
+yield discrete diffraction orders:
+Isolated space
+Dense space
+m
+m
+:
+sin( )
+:
+sin(
+Tf wf
+f
+Tf
+p
+x
+x
+x
+x
+()
+()
+=
+=
+π
+π
+1 πwf
+f f j
+p
+x
+x
+x
+j
+)
+π
+δ − 
+
+ 
+
+ =−∞
+∞
+∑
+ (2.45)
+where d is the Dirac delta function, w is the spacewidth and p is the pitch (the linewidth 
+plus the spacewidth). The delta function is the mathematical representation of a point of 
+light. (As a review, the properties of the delta function are discussed in Appendix C.)
+It is interesting to consider how different these two diffraction patterns are. The isolated 
+space results in a continuous distribution of energy in the form of a sinc function. The 
+dense array of spaces produces discrete points of light, whose brightness follows the sinc 
+function envelop (that is, the diffraction pattern of just one of its spaces). To visualize 
+how this happens, consider the intermediate cases of two or three spaces of equal width, 
+separated by lines of the same width. Figure 2.5 shows the intensity of the diffraction 
+patterns (electric fi eld amplitude squared) for these cases. For the multiple space cases, 
+diffraction patterns from adjacent spaces interfere with each other, producing narrow 
+interference fringes. The greater the number of spaces, the greater the interference is and 
+thus the narrower the peaks. As the number of spaces in the array approaches infi nity, the 
+fringes become infi nitely narrow points of light.
+Let’s take a closer look at the diffraction pattern for equal lines and spaces. At the 
+center of the objective lens entrance (fx = 0), the diffraction pattern has a bright spot called 
+the zero order. The zero order is the light that passes through the mask and is not bent. 
+To either side of the zero order are two peaks called the fi rst diffraction orders. These 
+peaks occur at spatial frequencies of ±1/p, where p is the pitch of the mask pattern (linewidth plus spacewidth). Since the position of these diffraction orders relative to the zero 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+–3 –2 –10 1 2 3
+wfx
+Intensity
+Figure 2.5 Magnitude of the diffraction pattern squared (intensity) for a single space (thick 
+solid line), two spaces (thin solid line) and three spaces (dashed lines) of width w. For the 
+multiple-feature cases, the linewidth is also equal to w
+
+
+## Page 15
+
+ Aerial Image Formation – The Basics 43
+order depends on the mask pitch, their relative positions contain information about the 
+pitch. It is this information that the objective lens will use to reproduce the image of the 
+mask. In fact, in order for the objective lens to form a true image of a pattern of lines and 
+spaces, at least two diffraction orders must be captured by the objective lens and used to 
+form the image. In addition to the fi rst order, there can be many higher orders, with the 
+jth order occurring at a spatial frequency of j/p.
+While in principle the number of diffraction orders (the range of values of j) is infi nite, 
+only some of these orders are capable of propagating from the mask to the lens. If a wave 
+has a spatial frequency such that
+ff xy
+22 1
++> λ
+ (2.46)
+these waves are said to evanescent. This condition is equivalent to a wave whose direction 
+cosines have a2 + b2 > 1 so that the direction cosine g is imaginary. The amplitudes of 
+these evanescent waves decay exponentially as
+e where − = +− ς ςπ λ
+z 2 nf f xy22 1
+2 (2.47)
+Thus, for practical purposes, diffraction patterns need only be considered out to spatial 
+frequencies less than the onset of evanescent waves.
+Summarizing, given a mask in the x–y plane described by its electric fi eld transmission 
+tm(x,y) multiplied by the incident electric fi eld Ei(x,y), the electric fi eld Tm as it enters the 
+objective lens (the x′–y′ plane) is given by
+T f f E xyt xy m im xy ( ) { ( ) ( )} , ,, =F (2.48)
+where the symbol F represents the Fourier transform and fx and fy are the spatial frequencies and are simply scaled coordinates in the x′–y′ diffraction plane. Often, tm(x,y) is 
+approximated as the shadow transmittance of the mask using the Kirchhoff boundary 
+condition. For normally incident plane wave illumination, Ei = 1.
+2.2.2 Fourier Transform Pairs
+Some important diffraction patterns can now be calculated. Table 2.1 shows several 
+common 1D functions of some interest to lithographers, as well as their Fourier transforms. These transform pairs can be applied to different problems with the addition of 
+two important theorems. If F{g(x,y)} = G(fx,fy), the shift theorem of the Fourier transform 
+says
+F{ ( )} ( ) () g x ay b G f f xy
+i fa fb xy −− = −+ , ,e 2π (2.49)
+where a and b are constants. In other words, a shift in position of the mask produces a 
+linear phase variation across the diffraction pattern. The similarity theorem of the Fourier 
+transform is
+F{ ( )} g ax by abG f
+a
+f
+b
+x y ,, = 
+
+
+
+1 (2.50)
+
+
+## Page 16
+
+44 Fundamental Principles of Optical Lithography
+Table 2.1 1D Fourier transform pairs useful in lithography
+g(x) Graph of g(x) G(fx)
+rect x x
+x () .. = <>
+
+
+
+1 05
+0 05
+,
+,
+sin( ) π
+π
+f
+f
+x
+x
+step x x
+x () = ><
+
+
+
+10
+00
+,
+,
+1
+22
+δ
+π
+() f i
+f x
+x
+−
+Delta function d(x) 1
+comb x x j
+j
+( ) =− =−∞
+∞
+∑ δ() δ() fj x
+j
+− =−∞
+∞
+∑
+cos(px) 1
+2
+1
+2
+1
+2
+1
+2
+δδ ff xx + ( ) +− ( )
+sin(px) i f i f xx 2
+1
+22
+1
+2
+δδ + ( ) −− ( )
+Gaussian e−πx2
+e f −π x
+2
+circ r r
+r () = <>
+
+
+
+11
+01
+,
+,
+r xy =+22
+J1() 2πρ
+πρ
+ρ =+ ff xy
+22
+This theorem shows that making a pattern smaller (a, b < 1) spreads the diffraction pattern 
+to higher spatial frequencies. Finally, by recognizing that the Fourier transform is a linear 
+operation (see Problem 2.7), superposition of known Fourier transform pairs can be used 
+to build more complicated functions.
+Another important general transform that is extremely useful in lithography is the 
+generalized repeating pattern. Consider a two-dimensional pattern that repeats in x and y
+with pitches px and py, respectively. Let tr(x,y) be the transmittance of a single repeating 
+unit such that the transmittance is nonzero only in the range −px/2 < x < px/2 and −py/2 
+< y < py/2. The total transmittance of the mask is then
+
+
+## Page 17
+
+ Aerial Image Formation – The Basics 45
+t x y t x jp y kp t x y comb x
+p
+y
+p xy
+j k xy
+mr r () ( ) () , ,, , = + += ⊗ 
+
+ =−∞
+∞
+=−∞
+∞
+∑ ∑ 
+
+ (2.51)
+where the ‘⊗’ symbol denotes convolution. Letting Tr(fx, fy) be the Fourier transform of 
+the isolated repeating unit transmittance, the Fourier transform of Equation (2.51) gives
+T ff
+pp
+Tff f j
+p
+f k
+p xy
+xy
+xy x
+x
+y
+j k y
+mr () () , ,, = −− 
+
+ 
+
+ =−∞
+∞
+=−∞
+∞
+∑ ∑ 1 δ (2.52)
+Thus, any repeating pattern produces a diffraction pattern made up of delta functions 
+(diffraction orders). The amplitudes of the diffraction orders are given by the Fourier 
+transform of the isolated repeating unit mask pattern.
+2.2.3 Imaging Lens
+We are now ready to describe what happens next and follow the diffracted light as it 
+enters the objective lens. In general, the diffraction pattern extends throughout the x′–y′
+plane. However, the objective lens, being only of fi nite size, cannot collect all of the light 
+in the diffraction pattern. Typically, lenses used in microlithography are circularly symmetric and the entrance to the objective lens can be thought of as a circular aperture. Only 
+those portions of the mask diffraction pattern that fall inside the aperture of the objective 
+lens go on to form the image. Of course, we can describe the size of the lens aperture by 
+its radius, but a more common and useful description is to defi ne the maximum angle of 
+diffracted light that can enter the lens. Consider the geometry shown in Figure 2.6. Light 
+passing through the mask is diffracted at various angles. Given a lens of a certain size 
+placed at a certain distance from the mask, there is some maximum angle of diffraction, 
+qmax, for which the diffracted light just makes it into the lens. Light emerging from the 
+mask at larger angles misses the lens and is not used in forming the image. The most 
+convenient way to describe the size of the lens aperture is by its numerical aperture, 
+Aperture
+(xy’, ’)-plane
+Object
+Plane
+max
+Objective
+Lens
+Entrance
+PuPil
+q
+Figure 2.6 The numerical aperture is defi ned as NA = n sin qmax where qmax is the maximum 
+half-angle of the diffracted light that can enter the objective lens, and n is the refractive index 
+of the medium between the mask and the lens
+
+
+## Page 18
+
+46 Fundamental Principles of Optical Lithography
+defi ned as the sine of the maximum half-angle of diffracted light that can enter the lens 
+times the index of refraction of the surrounding medium, n.
+NA n = sinθmax (2.53)
+Besides the diffraction plane, it is important to defi ne the entrance pupil of the objective 
+lens. Despite the simplicity of the single-lens diagram in Figure 2.6, the diffraction plane 
+(also called the pupil plane or aperture plane) is actually buried inside the lens in most 
+cases. The entrance pupil (or opening) is spherical in shape and is the image of the diffraction plane as seen from the entrance of the lens. The diffraction plane can be constructed 
+simply as the geometric projection of the spherical entrance pupil onto a plane. (Likewise, 
+the exit pupil is the image of the aperture plane as viewed from the exit side of the lens.) 
+Thus, one can easily express the spatial frequency in terms of the angle of diffraction:
+f nx
+z
+n x
+x = ′
+= λ
+θ
+λ
+sin (2.54)
+with, of course, an equivalent expression for the y-direction. Alternately, the spatial frequencies can be related to the direction cosines as defi ned in Equation (2.25):
+f n f n xy == α
+λ
+β
+λ , (2.55)
+Using this description, the maximum spatial frequency that can enter the objective lens 
+is given by NA/l.
+Clearly, the numerical aperture is going to be quite important. A large numerical aperture means that a larger portion of the diffraction pattern is captured by the objective lens. 
+For a small numerical aperture, much more of the diffracted light is lost. In fact, we can 
+use this viewpoint to defi ne resolution, at least from the limited perspective of image 
+formation. Consider the simple case of a mask pattern of equal lines and spaces. As we 
+have seen, the resulting diffraction pattern is a series of discrete diffraction orders. In 
+order to produce an image that even remotely resembles the original mask pattern, it is 
+necessary for the objective lens to capture the zero order and at least one higher diffraction order. If the light illuminating the mask is a normally incident plane wave (the only 
+type of illumination we have discussed so far), the diffraction pattern will be centered in 
+the objective lens (more on this topic will be covered in section 2.3.1). Since the positions 
+of the ±1st diffraction orders in frequency space are given by ±1/p, the requirement that 
+a lens must capture these diffraction orders to form an image puts a lower limit on the 
+pitch that can be imaged. Thus, the smallest pitch (pmin) that still produces an image will 
+put the fi rst diffraction order at the outer edge of the objective lens:
+1
+p
+NA
+min
+= λ (2.56)
+If we let R represent the resolution element (the linewidth or the spacewidth) of our equal 
+line/space pattern, the resolution will be given by
+R
+NA = 05. λ (2.57)
+
+
+## Page 19
+
+ Aerial Image Formation – The Basics 47
+This classic equation is often called the theoretical resolution of an imaging system. 
+Note that several very specifi c assumptions were made in deriving this resolution equation: a mask pattern of equal lines and spaces was used, and the illumination was a single 
+wavelength normally incident plane wave (called coherent illumination). In reality, this 
+equation defi nes the pitch resolution, the smallest pitch that can be imaged, for normally 
+incident plane waves. For other features, for example an isolated line, there is no clear 
+resolution cutoff. For other types of illumination, this cutoff will change. As a result, this 
+approximate resolution expression is often generalized as
+Rk
+NA = 1
+λ (2.58)
+Such resolution equations are best interpreted as scaling equations, with k1 as the scaled 
+resolution. See Chapter 10 for a more thorough discussion of resolution.
+2.2.4 Forming an Image
+To proceed further, we must now describe how the lens affects the light entering it. 
+Obviously, we would like the image to resemble the mask pattern. Since diffraction 
+gives the Fourier transform of the mask, if the lens could give the inverse Fourier transform of the diffraction pattern, the resulting image would resemble the mask pattern. 
+In fact, lenses are designed to behave precisely in this way. We can defi ne an ideal 
+imaging lens as one that produces an image at the focal plane that is identically equal to 
+the Fourier transform of the light distribution entering the lens. A property of the Fourier 
+transform is
+FF{ { ( )}} ( ) g xy g x y ,, = −− (2.59)
+Thus, one Fourier transform (diffraction) followed by a second Fourier transform (focusing by the imaging lens) produces an image that is a 180° rotated version of the original. 
+It is common to defi ne an image coordinate system that is rotated by 180° so that this 
+rotation can be ignored. In the rotated image coordinate system, the focusing behavior of 
+the imaging lens is described as a simple inverse Fourier transform.
+It is the goal of lens designers and manufacturers to create lenses as close as possible 
+to this ideal. Does an ideal lens produce a perfect image? No. Because of the fi nite size 
+of the lens aperture, only a portion of the diffraction pattern enters the lens. Thus, even 
+an ideal lens cannot produce a perfect image unless the lens is infi nitely big. Since in the 
+case of an ideal lens the image is limited only by the diffracted light that does not make 
+it through the lens, we call such an ideal system diffraction limited.
+In order to write our fi nal equation for the formation of an image, let us defi ne the 
+objective lens pupil function P (a pupil is just another name for an aperture) as the transmittance of the lens from the entrance pupil to the exit pupil. The pupil function of an 
+ideal lens simply describes what portion of light makes it through the lens: it is one inside 
+the aperture and zero outside.
+Pf f f f NA
+f f NA xy
+xy
+xy
+() , ,/
+,/ = +<+>
+
+
+
+
+1
+0
+22
+22
+λ
+λ
+ (2.60)
+
+
+## Page 20
+
+48 Fundamental Principles of Optical Lithography
+Thus, the product of the pupil function and the diffraction pattern describes the light 
+transmitted through the objective lens, that is, the light at the exit pupil. Combining this 
+with our description of how a lens behaves gives us our fi nal expression for the electric 
+fi eld at the image plane (that is, at the wafer):
+E xy T f f P f f xy xy ( ) { ( ) ( )} , ,, = m − F 1 (2.61)
+where the symbol F −1 represents the inverse Fourier transform. The aerial image is 
+defi ned as the intensity distribution in air at the wafer plane and is simply the square of 
+the magnitude of the electric fi eld (see section 2.1.3).
+Consider the full imaging process (Figure 2.7). First, light passing through the mask 
+is diffracted. The diffraction pattern can be described as the Fourier transform of the 
+electric fi eld at the bottom of the mask. Since the objective lens is of fi nite size, only a 
+portion of the diffraction pattern actually enters the lens. The numerical aperture defi nes 
+the maximum angle of diffracted light that enters the lens and the pupil function is used 
+to mathematically describe this behavior. Finally, the effect of the lens is to take the 
+inverse Fourier transform of the light exiting the lens to give an image which (one hopes) 
+resembles the mask pattern. If the lens is ideal, the quality of the resulting image is only 
+limited by the amount of the diffraction pattern collected. This type of imaging system is 
+called diffraction limited.
+2.2.5 Imaging Example: Dense Array of Lines and Spaces
+Again referring to the simplifi ed case of an infi nite array of lines and spaces, the diffraction pattern is made up of discrete diffraction orders, points of light represented mathematically as delta functions. The image of such a pattern is calculated as the inverse 
+Fourier transform of the diffraction orders that make it through the lens (those with spatial 
+frequencies less than NA/l). The inverse Fourier transform of a delta function is just 1, 
+so that a point source in the pupil plane of the lens produces a plane wave at the wafer 
+Objective
+Lens
+Mask 
+(Object)
+Wafer
+(Image)
+Entrance Pupil
+Exit Pupil
+Figure 2.7 Formation of an aerial image: a pattern of lines and spaces produces a diffraction 
+pattern of discrete diffraction orders (in this case, three orders are captured by the lens). The 
+lens turns these diffraction orders into plane waves projected onto the wafer, which interfere 
+to form the image
+
+
+## Page 21
+
+ Aerial Image Formation – The Basics 49
+plane. Letting N be the largest diffraction order that passes through the lens, and using 
+the dense space diffraction pattern of Equation (2.45),
+Ex
+p
+wf
+f f j
+p
+f
+Ex a
+x
+jN x
+N
+x i fx x
+j
+x () sin( )
+()
+=− 
+
+ 
+
+
+=
+−∞ =−
+∞
+∫ ∑1 π 2
+π
+δ π ed
+e where / i jx p/
+jN
+N
+aj
+j wp
+j
+2π π
+=− π ∑ = sin( )
+ (2.62)
+The term ei2pjx/p represents the electric fi eld of a unit-amplitude plane wave spread out 
+over the focal plane, whose incident angle when striking the focal plane is given by the 
+angle of the jth diffraction order (sin q = jl/p). The amplitude of this plane wave is aj, the 
+amplitude of the jth diffraction order. The electric fi eld image at the wafer plane is 
+the sum (the interference) of the various plane waves reaching the wafer. This interpretation of the line/space image result is extremely useful. As Equation (2.52) shows, any 
+repeating pattern on the mask will produce a diffraction pattern made up of delta functions 
+(point sources) called diffraction orders. Each diffraction order in turn produces one plane 
+wave striking the wafer. The summation (interference) of all of the plane waves produces 
+the image. This is sometimes called plane wave decomposition, since the image is decomposed into plane wave basis functions.
+Since the diffraction pattern for this case is centered in the entrance pupil, Equation 
+(2.62) can be simplifi ed using Euler’s theorem.
+E x a a jx p j
+j
+N
+( ) cos( ) =+ =
+0 ∑1
+22π / (2.63)
+The zero order, given by a0, provides a DC offset to the electric fi eld. Each pair of diffraction orders, ±1, ±2, etc., provides a cosine at harmonics of the pitch p. For the case 
+of equal lines and spaces, the diffraction order amplitudes become
+a j
+j
+j
+j even
+j
+j
+j = () =
+=
+=
+=± ± ±
+− =± ±
+sin
+...
+π
+π
+π
+π
+/
+,
+,
+, j 1, , ,
+, j 3,
+2
+1
+2
+0
+0
+1 59
+1 7 11 ,, ±
+
+
+
+
+
+
+
+
+
+
+ ...
+ (2.64)
+A graph of this diffraction pattern for ±3 orders is given in Figure 2.8.
+Consider the case of lines and spaces where N = 1 (that is, the lens captures the zero 
+order and the ±1 orders). The electric fi eld image is then
+E x a a xp xp ( ) cos( ) cos( ) = + =+ 01 22 1
+2
+2
+π 2
+π
+// π (2.65)
+and the intensity image is
+I x E x a aa xp a xp ( ) ( ) cos( ) cos ( ) = =+ + 2
+0
+2 01 122 4 242 ππ // (2.66)
+
+
+## Page 22
+
+50 Fundamental Principles of Optical Lithography
+For equal lines and spaces, the image becomes
+I x xp xp ( ) cos( ) cos ( ) =+ +
+1
+4
+2 2 4 2 2
+2
+π
+π
+π
+// π (2.67)
+or
+I x xp xp ( ) cos( ) cos( ) =+ + +
+1
+4
+22 2 2 4 22 ππ
+π
+π
+// π (2.68)
+It is useful to interpret each term in Equation (2.67) physically. The zero order contributes a DC bias to the fi nal image, seen as the fi rst term on the right-hand side of Equation 
+(2.67). The second term represents the interference of the zero order with the fi rst orders 
+and contains the main cosine function that determines the overall shape of the aerial 
+image. The fi nal cosine-squared term represents the interference of the +1 order with the 
+−1 order. Since the distance between these orders is 2/p in spatial frequency space, this 
+term contributes a frequency-doubled sinusoid to the image.
+As a note, the image calculations above perform a scalar addition of the electric fi elds 
+of the zero and fi rst orders. That is, the vector directions of the electric fi elds of each 
+plane wave interfering at the wafer plane are assumed to be parallel. For the case where 
+this is not true, a full vector treatment of the image calculation, as given in Chapter 3, is 
+required.
+The number of diffraction orders captured by the objective lens determines the quality 
+and characteristics of the resulting aerial image. If the numerical aperture of the lens is 
+increased (or if the wavelength is decreased), increasing numbers of diffracted orders can 
+be captured and used to form the image. Each added diffraction order contains information that improves the quality of the aerial image (Figure 2.9).
+2.2.6 Imaging Example: Isolated Space
+Consider now the image of an isolated space under coherent illumination. Taking the 
+inverse Fourier transform of the portion of the diffraction pattern [from Equation (2.45)] 
+that makes it through the lens,
+Ex wf
+f f x
+x
+i fx x
+NA
+NA
+x () sin( )
+/
+/
+=
+−
+∫ π
+π
+π
+λ
+λ
+ed 2 (2.69)
+fx
+Amplitude
+0 p
+1
+p
+2
+p
+3
+p
+1 − p2 −
+p
+3 −
+0.5
+Figure 2.8 Graph of the diffraction pattern for equal lines and spaces plotted out to ±3rd 
+diffraction orders. For graphing purposes, the delta function is plotted as an arrow, the height 
+equal to the amplitude multiplier of the delta function
+
+
+## Page 23
+
+ Aerial Image Formation – The Basics 51
+Breaking up the complex exponential into a sine and cosine using Euler’s identity, any 
+odd part of the function will integrate to zero. Thus, keeping only the even part,
+Ex wf xf
+f f xx
+x
+x
+NA
+() sin( )cos( ) = ∫ 2 2
+0
+ππ
+π
+λ
+d
+/
+ (2.70)
+Using a trigonometric identity,
+Ex fx w fx w
+f f xx
+x
+x
+NA
+() sin( [ ]) sin( [ ]) = +− − ∫ 2 22 2
+0
+ππ
+π
+λ // d/
+ (2.71)
+This integral can be expressed in terms of the commonly tabulated Sine integral (Si) to 
+give the fi nal image intensity:
+Ix NAxw
+NA () ( ) ( ) =+ xw 
+
+
+ −− 
+
+
+
+
+ 
+
+
+12 2 2 2 2
+2
+π
+π
+λ
+π
+λ Si / Si / (2.72)
+where
+Si d () sin θ
+θ
+= ∫ z
+z
+z
+0
+2.2.7 The Point Spread Function
+A common method of characterizing the resolving capability of an imaging system is to 
+consider the smallest possible contact hole that can be printed. (The term ‘contact’ hole 
+refers to the use of this small hole in ICs for making electrical contact between two metal 
+layers separated by an insulator.) Consider a mask pattern of an isolated rectangular hole 
+in a chrome (totally dark) background. Now let that hole shrink to an infi nitesimal pinhole. 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+–w –w/2 0 w/2 w
+Horizontal Position
+Relative Intensity
+N = 1
+N = 3
+N = 9
+Figure 2.9 Aerial images for a pattern of equal lines and spaces of width w as a function 
+of the number of diffraction orders captured by the objective lens (coherent illumination). N
+is the maximum diffraction order number captured by the lens
+
+
+## Page 24
+
+52 Fundamental Principles of Optical Lithography
+As the hole shrinks, the intensity of light reaching the wafer becomes infi nitesimally 
+small, but we shall normalize out this effect and consider only the shape of the resulting 
+aerial image. Thus, as the contact hole shrinks to a pinhole, the transmittance of the photomask becomes a delta function. The diffraction pattern, then, is just 1, a plane wave 
+uniformly fi lling the pupil of the objective lens.
+For uniform fi lling of the entrance pupil, the resulting image is the inverse Fourier 
+transform of the pupil function. The result for an ideal circular aperture is
+E xy P f f J xy () ( ) () ,, = {} = − F 1 1 2πρ
+πρ
+ (2.73)
+where J1 is the Bessel function of the fi rst kind, order one, and r is the radial distance 
+from the center of the image normalized by multiplying by NA/l. The intensity aerial 
+image of a pinhole, when normalized in this way, is called the point spread function (PSF) 
+of the optical system.
+PSF J ideal = 1
+2 () 2πρ
+πρ
+ (2.74)
+The PSF (also called the Airy disk, after George Biddle Airy) is a widely used metric of 
+imaging quality for optical system design and manufacture and is commonly calculated 
+for lens designs and measured on fabricated lenses using special bench-top equipment. 
+Figure 2.10 shows a graph of the ideal PSF.
+How wide is the PSF? For large contact holes, the normalized intensity at a position 
+corresponding to the mask edge (that is, at the desired contact hole width) is about 0.25–
+0.3. If we use this intensity range to measure the width of the PSF, the result is a contact 
+hole between 0.66 and 0.70 l/NA wide. Thus, this width represents the smallest possible 
+contact hole that could be imaged with a conventional chrome on glass (i.e. not phaseshifted) mask. If the contact hole size on the mask approaches or is made smaller than 
+0.0
+–1.5 –1.0 –0.5 0.0 0.5 1.0 1.5
+Normalized Radius = rNA/
+0.2
+0.4
+0.6
+0.8
+1.0
+Normalized Intensity
+l
+Figure 2.10 Ideal point spread function (PSF), the normalized image of an infi nitely small 
+contact hole. The radial position is normalized by multiplying by NA/l
+
+
+## Page 25
+
+ Aerial Image Formation – The Basics 53
+this value, the printed image is controlled by the PSF, not by the dimensions of the mask! 
+Making the contact size on the mask smaller only reduces the intensity of the image peak. 
+Thus, this width of the PSF, the ultimate resolution of a chrome on glass (COG) contact 
+hole, is a natural resolution of the imaging system.
+The PSF can also be interpreted using linear systems theory. For the coherent illumination discussed so far, the Fourier transform of the electric fi eld image is equal to the pupil 
+function multiplied by the Fourier transform of the mask transmittance.
+F{ ( )} ( ) ( ) E xy T f f P f f xy xy , ,, = m (2.75)
+Thus, the electric fi eld image is linear in Fourier space, with the pupil function serving 
+the role of the system transfer function. In real space, applying the convolution theorem 
+of the Fourier transform to Equation (2.75) gives
+E xy t xy P f f xy ( ) ( ) { ( )} ,, , m 1 =⊗ − F (2.76)
+The inverse Fourier transform of the pupil function, as we saw above, is just the electric 
+fi eld PSF. Thus, for coherent illumination, the electric fi eld image is the electric fi eld mask 
+transmittance convolved with the electric fi eld PSF.
+In linear systems theory, the electric fi eld PSF would be called the impulse response
+of the imaging system. An infi nitely small pinhole on the mask produces a delta function 
+or ‘impulse’ of light as the object, so that the PSF, being the image of that impulse object, 
+is called the impulse response of the imaging system. For fi elds, the Green’s function 
+plays the equivalent role of the impulse response and the PSF will sometimes be referred 
+to as a Green’s function.
+2.2.8 Reduction Imaging
+The above discussion makes a useful simplifying assumption – that the imaging system 
+is 1×, or unit magnifi cation, so that the dimensions of the mask patterns are nominally 
+the same as those of the image being produced. In reality, most imaging tools used in 
+lithography are 4× to 10× reduction systems (with 4× the most common), so that the mask 
+is made 4× to 10× bigger than the desired pattern sizes on the wafer. Fortunately, this 
+reduction can be accounted for by a simple scaling relationship so that imaging with 
+reduction is treated mathematically the same as for a 1× system. For a reduction ratio R, 
+all lateral (x and y) dimensions at the wafer are equal to the mask dimensions divided by 
+R. Additionally, the sine of the angles of diffraction are R times greater on the wafer side 
+(exit side) of the lens compared to the mask side (entrance side). Thus, the common 
+numerical aperture used to describe the size of the lens is more properly defi ned as the 
+exit pupil numerical aperture, the entrance pupil NA being R times smaller (Figure 2.11). 
+Likewise, spatial frequencies on the wafer side are R times larger than spatial frequencies 
+on the mask side (a property of any good imaging system known as the Abbe sine 
+condition):
+n Rn ww mm sin sin θθ = (2.77)
+One can readily see that diffraction calculations using the mask dimensions and the 
+mask side numerical aperture produce the same results as calculations using the mask 
+scaled to wafer dimensions when using the wafer side NA. Additionally, all longitudinal 
+
+
+## Page 26
+
+54 Fundamental Principles of Optical Lithography
+(z, the focus direction) dimensions at the wafer are reduced by approximately R2 compared 
+to focus variations at the mask (see Chapter 3 for a more exact description).
+Reduction (or magnifi cation) in an imaging system adds an interesting complication. 
+Light entering the objective lens can be assumed to leave the lens with no loss in energy 
+(the lossless lens assumption). However, if there is reduction or magnifi cation in the lens, 
+the intensity distribution of the light entering will be different from that leaving since the 
+intensity is the energy spread over a changing area. The result is a radiometric correction 
+well known in optics.3 Conservation of energy requires that the amplitude of the electric 
+fi eld passing through the pupil at a wafer-side diffraction angle qw (corresponding to an 
+angle at the mask side of qm) be modifi ed by the radiometric correction
+Radiometric Correction
+n
+nR ==
+− 
+
+
+
+−
+cos
+cos
+sin
+sin
+θ
+θ
+θ
+m
+w
+w
+m
+w 1
+1
+2 2
+2
+2 θw
+
+
+
+
+
+
+
+
+
+
+
+
+0 25 .
+ (2.78)
+where R is the reduction factor (for example, 4.0 for a 4× reduction imaging tool, see 
+Figure 2.12) and Equation (2.77) was used to covert mask-side angles to the wafer side. 
+This radiometric correction can be incorporated directly into the lens pupil function in 
+terms of the wafer-side spatial frequencies:
+Pf f P f f
+ff
+nR
+ff
+n
+xy xy
+xy
+xy
+() ()
+()
+() ,, ideal m
+w
+=
+− +
+− +
+
+
+1
+1
+22 2
+22
+22 2
+2
+λ
+λ
+
+
+
+
+
+
+
+
+0 25 .
+ (2.79)
+Note that for R of about four and higher, the radiometric correction can be well approximated as
+Pf f P f f ff
+n xy xy
+xy () () () .
+,, ideal
+w
+≈−  +
+
+ 
+
+
+−
+1
+22 2
+2
+0 25 λ (2.80)
+The existence of this radiometric correction phenomenon gives rise to an interesting 
+question about image intensity normalization. In essence, for aerial image normalization, 
+θm
+Entrance
+Pupil
+Refractive index on 
+mask side = nm
+Refractive index on 
+wafer side = nw
+Exit 
+Pupil
+Aperture
+Stop
+θw
+Figure 2.11 An imaging lens with reduction R scales both the lateral dimensions and the 
+sine of the angles by R
+
+
+## Page 27
+
+ Aerial Image Formation – The Basics 55
+there are two choices: wafer level and mask level normalization. For example, one could 
+defi ne a unit relative intensity as the intensity obtained at the wafer for a large open-fi eld 
+exposure (blank glass mask in the reticle plane). Alternatively, one could defi ne the unit 
+intensity as the intensity transmitted by a large open area on a mask (and suitably multiplied by the reduction ratio squared to take the area change between mask and wafer into 
+account). If the radiometric correction is ignored, then these normalization approaches 
+are identical by invocation of the ‘lossless lens’ approximation: the energy leaving the 
+mask is 100 % transmitted to the wafer and thus the intensity just below the mask is 
+identical to the intensity striking the wafer for a blank quartz mask. However, if the 
+radiometric correction is taken into account, this simple, intuitive relationship no longer 
+holds (see Figure 2.13). Conservation of energy requires that, for a system with magnifi -
+cation or reduction, the intensity of light will change from one side of the lens to the other 
+if that light is traveling at a non-normal direction. As a result, when the radiometric correction is taken into account, the calculated aerial images will be different for a system 
+with a nonunit reduction ratio depending on whether mask-side or wafer-side normalization is used. The location of the energy sensor on the imaging tool, whether at the mask 
+plane or the wafer plane, dictates which normalization scheme is most appropriate (most 
+lithographic imaging tools have their dose sensors at the wafer plane).
+More importantly than intensity normalization, the radiometric correction impacts the 
+shape and quality of an aerial image. By increasing the pupil transmittance for high spatial 
+frequencies, the radiometric correction can actually improve image quality for some 
+masks and illuminators by making the higher-frequency diffraction orders (which carry 
+the information about the smallest features on the mask) brighter.
+Of course, the purpose of reduction in imaging has nothing to do with the radiometric 
+correction. Masks are made larger by some multiple in order to simplify the making of 
+the mask. Making masks with features that are 4× bigger than on the wafer is far easier 
+0.8
+1.0
+1.2
+1.4
+1.6
+1.8
+2.0
+0 0.2 0.4 0.6 0.8 1.0
+sin(angle)
+Pupil Transmittance
+Figure 2.12 A plot of the radiometric correction as a function of the wafer-side diffraction 
+angle (R = 4, nw/nm = 1)
+
+
+## Page 28
+
+56 Fundamental Principles of Optical Lithography
+than making 1× features on the mask. However, there are two important trade-offs with 
+increasing reduction ratio. For a given image fi eld size, the physical dimensions of the 
+mask grow as the reduction ratio. For a 25 × 25 mm image fi eld and a 4× mask, the resulting mask size would need to accommodate a 100 × 100 mm region. If the reduction ratio 
+were made larger, the mask size could become too large to handle effectively, especially 
+with respect to maintaining proper registration of the features over the larger mask area. 
+Additionally, higher reduction ratios lead to more complex lens designs (the symmetry 
+of 1× imaging leads to the simplest lens designs).
+2.3 Partial Coherence
+Although we have completely described the behavior of one simple, ideal imaging system, 
+we must add an important complication before we describe the operation of a projection 
+system for lithography. So far, we have assumed that the mask is illuminated by spatially 
+coherent light. Coherent illumination means simply that the light striking the mask arrives 
+from only one direction. We have further assumed that the coherent illumination on the 
+mask is normally incident. But real lithographic tools use a more complicated form of 
+illumination, where light strikes the mask from a range of angles.
+(As a note, the coherence described here is a spatial coherence, as opposed to the 
+related but different concept of temporal coherence. Spatial coherence can be thought of 
+as the phase relationship between light at two points in space at one instance in time. 
+Temporal coherence looks at light at one point in space but at different times. While 
+temporal coherence often entails spatial coherence, the existence of spatial coherence 
+usually does not imply anything about the temporal coherence of the light. Unfortunately, 
+most technical literature will refer to one or the other of these properties as simply ‘coherence’. Thus, in this book, coherence means spatial coherence unless specifi cally described 
+otherwise.)
+1.00
+1.04
+1.08
+1.12
+1.16
+1.20
+1.24
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8
+Wafer Plane Open-Field Intensity
+Partial Coherence
+0.9
+Figure 2.13 One impact of the radiometric correction: the intensity at the wafer plane 
+for a unit amplitude mask illumination as a function of the partial coherence factor (R = 4, 
+NA = 0.9)
+
+
+## Page 29
+
+ Aerial Image Formation – The Basics 57
+2.3.1 Oblique Illumination
+For spatially coherent illumination (a plane wave of illumination normally incident on 
+the mask), diffraction resulted in a pattern that was centered in the entrance to the objective lens. What would happen if we changed the direction of the illumination so that the 
+plane wave struck the mask at some angle q′? While the incident electric fi eld will still 
+have a magnitude of 1, the phase of this plane wave will vary linearly across the mask. 
+For a plane wave tilted relative to the x-axis,
+E xy ix i / () ,e sin = 2π θλ ′ (2.81)
+Under the Kirchhoff boundary condition assumption, the effect is simply to shift the 
+position of the diffraction pattern with respect to the lens aperture (in terms of spatial 
+frequency, the amount shifted is f ′ = ′ x sin / ), θλ as seen in Figure 2.14 (see Problem 2.16). 
+Recalling that only the portion of the diffraction pattern passing through the lens aperture 
+is used to form the image, it is quite apparent that this shift in the position of the diffraction pattern can have a profound effect on the resulting image. Letting ff ′′ xy and be the 
+shift in the spatial frequency due to the tilted illumination, Equation (2.61) becomes
+E xy f f T f f f f P f f
+I xy f f
+x y x x y y xy
+xy
+( ) { ( ) ( )}
+(
+,, , , ,
+,, ,
+′′ =− m ′ − ′
+′′
+− F 1
+)( ) = E xy f f ′′ xy ,, , 2 (2.82)
+The impact of shifting the diffraction pattern within the objective lens pupil on the 
+quality of the resulting image is hard to generalize. In some cases, the result might be 
+loss of an important diffraction order that otherwise would have made it through the lens. 
+In another case, the shift might enable an otherwise lost diffraction order to be captured. 
+The impact will be dependent on the incident angle, the mask pattern (for example, the 
+pitch) and on the spatial frequency cutoff, NA/l. Although the lithographic impact is 
+complicated, some general rules will be developed in Chapter 10.
+One of the most important lithographic consequences of tilting the illumination is a 
+change in the resolution. Equation (2.57) showed that for normally incident illumination, 
+the smallest half-pitch that could be imaged was 0.5l/NA. By tilting the illumination so 
+Diffraction Pattern
+Lens Aperture
+Mask Pattern 
+(Equal Lines and Spaces)
+Figure 2.14 The effect of changing the angle of incidence of plane wave illumination on 
+the diffraction pattern is simply to shift its position in the lens aperture. A positive illumination 
+tilt angle is depicted here
+
+
+## Page 30
+
+58 Fundamental Principles of Optical Lithography
+that the zero order of light just passes through the right edge of the lens, the pitch can be 
+reduced until the −1st order just passes through the left edge of the lens. Thus, the distance 
+between diffraction orders (1/p) is equal to the diameter of the lens (2NA/l) and the 
+smallest half-pitch becomes
+R
+NA = 0 25 . λ (2.83)
+Tilting the illumination has the potential for improving resolution by a factor of 2.
+2.3.2 Partially Coherent Illumination
+If the illumination of the mask is composed of light coming from a range of angles rather 
+than just one angle, the illumination is called partially coherent. If one angle of illumination causes a shift in the diffraction pattern, a range of angles will cause a range of shifts, 
+resulting in broadened diffraction orders (Figure 2.15). The most common type of partially 
+coherent source (called a ‘conventional’ source) provides a uniform range of angles illuminating the mask, with each angle having equal intensity. One can characterize the range 
+of angles used for the illumination in several ways, but the most common is the partial 
+coherence factor, s (also called the degree of partial coherence, the pupil fi lling function, 
+or just the partial coherence). The partial coherence is defi ned as the sine of the half-angle 
+of the illumination cone divided by the objective lens numerical aperture:
+σ
+θ == n
+NA
+source diameter
+lens diameter
+sin( ) max (2.84)
+(where a wafer-side equivalent illumination angle is used, calculated from the Abbe sine 
+condition). It is thus a measure of the angular range of the illumination relative to the 
+angular acceptance of the lens. As we shall see in section 2.3.7, the illumination system 
+creates an image of the light source at the objective lens pupil. Thus, a conventional illumination source will appear as a circle of uniform intensity when imaged into the pupil 
+Mask Pattern 
+(Equal Lines and Spaces)
+Diffraction Pattern
+Lens Aperture
+Figure 2.15 The diffraction pattern is broadened by the use of partially coherent illumination 
+(plane waves over a range of angles striking the mask)
+
+
+## Page 31
+
+ Aerial Image Formation – The Basics 59
+(Figure 2.16). Another form of the defi nition of the partial coherence factor of a conventional source is the diameter of the source disk divided by the diameter of the objective 
+lens aperture. Finally, if the range of angles striking the mask extends from −90 to 90°
+(that is, all possible angles), the illumination is said to be incoherent. Table 2.2 helps 
+defi ne the terminology of spatial coherence. Note that the maximum partial coherence 
+factor (assuming the mask remains in air) is R/NA, where R is the reduction ratio. Thus, 
+perfectly incoherent illumination is possible only in the limit of very small numerical 
+apertures. However, from an imaging perspective any partial coherence factor greater than 
+2 is essentially incoherent and is usually treated as such.
+An arbitrarily shaped illumination source can be described as an extended source, where 
+the source shape is divided into a collection of individual point sources. Each point is a 
+source of spatially coherent illumination, producing a plane wave striking the mask at 
+one angle, and resulting in an aerial image given by Equation (2.82). Two point sources 
+from the extended source, however, do not interact coherently with each other. Thus, the 
+contributions of these two sources must be added to each other incoherently (that is, the 
+intensities are added together). Illumination systems for lithographic tools are carefully 
+designed to have this property. If two spatially separated points on the source were phaserelated, light from those points would interfere at the mask plane, creating nonuniform 
+illumination (the phenomenon of speckle is an example of such coherent interaction of 
+source points).
+The full aerial image is determined by calculating the coherent aerial image from each 
+point on the source, and then integrating the intensity over the source (an approach known 
+as the Abbe method of partially coherent image calculation). The source can be defi ned 
+–1st 0th +1st –1st 0th +1st
+Lens Aperture Lens Aperture
+( (b) a)
+Figure 2.16 Top-down view of the lens aperture showing the diffraction pattern of a line/
+space pattern when partially coherent illumination is used: (a) s = 0.25; and (b) s = 0.5
+Table 2.2 Partial coherence types (conventional illumination)
+Illumination Type Partial Coherence Factor Source Shape
+Coherent s = 0 Point source
+Incoherent s = ∞ Infi nite size source
+Partially Coherent 0 < s < ∞ (but generally 0 < s < 1) Circular disk-shaped source
+
+
+## Page 32
+
+60 Fundamental Principles of Optical Lithography
+by a source function, Sf f xy ( , ), ′′ which is just the intensity of the source as a function of 
+position (or angle). The total intensity of the image is then
+I xy
+I xy f f S f f f f
+Sf f
+xy xy xy
+xy
+total , ,, , , d d
+,d
+()
+( )( )
+() = ′′ ′′ ′′
+′′ ′
+∫∫
+ff xy d ′ ∫∫ (2.85)
+Often, the pupil coordinates (fx, fy) are normalized in the same way as the partial coherence factor, creating pupil coordinates in ‘sigma’ space. These coordinates are
+σ
+λ
+σ
+λ x
+x
+y
+f y
+NA
+f
+NA == , (2.86)
+In sigma coordinates, the lens pupil is always the unit circle. Also, the source shape function S can be conveniently normalized as
+
+S S
+S dd xy
+xy
+xy x y
+(, ) (, )
+(, ) ′′ = ′′
+′′ ′ ′ ∫∫ σσ
+σσ
+σσ σ σ
+ (2.87)
+so that
+I xy I xy S total xy xy x y ( ) ( )( ) , ,, , , d d = ′′ ′′ ′ ′ ∫∫ σσ σσ σ σ  (2.88)
+The examples of Figure 2.16 illustrate an important diffi culty in calculating images 
+with partially coherent illumination. In Figure 2.16a, all of the zero and fi rst diffraction 
+orders are captured. When Equation (2.85) is evaluated, the aerial image for each source 
+point, Ixyf f xy ( , , , ), ′′ will be identical, being made up of three diffraction orders. Thus, the 
+partially coherent image is equal to the coherent image. For the case shown in Figure 
+2.16b, however, there is a very different result. For some source points, only one of the 
+fi rst orders is captured and thus a different image results.
+This idea can be expressed more clearly using Figure 2.17. Again showing a case of 
+imaging equal lines and spaces where only the zero and the two fi rst diffraction orders 
+are captured, the black region in the fi gure shows all of the source points where three 
+–1st order 0th order +1st order
+Figure 2.17 Example of dense line/space imaging where only the zero and fi rst diffraction 
+orders are used. Black represents three-beam imaging, lighter and darker grays show the area 
+of two-beam imaging
+
+
+## Page 33
+
+ Aerial Image Formation – The Basics 61
+diffraction orders are captured. This region of the source produces ‘three beam’ imaging, 
+equal to the coherent aerial image of Equation (2.66). The gray areas, however, result in 
+only the zero order and one fi rst order captured by the lens (the light gray area forms an 
+image from the 0 and +1st orders, the dark gray area forms an image from the 0 and −1st 
+orders). These areas form a ‘two-beam’ image, given by
+I x a a aa xp ( ) cos( ) =++ 0
+2 12 22 01 π / (2.89)
+The fi nal image will be a weighted average of the two-beam and three-beam images, 
+where the weights are their respective source intensity fractions. Thus, for the case of a 
+uniform intensity source shape and a repeating pattern of lines and spaces, the solution 
+to the partially coherent imaging integrals of Equation (2.85) becomes a geometry problem 
+of calculating the overlapping areas of the various circles for the source and the lens.
+This approach, often called the Kintner method,4
+ is readily solvable for the case of a 
+circularly shaped source. Every image takes the form of
+I x sI sI sI () =+ + 11 2 2 33 −−− beam beam beam (2.90)
+where
+Ia
+I a a aa xp
+I a aa
+102
+202 1
+2 01
+302 0
+22
+4
+−
+−
+−
+=
+=++
+=+
+beam
+beam
+beam
+cos( / ) π
+1122 cos( / ) cos ( / ) 242 ππ xp a xp +
+The weights si take on different values for different regimes of pitch and partial coherence, 
+as given in Table 2.3, and always add up to 1. This table makes use of the following 
+values (making sure that the inverse tangent is defi ned over the range from 0 to p):
+χ
+λ
+σ
+λ =
++ 
+
+ 
+ 1  −
+2
+2
+2
+pNA
+pNA
+ (2.91)
+Table 2.3 Kintner weights for conventional source imaging of small lines and spaces
+Regime Description s1 s2 s3
+λ
+σ
+pNA
+≤−1 All three-beam imaging 0 0 1
+11 2 −≤ ≤ − σ
+λ
+σ
+pNA
+Combination of two- and 
+three-beam imaging
+0 2g 1 − 2g
+11 2 −≤ ≤ σ
+λ
+pNA
+Combination of one-, twoand three-beam imaging
+h + 2g − 1 2(1 − g − h) h
+11 ≤ ≤+ λσ
+pNA
+Combination of one- and 
+two-beam imaging
+2g − 1 2(1 − g) 0
+1+≤ σ
+λ
+pNA
+Only the zero order is 
+captured, all one-beam
+10 0
+
+
+## Page 34
+
+62 Fundamental Principles of Optical Lithography
+γ
+σ χ
+χ
+λ χ
+λ
+χ
+πσ =
+−
+−
+
+
+
+
+
+
+
+
+
+
+− () +− 21−−
+2
+12
+2
+1
+tan cos 1
+pNA
+pNA (2.92)
+η
+λλ λ
+πσ =
+
+
+ 
+
+ −− 
+
+ 
+
+
+
+
+
+
+
+
+
+
+− 21 1
+2
+2
+cos
+pNA pNA pNA (2.93)
+2.3.3 Hopkins Approach to Partial Coherence
+H.H. Hopkins reformulated the Abbe extended source method for partially coherent image 
+calculations in an interesting and occasionally useful way.5,6 Equation (2.82) gives the 
+electric fi eld for a single source point by shifting the diffraction pattern relative to a fi xed 
+pupil. A change of variables will show that this is exactly equivalent to fi xing the diffraction pattern and shifting the pupil by the same amount:
+Ex f Pf f T f f x xx x if f x xx x ( ) ( )() () , ed ′ + ′ m + ′
+−∞
+∞
+∫ = 2π (2.94)
+where only one dimension is shown for simplicity. Calculating the image intensity for 
+this single source point as the product of the electric fi eld and its complex conjugate,
+Ixf Exf E xf
+Pf f T f f
+x xx
+xx x if f x xx x
+( ) ( ) *( )
+( )() ()
+, ,,
+m ed
+′ = ′′
++ ′ + ′ = 2π
+−∞
+∞
+−+ ′
+−∞
+∞
+∫∫ 
+
+ 
+
+ + ′ 
+
+ 
+ P f fT f f xx x if f x xx x *( ) ( )   () 
+m* ed 2π
+
++ ′ + ′ −
+−∞
+∞
+∫ = Pf f P f f T f T f f xx xx x x i ff x xx x ( ) *( ) ( ) ( )  ( ) 
+mm* e dd 2π 
+fx
+−∞
+∞
+∫
+ (2.95)
+The next step in the Abbe extended source method is to integrate over all of the source 
+points as in Equation (2.85) or (2.88). The critical step in the Hopkins formulation is to 
+change the order of integration and to integrate over the source fi rst, before carrying out 
+the inverse Fourier transform integrals of Equation (2.95). Since only the pupil functions 
+in Equation (2.95) depend on the source point, The integration over the source gives an 
+intermediate variable
+TCC f f P f f P f f S f f xx x x x x x x ( ( ) *( ) ( ) ,d   )= + ′ + ′ ′′
+−∞
+∞
+∫ (2.96)
+so that
+I x TCC f f T f T f f f xx x x i f fx x xx
+total m m () ( ) ( ) ( ) , * e dd ( ) = −
+−∞
+∞
+∫    2π x
+−∞
+∞
+∫ (2.97)
+
+
+## Page 35
+
+ Aerial Image Formation – The Basics 63
+The intermediate variable TCC in Equation (2.96) is called the transmission crosscoeffi cient. It has the useful property of being independent of the mask transmittance 
+function – it depends only on the pupil function and the source shape. For applications 
+where the pupil and source functions are fi xed, but images must be calculated for a wide 
+range for different masks, precalculation of the TCC function can greatly speed up image 
+calculations. Optical proximity correction (OPC), discussed in Chapter 10, is one example 
+where this approach becomes useful. Physically, the TCC can be thought of as an 
+intensity-based description of how two separate pupil points interact when forming an 
+image. Of course, the one-dimensional formulations above can be easily extended to 
+two dimensions.
+2.3.4 Sum of Coherent Sources Approach
+An approximate solution to the Hopkins imaging equations called Sum of Coherent 
+Sources (SOCS) provides extremely fast computation times and is thus very useful for 
+some imaging calculation like those used for optical proximity correction.7 To begin, 
+we will convert the fi nal Hopkins equation (2.97) from the spatial frequency domain 
+to the spatial domain. From the defi nition of the Fourier transform of the mask 
+transmittance,
+T f t x xT f t x x x i fx x xx i fx mm m m ( ) () ( ) () = ∗= e d, * ed −
+−∞
+∞
+−∞
+∞
+∫∫ 22 ππ   (2.98)
+Also, noting that the electric fi eld point spread function is the Fourier transform of the 
+pupil function,
+hx P f f x i fx x x () ( ) = −
+−∞
+∞
+∫ ed 2π (2.99)
+and defi ning the mutual coherence function as the Fourier transform of the normalized 
+source shape,
+J x Sf f x i fx x x
+0 2 () ( ) = −
+−∞
+∞
+∫  ed π (2.100)
+the Hopkins imaging integral can be converted to an integration over x (that is, an integration over the image plane) rather than an integration over the pupil plane:
+Ix J x x hx x h x x t x t x x x ( ) ( ) ( ) *( ) ( ) ( ) = ′ − ′′ − ′ − ′′ ′ ′′ ′ ′′
+−∞
+∞
+−∞
+∫ 0 mm* dd
+∞
+∫ (2.101)
+Defi ning a function W that depends only on the source and the pupil,
+W ab J a bh ah b ( ) ( ) ( ) *( ) , =− 0 (2.102)
+this new Hopkins integral becomes
+Ix Wx xx x t x t x x x () ( ) ( ) ( ) =− ′ − ′′ ′ ′′ ′ ′′
+−∞
+∞
+−∞
+∞
+∫ ∫ , mm* dd (2.103)
+
+
+## Page 36
+
+64 Fundamental Principles of Optical Lithography
+So far, there is no real advantage to this formulation of the Hopkins imaging equation. 
+Let us now propose an interesting decomposition for W as the weighted sum of its 
+eigenvectors fn:
+W ab a b nn n
+n
+( ) () () , = *
+=
+∞
+∑λφφ
+1
+ (2.104)
+where ln is the eigenvalue for the eigenvector fn. Expressed in this way, the Hopkins 
+integral becomes
+Ix x x x x t x t x x x n
+n
+nn () ( ) ( ) ( ) ( ) =− ′ − ′′ ′ ′′ ′ ′′ =
+∞
+−∞
+∞
+−∞
+∞
+∑ ∫ λφφ
+1
+** mm dd ∫
+∑ ∫ ∫ =− ′ ′′ − ′′ ′′ ′′
+=
+=
+∞
+−∞
+∞
+−∞
+∞
+λφφ n
+n
+nn x xt x x x x t x x 1
+( )() ( )( ) mm d ** d
+λφn
+n
+n x tx =
+∞
+∑ ⊗ 1
+2 () () m
+ (2.105)
+Thus, for a given source shape and pupil function, a set of eigenvectors and eigenvalues 
+can be determined, each eigenvector playing the role of a coherent PSF-like function. 
+These eigenvectors are then convolved with the mask transmittance function to give an 
+electric fi eld at the wafer plane. Converting to intensity, the weighted sum of these image 
+components becomes the total image. The eigen functions also have the convenient property of being orthogonal to each other. Note that for the case of coherent illumination, 
+J0(x) = 1, l1 = 1, f1 = h(x) and ln = 0 for n > 1. In fact, one simple decomposition is to 
+let each n represent a coherent point on the source, so that ln is the intensity of the source 
+point and fn is just the coherent PSF with a phase tilt corresponding to the position of 
+that source point. Thought of in this way, Equation (2.105) is just an expression of the 
+Abbe extended source formulation expressed as convolutions in the image plane rather 
+than products in the pupil plane.
+Of course, for any real calculation of an image using this approach, the infi nite summation must be cut off at some number N:
+Ix x t x n
+n
+N
+n () () () ≈⊗ =
+∑λφ
+1
+2
+m (2.106)
+where higher values of N lead to greater accuracy in the calculation. The key insight into 
+the use of SOCS is to fi nd a set of eigen functions that allows N to be minimized. Letting 
+each term in the summation represent one source point often requires hundreds of terms 
+to produce the desired accuracy. By cleverly choosing a different set of eigen functions, 
+the required number of terms in the summation can be reduced by an order of magnitude 
+or so. However, since a new set of eigen functions and eigenvalues must be determined 
+every time the source or the pupil function is changed, this approach tends to be used 
+only for cases where the source and pupil are fi xed and images for a large number of 
+mask patterns must be determined.
+
+
+## Page 37
+
+ Aerial Image Formation – The Basics 65
+2.3.5 Off-Axis Illumination
+Off-axis illumination refers to any illumination shape that signifi cantly reduces or eliminates the ‘on-axis’ component of the illumination, that is, the light striking the mask at 
+near normal incidence (Figure 2.14). By tilting the illumination away from normal incidence, the diffraction pattern of the mask is shifted within the objective lens. While all 
+the reasons why this is desirable are not yet obvious (resolution is one benefi t, but another 
+involves depth of focus, a concept not yet discussed), there are many lithographic applications where off-axis illumination is preferred. The most popular illumination shapes, 
+besides the conventional disk shape, are annular illumination, some form of quadrupole 
+illumination, and dipole illumination, although many other shapes are used for special 
+applications (see Chapter 10).
+The idealized source shapes pictured in Figure 2.18 can be thought of as ‘top-hat’ illuminators: the intensity is one inside the source shape and zero outside of it. However, 
+since these source shapes are created using a variety of optical components, the real source 
+distributions of a real projection tool can be signifi cantly more complicated. Figure 2.19 
+shows some actual measured source shapes from two different production lithographic 
+–1.0 –0.5 0.0 0.5 1.0
+–1.0
+–0.5
+0.0
+0.5
+1.0
+x Pupil Position
+y Pupil Position
+–1.0 –0.5 0.0 0.5 1.0
+–1.0
+–0.5
+0.0
+0.5
+1.0
+x Pupil Position
+y Pupil Position
+Conventional Annular Quadrupole Dipole
+Figure 2.18 Conventional illumination source shape, as well as the most popular off-axis 
+illumination schemes, plotted in spatial frequency coordinates. The outer circle in each 
+diagram shows the cutoff frequency of the lens
+Figure 2.19 Examples of measured annular source shapes (contours of constant intensity) 
+from two different lithographic projection tools showing a more complicated source distribution than the idealized ‘top-hat’ distributions
+
+
+## Page 38
+
+66 Fundamental Principles of Optical Lithography
+exposure tools. While both of these source shapes are annular, they exhibit a gradual 
+falloff of intensity with pupil radius rather than a sharp cutoff, and a fi ne structure that is 
+specifi c to the optical method of generating the shape.
+In many cases, the real source shape can be approximated by the ‘designed’ source 
+shape (the idealized top-hat illumination) convolved with an illumination point spread 
+function, to account for the fi nite resolution of the illumination system. Often, the illumination point spread function can reasonably be approximated as a Gaussian.
+2.3.6 Imaging Example: Dense Array of Lines and Spaces Under 
+Annular Illumination
+Off-axis illumination, with annular illumination being a common example, is most often 
+used to push the resolution limits of small, dense patterns. Thus, for the case of a dense 
+array of lines and spaces, these small features will generally only admit the zero and ±fi rst 
+diffraction orders through the lens (Figure 2.20). As before, the image will depend on the 
+fraction of the fi rst order that is captured by the lens, and whether this fraction results in 
+only two-beam imaging, or a combination of two-beam and three-beam imaging.
+While a full Kintner-like solution is certainly possible (see section 2.3.2), here we will 
+develop a simplifi ed approximate solution that will be reasonably accurate whenever the 
+width of the annulus is small. For such a case, the fraction g of the fi rst order that passes 
+through the lens will be8
+γ
+π
+λ
+σλ σσ = 
+
+ 
+
+ + 
+
+
+ − 
+
+
+
+
+
+ 
+ {}
+11 −
+2
+1 11
+cos
+pNA
+pNA (2.107)
+where s is the radial position of the center of the annulus in s-coordinates. Using the 
+notation of Equation (2.90), the fi nal image will be the weighted sum of one-beam, twobeam and three-beam images, with weights given in Table 2.4.
+2.3.7 Köhler Illumination
+In the descriptions of imaging above, the mask was always illuminated by a plane wave, 
+either normally or obliquely incident. Also, in the drawings and analyses of the diffraction 
+patterns given above, the assumption was made that the mask pattern was positioned 
++1st Order –1st Order
+Lens Pupil
+Figure 2.20 Annular illumination example where only the 0th and ±1st diffracted orders 
+pass through the imaging lens
+
+
+## Page 39
+
+ Aerial Image Formation – The Basics 67
+directly on the optical axis (the center line running through the middle of the lens). The 
+mask and the resulting image fi eld, however, are reasonably large so that imaging takes 
+place for mask features that are a long way from the optical axis. This poses a signifi cant 
+problem: diffraction patterns produced by features toward the edge of the mask will 
+produce diffraction patterns that are not centered in the lens (see Figure 2.21a).
+The shifting behavior of oblique illumination offers a solution to the problem. It is very 
+desirable that patterns at all positions of the mask be printed with about equal imaging 
+characteristics. Thus, identical mask patterns at different fi eld positions should produce 
+diffraction patterns that are positioned identically within the objective lens pupil. The 
+diffraction pattern for the line/space pattern at the mask edge of Figure 2.21a can be made 
+Table 2.4 Kintner weights for thin annular source imaging of small lines and spaces
+Regime Description s1 s2 s3
+λ
+σ
+pNA
+≤−1 All three-beam imaging 0 0 1
+11 2 −≤ ≤ − σ
+λ
+σ
+pNA
+Combination of two- and 
+three-beam imaging
+0 2(1 − g)2g − 1
+11 2 − ≤ ≤+ σ
+λ
+σ
+pNA
+Combination of one- and 
+two-beam imaging
+1 − 2g 2g 0
+1+≤ σ
+λ
+pNA
+Only the zero order is 
+captured, all one-beam
+10 0
+Mask
+Illumination
+Wavefront
+Objective Lens
+Mask
+(( a) b)
+Figure 2.21 The impact of illumination: (a) when illuminated by a plane wave, patterns at 
+the edge of the mask will not produce diffraction patterns centered in the objective lens pupil, 
+but (b) the proper converging spherical wave produces diffraction patterns that are independent of fi eld position
+
+
+## Page 40
+
+68 Fundamental Principles of Optical Lithography
+to behave identically with the mask pattern on the optical axis by shifting the diffraction 
+pattern up so that it is centered in the lens. This shift, as in section 2.3.1, can be accomplished by tilting the illumination. In fact, at every point on the mask the diffraction patterns can be made to coincide if the illumination is properly tilted for that mask point. The 
+ideal tilt is achieved across the entire mask if the illumination is made to be a spherical 
+wave converging to a point in the entrance pupil of the objective lens (Figure 2.21b).
+Note that all of the previous calculations of diffraction patterns assumed a plane wave of 
+illumination striking the mask. If a converging spherical wave is used instead as the illumination, the previous results are still valid so long as the radius of curvature of the spherical 
+wave (that is, the distance from the mask to the objective lens entrance pupil) is suffi ciently 
+large compared to the feature dimensions on the mask, so that the spherical wave appears 
+like a plane wave over the region of interest on the mask. This is most certainly true in the 
+Fraunhofer diffraction region. Thus, even though spherical wave illumination will be used, 
+plane wave illumination can still be assumed in the diffraction calculations.
+In most lithographic tools today, the various shapes and sizes of illumination are 
+achieved by an optical arrangement known as Köhler illumination. Named for August 
+Köhler, developer of illumination systems for Zeiss microscopes in the late 1800s, Köhler 
+illumination uses the condenser lens to form an image of the source at the entrance pupil 
+of the objective lens. Then, the mask is placed precisely at the exit pupil of the condenser 
+lens (Figure 2.22). This arrangement has several very desirable properties. First, the mask 
+is illuminated with converging spherical waves, producing the correct directionality of 
+the incident light over the entire mask as discussed above. Thus, the diffraction pattern 
+produced by a mask pattern will land in the entrance pupil at precisely the same spot, 
+regardless of the position of the mask pattern within the fi eld (i.e. its location on the 
+mask). Second, the uniformity of the illumination intensity over the mask is independent 
+of the uniformity of the intensity of the source itself (since every point on the mask 
+receives light from every point on the source). Thus, Köhler illumination helps ensure 
+uniform imaging for all points on the mask.
+An interesting side effect of the use of Köhler illumination is that the focal plane of 
+the source becomes the far fi eld of the diffraction pattern, in the Fraunhofer sense of the 
+far fi eld. That is, the Fresnel diffraction integrals evaluated at the entrance pupil of the 
+objective lens become equal to the Fraunhofer diffraction integrals without further 
+Mask
+Entrance
+Pupil
+Objective
+Lens
+Source
+Figure 2.22 Köhler illumination where the source is imaged at the entrance pupil of the 
+objective lens and the mask is placed at the exit pupil of the condenser lens
+
+
+## Page 41
+
+ Aerial Image Formation – The Basics 69
+approximation. By making only the Fresnel diffraction approximations, the diffraction 
+pattern can still be calculated as the Fourier transform of the mask transmittance. In 
+essence, the condenser lens brings the ‘infi nite’ diffraction plane in closer, to the image 
+plane of the condenser lens.
+2.3.8 Incoherent Illumination
+As mentioned above, as the size of the illumination source becomes large relative to the 
+size of the pupil (that is, as s for an ideal conventional source goes to infi nity), the illumination is said to be spatially incoherent. For this case, integration over the source can 
+be greatly simplifi ed. Using the Hopkins formulation, the TCC becomes
+TCC f f P f f P f f f P f P f f xx x x x x x x x x ( ( ) ( ) () ( , *d *   )= ∝+ ′ + ′′ ′ −+ ′
+−∞
+∞
+∫ ff xx )d ′
+−∞
+∞
+∫ (2.108)
+As the fi nal form of this equation indicates, the TCC will only be a function of the difference in spatial frequencies 
+ff xx − . Thus,
+TCC f f P f P f xx x x
+ () − ∝⊗ ( ) *( ) (2.109)
+where the proportionality is made into an equality through proper normalization. For 
+incoherent illumination, the TCC is called the Optical Transfer Function (OTF). The 
+magnitude the OTF is called the Modulation Transfer Function (MTF). It is usually normalized by dividing by the area of the pupil. For an ideal circular pupil, this convolution 
+can be easily carried out (being interpreted geometrically as the area overlap between 
+shifted circles, Figure 2.23) giving
+MTF f
+f
+NA
+f
+NA
+f
+NA f (
+cos
+)= // /
+2
+π λλ λ
+− 
+
+ 
+
+ −− 
+
+ 
+
+
+
+
+
+
+
+
+
+
+1
+2
+22
+1
+2 , ≤
+
+
+
+
+
+2
+0
+NA
+λ
+, otherwise
+ (2.110)
+fx
+0 f
+NA
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.0 0.2 0.4 0.6 0.8 1.0
+f/(2NA/)
+MTF
+l
+l
+(a) (b)
+Figure 2.23 The MTF(f) is the overlapping area of two circles of diameter NA/l separated 
+by an amount f, as illustrated in (a) and graphed in (b)
+
+
+## Page 42
+
+70 Fundamental Principles of Optical Lithography
+where ff f =−xx
+ for the case of our 1D features. One can see that the cutoff frequency 
+for the incoherent MTF is 2NA/l, corresponding to the zero order at one edge of the lens 
+and the fi rst order at the opposite edge.
+Using the MTF in Equation (2.97),
+I x MTF f T f T f f f f
+I
+xx ifx total m m x
+total
+() () ( ) ( ) * e dd
+(
+=+ −
+−∞
+∞
+−∞
+∞
+∫ ∫ 2π
+x MTF f f T f T f f f ifx xx x ) () ( ) ( ) =+ −
+−∞
+∞
+−∞
+∞
+∫ ∫ ed mm* d 2π
+ (2.111)
+But, the convolution of the diffraction pattern with its complex conjugate can be easily 
+computed using the convolution theorem of the Fourier transform:
+T f T f f f t xt x m m mm ( ) ( ) { ( ) ( )} xx x * += d *
+−∞
+∞
+∫ F (2.112)
+The product of the electric fi eld transmittance of the mask with its complex conjugate is 
+just the intensity transmittance of the mask. Thus, Equation (2.111) becomes
+I x MTF f IT f total xx 1 ( ) { ( ) ( )} = m − F (2.113)
+where ITm( fx) is the Fourier transform of the intensity transmittance of the mask.
+As we saw at the beginning of this chapter, for coherent illumination the electric fi eld 
+image is a linear function of the electric fi eld mask transmittance in Fourier space, with 
+the pupil function as the linear transfer function. Equation (2.113) shows that for incoherent illumination, the intensity image is a linear function of the intensity mask transmittance in Fourier space, with the MTF as the linear transfer function. For partially coherent 
+illumination, the relationship between the image and the object is nonlinear.
+As an example of an incoherent image, consider a binary pattern of lines and spaces. 
+The resulting aerial image is
+I x a MTF j p a jx p j
+j
+N
+( ) ( ) cos( ) =+ =
+0 ∑1
+22 // π (2.114)
+For equal lines and spaces where only the 0 and ±1st diffraction orders are captured, the 
+aerial image becomes
+I x MTF p x p ( ) ( )cos( ) =+
+1
+2
+2 12
+π
+// π (2.115)
+2.4 Some Imaging Examples
+While most of the imaging examples described above were one-dimensional for the sake 
+of mathematical simplicity, the approach described in this chapter can of course be used 
+to calculate more general two-dimensional images. Figure 2.24 shows a few simple 
+examples of two-dimensional aerial images calculated with the lithography simulator 
+PROLITH. Figure 2.25 shows images for an isolated binary edge mask feature as a function of the partial coherence factor.
+
+
+## Page 43
+
+ Aerial Image Formation – The Basics 71
+–1000
+–500
+500
+1000
+0
+y Position (nm)
+–1000 0 1000
+x Position (nm) 
+x Position (nm) 
+–1000 –500 0 500 1000
+–600
+–400
+–200
+200
+400
+600
+0
+y Position (nm)
+Figure 2.24 Some examples of two-dimensional aerial image calculations (shown as contours of constant intensity), with the mask pattern on the left (dark representing chrome)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+–0.8 –0.4 0.0 0.4 0.8 1.2 1.6
+Horizontal Position ( NA/)
+Relative Intensity
+σ = 0
+σ = 0.3
+σ = 0.6
+σ = 0.9
+× l
+Figure 2.25 Aerial images of an isolated edge as a function of the partial coherence 
+factor
+
+
+## Page 44
+
+72 Fundamental Principles of Optical Lithography
+Problems
+2.1. Derive Equations (2.5).
+2.2. Show that the spherical wave of Equation (2.27) is in fact a solution to the 
+Helmholtz equation.
+2.3. Using Equation (2.38), determine the SI units for intensity.
+2.4. Derive Equations (2.45) for the isolated space and the dense line/space pattern. 
+Some of the theorems from Appendix C may prove useful.
+2.5. Show that the diffraction pattern for an dense line/space pattern becomes the diffraction pattern for an isolated space as the pitch becomes infi nite (for a constant 
+spacewidth w). This is equivalent to proving that
+lim
+p x p j
+f j
+→∞ =−∞ p
+∞
+− 
+
+ 
+ ∑  = 1 δ 1
+2.6. Complimentary mask features (for example, an isolated line and an isolated space 
+of the same width) are defi ned by
+t xy t xy m
+c (,) (,) =−1 m
+Prove that the diffraction patterns of complimentary mask features are given by
+t ff ff T ff m xy xy xy c (,) (,) (,) =− δ m
+Use this expression to derive the diffraction pattern of an isolated line.
+2.7. Show that the Fourier transform is a linear operation, that is, show that for two 
+functions f(x,y) and g(x,y), and two constants a and b,
+ F{af(x,y) + bg(x,y)} = aF(fx, fy) + bG(fx, fy)
+2.8. Prove the shift theorem of the Fourier transform:
+If FF { ( , )} ( , ), { ( , )} ( , ) ( gxy G f f gx ay b G f f e xy xy
+i fa fb xy = −−= −+ 2π )
+2.9. Prove the similarity theorem of the Fourier transform:
+If , , , , , FF { ( )} ( ) { ( )} g x y G f f g ax by abG f
+a
+f
+b xy
+x y == 
+
+
+
+1
+2.10. Prove the convolution theorem of the Fourier transform:
+ If F{g(x,y)} = G( fx, fy) and F{h(x,y)} = H( fx, fy),
+F g hx y Gf f H f f xy xy ( )( ) ( ) ( ) ξη ξ η ξ η , , dd , , −− 
+
+
+
+
+
+=
+−∞
+∞
+∫ ∫
+2.11. Prove the scaling property of the Dirac delta function [in Appendix C, Equation 
+(C.10)].
+
+
+## Page 45
+
+ Aerial Image Formation – The Basics 73
+2.12. Derive the diffraction pattern of an isolated edge:
+0
+1 tm(x)
+x = 0
+2.13. Derive the diffraction pattern of an isolated double space pattern:
+0
+1 w2
+tm(x) w1
+x = 0
+(Hint: Superposition plus the shift theorem may prove useful.)
+2.14. Derive the diffraction pattern of an alternating phase shift mask (a pattern of lines 
+and spaces where every other space is shifted in phase by 180°, resulting in a 
+transmittance of −1):
+0
+1
+tm(x) w2
+w1 x = 0
+w1
+-1
+w2
+Graph the resulting diffraction pattern out to the ±5th diffraction orders for the case 
+of w1 = w2.
+2.15. Prove Equation (2.59).
+2.16. In section 2.3, it was claimed that illuminating a mask with a plane wave at an 
+angle q′ resulted, under the Kirchhoff boundary condition assumption, in a diffraction pattern equal to the normally incident diffraction pattern shifted by an amount 
+sinq/l. Prove this statement using the defi nition of the Fraunhofer diffraction 
+pattern, Equation (2.44).
+2.17. Consider a binary pattern of lines and spaces. Which diffraction orders pass through 
+the lens under these circumstances:
+(a) l = 248 nm, NA = 0.8, pitch = 300 nm, on-axis coherent illumination
+(b) Same as (a), but pitch = 400 nm
+(c) Same as (b), but illumination tilted by an angle sinq = 0.5
+2.18. Equations (2.65) and (2.67) give the electric fi eld and intensity images for threebeam images, where the 0 and ±1st diffraction orders are used to form the image. 
+Derive similar expressions for two-beam images, where only the 0 and +1st diffraction orders are captured by the lens.
+2.19. For a repeating line/space pattern and coherent illumination, derive expressions for 
+the aerial image intensity at the center of the line and the center of the space as a 
+function of the number of diffraction orders captured.
+2.20. For l = 248 nm, NA = 0.8 and pitch = 400 nm, below what value of s is the image 
+entirely made up of three-beam interference? At what s value does one-beam 
+imaging fi rst appear?
+
+
+## Page 46
+
+74 Fundamental Principles of Optical Lithography
+2.21. For coherent illumination and a lens of a given NA and l, derive a formula for the 
+electric fi eld image of an isolated edge. The result will be in terms of the sine integral, defi ned as
+Si d () sinz
+y
+y
+y
+z
+= ∫
+0
+References
+1 Goodman, J.W., 1968, Introduction to Fourier Optics, McGraw-Hill (New York, NY).
+2 Wong, A.K., 2005, Optical Imaging in Projection Microlithography, SPIE Press (Bellingham, 
+WA), pp. 3–8.
+3 Born, M. and Wolf, E., 1980, Principles of Optics, sixth edition, Pergamon Press, (Oxford, UK), 
+pp. 113–117.
+4 Kintner, E.C., 1978, Method for the calculation of partially coherent imagery, Applied Optics, 
+17, 2747–2753.
+5 Hopkins, H.H., 1951, The concept of partial coherence in optics, Proceedings of the Royal 
+Society of London, Series A, 208, pp. 263–277.
+6 Hopkins, H.H., 1953, On the diffraction theory of optical images, Proceedings of the Royal 
+Society of London, Series A, 217, 408–432.
+7 Pati, Y.C. and Kailath, T., 1994, Phase-shifting masks for microlithography: automated design 
+and mask requirements, Journal of the Optical Society of America A, 11, 2438–2452.
+8 Straaijer, A., 2005, Formulas for lithographic parameters when printing isolated and dense lines, 
+Journal of Microlithography, Microfabrication, and Microsystems, 4, 043005–1.

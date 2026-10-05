@@ -1,0 +1,3954 @@
+## Page 1
+
+8
+Lithographic Control in 
+Semiconductor Manufacturing
+Historically, lithography engineering has focused on two key, complimentary aspects of 
+lithographic quality: overlay performance and linewidth control. Linewidth (or critical 
+dimension, CD) control generally means ensuring that the widths of certain critical features, measured at specifi c points on those features, fall within acceptable bounds. Overlay 
+describes the positional errors in placing one mask layer pattern over an existing pattern 
+on the wafer. Control of both CD and overlay is absolutely essential to producing highyielding and high-performing semiconductor devices. And achieving adequate control 
+becomes increasingly diffi cult as the feature sizes of the devices decrease.
+8.1 Defi ning Lithographic Quality
+How is lithographic quality defi ned? This simple question has a surprisingly complex 
+answer. Lithography is such a large component of the total manufacturing cost of a chip 
+and has such a large impact on fi nal device performance that virtually all aspects of the 
+lithography process must be carefully considered. Although somewhat arbitrary, the list 
+below divides lithographic quality into four basic categories: photoresist profi le control, 
+overlay, downstream compatibility and manufacturability.
+Photoresist Profi le Control is a superset of the common CD control metric that is universally thought to be the most important aspect of high-resolution lithography processes. 
+For many lithographic steps, the ability to print features at the correct dimensions has a 
+direct and dramatic infl uence on device performance. It is typically measured as a mean 
+to target CD difference for one or more specifi c device features, as well as a distribution 
+metric such as the standard deviation. Spatial variations across the chip, fi eld, wafer or 
+lot are also important and can be characterized together or individually. In addition, the 
+sensitivity of CD to process variations is often characterized and optimized as a method 
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+298 Fundamental Principles of Optical Lithography
+to improve CD control. Metrics such as resolution, depth of focus and process latitude 
+in general are expressions of CD control. For example, resolution can be defi ned as 
+the smallest feature of a certain type that provides adequate CD control for a given 
+process.
+Profi le control, however, recognizes that the printed resist patterns are three-dimensional 
+in nature and a single CD value may not be suffi cient to characterize their lithographic 
+quality. Extension of CD control to profi le control means taking into account other dimensions. In the ‘z-direction’ from the top to the bottom of the photoresist, the resist profi le 
+shape is usually characterized by a sidewall angle and a fi nal resist height. In the ‘x–y
+direction’, patterns more complex than a line or space require a shape characterization that 
+can include metrics such as corner rounding, line-end shortening, area fi delity, line edge 
+roughness, or the critical shape difference (also called edge placement error).
+Overlay is the ability to properly position one lithographic level with respect to a previously printed level. In one sense, lithography can be thought of as an effort to position 
+photoresist edges properly on the wafer. But rather than characterize each edge individually, it is more convenient to correlate two neighboring edges and measure their distance 
+from each other (CD) and the position of their midpoint (overlay). One simple reason for 
+this division is that, for the most part, errors that affect CD do not infl uence overlay, and 
+vice versa. (Unfortunately, this convenient assumption is becoming less and less true as 
+the target feature sizes shrink.) Overlay is typically measured using special targets optimized for the task, but actual device structures can be used in some circumstances. Since 
+errors in overlay are conveniently divided into errors infl uenced by the reticle and those 
+infl uenced by the wafer and wafer stage, measurements are made within the exposure 
+fi eld and for different fi elds on the wafer to separate out these components. While historically CD control has gained the most attention as the limiter to feature size shrinks, 
+overlay control is often just as critical.
+Downstream Compatibility describes the appropriateness of the lithographic results for 
+subsequent processing steps, in particular etch and ion implantation. Unlike many other 
+processing steps in the manufacture of an integrated circuit, the handiwork of the lithographer rarely fi nds its way to the fi nal customer. Instead, the true customers of the lithography process are the etch and implant groups, who then strip off those painstakingly 
+prepared photoresist profi les when fi nished with them. Downstream compatibility is 
+measured with such metrics as etch resistance, thermal stability, adhesion, chemical compatibility, strippability and pattern collapse.
+Manufacturability is the fi nal, and ultimate, metric of a lithographic process. The two 
+major components of manufacturability are cost and defectivity. The importance of cost 
+is obvious. What makes this metric so interesting, and diffi cult to optimize, is the relationship between cost and other metrics of lithographic quality such as CD control. While 
+buying ultra fl at wafers or upgrading to the newest stepper platform may provide an easy 
+improvement in CD and overlay performance, the benefi t may be negated by the cost 
+increase. It is interesting to note that throughput (or more correctly overall equipment 
+productivity) is one of the major components of lithographic cost for a fab that is at or 
+near capacity due to the normal factory design that places lithography as the fab 
+bottleneck.
+Defectivity in all areas of the fab has been a major contributor to yield loss for most 
+processes throughout the history of this industry. Because lithographic processes are 
+
+
+## Page 3
+
+ Lithographic Control in Semiconductor Manufacturing 299
+repeatedly applied to make a chip, any improvements in defectivity in the lithography 
+area are multiplied many times over. Finally, concerns such as safety and environmental impact will always play a role in defi ning the overall manufacturability of a 
+process.
+The outline for defi ning lithographic quality presented above gives a fl avor for the 
+complexity of the task. Literally dozens of quality metrics are required to describe the 
+true value of a lithographic result. However, once these metrics have been defi ned, their 
+relative value to the customer evaluated, and methods for their measurement established, 
+they become powerful tools for the continuous improvement required to remain competitive in semiconductor manufacturing.
+8.2 Critical Dimension Control
+The shrinking of the dimensions of an integrated circuit is the technological driver of 
+Moore’s Law (see Chapter 1). As the dimensions of a transistor shrink, the transistor 
+becomes smaller, lighter, faster, consumes less power, and in many cases is more reliable. 
+In addition, the semiconductor industry has historically been able to manufacture silicon 
+devices at an essentially constant cost per area of processed silicon. Thus, an increased 
+density of transistors per area of silicon results in huge cost advantages in the manufacture 
+of chips. While many of these historical trends are being challenged (shrinking transistor 
+size now often increases power consumption rather than reducing it), the compelling cost 
+advantage of packing more transistors per unit area continues to push feature sizes smaller. 
+However, as features become smaller, the need to control the quality of the lithographic 
+results increases in proportion.
+8.2.1 Impact of CD Control
+Lithographers work hard to improve the control of the feature dimensions printed on the 
+wafer for two very important reasons. First, and most obviously, the dimensions of device 
+features affect the electrical behavior of those devices. In general, devices have been 
+designed to work optimally over a very limited range of feature sizes. If those sizes 
+become either too big or too small, a variety of undesirable consequences will result. 
+Because of this, the very process of design itself must take into account the variability of 
+the lithography process, resulting in the second important reason why linewidth control 
+is important: its impact on the area of a designed chip.
+Design rules are a complex set of geometric restrictions (such as the minimum allowed 
+dimensions and spacings for each circuit element) that are used when creating a circuit 
+layout (the design information that will eventually be translated into a photomask pattern). 
+The overall goal of the design rules is to minimize the silicon area of the circuit while at 
+the same time maintaining suffi cient yield and circuit performance in the face of variations 
+in the semiconductor manufacturing processes.
+Consider a contact hole making contact to a source or drain of a transistor (Figure 8.1). 
+One of the many design rules would defi ne the minimum layout separation between the 
+contact hole and the active area edge (dimension f in Figure 8.1). In general, this design 
+rule would be determined by the contact to active layer overlay specifi cation (Oc-aa) 
+
+
+## Page 4
+
+300 Fundamental Principles of Optical Lithography
+a
+b
+c
+d
+e f
+g
+i
+h
+a
+b
+c
+d
+e f
+g
+i
+h
+and the CD control specifi cations for the contact (∆CDc) and the active area width 
+(∆CDaa).
+Minimum f O=+ + c-aa c aa ∆∆ CD / CD / 22 (8.1)
+Thus, the minimum spacing f can be reduced if the CD control specifi cation is reduced. 
+In general, though, the overlay specifi cation is roughly three times the CD control specifi cation so that overlay control represents about 75 % of the control requirements and thus 
+tends to dominate this design rule (see section 8.4). On the other hand, dimension h is 
+completely determined by CD control considerations.
+One of the classic examples of the infl uence of CD control is at the polysilicon gate 
+level of standard CMOS logic devices. Physically, the polysilicon gate linewidth (paradoxically called the gate length by device engineers) controls the electrically important 
+effective gate length (Leff). In turn, Leff is directly related to the transit time t, the average 
+time required to move an electron or hole from the source to the drain of the MOS 
+device:
+τ
+µ = LV
+eff
+ds
+2
+ (8.2)
+where m is the mobility of the charge carrier for the transistor (either holes or electrons), 
+and Vds is the drain–source voltage. The delay time of an unloaded inverter is about twice 
+the transit time, plus any parasitic delays caused by resistance and capacitance of the 
+device not associated with the gate. These parasitic delays tend to be about equal in 
+magnitude to the delay caused by the gate transit time, but are independent of Leff. Pass 
+transistors have delays about equal to the inverter delay, and a two-input NAND gate has 
+a delay about equal to twice that of an inverter. Given these timing constraints, a circuit’s 
+clock period has a minimum of about 10 times the delay given by Equation (8.2), but 
+actual circuits use a slower 15× multiplier to allow for variations in this delay time. Thus, 
+Figure 8.1 A simple layout showing a two-transistor structure with source/drain contact
+holes. One design rule would dictate the minimum allowed spacing between the edge of the
+contact and the edge of the active area (dimension f)
+
+
+## Page 5
+
+ Lithographic Control in Semiconductor Manufacturing 301
+narrower gates tend to make transistors that can switch on and off at higher clock speeds. 
+The squared dependence shown in Equation (8.2) means that small variations in the poly 
+gate CD will cause a 2× larger variation in device delay times.
+Obviously, faster chips are more valuable than slower ones, as anyone who has priced 
+a personal computer knows. But smaller is not always better. Transistors are designed 
+(especially the doping levels and profi les) for a specifi c gate length. As the gate length 
+gets smaller than this designed value, the transistor begins to ‘leak’ current when it should 
+be off. If this leakage current becomes too high, the transistor is judged a failure. The 
+‘off’ current of a transistor, Ioff, defi ned as the current when the gate source voltage Vgs =
+0, is given by
+I I VV Vs off ds gs th / e th == − (@ ) (8.3)
+where Ids is the drain–source current, Vth is the threshold voltage, and s is the temperaturedependent subthreshold swing (typically equal to about 80–90 mV/decade at room temperature, which is about 35–40 mV as used in the above equation). When Vgs = Vth, the 
+device is not turned on and current is caused simply by diffusion. This diffusion current 
+(Ids in the above equation) will in turn be inversely proportional to Leff. However, it is the 
+exponential dependence of Ioff on the threshold voltage that provides the strongest dependence of leakage current on gate length. Thus, ignoring the less important dependence of 
+Ids,
+d
+d
+/ off
+th
+ln I
+V ≈−1 s (8.4)
+The threshold voltage is dependent on the effective gate length due to what are called 
+short channel effects. The change in threshold voltage from its long-channel value Vth_long
+depends on the exact doping profi les used, but a typical simple model is
+∆VV VC Ll th th_long th / e eff = −= − 1 2 (8.5)
+where C1 depends on the source-to-drain voltage and is on the order of 3–3.5 V, and l is 
+called the characteristic length of the short channel effect and depends on the oxide 
+thickness, the junction depth and the depletion layer width. This characteristic length 
+is generally engineered to produce short-channel effects on the order of 0.1 V, so that 
+l ≈ Leff/7. Thus,
+d
+d
+/ V/ th
+eff
+th eff
+V
+L =≈ ∆Vl L 2 0 35 . (8.6)
+Combining Equations (8.6) and (8.4) using the chain rule,
+d
+d
+V/ off
+eff
+ln
+ln . I
+L ≈−0 35 s (8.7)
+Assuming a typical subthreshold swing of 35 mV, a 10 % reduction in Leff will cause a 
+100 % increase in Ioff.
+When printing a chip with millions of transistor gates, the gate lengths take on a distribution of values across the chip (Figure 8.2a). This across chip linewidth variation 
+(ACLV) produces a range of transistor behaviors that affect the overall performance of 
+
+
+## Page 6
+
+302 Fundamental Principles of Optical Lithography
+the chip. Although the specifi c details can be quite complicated and device specifi c, there 
+are some very basic principles that apply.1 As a signal propagates through the transistors 
+of a chip to perform some operation, there will be several paths – connected chains of 
+transistors – that operate in parallel and interconnect with each other. At each clock cycle, 
+transistors are turned on and off, with the results passed to other interconnected transistors. The overall speed with which the operation can be performed (i.e. the fastest clock 
+speed) is limited by the slowest (largest gate CD) transistors in the critical path for that 
+operation (a critical path will typically have between 10 and 20 transistors in the path). 
+Also, when gate lengths become too large, the drive current available to turn on or off 
+the transistor may be too low, resulting in a potential reliability problem. On the other 
+hand, the reliability of the chip is limited by the smallest gate CDs on the chip due to 
+leakage current. If too many transistors on the chip have small gate CDs, the higher 
+leakage current can result in unacceptably high power consumption.
+The distribution of linewidths across the chip has another impact besides the limits of 
+the largest and smallest CDs. The range of gate lengths produces a range of switching 
+times for the transistors. If a group of connected transistors in a path all happens to be 
+undersized (and thus faster), while another group of transistors in a path is oversized (and 
+thus slower), a timing error can occur where the results from the two paths don’t show 
+up together at the same time. These timing errors, which are very diffi cult to predict and 
+sometimes diffi cult to test for, result in device function errors. Today, interconnect delays 
+(the time it takes a signal to travel from one transistor to another) are accounting for an 
+ever larger share of the timing delays of critical paths for chips. Much design focus continues to be on evening out the interconnect delays among competing paths. Still, the gate 
+delay distribution remains a critical part of the timing error problems on chips that are 
+pushing the limits of clock speeds.
+So how does improved CD control impact device performance? Obviously from the 
+discussion above, a tighter distribution of polysilicon gate CDs will result in reduced 
+(a) (b)
+0
+0.2
+0.4
+0.6
+0.8
+1.0
+75 80 85 90 95 100 105
+Gate CD (nm)
+Frequency
+Bin Sort 
+Limit
+Leakage
+Current
+Limit
+Gate CD (nm)
+Frequency
+Devices are 
+Too Slow, Poor 
+Bin Sort
+High Leakage 
+Current, Device 
+Fails
+Range Affects 
+Timing, Which 
+Affects Max Clock 
+Speed Possible
+0
+0.2
+0.4
+0.6
+0.8
+1.0
+75 80 85 90 95 100 105
+Figure 8.2 A distribution of polysilicon gate linewidths across a chip (a) can lead to different
+performance failures. Tightening up the distribution of polysilicon gate linewidths across a
+chip (b) allows for a smaller average CD and faster device performance
+
+
+## Page 7
+
+ Lithographic Control in Semiconductor Manufacturing 303
+timing errors. This smaller range of linewidths also means that the average linewidth can 
+be reduced without running into the leakage current limit (Figure 8.2b). As a result, the 
+overall speed of the chip can be increased without impacting reliability. The resulting 
+improved ‘bin sort’, the fraction of chips that can be put into the high clock speed bins 
+upon fi nal test of the device, can provide signifi cant revenue improvements for the fab.
+Like transistor gates, the impact of errors in the CD of a contact hole or via is different 
+for oversized versus undersized contacts. If a contact hole is too big, the hole can overshoot the edge of the pattern below to which it is making contact, possibly causing an 
+electrical short circuit. If a contact hole is too small, the electrical contact resistance will 
+increase. Contact resistance is proportional to the area of the contact, and thus to the 
+square of the contact diameter. A 10 % decrease in contact CD causes a roughly 20 % 
+increase in contact resistance. If the contact/via resistance gets too high, signals propagating through that contact/via will slow down. For voltage-sensitive parts of the circuit 
+(such as the source/drain contacts), the voltage drop across the contact can change the 
+electrical characteristics of the device.
+8.2.2 Improving CD Control
+Fundamentally, errors in the fi nal dimension of a feature are the result of errors in the 
+tools, processes and materials that affect the fi nal CD. An error in a process variable (the 
+temperature of a hot plate, for example) propagates through to become an error in 
+the fi nal CD based on the various physical mechanisms by which the variable infl uences 
+the lithographic result. In such a situation, a propagation of errors analysis can be used 
+to help understand the effects. Suppose the infl uence of each input variable on the fi nal 
+CD were expressed in a mathematical form, such as
+CD f v v v = ( . . .) 123 ,,, (8.8)
+where vi are the input (process) variables. Given an error in each process variable ∆vi, the 
+resulting CD error can be computed from a high-order total derivative of the CD function 
+in Equation (8.8).
+∆ ∆∆ CD v
+v
+v
+v
+fvv
+n
+n
+= ∂
+∂
++
+∂
+∂
++ 
+
+ 
+
+ =
+∞
+∑ 1
+1
+2
+2
+12
+1
+. . . ( . . .) ,, (8.9)
+This imposing summation of powers of derivatives can be simplifi ed if the function is 
+reasonably well behaved (and of course we hope that our critical features will be so) and 
+the errors in the process variables are small (we hope this is true as well). In such a case, 
+it may be possible to ignore the higher-order terms (n > 1), as well as the cross terms of 
+Equation (8.9), to leave a simple, linear error equation (the fi rst-order total derivative).
+∆∆ ∆ CD v CD
+v
+v
+CD
+v = ∂
+∂
++
+∂
+∂ 1 + 1
+2
+2
+... (8.10)
+Each ∆vi represents the magnitude of a process error. Each partial derivative ∂CD/∂vi
+represents the process response, the response of CD to an incremental change in the variable. This process response can be expressed in many forms; for example, the inverse of 
+the process response is called process latitude. Figure 8.3 shows a simple case where the 
+
+
+## Page 8
+
+304 Fundamental Principles of Optical Lithography
+process variable is exposure dose and the common-use defi nition of exposure latitude 
+(EL) is shown.
+The linear error Equation (8.10) can be modifi ed to account for the nature of the errors 
+at hand. In general, CD errors are specifi ed as a percentage of the nominal CD. For such 
+a case, the goal is usually to minimize the relative CD error, ∆CD/CD. Equation (8.10) 
+can be put in this form as
+∆ ∆∆ CD
+CD
+v
+CD
+v
+v
+CD
+v = ∂∂
++
+∂
+∂ 1 + 1
+2
+2
+ln ln ... (8.11)
+Also, many sources of process errors result in errors that are a fraction of the nominal 
+value of that variable (for example, illumination nonuniformity in a stepper produces a 
+dose error that is a fi xed percentage of the nominal dose). For such error types, it is best 
+to modify Equation (8.11) to use a relative process error, ∆vi/vi.
+∆∆ ∆ CD
+CD
+v
+v
+CD
+v
+v
+v
+CD
+v = ∂
+∂
++
+∂
+∂
++ 1
+11
+2
+22
+ln
+ln
+ln
+ln ... (8.12)
+Although Equations (8.10)–(8.12) may seem obvious, even trivial, in their form, they 
+reveal a very important truth about error propagation and the control of CD. There are 
+two distinct ways to reduce ∆CD: reduce the magnitude of the individual process errors 
+(∆vi), or reduce the response of CD to that error (∂CD/∂vi). The separation of CD errors 
+into these two source components identifi es the two important tasks that face the photolithography engineer. Reducing the magnitude of process errors is generally considered 
+a process control activity and involves picking the right material and equipment for the 
+job and ensuring that all equipment is working in proper order and all materials are 
+meeting their specifi cations. Reducing the process response is a process optimization
+activity and involves picking the right process settings, as well as the right equipment 
+and materials. Often, these two activities are reasonably independent of each other.
+100 %
+Enominal
+E(CD – 10 %) –E(CD + 10 %) EL =
+20 25 30 35 40 45
+60
+80
+100
+120
+140
+Resist Linewidth (nm)
+Exposure Energy (mJ/cm2)
+Figure 8.3 The common CD-versus-exposure dose (E) curve is used to measure exposure
+latitude (EL)
+
+
+## Page 9
+
+ Lithographic Control in Semiconductor Manufacturing 305
+A note of caution: the derivation of Equation (8.10) assumed that the process errors 
+were small enough to be linear and independent in their infl uence on CD. This will not 
+always be the case in a real lithographic process. One need only consider the two variables 
+of focus and exposure to see that the response of CD is certainly nonlinear and the two 
+variables are highly dependent on each other (see section 8.5). Usually, a linear expansion 
+such as that of Equation (8.10) is most useful as a guide to understanding rather than as 
+a computational tool.
+8.2.3 Sources of Focus and Dose Errors
+The above sections describe why critical dimension (CD) control is important, and 
+describe a common methodology for separating the causes of CD errors into two components: the magnitude of a process, material, or tool error, and the response of the lithographic process to that error. This separation of errors allows the process engineer to focus 
+independently on the two methods for improving CD control: reducing the sources of 
+errors and improving process latitude. In general, these approaches can be thought of as 
+independent (though not always). Efforts to improve process latitude usually do not 
+change the magnitude of the process errors, and vice versa. Let’s consider the fi rst 
+approach, reducing the magnitude of the errors, using focus errors as an example.
+Focus errors arise from many sources, both random and systematic. Tables 8.1 and 8.2 
+show estimates of the focus errors by source for different lithographic generations: a 
+1991 0.5-mm i-line process, 1995 0.35-mm i-line and KrF stepper processes, a 0.18-mm 
+KrF scanner process, and a more modern 90-nm ArF process. The values shown are 
+typical, but certainly vary from process to process. Although the tables are reasonably 
+Table 8.1 Examples of random focus errors (mm, 6s) for different lithographic generations
+Error Source
+19912
+ i-line 
+0.50 mm
+19953 i-line 
+0.35 mm
+19953
+ KrF 
+stepper 
+0.35 mm
+2001 KrF 
+scanner 
+0.18 mm
+2005 ArF 
+scanner 
+0.09 mm
+Lens Heating 
+(Compensated) 0.10 0.10 0.00 0.00 0.00
+Environmental 
+(Compensated)
+0.20 0.20 0.10 0.10 0.05
+Mask Tilt (actual/16) 0.05 0.05 0.10 0.05 0.05
+Mask Flatness 
+(actual/16)
+0.12 0.12 0.12 0.12 0.07
+Wafer Flatness 
+(over one fi eld)
+0.30 0.33 0.33 0.15 0.07
+Chuck Flatness 
+(over one fi eld)
+0.14 0.03 0.03 0.03 0.03
+Laser Bandwidth 0.0 0.0 0.20 0.1 0.04
+Autofocus 
+Repeatability
+0.20 0.08 0.10 0.07 0.04
+Best Focus 
+Determination
+0.30 0.15 0.10 0.10 0.05
+Vibration 0.10 0.10 0.05 0.05 0.03
+Total RSS Random 
+Focus Errors
+0.60 0.50 0.45 0.28 0.15
+
+
+## Page 10
+
+306 Fundamental Principles of Optical Lithography
+self-explanatory, a few items are worth noting. Errors in fl atness or tilt on the mask are 
+reduced by the reduction ratio of the imaging tool squared (assumed to be 4× in this 
+example). Wafer fl atness is a total range over the exposure fi eld assuming autoleveling is 
+turned on. One of the primary advantages of the scanner is that the exposure slit sees a 
+smaller region of the wafer and thus has a smaller focus error due to wafer nonfl atness 
+compared to a stepper, even for the same wafer. Note also that hot spots (focus errors 
+caused by a particle on the backside of the wafer) and edge die problems (caused by errors 
+in the autofocus system when attempting to focus at the edge of the wafer) are not included 
+in this list.
+Systematic focus errors include wafer topography (where chemical mechanical polishing has proven its worth, though is not yet perfect enough to make wafer topography a 
+negligible problem), lens aberrations across the fi eld or slit, and the errors due to focusing 
+through the thickness of the resist. While not considered here, phase errors on a phase 
+shift mask can also act like a focus error. Random and systematic errors can now be 
+combined by assuming the systematic errors have a uniform probability distribution with 
+the given range and convolving this uniform distribution with the Gaussian distribution 
+of the random errors. Since in all cases the uniform width is large compared to the 3s of 
+the random errors, the result is a probability distribution that looks like the uniform distribution with error function tails. For an error function probability, the equivalent to a 
+6s Gaussian range (99.7 % probability) depends on the ratio of range/s. For range/s =
+11, the total built-in focus errors (BIFE) of the process, with a probability of 99.7 %, is 
+range + 3.6s. For range/s = 6, the BIFE is range + 4s.
+The exercise to fi ll in the values in tables such as those presented here serves two 
+important functions. First, an evaluation of the BIFE can be combined with a measurement of the focus–exposure process window for the target process to see if the process 
+capability (the process window) exceeds the process requirements (see section 8.5). 
+Second, a listing of sources of focus errors inevitably leads to ideas where improvements 
+can be made. The largest sources of errors (wafer nonfl atness, for example, and wafer 
+topography) offer the greatest potential for improvement.
+Table 8.2 Examples of systematic (mm, total range) and random focus error estimates 
+combined to determine the Built-in Focus Errors (BIFE) of a process
+Error Source
+19912
+ i-line 
+0.50 mm
+19953 i-line 
+0.35 mm
+19953
+ KrF 
+stepper 
+0.35 mm
+2001 KrF 
+scanner 
+0.18 mm
+2005 ArF 
+scanner 
+0.09 mm
+Topography 0.5 0.3 0.3 0.10 0.05
+Field Curvature and 
+Astigmatism
+0.4 0.4 0.3 0.08 0.05
+Resist Thickness 0.2 0.2 0.2 0.10 0.05
+Total Systematic 
+Errors (range)
+1.1 0.9 0.8 0.28 0.15
+Total Random Errors 
+(6s)
+0.60 0.50 0.45 0.28 0.15
+Range/s 11 10.8 10.7 6 6
+Total BIFE (6s
+equivalent)
+1.5 1.2 1.1 0.47 0.25
+
+
+## Page 11
+
+ Lithographic Control in Semiconductor Manufacturing 307
+Interestingly, a historical look at built-in focus errors reveals an interesting trend: the 
+required depth of focus is about three times the minimum half-pitch for critical lithography layers such as gate polysilicon. While certainly not a rigorous analysis, using this 
+rule of thumb can prove useful for projecting BIFE requirements to future generations of 
+optical lithography.
+Many errors that are not focus errors, but still affect CD, can be thought of as equivalent 
+to an exposure dose error. Typical examples include:
+• across-fi eld (slit) intensity nonuniformity;
+• fi eld-to-fi eld and wafer-to-wafer dose control;
+• resist sensitivity variations (including development process variations);
+• resist/BARC thickness variations (refl ectivity variations);
+• PEB time and temperature variations;
+• fl are variations;
+• mask CD nonuniformity;
+• errors in optical proximity correction (behaves like a mask CD error).
+The required dose control has steadily tightened for smaller feature sizes. At the 0.5-mm 
+generation, the built-in dose errors of a well-controlled process were about 15 % (range). 
+At the 90-nm node, dose errors are typically less than about 6 %.
+8.2.4 Defi ning Critical Dimension
+A cross section of a photoresist profi le has, in general, a very complicated two-dimensional shape (see Figure 8.4, for example). Measurement of such a feature to determine 
+its width has many complications. Suppose, however, that we have been able to measure 
+the shape of this profi le exactly so that we have a complete mathematical description of 
+its shape. How wide is it? The answer depends on how one defi nes the width. The original 
+shape of the photoresist profi le is simply too complex to be unambiguously characterized 
+by a single width number. The defi nition of the width of a complex shape requires the 
+defi nition of a feature model.
+4
+A feature model is a mathematical function described by a conveniently small number 
+of parameters used to appropriately depict the actual shape of the resist feature. For our 
+application, one of these parameters should be related to the basic concept of the width 
+of the resist profi le. The most common feature model used for this application is a trapezoid (Figure 8.4). Thus, three numbers can be used to describe the profi le: the width of 
+w
+D
+q
+Figure 8.4 Example photoresist profi le and its corresponding ‘best-fi t’ trapezoidal feature
+model
+
+
+## Page 12
+
+308 Fundamental Principles of Optical Lithography
+the base of the trapezoid (linewidth, w), its height (profi le thickness, D) and the angle 
+that the side makes with the base (sidewall angle, q). To be perfectly general, the position 
+of the feature (defi ned, for example, by the centroid of the feature model) can be specifi ed 
+and the shape can be made asymmetrical by allowing a different sidewall angle for each 
+side.
+Obviously, to describe such a complicated shape as a resist profi le with just three 
+numbers is a great simplifi cation. One of the keys to success is to pick a method of fi tting 
+this feature model to the profi le that preserves the important properties of the profi le (and 
+its subsequent use in the device). Thus, one can see that even given an exact knowledge 
+of the actual photoresist profi le, there are two potential sources of error in determining 
+the critical dimension: the choice of the feature model and the method of fi tting the feature 
+model to the resist profi le. Consider Figure 8.5, which shows resist profi les through focus 
+exhibiting different curvatures of their sides (more on this topic in section 8.5). Using a 
+trapezoidal feature model will obviously result in a less than perfect fi t, which means that 
+the criterion for best fi t will infl uence the answer.
+What is the best feature model and best method of fi tting the feature model to measured 
+data for a given application? Since the choice of the feature model is based both on relevance and convenience, and since the trapezoid is so commonly used for CD metrology, 
+the impact of the feature model choice will not be discussed here. When fi tting the feature 
+model to the data, there are many possible methods. For example, one could fi nd a best-fi t 
+straight line through the sidewall of the profi le, possibly excluding data near the top and 
+bottom of the profi le. Alternately, one could force the trapezoid to always match the actual 
+profi le at some point of interest, for example at the bottom. Whenever the shape of the 
+actual profi le deviates signifi cantly from the idealized feature model, the method of fi tting 
+can have a large impact on the results.
+For example, as a lithographic process goes out of focus, the resist profi le and the 
+resulting feature size will change. But because the shape of the resist profi le is deviating 
+from a trapezoid quite substantially at the extremes of focus, CD can also be a strong 
+function of how the profi le data was fi t. Figure 8.6 compares the measured CD through 
+focus for two different feature model fi tting schemes: a best-fi t line through the sidewall 
+and fi tting the trapezoid to match the actual profi le at a set threshold (height above the 
+substrate). Near best focus, the two methods give essentially the same value since the 
+resist profi le is very close to a trapezoid. However, out of focus there can be a signifi cant 
+difference in the CD values ( > 5 %) based only on the fi tting method used.
+Focus Below the Resist Focus Above the Resist 
+Figure 8.5 Resist profi les at the extremes of focus show how the curvature of a pattern cross
+section can change
+
+
+## Page 13
+
+ Lithographic Control in Semiconductor Manufacturing 309
+In real metrology systems, the actual resist profi le is never known. Instead, some signal 
+(secondary electrons versus position, scattered light intensity versus wavelength) is measured that can be related to the shape of the resist profi le. This signal is then fi t to some 
+model, which ultimately relates to the feature size being measured. Although a bit more 
+complicated, the same principles still apply. Both the feature model and how that model 
+is fi t to the data will affect the accuracy of the results.
+8.3 How to Characterize Critical Dimension Variations
+Critical dimension (CD) errors in lithography come from many sources and exhibit many 
+interesting characteristics. The classifi cation of these errors into specifi c categories (systematic versus random, spatial versus temporal) is often the fi rst step in a root cause 
+analysis that allows the sources of CD variation to be identifi ed and addressed. The nature 
+of step-and-repeat or step-and-scan lithography on many identical wafers in a lot can 
+produce many systematic spatial and temporal processing characteristics that impact CD 
+errors. The discussion below will focus on step-and-scan lithography, with emphasis on 
+the characterization of systematic error sources.
+8.3.1 Spatial Variations
+The systematic spatial variations of CD within a wafer exhibit four basic signatures: 
+across-wafer, across-fi eld in the scan direction, across-fi eld in the slit direction, and 
+across-fi eld independent of the scan/slit orientation (Figure 8.7). The physical causes of 
+variations in each of these spatial domains can be very different. Thus, dividing up the 
+total spatial variation of CDs among these four components is the fi rst step in identifying 
+causes and remedies for unwanted CD errors.
+400
+500
+600
+700
+800
+900
+1000
+–1.5 –1.0 0.0 0.5 1.0
+Focus (µm)
+Feature Width (nm)
+Threshold Fit Straight Line Fit
+–0.5
+Figure 8.6 Using resist profi les at the extremes of focus as an example, the resulting
+measured feature size is a function of how the feature model is fi t to the profi le
+
+
+## Page 14
+
+310 Fundamental Principles of Optical Lithography
+For those processing steps that result in a full-wafer treatment (resist coating, postexposure baking, development), errors in that processing can contribute to CD variations 
+with a full-wafer signature. Essentially all wafer processing other than exposure is 
+full-wafer processing and results in an across-the-wafer variation in CD. Examples 
+include:
+• underlying fi lmstack thickness variations due to deposition;
+• resist and bottom antirefl ection coating thickness uniformity;
+• prebake temperature uniformity;
+• post-exposure bake temperature uniformity;
+• development uniformity (due to application, wetting, surface tension, etc.);
+• fi rst to last exposure shot variation due to lens heating or post-exposure delay;
+• edge shot focus variation due to autofocus/autolevel problems at the edge of the 
+wafer.
+Many of these sources of error will exhibit mostly radial signatures, though other signatures (such as a wedge variation – a linear variation from one side of the wafer to the 
+other) are certainly possible. The variation in CD caused by the difference in the fi rst and 
+last exposure shot can have a very different signature and, of course, depends on the 
+specifi c stepping pattern used. Hot spots, an extended region of the wafer with higher or 
+lower CDs, can be caused by backside defects or wafer chucking errors that produce a 
+localized focus error that cannot be compensated for by autofocus and autoleveling 
+mechanisms.
+The process of scanning a slit in one direction across the fi eld results in a distinct difference in the way many across-fi eld error sources are manifest. Spatial variations across 
+the fi eld in the scan direction will average out to produce a fairly uniform signature in 
+that direction. Spatial variations in the slit direction will be systematically reproduced 
+everywhere in the fi eld. There is one major systematic across-fi eld CD variation source 
+that is independent of scan orientation: reticle CD errors. Coupled with the mask error 
+Wafer
+Pattern of 
+Exposure 
+Fields
+Scan
+Direction
+Slit
+Single Exposure Field
+Figure 8.7 A wafer is made up of many exposure fi elds, each with one or more die. The
+fi eld is exposed by scanning a slit across the exposure fi eld
+
+
+## Page 15
+
+ Lithographic Control in Semiconductor Manufacturing 311
+enhancement factor (MEEF), reticle errors will systematically reproduce their signature 
+across the wafer fi eld without any averaging or other scan-induced changes.
+Along the long dimension of the slit, there is no averaging effect of scanning to reduce 
+the sources of CD variation. Thus, variations in the slit direction create a unique signature 
+for the exposure tool. Common sources of CD errors with systematic variations in the slit 
+direction include:
+• lens aberrations;
+• illumination (dose) uniformity;
+• source shape (partial coherence) variations;
+• fl are.
+In general, systematic errors in the slit direction dominate the systematic across-fi eld 
+errors.
+Most of the systematic sources of CD errors that plague lithographers in the slit direction tend to average themselves out in the scan direction – this is one of the major benefi ts 
+of step-and-scan technology. And while on-the-fl y focusing can greatly reduce the impact 
+of long-range wafer nonfl atness, it can also induce some systematic CD errors in the scan 
+direction. Autofocus systems can be fooled by underlying topography on the wafer (for 
+example, when scanning past a logic region onto a dense memory region) and systematically but incorrectly adjust focus as it scans.
+Variations from wafer to wafer can take on a spatial component due to systematic differences in how one wafer is processed versus another (it is important to differentiate the 
+spatial variation being considered here from a temporal variation caused by a change in 
+the processing of each wafer over time, to be discussed below). The main source of such 
+variations comes from multiple processing chambers (modules) used per lot. For example, 
+a single photolithography cell may have two developer cups and two post-exposure bake 
+(PEB) hot plates. Any systematic difference between these track modules will give a 
+systematic wafer-to-wafer error grouped by which module was used in the processing. 
+Likewise, incoming wafers may have systematic wafer-to-wafer fi lmstack variations due 
+to multiple deposition chambers.
+Lot-to-lot systematic spatial variations are typically caused by differences in processing 
+tools:
+• different photolithography cells;
+• different reticles;
+• different deposition tools for incoming wafers;
+• different metrology tools (tool matching errors).
+Again, one should distinguish between those lot-to-lot differences caused by using 
+different tools versus differences caused by temporal drifts in the behavior of a given 
+tool.
+8.3.2 Temporal Variations and Random Variations
+Temporal variations can be seen both wafer-to-wafer and lot-to-lot, depending only on 
+the timescales involved. Some effects, however, such as lens heating, have different 
+within-lot and lot-to-lot signatures. Temporal variations can be either drifts in lithographic 
+
+
+## Page 16
+
+312 Fundamental Principles of Optical Lithography
+inputs (a gradual barometric pressure change causing a focus shift) or an abrupt disturbance (switching to a new batch of photoresist). Although any lithographic input can 
+conceivably have a temporal variation, some of the most common are:
+• focus drift;
+• dose calibration (intensity measurement) drift;
+• resist batch change;
+• laser center wavelength and bandwidth variations;
+• lens heating;
+• metrology drift;
+• long-term lens degradation.
+Of course, almost any lithographic input can have random variations associated with 
+it. An important distinction between random errors and temporal variations as discussed 
+above is the time constant of change. If a variable changes randomly but over a period 
+of time such that many wafers can be processed (that is, between hours and months), such 
+errors are generally classed as temporal variations. If, however, the variations are rapid 
+enough to change across a wafer or from wafer to wafer, the errors are described as 
+random. Some of the most signifi cant random errors are:
+• focus;
+• dose;
+• scan synchronization (x, y and z);
+• PEB temperature/heating transients;
+• metrology.
+Of course, every input to the lithography process has some level of random variation 
+associated with it.
+8.3.3 Characterizing and Separating Sources of CD Variations
+Different methods are often employed to characterize and control errors from different 
+sources. For example, temporal variations are usually characterized using trend chart and 
+statistical process control (SPC) techniques.5
+ Wafer-to-wafer and lot-to-lot variations 
+caused by differences in processing tools or chambers can be caught using statistical correlation techniques (for example, where the average CD value obtained in one photolithography cell is compared to another and a statistically signifi cant difference is fl agged). 
+The separation of CD errors into random and within-wafer spatially systematic is one of 
+the most challenging problems in lithography data analysis. Further separation of the 
+within-wafer systematic errors into their specifi c components (across-wafer, across-fi eld, 
+slit direction and scan direction) is both diffi cult and important. There are two basic 
+approaches that can be used: characterizing output CD variations and characterizing input 
+parameter variations.
+The basic statistical technique for separating various systematic spatial variations and 
+random errors is the use of the ‘composite’ spatial source. For example, the variation of 
+CD across a wafer can have both a systematic component and a random component. By 
+measuring a number of wafers at the exact same spatial locations, averaging of the measurements at each spatial location creates a composite wafer with the random errors 
+
+
+## Page 17
+
+ Lithographic Control in Semiconductor Manufacturing 313
+mostly averaged out. This composite wafer can then be used to characterize the systematic 
+spatial signature of the error. Subtracting the composite wafer from the actual wafer data 
+produces a residual set of random errors that can be characterized by a mean and standard 
+deviation.
+Let Mi(x,y) be the measured CD on wafer i at the location (x,y) on the wafer for a 
+measured group of N wafers. This measured value can be separated into systematic and 
+random errors:
+M x y CD S x y R x y i ii () () () , ,, =+ + 0 (8.13)
+where CD0 is the nominal (target) CD, Si is the systematic error for wafer i and Ri is the 
+random error component. If the experiment used to make the measurements is conducted 
+appropriately, the systematic wafer-to-wafer variations can be kept to a minimum (by 
+making sure that each wafer is processed identically and by processing the wafers over 
+a very short period of time). If this wafer-to-wafer variation is much smaller than the 
+across-wafer variation, it is possible to approximate Si(x,y) ≈ S(x,y) = the systematic 
+across-wafer spatial signature. A ‘composite’ wafer CD error CCDE(x,y) is created by 
+averaging the measurements from the different wafers at each point:
+CCDE x y N M x y CD S x y N i R xy i
+N
+i
+i
+N
+() () () () , ,,, = −≈ + ==
+∑∑ 11
+1
+0
+1
+ (8.14)
+If normally distributed, the random errors will have a mean of zero at each point on 
+the wafer. For a large enough sample N, the average of the sample will approximate the 
+mean of the population with high accuracy. Thus,
+1 0
+N 1
+R xy xy N i
+i
+N
+() () , with an uncertainty of , R
+=
+∑ ≈ σ (8.15)
+where sR(x,y) is the standard deviation of the random CD error at the point (x,y). By 
+approximating the standard deviation of the random error with the standard deviation of 
+the residuals of the N sample of measurements sR(x,y), the accuracy of Equation (8.15) 
+can be estimated. By picking N to be suffi ciently large, one can use the composite wafer 
+error as an estimate of the systematic across-wafer CD error signature within a known 
+level of error.
+S x y CCDE x y s x y N () () () , , with an estimated uncertainty of , ≈ R (8.16)
+In turn, the composite wafer can be analyzed to create a composite fi eld. Averaging the 
+same fi eld measurement points from all fi elds across the wafer produces a signature that 
+is characteristic of the fi eld error only (with the assumption that the across-wafer errors 
+vary slowly enough across the fi eld as to contribute only negligibly to the composite 
+fi eld). Once the composite fi eld is obtained, it can be subtracted from the composite wafer 
+to create a separate across-wafer-only signature.
+Likewise, the composite fi eld can be broken down into a composite slit and composite 
+scan signature. This separation into components is complicated by the fact that the contribution of reticle errors to the composite fi eld is independent of scan direction. For one 
+simplifying case, however, all components can be properly separated. If the reticle CD 
+variations do not exhibit any systematic scan or slit direction components, subtraction of 
+
+
+## Page 18
+
+314 Fundamental Principles of Optical Lithography
+the composite slit and composite scan from the composite fi eld should yield the reticle 
+contribution. It seems likely, however, that this simplifying assumption will often prove 
+false. Any reticle error signature that has a systematic spatial signature (the edges of the 
+reticle might have a lower CD than the middle, for example) will confound the separation 
+of errors. In such a case, the second method of analyzing CD variations – a direct characterization of the sources of variation – can make this spatial decomposition even more 
+meaningful.
+While the previous paragraphs described a detailed statistical approach to the characterization of measured CD errors, a second approach would directly look for and measure 
+the variations in lithographic inputs thought to cause these errors. Such a ‘sources of 
+variations’ study can be coupled with the sensitivities of CD to each error source to predict 
+the resulting CD error distributions. One of the most common examples is the measurement of reticle CD errors to create a spatial map of the reticle. By combining this reticle 
+map with measured or simulated MEEF values for the specifi c features (mask error 
+enhancement factor, see section 8.7), a predicted wafer CD error map due only to reticle 
+errors can be generated.
+The most effective means of characterizing CD errors in a lithographic process is a 
+combination of a sources of variation study and statistical decomposition of measured 
+wafer errors. Using the reticle CD error map described above, for example, the reticle 
+contribution to the across-fi eld CD errors from the scan and slit direction signatures can 
+be subtracted out, making the statistical analysis of spatial variation more accurate. Also, 
+by comparing a ‘bottoms up’ prediction of wafer CD errors through a sources of variations 
+study with actual measured CD variations, one can check assumptions about which errors 
+are most signifi cant and which fab investments meant to improve CD control are most 
+likely to pay off.
+8.4 Overlay Control
+Like critical dimension control, overlay control is a vital part of lithography in semiconductor manufacturing. Errors in the overlay of different lithographic levels can directly 
+cause a number of electrical problems. At the gate level, overlay errors can pull a gate 
+line end close to the active area, causing an increase in leakage current. At contact or via, 
+overlay errors can reduce the overlap between the contact hole and the underlying conductor, causing higher contact resistance or, if bad enough, a short to the wrong electrical 
+connection. On the design side, design features are spread out to be insensitive to expected 
+errors in overlay. If overlay control can be improved, designs can be shrunk, allowing 
+smaller die, more die per wafer and lower cost per die. As a result, economics dictates 
+that overlay specifi cations must shrink in lockstep with device geometries, requiring 
+continuous improvement in overlay measurement and control.
+Overlay is defi ned as the positional accuracy with which a new lithographic pattern 
+has been printed on top of an existing pattern on the wafer, measured at any point on the 
+wafer. This is opposed to the slightly different concept of registration, which is the positional accuracy with which a lithographic pattern has been printed as compared to an 
+absolute coordinate grid. While registration can be important (for example, when considering the positional accuracy of features on a photomask), overlay is both much easier to 
+
+
+## Page 19
+
+ Lithographic Control in Semiconductor Manufacturing 315
+measure and more relevant to lithographic quality and yield. In this section we’ll examine 
+some basics of how overlay is measured, and how overlay data are used.
+8.4.1 Measuring and Expressing Overlay
+Overlay measurement involves the design of special patterns used on two different lithographic printing steps such that a metrology tool, when viewing the results of both printed 
+patterns simultaneously, can measure errors in overlay for that point on the wafer. The 
+most common pattern used today is the so-called box-in-box target (Figure 8.8). An outer 
+box is printed during the fi rst lithographic step and an inner box is printed during the 
+second lithography pass.
+Overlay measurement looks for differences in the space between the printed boxes (the 
+distances between inner and outer box edges). For example, the x-overlay error would be 
+one-half of the difference between the right and left widths between the inner and outer 
+boxes (Figure 8.9). By using both left and right widths, processing errors that affect the 
+dimensions of the boxes symmetrically will cancel out. Repeating this measurement for 
+the top and bottom of the boxes gives the y-overlay error. The x- and y-overlay measurement pair produces a vector of the overlay error at the wafer and fi eld location of the 
+measurement.
+While symmetrical errors in CD measurement will cancel when calculating overlay, 
+asymmetrical errors will not. Coma in the overlay measurement optics, for example, can 
+cause a left–right asymmetry in the measured box-in-box CDs, thus giving an error in the 
+overlay measurement. Such an asymmetry can easily be detected by rotating the wafer 
+by 180° and remeasuring the target. In the absence of any measurement asymmetries, the 
+two measurements would be the same, but of opposite signs. Thus, the tool-induced shift
+(TIS) is defi ned as
+TIS Overlay Overlay = °+ ° () ( ) 0 180 (8.17)
+with TIS = 0 for an ideal measurement. If TIS for an overlay measurement tool is 
+fi xed, it can be easily measured and subsequent overlay measurement corrected for this 
+Box-in-Box Frame-in-Frame Bar-in-Bar
+Figure 8.8 Typical ‘box-in-box’style overlay measurement targets,showing top-down optical
+images along the top and typical cross-section diagrams along the bottom. The outer box is
+typically 20mm wide. (Courtesy of KLA-Tencor Corp.)
+
+
+## Page 20
+
+316 Fundamental Principles of Optical Lithography
+systematic error. Thus, it is the variation of TIS that causes increased measurement 
+uncertainty.
+Asymmetries in the measurement target on the wafer can also cause similar shifts, 
+termed wafer-induced shift (WIS). Unlike TIS, however, WIS is rarely systematic enough 
+to be simply subtracted out of the data. Additionally, nonideal targets often interact with 
+the measurement tool, especially focus, to produce nonsystematic WIS errors.
+Recently, a new type of target called an Advanced Imaging Metrology (AIM) target 
+has shown superior measurement results (Figure 8.10). The AIM bars are less sensitive 
+wXL
+x-overlay = 0.5(wXL –wXR)
+wXR
+Figure 8.9 Measuring overlay as a difference in width measurements
+Figure 8.10 Typical AIM target where the inner bars (darker patterns in this photograph)
+are printed in one lithographic level and the outer (brighter) bars in another level. (Courtesy
+of KLA-Tencor Corp.)
+
+
+## Page 21
+
+ Lithographic Control in Semiconductor Manufacturing 317
+to chemical mechanical polishing (CMP) errors such as dishing and other processing 
+errors that can damage a box-in-box target, thus making the AIM target more processrobust. Also, the multiple bars essentially allow an averaging of multiple measurements 
+at one time, signifi cantly increasing the precision of the measurement. Special image 
+processing software is used to relate the optical image of the target (determining the center 
+of symmetry of each of the bars) to x- and y-overlay values.
+Overlay measurement targets are placed at various spatial positions in the reticle fi eld, 
+minimally at the four corners but often in the streets between the die (and thus within the 
+fi eld) as well. The spatial variation of overlay errors provides extremely important information as to the behavior of the reticle, the wafer and the stepper, as we shall see in the 
+next section. Overlay errors are characterized in terms of x-errors and y-errors separately, 
+rather than being combined into an overlay error length. Since integrated circuit (IC) 
+patterns are mostly laid out on a rectangular grid, the impact of an x-overlay error on 
+device yield or performance is almost independent of any y-overlay errors that might also 
+be present, or vice versa.
+8.4.2 Analysis and Modeling of Overlay Data
+The goal of overlay data analysis is twofold: assess the magnitude of overlay errors and 
+determine, if possible, their root causes. The overall magnitude of overlay errors is commonly summarized by the mean plus 3s of the overlay data in both x- and y-directions. 
+Root cause analysis involves explaining the data with a model that assigns a cause to the 
+observed effect.
+To see how an overlay model might work, let’s examine a simple example of a reticle 
+that is slightly rotated. Figure 8.11a shows how a rectangular reticle fi eld would print on 
+a wafer if the reticle were rotated slightly with respect to the previous layer. If the ideal 
+position of the upper-right corner of the fi eld were (x,y), rotation of the reticle about an 
+angle f would result in that corner printing at a location (x*,y*) given by
+xx y
+yy x
+*
+*
+=−
+=+
+cos sin
+cos sin
+φφ
+φφ (8.18)
+x
+y
+(x,y)
+(x*,y*)
+x
+y
+(x,y)
+(x*,y*)
+(a) (b)
+Figure 8.11 Examples of two simple overlay errors: (a) rotation and (b) magnifi cation
+errors
+
+
+## Page 22
+
+318 Fundamental Principles of Optical Lithography
+where the origin was set to be in the middle of the fi eld. In any reasonable lithography 
+process, these rotational errors will be quite small (on the order of 10 mradians or less) 
+so that the trigonometric functions can accurately be replaced by their small angle 
+approximations: cosf ≈ 1 and sinf ≈ f. The resulting overlay errors will then be
+d*
+d*
+xx x y
+yy y x
+≡ − =−
+≡ −=
+φ
+φ (8.19)
+Another possible alignment error is translation (also called offset), where the entire 
+reticle fi eld is shifted in x and y by ∆x and ∆y. In this case, the resulting overlay errors 
+are simply equal to this translation error:
+d
+d
+xx
+yy
+=
+=
+∆
+∆ (8.20)
+Another interesting error that can occur in optical lithography is a magnifi cation 
+error. While lithography tools are designed to reduce the reticle by a specifi c amount 
+(most commonly 4×), in fact changes in the index of refraction of air and the exact position of the lens or lens components relative to the reticle and wafer can cause small errors 
+in the magnifi cation of the imaging tool. Sometimes these magnifi cation errors can be 
+different in the x- and y-directions (this is especially true for step-and-scan tools, where 
+the ratio of reticle-to-wafer scan speeds controls the magnifi cation in the scan direction). 
+From Figure 8.11b, for x and y relative magnifi cation errors of ∆mx and ∆my, 
+respectively,
+x mx
+y my
+x mx
+y my
+x
+y
+x
+y
+*
+*
+d
+d
+=+ ()
+=+ ()
+=
+=
+1
+1
+∆
+∆
+∆
+∆
+ (8.21)
+The uniform or overall magnifi cation error is the average of ∆mx and ∆my. The difference 
+between ∆mx and ∆my is sometimes called anamorphism.
+Combining the three sources of overlay errors we’ve discussed so far, the resulting 
+total error in overlay would be
+d
+d
+x x y mx
+y y x my
+x
+y
+= −+
+=++
+∆∆
+∆∆
+φ
+φ (8.22)
+Like magnifi cation, rotational errors are sometimes broken up into x and y rotations as 
+well, with the uniform rotational error being the average of fx and fy and the difference 
+between these angles called skew or nonorthogonality. If the overlay error (dx, dy) were 
+measured at different points in the fi eld [different (x,y) points], one could fi nd the best fi t 
+of Equation (8.22) to the overlay data and extract the fi ve unknown overlay error sources: 
+rotation, x and y translation, and x and y magnifi cation errors.
+Is there a difference between a rotational error applied to the reticle and a rotational 
+error applied to the wafer? Since the reticle fi eld is repeated many times on one wafer, 
+rotating the reticle is very different from rotating the wafer, as can be seen more clearly 
+in Figure 8.12. (As an aside, the difference between wafer rotation in the x- and y-
+
+
+## Page 23
+
+ Lithographic Control in Semiconductor Manufacturing 319
+directions is called skew or orthogonality errors, and results from errors in the stepping 
+motion of the wafer stage. That is why wafer errors are sometimes called stage errors.) 
+Similarly, a reticle magnifi cation error (caused by the imaging tool) would yield a different signature than a wafer magnifi cation (also called scale) error (caused, for example, 
+by a thermal expansion of the wafer). Translation errors, however, are exactly the same 
+regardless of whether the reticle has been offset or the wafer has been offset.
+Wafer rotation and magnifi cation errors can be separated from reticle rotation and 
+magnifi cation errors by properly defi ning the coordinate axes used in Equation (8.22). If 
+x and y represent the coordinates relative to the center of the fi eld being measured, then 
+the model fi tting will yield reticle errors. If the coordinates are for the entire wafer (with 
+an origin at the center of the wafer, for example), the resulting model fi t will give wafer 
+errors. By combining reticle and wafer terms in the full model (using both wafer and fi eld 
+coordinates in the full equation), both reticle and wafer error terms can be determined. 
+Remember that translation errors cannot be separated into reticle and wafer, so only one 
+set of translation terms should be used. The fi nal model equations are
+d
+d
+wafer wafer field d
+wafer
+x x y Mx y mx
+yy x
+x xx x
+y
+=− + − +
+=+ +
+∆∆ ∆
+∆
+θφ
+θ ∆∆ My x my yy y wafer ++ φ field field
+fiel (8.23)
+where q and ∆M represent the wafer (stage) rotation and magnifi cation errors, and f and 
+∆m represent the reticle (fi eld) rotation and magnifi cation terms.
+In the linear model developed here, there are a total of 10 model coeffi cients: two 
+magnifi cation and two rotation errors each for the reticle and the wafer, and two translation terms. A typical sample plan would measure overlay at the four corners of an exposure 
+fi eld for fi ve different fi elds (in the middle and four ‘corners’ of the wafer), and for three 
+wafers in a lot. This number of measurements is generally enough to get good modeling 
+statistics, averaging random errors so that the model coeffi cients are reasonably precise. 
+The residuals, the difference between the modeled overlay errors (the systematic errors) 
+and the actual measured data, are a measure of the random component of the errors (Figure 
+8.13).
+(a) (b)
+Figure 8.12 Different types of rotation errors as exhibited on the wafer: (a) reticle rotation
+and (b) wafer rotation
+
+
+## Page 24
+
+320 Fundamental Principles of Optical Lithography
+8.4.3 Improving Overlay Data Analysis
+As discussed above, the primary overlay errors to consider are rotation of the wafer about 
+an angle q, rotation of the reticle about an angle f, translation where the entire reticle 
+fi eld or wafer is shifted in x and y by ∆x and ∆y, relative wafer magnifi cation errors of 
+∆Mx and ∆My in x and y, and relative fi eld magnifi cation errors of ∆mx and ∆my in x and 
+y, respectively. Combining these fi ve sources of overlay errors gave the model in Equation 
+(8.23). While this basic overlay model captures the majority of systematic errors typically 
+found in stepper or step-and-scan imaging, additional model terms and other approaches 
+can be used to improve the analysis. The goal is to properly account for all systematic 
+overlay errors such that the model residuals, the difference between the best-fi t model 
+values and the actual data, are purely random. These additional terms are especially 
+important when the fi rst and second lithography levels are printed on different lithographic 
+tools.
+The linear terms in Equation (8.23) can be expanded to include higher-order terms. 
+Second-order terms can model a trapezoidal error in the shape of the printed fi eld, caused 
+by a tilt in the reticle plane for nontelecentric imaging tools. Thus, these terms provide 
+additional ‘correctables’ that can be used to adjust reticle tilt and reduce subsequent 
+overlay errors. Third- and fi fth-order terms are added to the fi eld analysis to account for 
+systematic lens distortion. While these terms are often not correctable, their inclusion in 
+the model can improve the accuracy of the resulting lower-order model terms. A common 
+higher-order model (including only the reticle fi eld terms) is shown here:
+d
+d
+x y m x t x t xy d x x y d x x y
+y xm
+x xx x x x
+y
+=− + + + + + + +
+=+
+φ
+φ
+∆
+∆
+1 2 23 22 5 2 22 ( )( )
+yy y y y y t y t xy d y x y d y x y + + + ++ + 1 2 23 22 5 2 22 ( )( ) (8.24)
+where t1 and t2 are the trapezoidal error terms, d3 are the third-order distortion terms, and 
+d5 represent fi fth-order distortion. Figure 8.14 shows an overview of reticle model 
+terms.
+The purpose of using third- and fi fth-order distortion terms in modeling overlay data 
+is to account for the very real impact of systematic distortions caused by lens aberrations. 
+= +
+Raw Overlay Value Modeled Overlay Value Residual Value
+Figure 8.13 Separation of raw overlay data into modeled + residual values. The sampling
+shown here, four points per fi eld and nine fi elds per wafer, is common for production
+monitoring
+
+
+## Page 25
+
+ Lithographic Control in Semiconductor Manufacturing 321
+More correctly, such overlay errors are the result of differences in the distortion characteristics of the lenses used to print the fi rst and second lithographic levels. If the same 
+exposure tool was used for both levels, these high-order distortion terms should disappear 
+(since lens distortion changes only slowly with time), regardless of the distortion of the 
+lens relative to an absolute grid.
+While modeling with high-order terms is a reasonable approach, it would be better to 
+characterize the lens distortion more completely. Since distortion caused by lens aberrations varies slowly compared to the correctable error terms, it can be characterized infrequently with a thorough analysis. First, one exposure tool is picked as the reference or 
+‘golden’ tool. A ‘golden’ artifact wafer is printed on this tool and the resulting fi rst-layer 
+overlay marks are etched into the silicon. A test reticle is used that puts many, many 
+overlay measurement targets throughout the exposure fi eld (a 10 × 10 array, for example). 
+Then, this artifact wafer is printed with the second layer on each exposure tool to be 
+characterized. Measurement results are analyzed to subtract out the low-order correctables 
+and multiple fi elds are measured to average out random errors. The remaining residuals 
+form a lens fi ngerprint for each tool relative to the reference tool (Figure 8.15).
+Once a database of lens fi ngerprints for each tool has been collected, these fi ngerprints 
+can be used in different ways. In the simplest application, the lens fi ngerprint can be 
+subtracted from the raw overlay data before modeling those data. Suppose stepper A was 
+used as the reference and the current lot used stepper D for the fi rst layer and stepper G 
+for the second layer. The measured fi ngerprints in the database are D-A and G-A. The 
+Error Term Picture Coefficients 
+Translation ∆x, ∆y
+Rotation φx, φy
+Magnification ∆mx, ∆my
+Trapezoid (Keystone) t1, t2
+Lens Distortion d3, d5
+Figure 8.14 Illustration of fi eld (reticle) model terms including higher-order trapezoid and
+distortion6
+
+
+## Page 26
+
+322 Fundamental Principles of Optical Lithography
+lens fi ngerprint for this lot would be G-A–D-A. In a second application of lens fi ngerprint 
+data, every possible combination of steppers would be used to calculate the resulting fi ngerprints, which then are rank ordered by the maximum error in the fi ngerprint. This lens 
+matching exercise results in a list of the best and worst combinations of steppers/scanners 
+to use.
+Like the imaging lens, every reticle contains fi xed errors in registration (overlay relative 
+to an absolute grid). Differences between the reticle fi ngerprint of the fi rst and second 
+lithography layer result in systematic overlay errors across the fi eld that are independent 
+of both lens distortion and stepper/scanner correctables. And just like the lens fi ngerprint, 
+if this reticle fi ngerprint were to be measured, it could be used in the data analysis to 
+improve the resulting modeling. Unfortunately, reticle fi ngerprints are much harder to 
+measure and generally require special registration measurement equipment found only in 
+the mask-making shop. Thus, measurement of a reticle fi ngerprint must generally be 
+specifi ed at the time of mask purchase.
+Awareness of the reticle fi ngerprint makes measuring the lens fi ngerprint more diffi cult. 
+If two reticles are used for the lens fi ngerprint measurement, the result will be a combined 
+lens and reticle fi ngerprint measurement. Thus, typically one reticle is used for a lens 
+fi ngerprint measurement, with both lithography pass patterns (inner and outer boxes, for 
+example) located next to each other to minimize reticle effects.
+The switch from pure scanning or pure stepping motion of the wafer stage to a combined step-and-scan stage motion adds several new possible overlay error terms. One such 
+scanner term that affects the wafer overlay model is called backlash. With backlash, the 
+x and y translation errors depend on the direction of the scan. Step-and-scan tools work 
+Figure 8.15 Example of a stepper lens fi ngerprint showing in this case nearly random distortion across the lens fi eld
+
+
+## Page 27
+
+ Lithographic Control in Semiconductor Manufacturing 323
+by scanning the wafer and reticle past the exposure slit until a whole fi eld is exposed. 
+Then the wafer is stepped to a new location and the scanning repeats in the opposite 
+direction. Besides an overall translation error between reticle and wafer, backlash adds a 
+translation error that switches sign depending on the direction of the scan. Backlash terms 
+are often added to the standard overlay models [the 10-parameter model of Equation 
+(8.23) becomes a 12-parameter model], and while most common for step-and-scan tools, 
+it is sometimes used for steppers as well.
+Scanning also adds the possibility of higher-order stage ‘wobble’. If a stage were scanning in the y-direction, for example, that stage could slowly wobble back and forth in the 
+x-direction as it scans. Thus, a y-direction scan adds error terms to the x-overlay error dx
+that go as powers of the fi eld coordinate y. A y2
+ term is called scan bow. A y3 term adds 
+a snake-like signature to the fi eld overlay. Note that a linear variation in y is already 
+included as a reticle rotation.
+Like the reticle and the lens, a specifi c scanner stage can have its own signature. 
+However, unlike the reticle or the lens, the scanner stage signature varies more quickly 
+over time than the other signatures. Thus, ideally each of these signatures should be 
+measured independently. The lens fi ngerprint can be measured independent of the scan 
+signature by using the lens fi ngerprint measurement method above for a static exposure 
+(that is, with no scanning motion of stage and reticle). This lens signature within the slit 
+can then be collapsed to a one-dimensional slit signature by averaging all the errors across 
+the slit (that is, in the scan direction). Finally, a dynamic lens/scan signature can be measured by applying the lens fi ngerprint method for a full scanning exposure (see Figure 
+8.16). Subtracting out the slit signature leaves the scan signature remaining.
+8.4.4 Using Overlay Data
+Once overlay on a production lot of wafers has been measured and modeled, how is this 
+data and analysis to be used? In general, production lot measurements of any kind can 
+Scan
+Direction
+x Field Coordinate (mm)
+–15
+–18
+–14
+–10
+–6
+–2
+2
+6
+10
+14
+18
+–10 –5 0 5 10 15
+Max Error (um): x,y= 0.0265 0.0070 Scale: 150
+y Field Coordinate (mm)
+Figure 8.16 Example of a scanner lens/scan fi ngerprint7 (fi gure used with permission). Note
+that errors in the scan direction are mostly averaged out by the scan
+
+
+## Page 28
+
+324 Fundamental Principles of Optical Lithography
+be thought of as ‘health monitors’. The goal is to answer three questions: How healthy 
+is this lot? How healthy are the process and process tools? How healthy is the metrology? 
+For overlay, this translates into three basic uses of the metrology data: (1) lot dispositioning – should this lot be reworked or sent on to etch; (2) stepper correctables – have we 
+detected errors in the stepper or scanner that can be adjusted for improved overlay; and 
+(3) metrology diagnostics – do we have a problem with the targets, sample plan, or metrology tool that should be taken into account.
+If overlay errors on a wafer are too large, fi nal electric yield for that wafer can suffer. 
+Since lithography offers the unique option to rework wafers that have not been properly 
+processed, it is very cost-effective to try to catch yield-limiting overlay errors while the 
+option for rework still exists. Since wafers are processed in batches called lots (typically 
+made up of 25 wafers, though lot sizes can vary), and since each lot is processed in an 
+essentially identical manner (common tool settings and materials, very small elapsed time 
+between processing of wafers within a lot), these lots are almost always dispositioned 
+together as a group.
+After a lot has been processed through resist development, two or three wafers from 
+that lot are randomly selected for overlay measurement. (For dual wafer stage scanners, 
+care must be taken to sample both stages and analyze the stage/wafer errors separately.) 
+Data analysis leads to a number of statistical and model-based metrics from those measurements. This collection of metrics must then be distilled into a binary go-no go decision: Do we predict that the cost of yield losses due to overlay errors, should the lot be 
+passed, will exceed the cost of reworking the wafers? Some basic cost analysis can translate this question into a yield-loss threshold: if the predicted yield loss due to overlay 
+errors exceeds a certain value, the lot should be reworked.
+But standard overlay data analysis does not directly provide a prediction of overlaylimited yield. Instead, certain statistical or modeled proxies for yield are used. In the 
+simplest approach, if the maximum measured error, the mean value of the error magnitude, or the standard deviation of the measured data distribution (in either x or y) exceed 
+some predefi ned thresholds, the lot is to be reworked. These thresholds are generally 
+determined by a combination of experience and simple rules of thumb that have been 
+scaled with each technology node. Similarly, modeling results can also be used to assess 
+the value of reworking the lot. If applying the modeled correctables would reduce overlay 
+errors for this lot by some predefi ned amount, it becomes worthwhile to rework.
+The above approaches for assessing yield have a serious fl aw – they only predict the 
+impact on yield of the errors that occur at the measurement points. But measurement 
+sampling on production lots is generally sparse to keep measurement costs low. Thus, it 
+is most likely that errors at nonsampled points will be the yield limiters. Modeling can 
+be used to overcome this limitation by predicting the maximum error expected on the 
+wafer. The best-fi t model can be used to predict the systematic variation of overlay at any 
+point on the wafer. Using the residuals of the model fi t as an estimate of the random error 
+contribution, a maximum predicted error can be calculated for an average fi eld and for 
+the wafers. If this maximum predicted error is above some threshold, the lot is 
+reworked.
+Even the more rigorous approach of calculating the predicted maximum error on the 
+wafer has a fl aw: wafers don’t fail due to overlay errors, die fail. In general, each exposure 
+fi eld contains several die (2–4 microprocessors or 8–16 memory chips in a fi eld are 
+
+
+## Page 29
+
+ Lithographic Control in Semiconductor Manufacturing 325
+common). Knowing the number of die per fi eld and the pattern of fi elds printed on the 
+wafer, the max predicted error approach can be used to fi nd the maximum error that occurs 
+in each die on the wafer. By predicting that a catastrophic yield-loss error will occur 
+whenever the overlay exceeds some threshold at any point in the die, the max predicted 
+error calculation can be used to predict the overlay-limited yield – the number of die that 
+are expected to fail due to overlay errors from the current lithography step. This overlaylimited yield metric translates measured overlay data into a lot pass/fail decision that is 
+directly related to fi nal die yield.
+As discussed before, one important use of overlay data modeling is to calculate stepper 
+correctables. Correctables are defi ned as corrections to the exposure tool settings (affecting reticle and wafer position and motion) that, if they had been made before the measured 
+lot was processed, would have resulted in improved overlay for that lot. Thus, technically 
+these correctables are backward-looking. But their true value comes from applying them 
+in a forward-looking manner. There are several ways in which overlay correctables are 
+used. The most direct and obvious is during lot rework: if the measurements indicate that 
+the lot should be reworked, what stepper/scanner settings should be changed to best ensure 
+reworking will result in signifi cantly improved overlay? Since reworking is typically done 
+immediately after that lot was fi rst processed, without unloading the reticle or changing 
+the basic settings of the tool, the correctables tend to work extremely well at improving 
+the reworked overlay.
+Correctables can also be applied even if the current lot is passed. Often an exposure 
+tool is used to process numerous identical lots in a row. Like the rework case, the reticle 
+is not being reloaded and the basic stepper settings are not being changed between lots. 
+Thus, correctables can be used to keep the overlay errors of each subsequent lot at their 
+minimum. A system of feeding back correctables based on current measurements to keep 
+the next batch of wafers in control is termed APC, advanced process control. Finally, 
+correctables can be tracked over time for a given exposure tool to look for trends. SPC 
+(statistical process control) techniques can determine if the variation in correctables from 
+lot to lot is statistically unexpected and thus cause for alarm.
+The third ‘health monitor’ use of production lot overlay measurements is to diagnose 
+the health of the metrology itself. Overlay measurement begins with a signal acquisition, 
+which is then analyzed to produce the raw overlay data. The signal can also be analyzed 
+for noise and nonideal characteristics (such as asymmetries) in what is called target 
+diagnostics. Wafer processing, fi lm deposition and chemical mechanical polishing (CMP) 
+in particular, can reduce the visibility of target to an optical measurement tool both 
+decreasing the signal and increasing the noise. CMP and its variation across the wafer 
+can also cause an asymmetric ‘smearing’ of the topography that makes up the overlay 
+measurement target.
+Target diagnostics can be used to assess the uncertainty of a given measurement. This 
+uncertainty can be used to weight the data for subsequent modeling, or as a data removal 
+mechanism (if the target is too bad, measurement results from that target can be ignored). 
+But the modeling itself offers another diagnostic tool for the metrology. Fitting the data 
+to a model results in model coeffi cients plus residuals. If the residuals are too high, this 
+could be an indication that something has gone wrong with the measurement. Additionally, the data fi tting process results not only in model coeffi cients but in estimates of the 
+uncertainties of those coeffi cients (technically termed the covariance matrix of the fi t). If 
+
+
+## Page 30
+
+326 Fundamental Principles of Optical Lithography
+the uncertainty of a correctable is consistently too high, there is a good chance that the 
+sampling plan needs to be improved.
+8.4.5 Overlay Versus Pattern Placement Error
+Overlay is measured using special measurement targets which, in general, are large compared to the resolution limits of the lithographic imaging tool. As was discussed in Chapter 
+3, however, aberrations can cause errors in the positions of printed features that are a 
+function of the feature size and pitch of the patterns. The positional errors specifi c to the 
+feature being printed are called pattern placement errors (PPE) and are above and beyond 
+(and thus can be added directly to) the overlay errors that are the same for any pattern. 
+Using the Zernike polynomial terminology, the variation of x- and y-tilt with fi eld position, called distortion, is an overlay error since the same error is experienced by every 
+feature. However, the higher-order odd aberrations (such as coma) cause additional positional errors that depend on the feature. These additional errors are called pattern placement errors.
+Pattern placement errors can be measured by using special overlay targets that have 
+the same (or nearly the same) structure as the device patterns of interest. Since practically 
+this can very diffi cult to accomplish, pattern placement errors are more commonly predicted by calculating the various images of interesting patterns given measured lens 
+aberrations as a function of fi eld position (see Chapter 3).
+8.5 The Process Window
+As discussed in section 8.2.2, there are two ways to improve CD control: reduce the 
+variation in CD with a given process error (that is, increase process latitude); and reduce 
+the magnitude of process errors. In order to increase process latitude, one must fi rst 
+measure and characterize that process latitude. Unfortunately, there are a very large 
+number of potential process errors in the fab, from variations in the wafer fi lmstack to 
+batch-to-batch variations in resist properties, from scanner stage vibrations to PEB hot 
+plate temperature nonuniformities. To fully characterize the response of CD to each individual process error seen in manufacturing would be a daunting task, let alone to consider 
+the interactions of these errors.
+Fortunately, the task is simplifi ed by recognizing that essentially all errors in the fab 
+fall into two basic categories: errors that behave like dose errors, and errors that behave 
+like focus errors. Once this bifurcation of error sources is understood, the job of measuring process latitudes is simplifi ed to measuring the focus and dose responses of the 
+process. The sections below will address the importance of dose and focus by explaining 
+the focus–exposure matrix, and using it to provide defi nitions of the process window and 
+depth of focus (DOF).
+8.5.1 The Focus–Exposure Matrix
+In general, depth of focus can be thought of as the range of focus errors that a process 
+can tolerate and still give acceptable lithographic results. Of course, the key to a good 
+defi nition of DOF is in defi ning what is meant by tolerable. A change in focus results in 
+
+
+## Page 31
+
+ Lithographic Control in Semiconductor Manufacturing 327
+two major changes to the fi nal lithographic result: the photoresist profi le changes, and the 
+sensitivity of the process to other processing errors is increased. Typically, photoresist 
+profi les are described using three parameters: the linewidth (or critical dimension, CD), 
+the sidewall angle and the fi nal resist thickness (that is, the profi le is modeled as a trapezoid, see section 8.2.4). The variation of these parameters with focus can be readily 
+determined for any given set of conditions (although CD is the easiest of the three to 
+measure). The second effect of defocus is signifi cantly harder to quantify: as an image 
+goes out of focus, the process becomes more sensitive to other processing errors such as 
+exposure dose, PEB temperature and develop time. Exposure dose is commonly chosen 
+to represent these other process responses.
+The effect of focus on a resist feature is dependent on exposure. Thus, the only way to 
+judge the response of the process to focus is to simultaneously vary both focus and exposure in what is known as a focus–exposure matrix. Figure 8.17 shows a typical example 
+of the output of a focus–exposure matrix using linewidth as the response (sidewall angle 
+and resist loss can also be plotted in the same way) in what is called a Bossung plot.8
+Unfortunately, experimental data collected from a focus–exposure matrix will rarely 
+be as smooth and clean as that shown in Figure 8.17. Experimental error is typically 
+several percent for CDs at best focus and exposure, but the error grows appreciably when 
+out of focus. To better analyze focus–exposure CD data, it is common to fi t the data to a 
+reasonable empirical equation in order to reduce data noise and eliminate fl yers. A reasonable expression can be derived from a basic understanding of how an image is printed in 
+photoresist.
+Consider an ideal, infi nite contrast positive resist and simple 1D patterns. For such a 
+resist, any exposure above some threshold dose Eth will cause all of the resist to be 
+removed (see Chapter 3). For an aerial image I(x) and an exposure dose E, the CD will 
+equal 2x when
+E EI x th = () (8.25)
+–0.3 –0.2 –0.1 0.0 0.1
+Focus (µm)
+Exposure Dose 
+(mJ/cm2)
+14
+16
+18
+20
+22
+24
+26
+30
+34
+0
+50
+100
+150
+200
+250
+Resist Feature Width, CD (nm)
+0.2
+Figure 8.17 Example of the effect of focus and exposure on the resulting resist linewidth.
+Here, focal position is defi ned as zero at the top of the resist with a negative focal position
+indicating that the plane of focus is inside the resist
+
+
+## Page 32
+
+328 Fundamental Principles of Optical Lithography
+Consider some reference dose E1 producing x1 = CD1/2. For some small difference from 
+this x value, let us assume the aerial image is linear (that is, let us use only the fi rst two 
+terms in a Taylor series expansion of I about x1).
+Ix Ix I
+x
+() ( ) ( ) =+ − 11 xx
+d
+d (8.26)
+Combining Equations (8.25) and (8.26),
+E E I x EI x E I x I
+x th xx
+d
+d
+= = = +− 
+
+ 
+
+ 11 1 1 ( ) () ( ) ( ) (8.27)
+Dividing both sides of the equation by EI(x1),
+E
+E
+Ix
+Ix
+I
+x
+xx 1
+1
+= =+ − 1 1
+()
+()
+ln () d
+d (8.28)
+where the log-slope of the aerial image is evaluated at x1. Since x = CD/2, this equation 
+can be rearranged to give
+E
+E
+I
+CD
+CD CD
+CD
+11
+1
+−=1  −
+
+ 
+
+ d
+d
+ln
+ln (8.29)
+Since we have assumed an infi nite contrast resist, it is easy to show from Equation (8.25) 
+that
+d
+d
+d
+d
+ln
+ln
+ln
+ln
+I
+CD
+E
+CD =− (8.30)
+Combining Equations (8.29) and (8.30),
+CD CD
+CD
+CD
+E
+E
+EE E
+− =− 
+
+
+ =
+1
+1
+1
+1
+1 d
+d
+ln
+ln (8.31)
+The term dlnCD/dlnE is the slope of the CD-versus-dose curve when plotted on a log-log 
+scale, evaluated at the reference dose E1. Thus, from this simple model we have a prediction of how CD varies with dose.
+An alternate exposure dependence can be derived by assuming the log-slope of the 
+aerial image is constant around x1 rather than the slope of the image. In this case, Equation (8.26) is replaced with
+Ix Ix s I
+x
+sx x
+xx
+() ( ) () ln == −
+=
+1 1
+1
+e where d
+d (8.32)
+Following the same derivation path as before,
+CD CD
+CD
+CD
+E
+E
+EE E
+− = 
+
+ 
+
+ =
+1
+11 1
+d
+d
+ln
+ln
+ln (8.33)
+Note that Equation (8.33) reverts to Equation (8.31) with a Taylor expansion of the natural 
+logarithm when E is near E1.
+
+
+## Page 33
+
+ Lithographic Control in Semiconductor Manufacturing 329
+Finally, the most accurate aerial image dose variation model assumes the log-slope of 
+the image varies linearly with x. As was discussed in Chapter 7, this leads to an aerial 
+image of the space with a Gaussian shape:
+I x I NILS CD I
+x
+NILS x CD
+xx
+() () ln == −
+=
+0 11 11 2
+1
+e where d
+d
+/ (8.34)
+Proceeding as before,
+CD
+CD
+CD
+E
+E
+11 EE E
+12
+1
+=+ 
+
+ 
+
+ =
+d
+d
+ln
+ln
+ln (8.35)
+where in this case the CD is for the space. For a line, the equivalent expression for CD
+would be
+p CD
+p CD
+CD
+p CD
+CD
+E
+E
+EE E
+−
+− =− −
+
+
+ 
+
+ 
+
+ 
+
+ 1 =
+1
+11
+12
+1
+d
+d
+ln
+ln
+ln (8.36)
+where p is the pitch. Note that a Taylor series expansion of the square root when E is near 
+E1 leads to Equation (8.33). Equation (8.34) for a Gaussian-shaped image has its center 
+at x = 0, the center of the space. This describes typical aerial images very well for small 
+spaces, but for larger spaces there will be an offset between the peak of the Gaussian and 
+the center of the space. In this case, Equation (8.36) can still be used if the pitch is replaced 
+by an empirically determined effective pitch.
+Equation (8.31), (8.33) or (8.35) describes how CD varies with dose for any given 
+aerial image [though in practice Equation (8.33) doesn’t work nearly as well as Equation 
+(8.31) or (8.35), and Equation (8.35) matches data best of all]. Thus, these expressions 
+apply to an out-of-focus image just as well as to an in-focus image. The only thing that 
+changes through focus is the CD-versus-dose slope. To fi rst order, this slope varies 
+quadratically with focus.
+d
+d
+d
+d
+ln
+ln
+ln
+ln
+CD
+E
+CD
+E
+FF
+FF
+=+  −
+
+
+
+
+
+ 
+
+ = 0
+1 0
+2
+∆ (8.37)
+where F is the focal position, F0 is best focus, and ∆ is the focus error that causes the 
+log-CD-versus-log-dose slope to double.
+As an example, consider the case of pure three-beam coherent imaging of equal lines 
+and spaces through focus as discussed in Chapter 3. The aerial image was shown to be
+I x xp xp ( ) cos( )cos( ) cos( ) =+ + +
+1
+4
+22 2 2 4 22 ππ
+π
+π
+∆Φ // π (8.38)
+where ∆Φ= − 2 11 () 0 ( −− () ) 2 π λλ nF F p/ .
+The normalized log-slope of the image evaluated at the nominal line edge is
+NILS = 8cos( ) ∆Φ (8.39)
+
+
+## Page 34
+
+330 Fundamental Principles of Optical Lithography
+Recalling Equation (8.30) and assuming that the defocus amount is small enough that the 
+cosine can be replaced by the fi rst two terms of its Taylor series expansion,
+d
+d
+d
+d
+ln
+ln
+ln
+ln
+CD
+E
+CD
+E FF
+=+ 
+
+ 
+
+ = 0
+1
+2
+2 ∆Φ (8.40)
+This gives the same result as Equation (8.37) with
+∆= − − ( () ) ≈ λ −
+π
+λ
+2 πλ 11 2 2 1 2n p p
+n / (8.41)
+This method of adding the focus dependence to the dose dependence gives extra signifi cance to the dose E1. When E = E1, Equations (8.31), (8.33) and (8.35) require that 
+CD = CD1 regardless of the value of focus. As will be discussed in section 8.5.3, this is 
+the defi nition of the isofocal dose and isofocal CD. Thus, the exposure latitude term 
+dlnCD/dlnE used in the above expressions will be the value of this slope at the isofocal 
+dose (see Figure 8.18). At other exposure energies, this log-CD-versus-log-dose slope will 
+of course be different. For the simplest model, Equation (8.31), the result is
+d
+d
+d
+d
+ln
+ln
+ln
+ln
+CD
+E
+CD
+E
+E
+E
+CD
+EE CD = 
+
+
+
+
+
+
+ = 1
+11 (8.42)
+For the more exact model of Equations (8.35) or (8.36),
+Space d
+d
+d
+d
+Line d
+d
+d
+:
+ln
+ln
+ln
+ln
+:
+ln
+ln
+ln
+CD
+E
+CD
+E
+CD
+CD
+CD
+E
+C
+EE
+= 
+
+
+
+=
+= 1
+1
+2
+D
+E
+CD
+CD
+p CD
+d ln EE= p CD
+
+
+
+
+−
+−
+
+
+ 
+
+ 1
+11
+ (8.43)
+40
+60
+80
+100
+120
+140
+160
+–0.3 –0.2 –0.1 0.0 0.1 0.2 0.3
+Focus (µm)
+CD (nm)
+0.7
+ln
+ln
+1 0 ,
+= −
+E F d E
+d CD
+∆ = 0.17 µm
+CD1 = 100 nm 
+E1 = 30 mJ/cm2
+Figure 8.18 Plot of the simple Bossung model of Equations (8.31) and (8.37) shows that it
+describes well the basic behavior observed experimentally
+
+
+## Page 35
+
+ Lithographic Control in Semiconductor Manufacturing 331
+Over reasonable ranges of focus (the magnitudes of focus errors normally encountered 
+in semiconductor lithography), the impact of focus on the blurring of an aerial image is 
+symmetric. That is, going out of focus in each direction (the wafer too close or too far 
+from the projection lens) produces the same result on the aerial image for the same magnitude of focus error. And yet, when we measure the lithographic response to focus, in 
+the form of a focus–exposure matrix or Bossung plot, we can observe an obvious asymmetry in the response of critical dimension (CD) to focus. Figure 8.17 shows a small but 
+noticeable tilt in the shape of the Bossung curves and a decided asymmetry between plus 
+and minus focus.
+Since the aerial image responds to focus symmetrically, the cause of the observed 
+asymmetry must involve the way that the aerial image interacts with the photoresist to 
+produce the fi nal CD. In fact, it is the thickness of the photoresist that gives rise to this 
+asymmetry. As the aerial image travels through space, it becomes more ‘in focus’ as it 
+approaches the focal plane, then defocuses as it travels away from this plane of best focus. 
+Because the photoresist has a nonzero thickness, different parts of the resist will experience different amounts of defocus. Suppose the focal plane were placed just above the 
+top of the resist (Figure 8.19a). At the top, the resist sees an aerial image that is near best 
+focus and thus very sharp. As this image propagates toward the bottom of the resist, 
+however, it goes further out of focus. As a consequence, the top of the resist profi le looks 
+sharp but the bottom is curved or ‘blurred’ by the defocused image. If, on the other hand, 
+the plane of best focus were placed below the bottom of the resist (Figure 8.19b), a very 
+different resist shape will result. The bottom of the resist will see a sharp image, while 
+the top of the resist will experience a more defocused image. The result will be a resist 
+profi le with straight sidewalls at the bottom, but a very rounded top.
+As Figure 8.19 shows, the shape of the resist profi le will be very different depending 
+on the direction of the defocus (note that ‘best’ focus will typically place the focal plane 
+somewhere near the middle of the resist thickness). As one might expect, the critical 
+dimensions of the two resist profi les shown in Figure 8.19 will also be different. The 
+result is an asymmetric response to focus as shown in the Bossung curves. The asymmetry 
+becomes apparent whenever the thickness of the photoresist becomes an appreciable 
+fraction of the depth of focus of that feature.
+(a) (b)
+Aerial Image Resist Profile
+Top
+Bottom
+Top
+Bottom
+Aerial Image Resist Profile
+Figure 8.19 Positioning the focal plane (a) above the top of the resist, or (b) below the
+bottom of the resist results in very different shapes for the fi nal resist profi le
+
+
+## Page 36
+
+332 Fundamental Principles of Optical Lithography
+Asymmetric response to focus can be added to the semiempirical Bossung model by 
+allowing other powers of dose and focus (in particular, allowing odd powers of focus). 
+Thus, a generalized version of the Bossung model becomes
+CD CD
+CD
+a
+E
+E nm FF
+n
+m
+m
+M
+n
+N − =− 
+
+
+ () − = =
+∑∑ 1
+1
+1
+0
+1 0
+1 (8.44)
+In general, very good fi ts to experimental data are obtained with very few terms of the 
+summation.9
+8.5.2 Defi ning the Process Window and DOF
+Of course, one output as a function of two inputs can be plotted in several different ways. 
+For example, the Bossung curves could also be plotted as exposure latitude curves (linewidth versus exposure) for different focus settings. Another very useful way to plot this 
+two-dimensional data set is a contour plot – contours of constant linewidth versus focus 
+and exposure (Figure 8.20a).
+The contour plot form of data visualization is especially useful for establishing the 
+limits of exposure and focus that allow the fi nal image to meet certain specifi cations. 
+Rather than plotting all of the contours of constant CD, one could plot only the two 
+CDs corresponding to the outer limits of acceptability – the CD specifi cations. Because 
+of the nature of a contour plot, other variables can also be plotted on the same graph. 
+Figure 8.20b shows an example of plotting contours of CD (nominal ±10 %), 80° sidewall 
+angle and 10 % resist loss all on the same graph. The result is a process window – the 
+region of focus and exposure that keeps the fi nal resist profi le within all three 
+specifi cations.
+(a) (b)
+16
+18
+20
+22
+24
+26
+28
+30
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2
+Focus (µm)
+14
+CD
+Sidewall Angle
+Resist Loss
+Focus (µm)
+140
+120
+100
+90
+80
+70
+CD = 110 nm
+Exposure (mJ/cm2
+)
+16
+18
+20
+22
+24
+26
+28
+30
+14
+–0.3 –0.2 –0.1 0.0 0.1 0.2
+Figure 8.20 Displaying the data from a focus–exposure matrix in an alternate form: (a)
+contours of constant CD versus focus and exposure, and (b) as a focus–exposure process
+window constructed from contours of the specifi cations for linewidth, sidewall angle and
+resist loss
+
+
+## Page 37
+
+ Lithographic Control in Semiconductor Manufacturing 333
+The focus–exposure process window is one of the most important plots in lithography 
+since it shows how exposure and focus work together to affect linewidth (and possibly 
+sidewall angle and resist loss as well). The process window can be thought of as a process 
+capability – how the process responds to changes in focus and exposure. An analysis of 
+the error sources for focus and exposure in a given process will give a process requirement (see Table 8.2). If the process capability exceeds the process requirements, yield 
+will be high. If, however, the process requirement is too large to fi t inside the process 
+capability, yield will suffer.
+What is the maximum range of focus and exposure (that is, the maximum process 
+requirement) that can fi t inside the process window? A simple way to investigate this 
+question is to graphically represent errors in focus and exposure as a rectangle on the 
+same plot as the process window. The width of the rectangle represents the built-in focus 
+errors of the processes, and the height represents the built-in dose errors. The problem 
+then becomes one of fi nding the maximum rectangle that fi ts inside the process window. 
+However, there is no one answer to this question. There are many possible rectangles of 
+different widths and heights that are ‘maximal’, i.e. they cannot be made larger in either 
+direction without extending beyond the process window (Figure 8.21a). (Note that the 
+concept of a ‘maximum area’ is meaningless here.) Each maximum rectangle represents 
+one possible trade-off between tolerance to focus errors and tolerance to exposure errors. 
+Larger DOF can be obtained if exposure errors are minimized. Likewise, exposure latitude 
+can be improved if focus errors are small. The result is a very important trade-off between 
+exposure latitude and DOF.
+If all focus and exposure errors were systematic, then the proper graphical representation of those errors would be a rectangle. The width and height would represent the 
+total ranges of the respective errors. If, however, the errors were randomly distributed, 
+then a probability distribution function would be needed to describe them. It is common 
+to assume that random errors in exposure and focus are caused by the summation of 
+many small sources of error, so that by the central limit theorem the overall probability 
+(a) (b)
+Focus (µm)
+16
+18
+20
+22
+24
+26
+28
+30
+Exposure (mJ/cm2
+) 14
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2
+16
+18
+20
+22
+24
+26
+28
+30
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2
+Exposure (mJ/cm2
+)
+Focus (µm)
+14
+Figure 8.21 Measuring the size of the process window: (a) fi nding maximum rectangles;
+and (b) comparing a rectangle to an ellipse
+
+
+## Page 38
+
+334 Fundamental Principles of Optical Lithography
+distributions for focus and dose will be Gaussian (a normal distribution). Given standard 
+deviations in exposure and focus, sE and sF respectively, the probability density function 
+will be
+pE F E F ( ) exp( )exp( ) ∆∆ ∆ ∆ , // EF=− − EF
+1
+2
+22 22 22
+πσ σ
+σσ (8.45)
+where focus errors and exposure errors are assumed to be independent. In order to graphically represent the errors of focus and exposure, one should describe a surface of constant 
+probability of occurrence. All errors in focus and exposure inside the surface would have 
+a probability of occurring which is greater than the established cutoff. What is the shape 
+of such a surface? For fi xed systematic errors, the shape is a rectangle. For a Gaussian 
+distribution, the surface can be derived by setting the probability of Equation (8.45) to a 
+constant, p*.
+p EF
+p
+E
+* //
+*
+EF
+EF
+EF
+E
+=− −
+−=
+1
+2
+22
+2
+2
+22 22
+2
+πσ σ
+σσ
+πσ σ
+σ
+exp( )exp( )
+ln( )
+∆∆
+∆
+2
+2
+2 2
++
+∆F
+σF
+ (8.46)
+Equation (8.46) is that of an ellipse. Suppose, for example, that one wishes to describe a 
+‘three-sigma’ surface, where p* corresponds to the probability of having an error equal 
+to 3s in one variable. The resulting surface would be an ellipse with major and minor 
+axes equal to 3sE and 3sF (Figure 8.21b).
+1
+33
+2
+2
+2
+2 =
+()
++
+()
+∆∆ EF
+σσ EF
+ (8.47)
+As seen in Table 8.2 for focus errors, the errors that actually occur in manufacturing 
+are a combination of random and systematic errors. In fact, it is a reasonable rule of thumb 
+to say that the full-range systematic errors are about equal in magnitude to (on the same 
+order as) 6 times the standard deviation of the random errors. As a result, the total error 
+probability distribution will be a complimentary error function (the random error Gaussian 
+convolved with the systematic error step function). Since the tail of an error function has 
+a shape very much like a Gaussian, the resulting surface of constant probability for small 
+probabilities (like a 2s or 3s probability) will be very similar to an ellipse.
+Using either a rectangle for systematic errors or an ellipse for random errors, the size 
+of the errors that can be tolerated for a given process window can be determined. Taking 
+the rectangle as an example, one can fi nd the maximum rectangle that will fi t inside the 
+process window. Figure 8.22 shows an analysis of the process window where every 
+maximum rectangle is determined and its height (the exposure latitude) plotted versus its 
+width (depth of focus). Likewise, assuming Gaussian errors in focus and exposure, every 
+maximum ellipse that fi ts inside the process window can be determined. The horizontal 
+width of the ellipse would represent a three-sigma error in focus, while the vertical height 
+of the ellipse would give a three-sigma error in exposure. Plotting the height versus the 
+width of all the maximum ellipses gives the second curve of exposure latitude versus 
+DOF in Figure 8.22.
+
+
+## Page 39
+
+ Lithographic Control in Semiconductor Manufacturing 335
+The exposure latitude-versus-DOF curves of Figure 8.22 provide the most concise 
+representation of the coupled effects of focus and exposure on the lithography process. 
+Each point on the exposure latitude-DOF curve is one possible operating point for the 
+process. The user must decide how to balance the trade-off between DOF and exposure 
+latitude. One approach is to defi ne a minimum acceptable exposure latitude, and then 
+operate at this point; this has the effect of maximizing the DOF of the process. In fact, 
+this approach allows for the defi nition of a single value for the DOF of a given feature 
+for a given process. The depth of focus of a feature can be defi ned as the range of focus 
+that keeps the resist profi le of a given feature within all applicable profi le specifi cations 
+(linewidth, sidewall angle and resist loss, for example) over a specifi ed exposure range. 
+For the example given in Figure 8.22, a minimum acceptable exposure latitude of 10 %, 
+in addition to the other profi le specifi cations, would lead to the following depth of focus 
+results:
+• DOF (rectangle) = 0.40 mm
+• DOF (ellipse) = 0.52 mm
+As one might expect, systematic errors in focus and exposure are more problematic than 
+random errors, leading to a smaller DOF. Most actual processes would have a combination 
+of systematic and random errors. Thus, one might expect the rectangle analysis to give a 
+pessimistic value for the DOF, and the ellipse method to give an optimistic view of DOF. 
+As mentioned above, however, the ellipse method gives a DOF very close to the true 
+value for a common mix of systematic and random errors.
+The defi nition of depth of focus also leads naturally to the determination of best focus 
+and best exposure. The DOF value read off from the exposure latitude-versus-DOF curve 
+corresponds to one maximum rectangle or ellipse that fi ts inside the process window. The 
+center of this rectangle or ellipse would then correspond to best focus and exposure for 
+this desired operating point. Knowing the optimum focus and dose values is essential to 
+being able to use the full process window. If the process focus and dose settings deviate 
+18
+0
+2
+4
+6
+8
+10
+12
+14
+16
+20
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+Exposure Latitude (%)
+Ellipse
+Rectangle
+Depth of Focus (µm)
+Figure 8.22 The process window of Figure 8.20b is analyzed by fi tting all the maximum
+rectangles and all the maximum ellipses, then plotting their height (exposure latitude) versus
+their width (depth of focus)
+
+
+## Page 40
+
+336 Fundamental Principles of Optical Lithography
+from this optimum, the range of focus and dose errors that can be tolerated will be reduced 
+accordingly. For example, if focus is set in error from best focus by an amount ∆f, the 
+resulting DOF will generally be reduced by 2∆f.
+8.5.3 The Isofocal Point
+An interesting effect is observed in many focus–exposure data sets. There is often one 
+exposure dose that produces a CD that has almost no sensitivity to focus. In the Bossung 
+plot, this corresponds to the curve with the fl attest response to focus over the middle of 
+the focus range (Figure 8.23). By plotting CD through dose for different focuses, this 
+isofocal point becomes even clearer as the point where the various curves cross. The dose 
+that produces this isofocal behavior is called the isofocal dose, and the resulting CD is 
+called the isofocal CD.
+Ideally, the isofocal CD would equal the target CD of the process. Unfortunately, this 
+is rarely the case without specifi cally designing the process for that result. The difference 
+between the isofocal CD and the target CD is called the isofocal bias. A process with a 
+large isofocal bias will produce smaller usable process windows because the right and 
+left sides of the process window will bend either up or down, making the maximum possible ellipse or rectangle much smaller. In general, more isolated features exhibit greater 
+isofocal bias than dense features, as seen in Figure 8.24.
+As was mentioned in section 8.5.1, the isofocal CD and the isofocal dose play an 
+important role in the semiempirical Bossung model of Equation (8.44). The terms E1 and 
+CD1 are in fact identical to the isofocal dose and CD. For the simplest version of this 
+model, Equations (8.31) and (8.37), the role of the isofocal point in infl uencing the shape 
+of the process window can be made explicit. Since the model takes the form
+CD CD
+CD
+s
+E
+E
+FF
+s
+CD
+E E
+− =− 
+
+
+ +  −
+
+
+
+
+ 
+
+ = 1
+1
+10
+2
+11
+∆ 1
+, where d
+d ,
+ln
+ln F0
+ (8.48)
+Resist Linewidth (nm)
+14 18 22 26 30 34
+Focal Position (microns)
+–0.3 –0.2 –0.1 0.0 0.1 0.2
+Exposure Energy (mJ/cm2)
+Isofocal point
+200
+160
+120
+80
+40
+0
+Resist Linewidth (nm)
+200
+160
+120
+80
+40
+0
+Figure 8.23 Two ways of plotting the focus–exposure data setshowing the isofocal point – the
+dose and CD that have minimum sensitivity to focus changes (for the left graph, each curve 
+represents a different exposure dose; for the right graph each curve is for a different focus)
+
+
+## Page 41
+
+ Lithographic Control in Semiconductor Manufacturing 337
+contours of constant CD can be found by solving for E(F,CD):
+E F CD E
+FF
+F F CD CD
+sCD
+() , =
++  −
+ 
++  −
+  −  −
+
+
+
+1
+0
+2
+0
+2
+1
+1
+1
+1
+∆
+∆
+ (8.49)
+(It is useful to remember that s will be negative for a line pattern, and positive for a space.) 
+Figure 8.25 shows three example process windows, showing how the shape of the process 
+window changes depending on whether the nominal CD is smaller, the same, or larger 
+than the isofocal CD.
+The process window defi ned by two contours as given by Equation (8.49) can be analytically measured to give the depth of focus. Using the rectangle approach to measuring 
+(a) (b) (c)
+16
+18
+20
+22
+24
+26
+–0.5 0.0 0.5
+Focus (microns)
+Dose (mJ/cm2
+)
+16
+18
+20
+22
+24
+26
+–0.5 0.0 0.5
+Focus (microns)
+Dose (mJ/cm2
+)
+16
+18
+20
+22
+24
+26
+–0.5 0.0 0.5
+Focus (microns)
+Dose (mJ/cm2
+)
+(a) (b)
+0
+50
+100
+150
+200
+250
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2
+Resist Feature Width (nm)
+Focus (µm)
+0
+20
+40
+60
+80
+100
+120
+140
+160
+180
+Resist Feature Width (nm)
+Focus (µm)
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+Dose
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+–0.4 –0.3 –0.2 –0.1 0.0 0.1 0.2
+Figure 8.24 Bossung plots for (a) dense and (b) isolated 130-nm lines showing the difference in isofocal bias
+Figure 8.25 Process windows calculated using Equation (8.49) for a nominal line CD of
+100 ± 10nm, nominal dose of 20mJ/cm2
+, s = −1, and ∆ = 0.45 microns: (a) isofocal CD1 =
+130nm, (b) isofocal CD1 = 100nm and (c) isofocal CD1 = 70nm
+
+
+## Page 42
+
+338 Fundamental Principles of Optical Lithography
+the size of the process window, consider fi rst the case where the isofocal CD is within 
+the process window (such as Figure 8.25b). The rectangle will be limited by its four 
+corners, and the resulting DOF (for either a line or a space) will be approximately
+DOF
+CD
+s EL =− 21 ∆ spec
+nom spec
+ (8.50)
+where CDspec is the range of acceptable CDs divided by the nominal CD (equal to 0.2 for 
+the typical ±10 % spec), ELspec is the exposure latitude spec (for example, 0.1 for a 10 % 
+exposure latitude specifi cation), and snom is the slope of the log-CD-versus-log-dose curve 
+evaluated at the nominal dose [which can be related to s by Equation (8.42)]. As expected, 
+the DOF can be improved with a larger ∆, a smaller snom, and relaxed CD and exposure 
+latitude specifi cations.
+When the isofocal CD is not within the process window (Figure 8.25a and c), the 
+bending of the process window further limits the maximum rectangle that can fi t inside 
+the window and thus the DOF. For these cases, the DOF becomes
+DOF
+K
+CD
+s EL ≈− 1 21 ∆ spec
+nom spec
+ (8.51)
+where
+K CD
+s EL
+CD CD CD=+ = −− − −−
+rel iso limit
+nom spec
+rel iso limit
+limi 1 and 1 t
+CDnom
+ (8.52)
+and CDlimit is the CD value of the process window contour closest to the isofocal CD. 
+This K factor shrinks the process window as a function of how far CD1 is from its closest 
+CD specifi cation limit, and thus how much the process window is bent upward or 
+downward.
+8.5.4 Overlapping Process Windows
+Although all of the above results describe the focus and exposure response of one critical 
+feature, in reality a number of mask features must be printed simultaneously. Using the 
+most common example, isolated lines typically occur on the same design as dense lines. 
+Thus, a more important measure of performance than the DOF of each individual feature 
+is the overlapping DOF of multiple critical features. Just as multiple profi le metrics were 
+overlapped to form one overlapping process window in Figure 8.20b, process windows 
+from different features can be overlapped to determine the DOF for simultaneously printing those multiple features. Figure 8.26 shows such an example for isolated and dense 
+features, where subresolution assist features (SRAFs) are used to reduce the isofocal bias 
+of the isolated line and achieve a signifi cantly better overlapping DOF. Ideally, process 
+windows for all critical feature sizes and pitches would be overlapped to fi nd out which 
+of the features represent the process window limiters.
+Systematic variations in patterning as a function of fi eld position can also be accounted 
+for with overlapping process windows. If the same feature were printed at different points 
+in the fi eld (typically the center and the four corners of the fi eld are suffi cient), process 
+
+
+## Page 43
+
+ Lithographic Control in Semiconductor Manufacturing 339
+windows can be overlapped to create the usable process window for that feature. The 
+resulting depth of focus is called the useable depth of focus (UDOF).
+8.5.5 Dose and Focus Control
+Controlling focus and dose is an important part of keeping the critical dimensions of the 
+printed patterns in control. The fi rst step in understanding how to control focus and dose 
+is to characterize the response of critical features to variations using the focus–exposure 
+process window, as discussed above. Proper analysis of CD versus focus and dose data 
+allows for the calculation of the process window, measurement of the process window 
+size to produce the exposure latitude–DOF plot, and determination of a single value for 
+the depth of focus. Best focus and dose are also determined with this analysis as the 
+process settings that maximize the tolerance to focus and dose errors. Once best focus 
+and dose are determined, the next goal is to keep the process centered at this best 
+focus and dose condition as thousands of production wafers pass through the lithography 
+cell. And since almost all errors that occur in lithography act like either a dose error or a 
+focus error, properly adjusting dose and focus on a lot-by-lot basis can provide for much 
+tighter CD control. Dose and focus monitoring and feedback control has become a quite 
+common technique for living within shrinking process windows.
+The most common way to monitor and correct for drifts in exposure dose grew out of 
+standard product-monitoring metrology applications. Critical dimension test structures 
+(generically called metrology targets) are placed in the kerf (streets separating each die) 
+and are designed to mimic the size and surroundings of some critical feature of interest 
+within the die. For example, on the polysilicon level of a CMOS device, the most common 
+critical gate may be a 90-nm line on a 250-nm pitch. The CD targets might then be an 
+array of fi ve 90-nm lines on a 250-nm pitch. These types of targets are called 
+device-representing.
+By characterizing the change in CD versus dose of this specifi c device-representing 
+target, any change in measured CD can be directly related to an equivalent change in dose 
+(see Figure 8.3). Often the data are fi t to a function, and the function used to predict the 
+18
+19
+20
+21
+22
+23
+24
+25
+26
+–0.2 –0.1 0.0 0.1
+Exposure (mJ/cm2
+)
+Focus (µm)
+Figure 8.26 The overlapping process window for the dense (dashed lines) and isolated
+(solid lines) features shown to the right of the graph
+
+
+## Page 44
+
+340 Fundamental Principles of Optical Lithography
+required dose correction. While a linear function is often used (everything becomes linear 
+over a small enough range), a signifi cantly better function was given in Equation (8.31). 
+This equation can be inverted to give the dose correctable ∆E for a measured critical 
+dimension error ∆CD.
+∆ ∆
+∆
+EE CD
+sCD CD
+s
+CD
+E EE
+= −
+
+
+ 
+
+ = =
+1
+1 1
+where d
+d
+ln
+ln (8.53)
+Multiple measurements and a proper sampling plan help to eliminate random errors in 
+the measured CD and ensure that the changes observed are systematic. By monitoring 
+this target on product lots over time, temporal drifts in CD can be corrected by changing 
+the exposure dose in a feedback loop (often automated using advanced process control, 
+APC).
+The advantages of using device-representing targets are their simplicity and multipurpose use. Device-representing CD targets are often measured for the purpose of lot monitoring: do the measured CD values indicate that this lot will yield high or low? If these 
+structures are being measured anyway, it only makes sense to use them for dose monitoring and corrections as well. The disadvantage of using device-representing targets, as we 
+shall see below, is that they may have reduced sensitivity to the variable being controlled 
+(exposure dose, in this case), compared to other possible test structures, and may be too 
+sensitive to other variables not being measured or controlled (focus being the most important of these).
+Monitoring exposure dose is relatively easy since all features vary monotonically with 
+dose. However, as we saw above, the sensitivity of any given feature to dose depends on 
+focus. In other words, the exposure latitude slope term in Equation (8.53) is focus dependent. In general, s varies quadratically with focus, reaching a minimum at best focus. 
+Further, focus errors most often cause CD errors. If focus drifts, the use of an exposure 
+monitoring strategy like that outlined above will make exposure dose adjustments to 
+compensate for focus errors. If suffi ciently large, the combined focus drift and exposure 
+adjustment can render the lithography process unstable (meaning the useable process 
+window becomes too small to ensure adequate CD control) even though the target CD 
+appears to be in control. How can this situation be avoided?
+As we saw above, the two variables focus and dose must be characterized together in 
+a focus–exposure matrix (Figure 8.17). Note that at some doses, changes in focus make 
+this CD larger, while at other doses the same change in focus will make the CD smaller. 
+At the isofocal dose, changes in focus have the least impact on CD. This observation 
+suggests a way to improve exposure monitoring: If a CD target is found which exhibits 
+isofocal behavior at the nominal dose, this test structure will have minimum sensitivity 
+to focus errors while maintaining reasonable dose sensitivity. Such a test structure will 
+be called an isofocal target. An isofocal target will have minimum sensitivity to focus 
+errors, so that only dose errors will be detected and corrected. However, focus errors will 
+still change the exposure latitude term s in the exposure correction equation. Thus, if both 
+focus and exposure errors are present, the predicted dose correction from Equation (8.53) 
+will be too large. To address this defi ciency, focus monitoring must be added to the overall 
+control strategy.
+
+
+## Page 45
+
+ Lithographic Control in Semiconductor Manufacturing 341
+Focus presents an extremely diffi cult control problem since CD tends to vary quadratically with focus. As a result, it becomes extremely diffi cult to determine the direction of 
+a focus error – was the focal plane too high or too low compared to best focus? Thus, the 
+focus monitoring problem is often broken up into two parts: determining the magnitude 
+of a focus error, and its direction.
+Since the responses of CD to dose and to focus are coupled, the goal is to fi nd two 
+targets with different responses to these variables. If, for example, two targets had the 
+same response to dose, but different responses to focus, measuring them both would 
+allow focus errors to be separated from dose errors. A simple approach would be to 
+fi nd a dense line whose isofocal dose matched the nominal dose for the process and an 
+isolated line far removed from its isofocal dose. Further, if the isolated line were sized 
+so that it had approximately the same exposure latitude as the dense line [same value of 
+s in Equation (8.53)], then the isofocal dense feature could be used as the dose monitor 
+while the difference in CD between dense and isolated features could be used to monitor 
+focus. Figure 8.27 shows an example of a reasonably well-designed target. The dense 
+feature (which is the dose monitor) varies by only about 2 nm over the full range of 
+focus errors of interest, but varies by over 20 nm over the exposure range of interest. 
+The CD difference (the focus monitor) varies by only 2 nm over the dose range of interest 
+but changes by over 20 nm over the focus range of interest. Thus each monitor has 10×
+discrimination, that is, 10 times more sensitivity to the variable being monitored compared to the other variable. Further refi nement of the target design can often lead to 
+even better discrimination between focus and dose errors, while maintaining high 
+sensitivity.
+It is possible to improve the analysis of this dual-target dose and focus monitoring 
+strategy by creating models for the combined focus–exposure response of each target. 
+Inverting both models using the two CD target measurements can provide for good discrimination between dose and focus errors even when the two features do not have identical exposure latitude and the dense feature is not perfectly isofocal. It is important to 
+remember, however, that the nearly quadratic response of CD with focus means that focus 
+direction cannot be determined from such data.
+To monitor the direction of a focus error, one must measure a response on the wafer 
+that is suffi ciently asymmetric with respect to focus direction. CD does not provide such 
+a response in general. Of course, at any time the lithography engineer can stop running 
+product wafers and print a focus–exposure matrix wafer in order to determine best focus 
+and adjust the focus on the stepper or scanner. However, the goal of product monitoring 
+is to make measurements on product wafers that can detect and correct for dose and focus 
+errors quickly without reducing stepper productivity or throughput. Some novel approaches 
+have been developed, each with their own advantages and disadvantages. Two important 
+examples are described below.
+The phase-shift focus monitor developed by Tim Brunner10 uses a 90° phase shift 
+pattern on the mask to turn focus errors into pattern placement errors on the wafer. Thus, 
+a measurement of overlay for this pattern is directly proportional to the focus error, direction included. Unfortunately, the need for a 90° phase shift region on the mask means 
+that this focus monitor cannot in general be placed on product reticles – it is a test mask 
+approach that doesn’t meet product monitoring requirements.
+
+
+## Page 46
+
+342 Fundamental Principles of Optical Lithography
+Scatterometry-based measurements offer a product-measurement solution to the focus 
+monitoring problem. Unlike scanning electron microscopes, scatterometry allows for the 
+simultaneous measurement of linewidth, sidewall angle and resist height for a pattern of 
+long lines and spaces. While CD varies approximately quadratically with focus, resist 
+height and sidewall angle have a strong linear component to their responses, making 
+detection of focus direction possible. Like Figure 8.19 above, Figure 8.28 shows an 
+example of how a typical resist cross section varies with focus. The strong asymmetry of 
+the sidewall angle can provide sensitive detection of focus direction.
+The sensitivity of a monitor target is defi ned as the smallest error that can be reliably 
+detected. The goal of focus and exposure monitoring is to have sensitivities of detecting 
+focus and exposure errors equal to about 10–20 % of the process window size or less. For 
+example, if the depth of focus is 400 nm, the focus sensitivity must be at least 80 nm, but 
+(a) (b)
+(c) (d)
+50
+60
+70
+80
+90
+100
+110
+120
+130
+30 32 34 36 38 40
+Exposure Dose (mJ/cm2)
+CD (nm)
+Dense
+Isolated
+20
+21
+22
+23
+24
+25
+26
+27
+30 32 34 36 38 40
+Exposure Dose (mJ/cm2)
+CDdense - CDiso (nm)
+0
+20
+40
+60
+80
+100
+120
+–0.3 –0.2 –0.1 0 0.1
+Focus (µm)
+CD (nm)
+Dense
+Isolated
+20
+25
+30
+35
+40
+45
+–0.3 –0.2 –0.1 0 0.1
+CDdense - CDiso (nm)
+Focus (µm)
+Figure 8.27 A dual-target approach to monitoring dose and focus using a 90-nm dense line
+on a 220-nm pitch and an 80-nm isolated line: (a) dense and isolated lines through dose;
+(b) the iso-dense difference through dose; (c) dense and isolated lines through focus;
+(d) the iso-dense difference through focus
+
+
+## Page 47
+
+ Lithographic Control in Semiconductor Manufacturing 343
+40 nm is preferable. For an 8 % exposure latitude specifi cation, the dose sensitivity must 
+be at least 1.6 %, but 0.8 % is the preferred sensitivity.
+8.6 H–V Bias
+One interesting effect of aberrations is called horizontal–vertical (H–V) bias. Quite 
+simply, H–V bias is the systematic difference in linewidth between closely located horizontally and vertically oriented resist features that, other than orientation, should be 
+identical. There are two main causes of H–V bias: astigmatism and related aberrations; 
+and source shape aberrations.
+8.6.1 Astigmatism and H–V Bias
+The aberration of astigmatism results in a difference in best focus as a function of the 
+orientation of the feature. Using the Zernike polynomial description of aberrations (see 
+Chapter 3), 3rd order 90° astigmatism (which affects horizontally and vertically oriented 
+lines) takes the form
+phase error Z R = 22 4 2 πφ cos (8.54)
+Consider a vertically, y-oriented pattern of lines and spaces. The diffraction pattern will 
+spread across the x-axis of the pupil, corresponding to f = 0° and 180°. Thus, the phase 
+error will be 2pZ4R2
+ for this feature. Recalling the description of defocus as an aberration 
+(see Chapter 3), the phase error due to defocus is
+phase error NA ≈ R πδ
+λ
+2
+2 (8.55)
+where d is the defocus distance, l is the wavelength, and NA is the numerical aperture. 
+[Equation (8.55) is approximate because it retains only the fi rst term in a Taylor series. 
+While this approximation is progressively less accurate for higher numerical apertures, it 
+will be good enough for our purposes.] Immediately, one sees that 3rd order astigmatism 
+– Focus + Focus Best
+Focus
+Figure 8.28 The asymmetric response of resist sidewall angle to focus provides a means for
+monitoring focus direction as well as magnitude. Here, + focus is defi ned as placing the focal
+plane above the wafer (moving the wafer further away from the lens)
+
+
+## Page 48
+
+344 Fundamental Principles of Optical Lithography
+looks just like the approximate effect of defocus. Thus, astigmatism will cause the vertically oriented lines to shift best focus by an amount
+∆δ λ vert ≈ 2 4
+2
+Z
+NA (8.56)
+For horizontally oriented lines, the diffraction pattern will be along the y-axis of the pupil 
+(q = ±90°) and the astigmatism will cause a phase error of −2pZ4R2. Thus, the focus shift 
+for the horizontal lines will be the same magnitude as given by Equation (8.56), but in 
+the opposite direction.
+To see how astigmatism causes H–V bias, we need to understand how a shift in focus 
+might affect the resist feature CD. To fi rst order, CD has a quadratic dependence on 
+focus.
+CD CD a ≈+ best focus δ2 (8.57)
+where a is the dose-dependent curvature of the CD through focus curve (see section 8.5.1) 
+and is given by
+a CD CD
+E
+E
+EF E = 
+
+ 
+
+ − 
+
+
+
+
+
+
+ 1
+1
+2
+10
+1 d 1
+d ,
+ln
+ln ∆ (8.58)
+Recalling the typical shapes of Bossung curves, a can vary from positive to negative 
+values as a function of dose (that is, depending on whether E is greater than or less than 
+the isofocal dose, E1). If best focus is shifted due to astigmatism, we can calculate the 
+CD of the vertical and horizontal features by adding the focus shift of Equation (8.56) to 
+Equation (8.57).
+CD CD a Z
+NA
+CD CD a
+vert best focus
+horiz best focus
+≈ +− 
+
+
+
+≈ ++
+δ λ
+δ
+2
+2
+4
+2
+2
+Z
+NA
+4
+2
+2
+ λ
+
+
+
+ (8.59)
+From, here a straightforward subtraction gives us the H–V bias:
+H V bias aZ
+NA −≈ 8 4
+2
+δλ (8.60)
+The H–V bias is directly proportional to the amount of astigmatism in the lens (Z4) and 
+to the curvature of the CD-through-focus curve (a). But it is also directly proportional to 
+the amount of defocus. In fact, a plot of H–V bias through focus is a sure way to identify 
+astigmatism (that is, when not using the isofocal dose, where a ≈ 0, for the experiment). 
+Figure 8.29 shows some typical results. Note that the isolated lines show a steeper slope 
+than the dense lines due to a larger value of the CD through focus curvature. In fact, if a
+is determined by fi tting Equation (8.57) to CD through focus data, a reasonable estimate 
+of Z4 can be made using an experimentally measured H–V bias through focus curve. Note 
+also that the true shape of the curves in Figure 8.29 is only approximately linear, since 
+both Equations (8.56) and (8.57) ignore higher-order terms.
+
+
+## Page 49
+
+ Lithographic Control in Semiconductor Manufacturing 345
+Assume that the maximum possible value of the defocus is one-half of the depth of 
+focus (DOF). At this defocus, Equation (8.57) would tell us that at the worst case dose, 
+the term ad2 will be about 10 % of the nominal CD (by defi nition of the process window 
+with a ±10 % CD specifi cation). Thus, we can say that within the process window, the 
+worst case H–V bias due to astigmatism will be
+H V bias
+CD
+Z
+DOF NA
+− ≈ nominal max16. 4
+2
+λ (8.61)
+Using typical numbers for a 65-nm process, for a wavelength of 193 nm, an NA of 0.9, 
+and assuming a depth of focus of 200 nm, the fractional H–V bias will be about 2Z4. If 
+we are willing to give 1 % CD error to H–V bias, our astigmatism must be kept below 5 
+milliwaves. In general, Equation (8.61) shows that as new, higher resolution scanners are 
+designed and built, the astigmatism in the lens must shrink as fast or faster than the depth 
+of focus of the smallest features to be put into production.
+8.6.2 Source Shape Asymmetry
+The second major cause of H–V bias is illumination aberrations (that is, source shape 
+asymmetries). In Chapter 2, a discussion of partial coherence showed that source points 
+must be symmetrically placed about the axis of symmetry for a mask pattern in order to 
+avoid telecentricity errors (which cause pattern placement errors as a function of defocus). 
+For example, for y-oriented lines and spaces, a source point at (fx, fy) must be accompanied 
+by a corresponding source point of the same intensity at (−fx, fy) in order to avoid telecentricity errors. The avoidance of telecentricity errors for x-oriented lines will likewise 
+–3.0
+–2.0
+–1.0
+0.0
+1.0
+2.0
+3.0
+–0.20 –0.15 –0.10 –0.05 0.00 0.05 0.10 0.15 0.20
+Defocus (microns)
+H–V Bias (nm)
+Equal Line/Space
+Isolated Line
+Figure 8.29 PROLITH simulations of H–V bias through focus showing approximately linear
+behavior (l = 193nm, NA = 0.75, s = 0.6, 150-nm binary features, 20 milliwaves of astigmatism). Simulations of CD through focus and fi ts to Equation (8.57) gave the CD curvature
+parameter a = −184mm−2 for the dense features and −403mm−2 for the isolated lines
+
+
+## Page 50
+
+346 Fundamental Principles of Optical Lithography
+require additional points at (fx,−fy) and (−fx,−fy), providing the general guidance that all 
+source shapes must have fourfold symmetry. If both horizontal and vertical lines must be 
+printed simultaneously, identical printing will occur only if the source shape is invariant 
+to a 90° rotation. This provides an additional constraint that for every source point (fx, fy), 
+there must be a corresponding source point of the same intensity at (−fy, fx).
+Consider conventional illumination where the center of the disk-shaped source is 
+not perfectly aligned with the center of the optical path (called an illumination telecentricity error). The impact of such a source telecentricity error is dependent on the partial 
+coherence, the pitch, and of course on the amount of telecentricity error. Figure 8.30 
+shows that, in general, an x-shift of the center of the illumination source shape affects 
+vertically oriented (y-oriented) lines signifi cantly, but horizontal (x-oriented) lines very 
+little.
+For the simple case of dense line/space patterns where only the zero and the two fi rst 
+diffraction orders are used in the imaging, the image will be made up of combinations of 
+one-, two- and/or three-beam interference. The change in CD for the vertical features for 
+an x-shift in the source center is caused by a change in the ratio of two-beam to threebeam imaging. Figure 8.31 shows an example case where the total three-beam imaging 
+area (light grey) and the total two-beam imaging area (dark grey) do not appreciably 
+change as the center of the source is shifted by about 0.1 sigma. Thus, for this pitch and 
+sigma, one would not expect to see much change in the vertical feature CD. Consider a 
+different pitch, as shown below in Figure 8.32a. At this particular pitch, all of the fi rst 
+order is inside the lens, so that all of the imaging is three-beam (note that the second diffracted order is not shown in the diagram for clarity’s sake). However, when the source 
+is shifted in x by 0.1 sigma (Figure 8.32b), the amount of three-beam imaging for the 
+vertical lines is reduced and two-beam imaging is introduced. By contrast, the horizontal 
+lines (which spread the diffraction pattern vertically in the pupil) have only an 
+118
+120
+122
+124
+126
+128
+130
+0.00 0.05 0.10 0.15 0.20
+Sigma x-Shift
+Linewidth (nm)
+Vertical
+Horizontal
+Figure 8.30 Example of how an x-shift in the center of a conventional source (s = 0.6)
+affects mainly the vertical (y-oriented) lines and spaces (CD = 130nm, pitch = 650nm,
+PROLITH simulations)
+
+
+## Page 51
+
+–1st order
+0th order
++1st order
+(a) (b)
+(c) (d)
+(a) (b)
+–1st order 0th order +1st order –1st order 0th order +1st order
+Figure 8.31 Example of dense line/space imaging where only the zero and fi rst diffraction
+orders are used (kpitch = 1.05). The middle segment of each source circle represents threebeam imaging, the outer areas are two-beam imaging. (a) source shape is properly centered,
+(b) source is offset in x (to the right) by 0.1. Note that the diffraction pattern represents vertical (y-oriented) features
+Figure 8.32 Examples of how a telecentricity error affects the ratio of two-beam to threebeam imaging at the worst case pitch (s = 0.4, x-shift = 0.1, kpitch = 1.65). (a) vertical lines,
+no telecentricity error, (b) vertical lines, with telecentricity error, (c) horizontal lines, no
+telecentricity error, and (d) horizontal lines, with telecentricity error
+
+
+## Page 52
+
+348 Fundamental Principles of Optical Lithography
+imperceptible change in the amount of three-beam imaging for the same x-shift of the 
+source position (Figure 8.32c and d). Thus, at this pitch, one would expect to see a large 
+amount of H–V bias with source shift.
+The pitch that just allows only three-beam imaging for a given partial coherence is the 
+pitch that is most sensitive to a shift in the source center position. Thus, the worst case 
+pitch from an H–V bias telecentricity error sensitivity perspective is given by
+worst case k pNA
+pitch =≈ λσ−
+1
+1 (8.62)
+8.7 Mask Error Enhancement Factor (MEEF)
+Errors in the critical dimensions of the features on a mask have always been a signifi cant 
+cause of critical dimension errors on the wafer. As optical lithography has pushed features 
+to lower and lower k1 values (= feature size *NA/l), however, mask CD errors have taken 
+up a much larger fraction of the overall sources of CD variations on the wafer.
+8.7.1 Linearity
+An important constraint placed on any lithographic imaging task is that every feature on 
+the mask must be faithfully imaged onto the wafer within predetermined tolerances. Most 
+typical integrated circuit device layers consist of a myriad of different pattern types, 
+shapes and sizes. It is a common assumption that since the resolution defi nes the smallest 
+pattern that can be acceptably imaged, all features larger than this limit will also be 
+acceptably imaged. Unfortunately, this assumption may not always be true. For imaging 
+systems designed to maximize the printability of a given small feature (e.g. using off-axis 
+illumination), often some larger features will be more diffi cult to print. One way to insure 
+that larger features print well at the same time as the minimum feature is to build this 
+requirement into the defi nition of resolution: the smallest feature of a given type such that
+it and all larger features of the same type can be printed simultaneously with a specifi ed
+depth of focus. This resolution is called the linear resolution of the imaging system.
+The linear resolution is typically assessed using the mask linearity plot. Consider a 
+mask with many feature sizes of a given type, for example, equal lines and spaces, isolated 
+lines, or contact holes. By plotting the resulting resist feature width versus the mask width, 
+the mask linearity plot is generated. Shown in Figure 8.33 are examples of linearity plots 
+for equal line/space patterns and isolated lines, both imaged at best focus and at the doseto-size for the 350-nm features. Perfect, linear behavior would be a line through the origin 
+with a slope of 1. By defi ning specifi cations for any deviation from perfect linearity (±5 %, 
+for example), the minimum feature that stays within the specifi cation would be the linear 
+resolution. Qualitatively, Figure 8.33 shows that the equal line/space patterns of this 
+example have a linear resolution down to about 350 nm (k1 = 0.54), whereas the isolated 
+lines are linear down to about 300 nm (k1 = 0.46).
+Of course, to be truly practical, one should include variations in exposure and focus as 
+well. The most rigorous approach would begin with the focus–exposure process window 
+
+
+## Page 53
+
+ Lithographic Control in Semiconductor Manufacturing 349
+for the largest feature size. The process window from each smaller feature is then overlapped with that from the larger features and the depth of focus calculated. Smaller and 
+smaller features are added until the overlapped depth of focus drops below the specifi ed 
+limit, indicating the linear resolution limit. Thus, although mask linearity plots do not 
+provide a rigorous, general method for determining the linear resolution, they are qualitatively useful.
+As lithography for manufacturing continues to push toward its ultimate resolution 
+limits, linearity is playing a decidedly different role in defi ning the capabilities of low k1
+imaging. Consider, using Figure 8.33 as an example, manufacturing at the linear resolution limits: 350-nm lines and spaces and 300-nm isolated lines. Although these features 
+may be ‘resolvable’ by the defi nitions provided above, critical dimension (CD) control 
+may be limited by a new factor: how do errors in the dimensions of the feature on the 
+mask translate into errors in resist CD on the wafer?
+8.7.2 Defi ning MEEF
+For ‘linear’ imaging, mask CD errors would translate directly into wafer CD errors 
+(taking into account the reduction factor of the imaging tool, of course). Thus, a 3-nm 
+CD error on the mask (all CDs on the mask will be expressed here in wafer dimensions) 
+would result in a 3-nm CD error on the fi nal resist feature. If, however, the features of 
+interest are at the very edge of the linear resolution limit, or even beyond it, the assumption of linear imaging falls apart. How then do mask CD errors translate into resist CD 
+errors?
+Consider the examples shown in Figure 8.33. If an isolated line is being imaged near 
+its resolution limit, about 300 nm, a 10-nm mask CD error would give a 14-nm resist CD 
+error. Thus, at this feature width, isolated line mask errors are amplifi ed by a factor of 
+1.4. This amplifi cation of mask errors is called the mask error enhancement factor Resist Feature Width, CD (nm) 
+Mask Width (Constant Duty) (nm) 
+Isolated Line
+Line/Space
+0 100 200 300 400 500 600 700 800 900 1000 1100 
+0
+100
+200
+300
+400
+500
+600
+700
+800
+900
+1000
+1100
+Figure 8.33 Typical mask linearity plot for isolated lines and equal lines and spaces (i-line,
+NA = 0.56, s = 0.5)
+
+
+## Page 54
+
+350 Fundamental Principles of Optical Lithography
+(MEEF). First discussed by Wilhelm Maurer,11 the MEEF (also called MEF by some 
+authors) is defi ned as the change in resist CD per unit change in mask CD:
+MEEF CD
+CD = ∂
+∂
+resist
+mask
+ (8.63)
+where again the mask CD is in wafer dimensions. If we assume a ‘zero bias’ process 
+(where the target CD on the wafer is the same as the mask CD), then the MEEF can also 
+be expressed as 
+MEEF CD
+CD = ∂∂
+ln
+ln
+resist
+mask
+ (8.64)
+This form of the MEEF equation will be useful later. Figure 8.34 shows how the MEEF 
+varies with feature size for the mask linearity data of Figure 8.33. Regions where the 
+MEEF is signifi cantly greater than 1 are regions where mask errors may come to dominate 
+CD control on the wafer. Optical proximity correction techniques (discussed in Chapter 
+10) allow us to lower the linear resolution, but generally without improving the MEEF. 
+As a result, the mask has begun to take on a much larger portion of the total CD error 
+budget.
+8.7.3 Aerial Image MEEF
+A MEEF of 1.0 is the defi nition of a linear imaging result. Although a MEEF less than 
+one can have some desirable consequences for specifi c features, in general a MEEF of 
+1.0 is best. Fundamentally, anything that causes the overall imaging process to be nonlinear will lead to a nonunit valued MEEF. In lithography, every aspect of the imaging 
+process is nonlinear to some degree, with the degree of nonlinearity increasing as the 
+dimensions of the features approach the resolution limits. Consider the fi rst step in the 
+imaging process, the formation of an aerial image. One might judge the linearity of this 
+200 300 400 500 600 700 800
+Mask CD (nm)
+MEEF
+Isolated Line
+Equal Line/Space
+0
+1
+2
+3
+Figure 8.34 The mask error enhancement factor (MEEF) for the data of Figure 8.33
+
+
+## Page 55
+
+ Lithographic Control in Semiconductor Manufacturing 351
+fi rst step by approximating the resist CD with an image CD, defi ned to be the width of 
+the aerial image at some image threshold intensity value. It is important to note that the 
+image CD is only an approximate indicator of the resist CD. For real, fi nite-contrast resists 
+the differences between these two quantities can be substantial. Nonetheless, the image 
+CD will be used here to elucidate some general principles about imaging and the 
+MEEF.
+For two simple cases of projection imaging, coherent and incoherent illumination, 
+analytical expressions for the aerial image can be defi ned. Assuming a pattern of many 
+long lines and spaces with a spacewidth w and pitch p such that only the 0 and ±1 diffraction orders pass through the lens, the TE coherent and incoherent in-focus aerial 
+images would be 
+Coherent Illumination / :() / sin( ) Ix cos( ) w
+p
+wp =+ xp
+
+
+ 
+
+
+2 2
+2 π
+π
+π (8.65)
+Incoherent Illumination / :() / sin( ) Ix ( )cos( ) w
+p
+wp =+ MTF x p 2 1 2 π
+π
+π (8.66)
+where MTF1 is the value of the incoherent Modulation Transfer Function at the spatial 
+frequency corresponding to the fi rst diffraction order. The requirement that no orders 
+higher than the fi rst diffraction order be used to form the image means that the coherent 
+image equation is valid for a limited range of pitches such that 1 < pNA/l < 2, and the 
+incoherent expression is valid for 0.5 < pNA/l < 1.
+Using these expressions to defi ne the image CD, exact expressions for the image
+MEEF can be derived for these repeating line/space patterns under the conditions given 
+above:
+image MEEF
+CD
+CD
+CD
+w = ∂∂ = ∂∂
+image
+mask
+image (8.67)
+Coherent Illumination /
+/
+:
+cos( )
+cos( ) image MEEF wpwp = +−
+22
+12
+π
+π
+ (8.68)
+Incoherent Illumination
+/
+:
+cos( )
+cos( image MEEF MTF wp
+=
+++
+−
+1 12
+12
+1
+π
+πwp/) (8.69)
+An interesting observation can be made immediately. Over the range of valid pitches, the 
+coherent image MEEF is only dependent upon the duty cycle (w/p), not on the pitch itself. 
+The incoherent image MEEF, on the other hand, has a direct pitch dependence through 
+the value of the MTF (which is approximately equal to 1 − l/[2NAp]). Figure 8.35 shows 
+how both image MEEFs vary with spacewidth-to-linewidth ratio.
+The extreme nonlinearity of the imaging process is evident from the results shown in 
+Figure 8.35. For coherent illumination, a pattern of equal lines and spaces will have an 
+image MEEF of 0.5. A spacewidth twice the linewidth produces a MEEF of 1.0, and a 
+spacewidth three times the linewidth results in a coherent image MEEF of 2.0. Obviously, 
+different duty cycles can have wildly different sensitivities to mask errors. While the 
+
+
+## Page 56
+
+352 Fundamental Principles of Optical Lithography
+approximations used do not apply to truly isolated lines, it is clear that such features will 
+also deviate from unit MEEF. A spacewidth/linewidth ratio less than unity also enhances 
+the effect.
+Although neither purely coherent nor purely incoherent illumination is ever used in 
+real lithographic imaging, these two extremes tend to bound the behavior of typical partially coherent imaging tools. Thus, we would expect the image MEEF of a partially 
+coherent imaging system to vary with both duty cycle and pitch, and to vary by about a 
+factor of 2 as a function of the partial coherence.
+8.7.4 Contact Hole MEEF
+Possibly the most challenging mask layer to print in high-end lithography processes is 
+the contact or via layer. These small features are subwavelength in two dimensions, 
+making them exceptionally sensitive to everything that makes low k1 lithography diffi cult. 
+For example, contact holes suffer from the largest MEEFs of any feature type (as we shall 
+see below). Assuming that the source of the mask error is isotropic (that is, it affects both 
+the height and width of the contact in the same way), then such an error is affecting two 
+dimensions of the mask simultaneously. In other words, errors in the area of the mask 
+feature go as errors in the CD squared.
+When printing a small contact hole, the aerial image projected onto the wafer is essentially the same as the point spread function (PSF) of the optical system. The point spread 
+function is defi ned as the normalized aerial image of an infi nitely small contact hole on 
+the mask. For small contact holes (about 0.6l/NA or smaller), the aerial image takes on 
+the shape of the PSF. If the contact hole size on the mask is smaller than this value, the 
+printed image is controlled by the PSF, not by the dimensions of the mask. Making the 
+contact size on the mask smaller only reduces the intensity of the image peak. This results 
+in a very interesting relationship: a change in the mask size of a small contact hole is 
+essentially equivalent to a change in exposure dose.
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6 2.8 3.0
+Spacewidth/Linewidth
+Image MEEF
+Coherent
+Incoherent
+Figure 8.35 The impact of duty cycle (represented here as the ratio of spacewidth to linewidth for an array of line/space patterns) on the image CD-based MEEF for both coherent
+and incoherent illumination. For the incoherent case, an MTF1 of 0.45 was used
+
+
+## Page 57
+
+ Lithographic Control in Semiconductor Manufacturing 353
+It is the area of the contact hole that controls the printing of the contact. The electric 
+fi eld amplitude transmittance of a small contact hole is proportional to the area of the 
+contact, which is the CD squared. The intensity is then proportional to the area squared. 
+Thus, the effect of a small change in the mask CD of a contact hole is to change the 
+effective dose reaching the wafer (E) as the CD to the fourth power.
+E CD
+E d CD
+∝
+≈
+mask
+d mask
+4
+ln ln 4 (8.70)
+where the approximate sign is used because the fourth power dependence is only approximately true for typically sized contact holes.
+The above equation relates mask errors to dose errors. Combining this with the MEEF 
+Equation (8.64) allows us to relate MEEF to exposure latitude.
+MEEF CD
+E ≈ ∂
+∂
+4 ln
+ln
+wafer (8.71)
+The term ∂lnCD/∂lnE can be thought of as the percent change in CD for a 1 % dose change 
+and is the inverse of the common exposure latitude metric. Thus, anything that improves 
+the exposure latitude of a contact hole will also reduce its MEEF. Anything that reduces 
+exposure latitude (like going out of focus) will result in a proportional increase in the 
+MEEF. The importance of exposure latitude as a metric of printability is even greater for 
+contact holes due to the factor of four multiplier for the MEEF. Additionally, the above 
+expression could be used to lump mask errors into effective exposure dose errors for the 
+purpose of process window specifi cations. Mask errors could be thought of as consuming 
+a portion of the exposure dose budget for a process.
+8.7.5 Mask Errors as Effective Dose Errors
+The concept of mask errors as effectively exposure dose errors, fi rst discussed above 
+in the context of contact hole MEEF, can be used as a general concept for understanding 
+the nature of the mask error enhancement factor. Consider again the image MEEF based 
+on an aerial image CD. For a given mask feature size w, the image CD will occur at x =
+CD/2 when the intensity equals the image threshold value.
+I x CD w I () == /, 2 th (8.72)
+Consider the total differential of the intensity with x and w as variables:12
+dd d I I
+x
+x
+I
+w = w
+∂
+∂
++
+∂
+∂ = 0 (8.73)
+where the total differential must be zero since the intensity is constrained to be at the 
+threshold intensity. Thus,
+d
+d
+or
+x
+w
+Iw
+Ix image MEEF IwIx =− ∂∂∂∂ =− ∂∂∂∂
+2 (8.74)
+In this expression, the numerator can be thought of as the change in dose reaching the 
+wafer caused by a change in the mask CD (Figure 8.36). The denominator is the image 
+
+
+## Page 58
+
+354 Fundamental Principles of Optical Lithography
+slope, which is proportional to exposure latitude. An alternate form of this expression is 
+image MEEF NILS
+I
+w x CD
+= ∂
+∂ =
+2
+2
+ln
+ln /
+ (8.75)
+As an example, consider the out-of-focus coherent three-beam image for TE 
+illumination:
+Ix w
+p
+wp () p xpsin( ) =+ cos( )cos( ) 
+
+ 
+
+
+2 2 2
+2 π
+π
+πλδ π / // (8.76)
+(The low NA expression for defocus is used here, but the results will be identical if 
+the more exact expression were used.) Taking the derivative with respect to the mask 
+spacewidth w,
+∂
+∂ = +
+=
+ln
+ln
+[ cos ( )cos( )]
+()
+I
+w
+w
+p
+wp p
+xw/ Iw
+//
+2 /
+22 2 12
+2
+π πλδ (8.77)
+For the case of equal lines and spaces, this derivative becomes a constant (since the edge 
+of the feature is at the image isofocal point):
+∂
+∂ = =
+ln
+ln
+I
+w x CD/2
+2 (8.78)
+Thus, the coherent three-beam equal line/space image MEEF, including defocus, 
+becomes
+image MEEF NILS = 4 (8.79)
+As will be explained in greater detail in Chapter 9, 2/NILS is equal to the slope of a 
+log-CD-versus-log-dose curve for the case of an infi nite contrast resist. Thus, one can 
+–200 –100 0 100 200
+0.0
+0.3
+0.6
+0.9
+1.2
+Horizontal Position (nm)
+Relative Intensity
+Effective 
+Dose Error at
+the Nominal 
+Line Edge
+Figure 8.36 Mask errors can be thought of as creating effective dose errors near the edge
+of the feature
+
+
+## Page 59
+
+ Lithographic Control in Semiconductor Manufacturing 355
+generalize this image MEEF by replacing 2/NILS with the actual CD-versus-dose 
+slope.
+MEEF CD
+E
+I
+w x CD
+≈ ∂
+∂
+
+
+
+
+∂
+∂
+
+
+
+ =
+ln
+ln
+ln
+ln
+wafer
+/2
+ (8.80)
+For the case of a small contact hole, we saw in the previous section that the fractional 
+dose change per fractional mask CD change was 4. For a small isolated space, the value 
+is about 2. For other features, the change in intensity at the nominal line edge can be 
+computed and an estimate of MEEF made using Equation (8.80).
+Another way to interpret the above result is to consider that mask errors result in a 
+reduction of the effective exposure latitude. If EL is the exposure latitude when no mask 
+errors are present, then the effective exposure latitude in the presence of mask errors of 
+range ∆CDmask will be
+EL EL MEEF CD
+CD eff
+mask
+spec
+≈− 
+
+ 
+
+ 1 ∆
+∆ (8.81)
+where ∆CDspec is the CD tolerance used to defi ne the exposure latitude (for example, 0.2 
+times the nominal CD). This expression can be used to scale an entire exposure latitude 
+versus depth of focus plot, such as Figure 8.22, and thus can also be used to determine 
+the effect of mask errors on the available depth of focus.
+8.7.6 Resist Impact on MEEF
+For a given aerial image response, the response of a real, fi nite-contrast resist will change 
+the value of the MEEF, sometimes dramatically. Although it is diffi cult to systematically 
+and controllably vary resist contrast experimentally, simulation provides an effective tool 
+for exploring its impact on MEEF theoretically. Consider a simple baseline process of 
+248-nm exposure with a 0.6 NA, 0.5 partial coherence imaging tool using 500-nm-thick 
+resist on BARC on silicon. The contrast of the resist is controlled by essentially one 
+simulation parameter, the dissolution selectivity parameter n of the original kinetic dissolution rate model (see Chapter 7). High values of n correspond to high values of resist 
+contrast. For this example, n = 5 will be a low-contrast resist, n = 10 is a mid-contrast 
+resist and n = 25 will be called a high-contrast resist.
+The variation of MEEF with nominal mask feature size for these three virtual resists 
+is shown in Figure 8.37 for a mask pattern of equal lines and spaces. For larger feature 
+sizes, the MEEF is near 1.0 for all resists, controlled by the aerial image MEEF. However, 
+as the feature sizes approach the resolution limit, the characteristic skyrocketing MEEF 
+is observed. (In fact, this dramatic increase in MEEF for smaller features can be used as 
+one defi nition of resolution: the smallest feature size that keeps the MEEF below some 
+critical value, say 3.) As can be seen from the fi gure, the major impact of resist contrast 
+is to determine at what feature size the MEEF begins its dramatic rise. Above k1 values 
+of about 0.6, MEEF values are near 1.0 or below, and resist contrast has little impact. 
+Below this value, the MEEF rises rapidly. Resist contrast affects the steepness of this 
+rise.
+
+
+## Page 60
+
+356 Fundamental Principles of Optical Lithography
+Obviously, resist contrast has a huge effect on the MEEF for features pushing the resolution limits. At a k1 value of 0.5 for the example shown here, the MEEF for the highcontrast resist is 1.5, for the mid-contrast resist it is 2.0, and for the low-contrast resist 
+the MEEF has grown to greater than 3.0. As is seen in so many ways, improvements in 
+resist contrast can dramatically improve the ability to control high-resolution linewidths 
+on the wafer, in this case in the presence of mask errors.
+8.8 Line-End Shortening
+As lithography pushes to smaller and smaller features, single number metrics such as the 
+critical dimension (CD) of a feature are not adequate. The three-dimensional shapes of 
+the fi nal printed photoresist features can, in fact, affect the performance of the fi nal electrical devices in ways that cannot be described by variations in a single width parameter 
+of those features. In such cases, more information about the shape of a photoresist pattern 
+must be measured in order to characterize its quality. One very simple example is known 
+as line-end shortening (LES).
+Consider a single, isolated line with width near the resolution limit of a lithographic 
+process. Considerable effort is usually required to develop a process that provides adequate CD control over a range of processing errors (focus, exposure, mask errors, etc.). 
+Although such a feature is generally considered to be one-dimensional (with CD, measured perpendicular to the long line, as the only important dimension), it must, by necessity, have a two-dimensional character at the line end. An important question then arises: 
+for a process where control of the linewidth is adequate, will the shape of the line end 
+also behave acceptably? Often, the answer to this question is no due to line-end 
+shortening.
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+100 200 300 400 500 600
+Nominal Feature Width (nm)
+MEEF
+High Contrast
+Mid Contrast
+Low Contrast
+Figure 8.37 Resist contrast affects the mask error enhancement factor (MEEF) dramatically
+near the resolution limit
+
+
+## Page 61
+
+ Lithographic Control in Semiconductor Manufacturing 357
+Figure 8.38 illustrates the problem. When the process is adjusted to give the correct 
+CD along the length of the line, the result at the line end will be a pull-back of the 
+resist to produce a foreshortened end. The degree of line-end shortening is a strong 
+function of the line width, with effects becoming noticeable for k less than about 0.8. 
+At fi rst glance, it may seem that a solution to this problem is straightforward. If the 
+printed image of a line end is shorter than the drawn pattern on the mask, simply extending the mask by the amount of line-end shortening would solve the problem. Of course, 
+since the degree of LES is feature size dependent, proper characterization would be 
+required. Most commercial optical proximity correction or design rule checking software 
+today can automatically perform such corrections on the design before the photomask is 
+made (see Chapter 10). This solution ignores two very important problems, however. 
+First, what happens when the end of the line is in proximity to another feature, as in 
+Figure 8.38, and second, how does the degree of LES vary with processing errors? 
+For the fi rst problem, a simple extension of the line may not work. Thus, more complicated corrections (such as increasing the width of the line near the end) are required. 
+For the second problem, a more complete characterization of line-end shortening is 
+needed.
+8.8.1 Measuring LES
+In order to characterize line-end shortening, the fi rst step is to fi nd a way to measure it. 
+Since LES is fundamentally an error of the resist pattern relative to the design, it cannot 
+be independently measured. Instead, it must be measured as the difference between two 
+measurements, such as a measure of the line-end position relative to another feature. A 
+very simple approach is to use a test structure such as those shown in Figure 8.38 where 
+the line-end shortening is considered to be proportional to the width of the gap between 
+y-Position (nm)
+x-Position (nm)
+–600
+–400
+–200
+0
+200
+400
+600
+–400
+y-Position (nm)
+x-Position (nm)
+–600
+–400
+–200
+0
+200
+400
+600
+–800 –600 –400 –200 0 200 400 600 800 –200 0 200 400
+Figure 8.38 Outline of the printed photoresist pattern (solid) superimposed on an outline
+of the mask (dashed) shows two examples of line-end shortening (k1 = 0.6)
+
+
+## Page 62
+
+358 Fundamental Principles of Optical Lithography
+the end of the line and the edge of the nearby perpendicular line, or between two butting 
+line ends. But this gap alone does not tell the whole story. Changes in the process (such 
+as focus and exposure) will affect the gap width as well as the width of the isolated 
+line.
+An interesting approach to normalizing the relationship between linewidth and line-end 
+shortening is to plot the gap width from a structure like that in Figure 8.38 as a function 
+of the resist linewidth over a range of processing conditions. Based on the simple behavior 
+of a pattern of lines and spaces where the resist linewidth plus the spacewidth will always 
+be equal to the pitch, one can establish the ideal, linear imaging result for this case. For 
+the pattern in Figure 8.38, the ideal result should be a straight line with equation linewidth
++ gapwidth = 500 nm, where the designed linewidth and gap width are both 250 nm. As 
+an example, the data from a focus–exposure matrix are plotted in Figure 8.39 using this 
+technique. Interestingly, all of the data essentially follow a straight line which is offset 
+from the ideal, no line-end shortening result. The vertical offset between the ideal line 
+and a parallel line going through the data can be considered the effective line-end shortening over the range of processing conditions considered. Although not perfect, this result 
+shows that the variables of focus and exposure do not infl uence the effective LES to fi rst 
+order. The fact that the data form a line which is not exactly parallel to the ideal line 
+simply indicates that, to second order, the LES does not exhibit the same process response 
+to these variables as does the linewidth.
+The gap width-versus-linewidth approach to characterizing the effective line-end shortening still ignores the three-dimensional nature of line-end effects. Processing changes, 
+especially focus, can alter the shape as well as the size of a photoresist feature. For the 
+150
+200
+250
+300
+350
+400
+Isolated Line Width (nm)
+Gap Width (nm)
+Linewidth
+Gap Width
+150 200 250 300 350
+Focus–Exposure Data
+Ideal Behavior
+Target Operating Point
+Figure 8.39 Line-end shortening can be characterized by plotting the gap width of a structure like that in the insert as a function of the isolated linewidth under a variety of conditions.
+As shown here, changes in focus and exposure produce a linear gap width versus linewidth
+behavior
+
+
+## Page 63
+
+ Lithographic Control in Semiconductor Manufacturing 359
+case of a resist line cross section, the sidewall angle of the resist pattern is reduced when 
+out of focus. What is less obvious is that the end of a line is even more sensitive to focus 
+errors than the line itself. Figure 8.40 shows how errors in focus can change the threedimensional shape of a line end. Obviously, any metrology designed to measure lineend shortening will almost certainly be affected by the shape changes depicted in 
+Figure 8.40.
+8.8.2 Characterizing LES Process Effects
+Any line whose width is near the resolution limit of a lithographic process will usually 
+exhibit signifi cant line-end shortening. The end of the line is made up of two 90° corners. 
+But as these corners pass through an imaging process of limited resolution, the corners 
+will, by necessity, round. If the feature width is less than the sum of the two cornerrounding radii, the end of the line will pull back due to this corner rounding. There are 
+actually three major causes of this corner rounding, all of which contribute to the fi nal 
+LES magnitude.
+The primary corner rounding, and thus line-end shortening, mechanism is the 
+diffraction limitation of aerial image formation. To fi rst order, the aerial image cornerrounding radius is about equal to the radius of the point spread function (about 0.35l/NA). 
+Thus, signifi cant line-end shortening is expected for feature sizes smaller than about 
+k1 = 0.7. As an example, a 180-nm isolated line imaged at 248 nm with a numerical aperture (NA) of 0.688 (giving a scaled feature size of k1 = 0.5) and with a partial coherence 
+of 0.5 will produce an aerial image with nearly 50 nm of LES. The amount of corner 
+rounding is a strong function of k1. Figure 8.41a shows the effect of NA on the line-end 
+shortening of the aerial image of a 180-nm-sized structure like that of Figure 8.38. 
+Obviously, a higher NA (just like a lower wavelength or larger feature size) produces 
+less LES. The infl uence of partial coherence (Figure 8.41b) is less dramatic but still 
+signifi cant.
+LES is also infl uenced by corner rounding on the reticle. Mask making involves lithography processes that, due to their inherent resolution limits, inevitably produce rounded 
+corners. At the end of a line, rounded corners on the mask reduce light intensity transmitted through the mask in a manner nearly identical to a foreshortening of the mask line. 
+Equating the area lost due to mask corner rounding of radius R (wafer dimensions) with 
++0.4 µm Defocus In Focus –0.4 µm Defocus
+Figure 8.40 Simulated impact of focus on the shape of the end of an isolated line (250-nm
+line, NA = 0.6, s = 0.5, l = 248, positive focus defi ned as shifting the focal plane up)
+
+
+## Page 64
+
+360 Fundamental Principles of Optical Lithography
+an equivalent area due to a foreshortened mask, an approximate LES due to mask corner 
+rounding can be estimated, for a space of width w, as
+LES
+R
+w
+R
+w mask ≈
+− 
+  ≈
+21
+4 0 43 2 2
+π
+. (8.82)
+A similar result is expected for lines. Thus, mask corner rounding leads to an effectively 
+shorter mask line, which of course will lead directly to a shorter line printed in resist. As 
+an example, consider a mask-making process with a corner-rounding radius of 20 nm 
+(wafer dimensions). For an 80-nm feature, the amount of LES due to the mask corner 
+rounding can be estimated at 2 nm. If the mask corner rounding is increased to 40 nm, the 
+impact of the mask on LES grows to 9 nm. If the maximum allowed LES due to mask 
+corner rounding is set to be a fi xed fraction of the minimum feature size, Equation (8.82) 
+shows that the maximum allowed mask corner rounding must also be a fi xed fraction of 
+the minimum feature size.
+The resist also affects the fi nal degree of line-end shortening. Interestingly, development contrast seems to have only a small infl uence on the amount of LES of the fi nal 
+resist patterns. Diffusion during PEB, on the other hand, has a very signifi cant effect. 
+Figure 8.42 shows the simulated result of increasing diffusion length (for an idealized 
+conventional resist and for a chemically amplifi ed resist, both with constant diffusivity) 
+on the line-end shortening of a completely isolated line. The diffusion length must be 
+kept fairly small in order for diffusion to only marginally impact the LES. In both cases, 
+the increase in line-end shortening goes as about the diffusion length squared. The reason 
+for the large effect of diffusion on line-end shortening is the three-dimensional nature of 
+(a) (b)
+35
+40
+45
+50
+55
+60
+65
+70
+75
+80
+0.6 0.7 0.8 0.9 1.0
+Numerical Aperture
+LES (nm)
+35
+40
+45
+50
+55
+60
+0 0.2 0.4 0.6 0.8 1.0
+Partial Coherence
+LES (nm)
+Figure 8.41 Response of line-end shortening (LES) to imaging parameters (130-nm isolated
+line, l = 248nm): (a) numerical aperture (s = 0.5), and (b) partial coherence (NA =
+0.85)
+
+
+## Page 65
+
+ Lithographic Control in Semiconductor Manufacturing 361
+the diffusion process: at the end of an isolated line, chemical species from the exposed 
+areas can diffuse from all three sides of the line end (as opposed to one direction for a 
+line edge).
+8.9 Critical Shape and Edge Placement Errors
+A discussion of CD control assumes that a convenient and accurate dimensional measure 
+of the feature in question is available. For long lines and spaces, and symmetric contact 
+holes, a simple, single metric can be used to describe the difference between the actual 
+result on the wafer and the desired result: the critical dimension error (CDE). The 
+optimum process is that which drives the CDE to zero. But real integrated circuit patterns 
+include numerous complex shapes that defy easy one-dimensional characterization. How 
+does one judge the error in the shape of an arbitrary 2D pattern? For this we must defi ne 
+a critical shape error (CSE), the 2D analog to the critical dimension error.
+The critical shape error is determined by fi nding the point-by-point difference between 
+the actual printed resist shape and the desired shape.13 For example, Figure 8.43a takes a 
+desired shape (equal to the layout design with an acceptable amount of corner rounding 
+added) and compares it to a top-down image of the printed resist shape. The desired shape 
+is broken down into a collection of measurement points (in this case, equally spaced points 
+are placed around the entire desired shape). Then vectors are drawn from these measurement points to the actual wafer shape, collecting their lengths in a frequency distribution 
+of errors as shown in Figure 8.43b. Once such a distribution is determined, some characterization of the distribution can be used to describe the overall shape error. For example, 
+the average error could be used (CSEavg) or the error which is greater than 90 % of the 
+0
+10
+20
+30
+40
+50
+60
+0 20 40 60 80
+(a) (b)
+100
+Diffusion Length (nm)
+Increase in LES (nm)
+0
+10
+20
+30
+40
+50
+0 50 100 150
+Diffusion Length (nm)
+Increase in LES (nm)
+Figure 8.42 Diffusion can have a dramatic effect on line-end shortening (LES) of an isolated
+line: (a) 180-nm line, l = 248nm, NA = 0.688, s = 0.5, conventional resist, and (b) 130-nm
+line, l = 248nm, NA = 0.85, s = 0.5, chemically amplifi ed resist
+
+
+## Page 66
+
+362 Fundamental Principles of Optical Lithography
+point-by-point measurements (CSE90), or some other percentage could also be used. For 
+the distribution in Figure 8.43, some results are given below:
+• CSEavg = 13.5 nm
+• CSE80 = 23 nm
+• CSE90 = 28 nm
+• CSE95 = 32 nm
+• CSE99.7 = 46 nm
+Several different defi nitions of the point-by-point error are possible. In the example 
+above, the unsigned length of the vector is used to generate the error histogram. The 
+signed vector could also be used (a mean of zero for the signed vectors would be an 
+indication of a properly sized feature). An alternate approach, useful for features on a 
+‘Manhattan’ layout, constrains the error vectors to be wholly vertical or horizontal. These 
+Manhattan error vectors are typically called edge placement errors (EPE) and are commonly used by optical proximity correction software when characterizing pattern fi delity 
+(see Chapter 10).
+8.10 Pattern Collapse
+Photoresist profi le control has traditionally been defi ned by making a trapezoidal model 
+of the shape of the resist profi le and defi ning the width, height and sidewall angle of the 
+trapezoid as parameters to be controlled. In general, this approach works well for 1D 
+patterns (long lines and spaces). However, under some circumstances, a different problem 
+can plague the control of profi le shape – pattern collapse, where seemingly well-formed 
+resist profi les fail mechanically and fall over (Figure 8.44).
+(a) (b)
+0
+5
+10
+15
+20
+25
+30
+35
+10 20 30 40 50
+Point-by-Point Error (nm) 
+Frequency
+CSE90
+0
+Figure 8.43 Defi ning a metric of shape error begins with (a) making point-by-point measurements comparing actual (dashed) to desired (solid) shapes, which produces (b) a frequency
+distribution of errors (unsigned lengths of the vectors are used here). One possible critical
+shape error (the CSE90) is shown as an example of the analysis of this distribution
+
+
+## Page 67
+
+ Lithographic Control in Semiconductor Manufacturing 363
+Pattern collapse occurs for tall, narrow resist lines when some force pushing against 
+the top of the line causes the profi le to bend and eventually break or peal off the substrate. 
+As one might expect, the taller and narrower the line, the easier it would be to push it 
+over. But where does this pushing force come from? After development, the wafer is 
+rinsed with deionized water and then air-dried. As the water dries, surface tension from 
+the receding water will pull on the top of the resist feature. Of course, if the water is 
+symmetrically receding from both sides of the line, the two forces on each side will cancel. 
+If, however, there is an asymmetry and the water from one side of the line dries off faster 
+than the other side, the resultant force will not be zero.
+Figure 8.45a shows what is probably the worst case for generating asymmetric surface 
+tension forces during after-rinse drying: two isolated parallel lines with a small gap 
+between them. The large open areas to each side of the pair quickly dry while the small 
+space between them requires a much longer time for removal of the water. As a result, 
+Figure 8.44 Examples of photoresist pattern collapse, both in cross section (left) and top
+down (Courtesy of Joe Ebihara of Canon)
+wl
+ws
+H
+θ
+(a) (b)
+Figure 8.45 Pattern collapse of a pair of isolated lines: (a) drying after rinse leaves water
+between the lines, and (b) capillary forces caused by the surface tension of water pull the
+tops of the lines toward each other, leading to collapse
+
+
+## Page 68
+
+364 Fundamental Principles of Optical Lithography
+there will be a point in the drying cycle where the top meniscus of the water in the gap 
+will line up with the top of the resist features, producing a capillary force, driven by the 
+surface tension of water, that will pull the two resist lines toward each other (Figure 
+8.45b). If the force is great enough to cause the two resist tops to touch each other, these 
+features are said to have collapsed. Other patterns of lines and spaces (a fi ve-bar pattern, 
+for example) will behave very similarly to this two-bar test pattern for at least the most 
+outside lines.
+Tanaka14 developed a simple cantilever-beam mechanical model for this pattern collapse situation. The capillary pressure (force per unit area) along the side of the resist line 
+covered by water is equal to the surface tension s of the water–air interface divided by 
+the radius of curvature R of the meniscus. The radius of curvature in turn is determined 
+by the contact angle q of the water–resist interface and the spacewidth ws. Before any 
+bending occurs, this curvature will be 
+R w = s
+2 cosθ
+ (8.83)
+For a resist thickness H, the resulting capillary force per unit length of line is
+F H
+R
+H
+w == σ σθ 2 cos
+s
+ (8.84)
+As the resist line starts to bend, however, this force increases. The radius of curvature of 
+the meniscus decreases as the two resist lines come closer together, causing an increase 
+in the capillary force.
+Since the force caused by the surface tension is always perpendicular to the air–water 
+interface, a contact angle of zero (very hydrophilic case) causes the maximum force 
+pulling the resist line toward the center of the space. Resists tend to be somewhat hydrophobic, so that contact angles between water and resist are often in the 50–70° range 
+(though these measurements are for unexposed resist, not the partially exposed and 
+deblocked resist along the profi le edge where the contact angle should be less). Note that 
+the capillary force increases with the aspect ratio of the space (As = H/ws) and with the 
+surface tension of water, which at room temperature is about 0.072 N/m (72 dyne/cm).
+The bending of the resist line can be described as an elastic cantilever beam. The 
+important resist material property of mechanical strength is the Young’s modulus, E, 
+which is a measure of the stiffness of the resist and is higher for resists with high glass 
+transition temperatures. Resists have been measured to have Young’s modulus values in 
+the range of 2–6 GPa with the high end of the range corresponding to novolac resists and 
+the low end of the range for ArF resists.15 Applying a force F to a line of width wl causes 
+that line to move (sway) into the space by an amount d given by
+δ = 
+
+
+
+
+
+ 
+
+ 3
+2
+3 F
+E
+H
+wl
+ (8.85)
+Note that the amount of bending is proportional to the cube of the aspect ratio of the resist 
+line, and thus will be very sensitive to this aspect ratio.
+As the resist line bends, the pulling of the line by the capillary force is countered by a 
+restoring force caused by the stiffness of the resist. Eventually a ‘tipping point’ is reached 
+
+
+## Page 69
+
+ Lithographic Control in Semiconductor Manufacturing 365
+where the increasing capillary force exceeds the restoring force of the resist and the line 
+collapses. Tanaka calculated this critical point to occur when
+E
+w
+AA A A s σ
+≤ ++ +  θ θ θ θθ  
+
+4 3 96 3 22
+s
+l ss cos sin cos cos sin (8.86)
+where As is the aspect ratio of the space and Al is the aspect ratio of the line (H/wl). If the 
+contact angle is less than about 80° and the aspect ratio of the space is high (that is, we 
+are in an interesting regime where pattern collapse is likely to be a problem), the square 
+root can be approximated with the fi rst terms of a Taylor series to give a somewhat more 
+approachable result:
+E
+w
+AA
+σ
+≤+ θθ 8 33
+s
+ls [ cos sin ] (8.87)
+Equation (8.87) shows what affects pattern collapse and therefore what can be done to 
+try to reduce pattern collapse. Resist chemists could make the resist stiffer by increasing 
+the Young’s modulus E (similar to increasing Tg, the glass transition temperature), something that is hard to do without altering other very important resist properties. The 
+water–air surface tension can be reduced by adding surfactant into the rinse liquid. Surfactants can easily reduce the surface tension by a factor of 2 or 3, but may pose contamination problems and can also soften the resist, reducing its Young’s modulus. Contact 
+angle of water to the resist also infl uences collapse. The worst case (maximum value of 
+3Ascosq + sinq) occurs at an angle of tan−1(1/3As) which is generally less than 10°. Thus, 
+hydrophilic resists produce greater pattern collapse. Making the resist more hydrophobic 
+will help (this, incidentally, is also a goal for immersion lithography). The aspect ratio of 
+the space is important, but is less so for hydrophobic resists (small cosq). The space width 
+has a direct impact on collapse, with smaller spaces increasing the capillary force and 
+thus the likelihood of collapse. By far the most critical factor is the aspect ratio of the 
+line. Since the tendency to collapse increases as the line aspect ratio cubed, small changes 
+in this factor can have big consequences.
+Putting some numbers into the equation, ArF resists will have E/s in the range of about 
+35 nm−1 assuming no surfactants in the water. Assuming a 60° water–resist contact angle, 
+consider a 100-nm space with a space aspect ratio of 3. The maximum aspect ratio of the 
+line will be 4.3 (a 70-nm linewidth before the line collapses). If the space were shrunk 
+to 50 nm keeping the space aspect ratio at 3, the maximum line aspect ratio drops to 3.4 
+(a 44-nm linewidth). As another example, when printing a pair of 45-nm equal lines and 
+spaces in a resist of thickness 141 nm, overexposure will cause the patterns to collapse 
+before they reach a 10 % CD error. Pattern collapse can become a process window limiter 
+before CD, sidewall angle, or resist loss reach their specifi cations.
+Equation (8.87) can also predict the tendency toward pattern collapse as a function of 
+line/space duty cycle. To simplify, assume that the contact angle is small enough that 
+ignoring the sinq term in Equation (8.87) produces very little error (this approximation 
+is not so bad, even for a 60° contact angle). For this case, a given pitch equal to ws + wl
+will have the minimum tendency to collapse when the linewidth is 50 % bigger than the 
+spacewidth (a 3 : 2 linewidth to spacewidth ratio). All other duty cycles will have an 
+increased chance of pattern collapse. For a fi xed duty cycle, the likelihood of collapse 
+
+
+## Page 70
+
+366 Fundamental Principles of Optical Lithography
+goes as the resist thickness to the fourth power, and as one over the pitch to the third 
+power.
+The two-dimensional model used here is really a worst case since it assumes very long 
+lines and spaces. For shorter lines that are connected to another resist feature at one or 
+both ends, the other features can give support to the line, inhibiting the twisting that would 
+be required to make the line collapse. However, it is likely that CMOS device levels like 
+poly and metal 1 will always have some patterns that will behave close to the worst case 
+presented here. And the trend toward smaller feature sizes and constant or even greater 
+aspect ratios will only make the problem of pattern collapse worse in the future.
+Problems
+ 8.1. A given 90-nm lithography process level exhibits a 0.1-ppm (parts per million) 
+wafer magnifi cation error due to wafer expansion. For a 300-mm wafer, what is the 
+maximum overlay error due to this term if it goes uncorrected? Is the magnitude 
+of this error signifi cant (assume the overlay specifi cations is 1/3 of the technology 
+node feature size)?
+ 8.2. Silicon has a coeffi cient of linear expansion of about 3 × 10−6
+/K. Assume that 3 nm 
+of overlay error due to lack of wafer temperature control is acceptable. How well 
+must the temperature of the wafer be controlled for a 200-mm wafer? For a 300-mm 
+wafer?
+ 8.3. What are the maximum x- and y-overlay errors due to a 0.3 arc-second reticle 
+rotation error for a 24 × 28 mm fi eld?
+ 8.4. It is possible that the overlay targets, when printed on the wafer, may be asymmetric, as shown below for a frame-in-frame target. What will be the impact of such 
+asymmetry on overlay measurement?
+ 8.5. Derive Equations (8.42) and (8.43).
+ 8.6. Equations (8.31) and (8.35) both predict CD versus dose, with the later equation a 
+bit more accurate. Plot CD versus dose for these two models on one graph for the 
+case of
+CD E CD
+E EE
+11 2 80 32 0 6
+1
+== = =nm, mJ/cm , and d
+d
+ln
+ln .
+At what dose values do the two models disagree with each other in predicted CD 
+by 2 %?
+
+
+## Page 71
+
+ Lithographic Control in Semiconductor Manufacturing 367
+ 8.8. Using Equations (8.50)–(8.52), plot the depth of focus of a 65-nm line as a function 
+of isofocal bias: let CDspec = 0.2, Elspec = 0.08, snom = 0.75, and ∆ = 0.2 mm.
+ 8.9. Use the general expression (8.75) to derive the image MEEF for a coherent equal 
+line/space image that uses only the 0th and ±1st diffraction orders [that is, derive 
+Equation (8.68)].
+8.10. For the two-line pattern collapse problem, what linewidth-to-spacewidth ratio (for 
+a fi xed pitch) minimizes the tendency for pattern collapse under the following 
+conditions:
+(a) Assume that the water–resist contact angle is small enough that the sinq term 
+in Equation (8.87) can be ignored.
+(b) Assume that the water–resist contact angle is large enough that the cosq term 
+in Equation (8.87) can be ignored.
+References
+ 1 Sturtevant, J., Allgair, J., Fu, C., Green, K., Hershey, R., Kling, M., Litt, L., Lucas, K., Roman, 
+B., Seligman, G. and Schippers, M., 1999, Characterization of CD control for sub-0.18 mm 
+lithographic patterning, Proceedings of SPIE: Optical Microlithography XII, 3679, 220–227.
+ 2 Mack, C.A., 1992, Understanding focus effects in submicron optical lithography, part 3: 
+methods for depth-of-focus improvement, Proceedings of SPIE: Optical/Laser Microlithography V, 1674, 272–284.
+ 3 Sethi, S., Barrick, M., Massey, J., Froelich, C., Weilemann, M. and Garza, F., 1995, Lithography strategy for printing 0.35 um devices, Proceedings of SPIE: Optical/Laser Microlithography VIII, 2440, 619–632.
+ 4 SEMI Standard SEMI P35-1106, 2006, Terminology for Microlithography Metrology, Semiconductor Equipment and Materials International, San Jose, CA.
+ 8.7. For the Bossung plot given below,
+(a) Approximately where is best focus? Why?
+(b) What is the approximate isofocal bias (numerical value) for a target CD of 
+180 nm?
+50
+100
+150
+200
+250
+300
+–0.5 –0.3 –0.1 0.1
+Focus (µm)
+Resist Linewidth (nm)
+20
+24
+28
+32
+36
+40
+48
+Dose (mJ/cm2)
+
+
+## Page 72
+
+368 Fundamental Principles of Optical Lithography
+ 5 Levinson, H.J., 1999, Lithography Process Control, SPIE Press Vol. TT28, Bellingham, CA.
+ 6 Ausschnitt, C., 1988, Chapter 8: electrical measurements for characterizing lithography, in 
+VLSI Electronics: Microstructure Science, Vol. 16, Academic Press, p. 330.
+ 7 DeMoor, S., Brown, J., Robinson, J.C., Chang, S. and Tan, C., 2004, Scanner overlay mix and 
+match matrix generation; capturing all sources of variation, Proceedings of SPIE: Metrology,
+Inspection, and Process Control for Microlithography XVIII, 5375, 66–77.
+ 8 Bossung, J.W., 1977, Projection printing characterization, Proceedings of SPIE: Developments
+in Semiconductor Microlithography II, 100, 80–84.
+ 9 Ausschnitt, C.P., Rapid optimization of the lithographic process window, Proceedings of SPIE:
+Optical/Laser Microlithography II, 1088, 115–133.
+10 Brunner, T., Martin, A., Martino, R., Ausschnitt, C., Newman, T. and Hibbs, M., 1994, Quantitative stepper metrology using the focus monitor test mask, Proceedings of SPIE: Optical/
+Laser Microlithography VII, 2197, 541–549.
+11 Maurer, W., 1996, Mask specifi cations for 193-nm lithography, Proceedings of SPIE, 2884, 
+562–571.
+12 The derivation was fi rst suggested to me by Mark D. Smith.
+13 Tsudaka, K., et al., 1995, Practical optical mask proximity effect correction adopting process 
+latitude consideration, MicroProcess ‘95 Digest of Papers, 140–141.
+14 Tanaka, T., Morigami, M. and Atoda, N., 1993, Mechanism of resist pattern collapse during 
+development process, Japanese Journal of Applied Physics, 32, 6059–6064.
+15 Simons, J., Goldfarb, D., Angelopoulos, M., Messick, S., Moreau, W., Robinson, C., de Pablo, 
+J. and Nealey, P., 2001, Image collapse issues in photoresist, Proceedings of SPIE: Advances
+in Resist Technology and Processing XVIII, 4345, 19–29.

@@ -1,0 +1,17 @@
+{
+  "sessionId": "conv_1791128196430_fbqkuf",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "cut od你會知道是什麼嗎?",
+      "timestamp": 1791128207225
+    },
+    {
+      "role": "assistant",
+      "content": "「Cut OD」這個詞有幾種可能的意思，單看這兩個字沒有上下文我無法確定你指的是哪一個。常見的解釋：\n\n1. **Cut + OD（Optical Density，光密度）**：在微影／薄膜製程中，「cut」常指圖案切割或斷開（例如 cut mask、cut layer、line-cut 製程），而 **OD** 在光罩術語裡常指 **Optical Density**（光罩遮光層的透光衰減值，例如 MoSi 半色調光罩的 OD），也可能指 **Dark Field / Opaque Dark** 之類的遮光區域。所以「cut OD」可能是指「cut 層的 OD 規格／遮光值」。\n\n2. **OD 作為 Overlay / Overdrive / Outer Diameter**：在半導體與機械領域，OD 也常是 Overlay、Overdrive 或外徑等縮寫。\n\n3. **其他圈內用法**：在某些公司或團隊裡，「cut OD」可能是內部縮寫或口語簡稱（例如某個步驟、某張光罩的代號）。\n\n抱歉無法直接確認——這個詞不在目前的專案 wiki 裡（檢索沒有找到相關頁面），所以缺少關鍵字定義與上下文。\n\n可以幫我補充一下嗎？例如：\n- 「cut OD」出現在哪個情境（微影、光罩、薄膜、機構圖面、還是別的領域）？\n- 是完整句子或製程步驟名稱嗎（例如「cut OD 值要 < X」）？\n- OD 你預期是 Optical Density、Overlay、Overdrive、外徑，還是其他？\n\n告訴我上下文，我就能給出精確解釋，並視需要把這個術語整理成 wiki 頁面（例如 `wiki/concepts/optical-density.md`）方便日後查詢。",
+      "timestamp": 1791128207225
+    }
+  ],
+  "updatedAt": 1791128207225
+}

@@ -1,0 +1,17 @@
+{
+  "sessionId": "conv_1791128113459_nfcwf7",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "cut od你會知道是什麼嗎?",
+      "timestamp": 1791128120838
+    },
+    {
+      "role": "assistant",
+      "content": "「cut od」單獨看不太算一個標準術語，所以我先確認一下你指的是哪個。幾個常見可能：\n\n1. **Cut-off / cutoff（切斷、截止）** — 微影裡常見的 **cut-off frequency（截止頻率）** 或 **cut-off dimension（臨界尺寸）**，指光學系統/光阻無法解析的極限。\n2. **「cut」的拼字/縮寫誤打** — 例如 **CD（critical dimension）** 打錯，或 **cut mask / cut layer**（在多重曝光中用來切斷線段的光罩層）。\n3. **O.D.（optical density，光密度）** — 常寫成「OD」，用於描述光阻、光罩吸收層或薄膜的吸光能力；若你打的是「od」而非「O.D.」，那就是這個。\n4. **OD 當「outer diameter（外徑）」** — 若是講晶圓、管子、鏡頭口徑時可能是這個。\n\n以這個微影 wiki 的脈絡來看，最可能是 **(1) cutoff（光學/解析度截止）** 或 **(3) OD = optical density**。\n\n目前 wiki 裡沒有對應的頁面（檢索沒有命中），所以我不想硬猜細節。你告訴我是哪一個（或貼上下文/整句），我就能給準確的定義、公式（例如 cutoff frequency = NA/λ 相關）或相關頁面連結。若你希望，我也可以幫你建立一個 concept 頁面把這個術語記錄下來。",
+      "timestamp": 1791128120838
+    }
+  ],
+  "updatedAt": 1791128120838
+}

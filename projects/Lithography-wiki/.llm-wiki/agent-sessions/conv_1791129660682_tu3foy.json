@@ -1,0 +1,27 @@
+{
+  "sessionId": "conv_1791129660682_tu3foy",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "overlay是什麼？ 有什麼相關的文件嗎？",
+      "timestamp": 1791129677078
+    },
+    {
+      "role": "assistant",
+      "content": "## overlay 是什麼？\n\n**overlay（疊對）** 指的是新微影層相對於晶圓上既有圖形的位置誤差控制。它與 *registration*（registration 衡量圖形相對**絕對座標網格**的位置）不同，兩者不可混用。核心頁面見 [[overlay 控制]]（`wiki/concepts/overlay-控制.md`）。\n\n### 主要內容\n\n**量測偏差**\n- box-in-box：以兩側間隙差的一半估計位置差，可抵消對稱 CD 變化，但無法抵消不對稱。\n- [[aim]]：利用多條帶改善精密度與製程穩健性。\n- 本章採 `TIS = Overlay(0°) + Overlay(180°)` 的定義；固定 TIS 可校正，其變動才增加不確定度。\n- WIS（晶圓誘發位移）由標靶不對稱造成，可能與量測焦距交互作用，不保證能用固定偏移修正。\n\n**模型及可識別性**\n- 基本線性模型含晶圓與場內各兩個旋轉、倍率項，加上共用的兩個平移項，共 10 個係數。\n- 平移無法單從此模型分離為晶圓或 reticle 來源；backlash 另加入兩個隨掃描方向改號的平移項。\n- 高階畸變、reticle registration 及 stage signature 需額外表徵 → [[overlay fingerprint 表徵]]。殘差不能未經檢查便視為純隨機。\n\n**批次處置**\n- overlay 資料可用於批次放行、曝光工具設定修正及量測診斷。\n- 稀疏量測點的最大值未必代表未取樣區域；較有意義的是結合模型與誤差估計，預測每個 die 的 overlay-limited yield，再比較良率損失與重工成本。\n- 可修正項是對已處理批次的回溯估計；用於下一批次的 APC 仍依賴誤差的時間穩定性。\n\n---\n\n## 相關文件\n\n| 頁面 | 類型 | 說明 |\n|------|------|------|\n| `wiki/concepts/overlay-控制.md` | concept | overlay 控制主頁：量測偏差、模型、批次處置 |\n| `wiki/methodology/overlay-fingerprint-表徵.md` | methodology | overlay fingerprint 表徵（工具匹配等） |\n| `wiki/comparisons/overlay-與-pattern-placement-error-比較.md` | comparison | overlay 與 pattern placement error（PPE）的區分 |\n| `wiki/concepts/aim.md` | concept | AIM 標靶 |\n| `wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md` | source | 主要來源：Optical Lithography ch8，§8.4 |\n| `wiki/index.md` | overview | 索引（可查所有相關頁面） |\n\n延伸關聯（圖譜）：`adi-與重工`、以及 tag `量測` 下的其他條目。\n\n若你需要，我可以把上述整理成一份綜合頁（synthesis）或補上「overlay 控制」目前缺的細節。",
+      "timestamp": 1791129677078
+    },
+    {
+      "role": "user",
+      "content": "cut od你會知道是什麼嗎?",
+      "timestamp": 1791129696426
+    },
+    {
+      "role": "assistant",
+      "content": "## 「cut OD」我知道的是什麼？\n\n老實說：**單憑這個 wiki 的內容，我無法確認「cut OD」是一個已收錄的術語。** 我先說明我對它的理解，再說明資料庫裡的實際狀況。\n\n### 我的理解（一般半導體製程用語）\n\n- **OD** = *oxide definition*（也有寫成 *active area / OD layer*），指 CMOS 製程中定義**主動區（源／汲與通道）**的遮罩層，用來界定哪裡要有場氧化層、哪裡要保留矽表面做元件。\n- **cut OD** 通常指**把原本連續的 OD 圖形切開**的一道遮罩或一個 OPC/設計步驟：例如把大塊 OD 切成彼此隔離的主動區島嶼、或在 OD 中開出隔離用的切口（cut）。在 double patterning / 先進節點流程裡，也可能是指某個 OD 層的「cut mask」（切斷遮罩）。\n- 這與 **cut mask／cut layer** 的一般模式一致：連續圖形先形成，再用一道「cut」把它斷開，以突破單次曝光的間距限制。\n\n### 這個 wiki 的實際狀況\n\n- 檢索相關頁面（overlay 控制、圖案轉移、OPC、RET/解析度增強等多個條目）**都沒有出現「cut OD」的定義或討論**。\n- 最接近的相關概念是 [[圖案轉移]]（`wiki/concepts/圖案轉移.md`）、[[opc]]（`wiki/concepts/opc.md`）與 [[ret]]／解析度增強技術條目——它們處理圖案化與遮罩修正，但沒有觸及 OD 層的 cut 步驟。\n- 也就是說：**目前缺少可靠來源，我不該替你補上一個聽起來合理但未經此 wiki 佐證的定義。**\n\n### 建議\n\n如果你要的是這個專案內可引用的說法，需要補一份來源（例如討論 OD / active area 定義、cut mask 或 double patterning 的製程文件），我可以據此新增一個 entity/concept 頁（例如 `wiki/concepts/cut-od.md`），並連到 [[圖案轉移]] 與 [[opc]]。你手上若有該定義出處，直接貼給我，我就照其內容整理。",
+      "timestamp": 1791129696426
+    }
+  ],
+  "updatedAt": 1791129696426
+}

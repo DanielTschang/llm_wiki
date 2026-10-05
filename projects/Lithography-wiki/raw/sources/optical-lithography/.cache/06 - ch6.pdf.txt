@@ -1,0 +1,2452 @@
+## Page 1
+
+6
+Chemically Amplifi ed Resists: 
+Exposure and Bake Chemistry
+Unlike conventional resists, such as the diazonaphthoquinone (DNQ)/novolac systems 
+discussed in the previous chapter, chemically amplifi ed resists require two separate 
+chemical reactions in order to change the solubility of the resists. First, exposure turns 
+an aerial image into a latent image of exposure reaction products. Although very similar 
+to conventional resists, the reaction products of exposure for a chemically amplifi ed resist 
+do not appreciably change the solubility of the resist. Instead, a second reaction during a 
+post-exposure bake is catalyzed by the exposure reaction products. The result of the postexposure bake reaction is a change in the solubility of the resist. This two-step process 
+has some interesting characteristics and challenges.
+In many respects, chemically amplifi ed resists are a conceptual superset of conventional 
+resists. With the exception of thermal decomposition, all of the concepts discussed in the 
+previous chapter apply to chemically amplifi ed resists as well. Familiarity with the concepts of that chapter is thus assumed in this chapter.
+6.1 Exposure Reaction
+Chemically amplifi ed photoresists are composed of a polymer resin (possibly ‘blocked’ 
+to inhibit dissolution), a sensitizer called a photoacid generator (PAG), and possibly a 
+cross-linking agent, dye or other additive. As the name implies, the PAG forms an acid 
+when exposed to deep-UV light. Ito and Willson at IBM fi rst proposed the use of an aryl 
+onium salt,1
+ and triphenylsulfonium salts have been studied extensively as PAGs. The 
+reaction of a very simple triphenylsulfonium salt PAG is:
+Ph
+Ph S CF COO CF COOH others
+Ph
+33 +− →+ hν (6.1)
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+224 Fundamental Principles of Optical Lithography
+The acid generated in this case (trifl uoroacetic acid) is a derivative of acetic acid 
+where the electron-drawing properties of the fl uorines greatly increase the acidity of the 
+molecule. In fact, very strong acids will be required for the chemical amplifi cation step 
+described in the next section. The PAG is mixed with the polymer resin at a concentration 
+of typically 5–15 % by weight for 248-nm resists, with 10 % as a typical formulation 
+(corresponding to a PAG concentration of about 0.2 mol/liter). For 193-nm resists, PAG 
+loading is kept lower at 1–5 wt % in order to keep the optical absorbance of the resist 
+within desired levels.
+The kinetics of the exposure reaction are presumed to be standard fi rst order (just as 
+for the exposure of PAC in a conventional resist):
+∂
+∂ =− Gt
+CIG (6.2)
+where G is the concentration of PAG at exposure time t (the initial PAG concentration 
+is Go), I is the exposure intensity, and C is the exposure rate constant. For most chemically amplifi ed resists, the bleachable absorption coeffi cient A is zero and the intensity in 
+the resist stays constant during exposure. For this case, the rate equation can be solved 
+for G:
+GG CIt = − 0e (6.3)
+The acid concentration H is given by
+HG GG CIt = −= − − 00() 1 e (6.4)
+Some 248-nm PAGs react to exposure by a different mechanism. The polymer resin used 
+by the resist (such as polyhydroxystyrene, discussed below) will absorb light, resulting in 
+electrons promoted to higher energy states in the polymer. It is possible for some of this 
+energy to be transferred from the polymer to the PAG, providing an indirect pathway for 
+photon absorption to provide energy to the PAG. If this mechanism exists in a resist, the 
+resulting kinetics will still be well described by the fi rst-order kinetics discussed above.
+6.2 Chemical Amplifi cation
+Exposure of the resist with an aerial image I(x) results in an acid latent image H(x). A 
+post-exposure bake (PEB) is then used to thermally induce a chemical reaction. This may 
+be the activation of a cross-linking agent for a negative resist or the deblocking of the 
+polymer resin for a positive resist. The defi ning characteristic of a chemically amplifi ed 
+resist is that this reaction is catalyzed by the acid so that the acid is not consumed by the 
+reaction and, to fi rst order, H remains constant. As a result, each exposure event (creating 
+one acid molecule) can cause a large number of dissolution-changing chemical events 
+during PEB. The effects of exposure are said to be ‘amplifi ed’ by the catalytic nature of 
+this chemical reaction. The catalytic chain length, defi ned to be the average number of 
+amplifi cation chemical events caused by one acid molecule, is in the range of 10 to 100 
+for most chemically amplifi ed resists, with 20 a typical catalytic chain length. Chemically 
+amplifi ed resists use exposure doses in the range of 20–50 mJ/cm2
+, making them 5–10 
+times more sensitive than the DNQ resists used at i-line.
+
+
+## Page 3
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 225
+6.2.1 Amplifi cation Reaction
+Willson, Ito and Frechet fi rst proposed the concept of deblocking a polymer to change its 
+solubility.2 A base polymer, such as polyhydroxystyrene (PHS), is used that is very 
+soluble in an aqueous base developer. It is the acidic hydroxyl (—OH) groups that give 
+the PHS its high solubility, so by ‘blocking’ these sites (by reacting the hydroxyl group 
+with some longer-chain molecule) the solubility can be reduced. The IBM team employed 
+a t-butoxycarbonyl group (t-BOC), resulting in a very slowly dissolving polymer. In the 
+presence of a strong acid and heat, the t-BOC blocked polymer will undergo acidolysis 
+to generate the soluble hydroxyl group, as shown below.
+t-BOC blocking 
+group CH3
+CH2-CH 
+O
+O
+C
+O
+CH3
+C CH3
+CH2-CH 
+OH
+H+
++ CH2
+CH3
+CH3
+C + CO2 ∆
+(6.5)
+One drawback of this scheme is that the cleaved t-BOC is volatile and will evaporate, 
+causing fi lm shrinkage in the exposed areas. Larger molecular weight blocking 
+groups are commonly used to reduce this fi lm shrinkage to acceptable levels (below 
+10 %). Also, the blocking group is such an effective inhibitor of dissolution that nearly 
+every blocked site on the polymer must be deblocked to obtain signifi cant dissolution. 
+Thus, the photoresist can be made more ‘sensitive’ by only partially blocking the PHS 
+(creating what is called a copolymer, since the polymer chain is now made up of two 
+repeating units – blocked and unblocked PHS). Additionally, fully blocked polymers 
+tend to have poor coating and adhesion properties. Typical photoresists use 10–30 % of 
+the hydroxyl groups blocked, with 20 % as a typical value. Molecular weights for the 
+PHS run in the range of 3000–6000 giving about 20–40 hydroxyl groups per polymer 
+molecule, about 4 to 10 of which are initially blocked in typical formulations. As an 
+example, the early chemically amplifi ed resist Apex-E has a molecular weight of about 
+5000, giving about 35 hydroxyl sites per polymer, about 25 % of which are initially 
+blocked by t-BOC.
+This deblocking reaction (also called the deprotection reaction) is often characterized 
+as being either low activation or high activation, referring to the amount of heat that must 
+be supplied to make the reaction go. For a low activation resist, deblocking can occur at 
+room temperature, and so begins during the exposure process. For a high activation resist, 
+a post-exposure bake in the 95–135 °C temperature range is required. While low activation 
+resists have an advantage in not being sensitive to delay time effects (see section 6.2.3), 
+high activation resists tend to be more readily controlled (produce more uniform resist 
+feature sizes) and are thus the most commonly used. Typical high and low activation 
+blocking groups are shown in Figure 6.1. Many resists today in fact include copolymers 
+of both high and low activation blocking groups.
+
+
+## Page 4
+
+226 Fundamental Principles of Optical Lithography
+Using M as the concentration of some reactive site (such as the t-BOC blocking group), 
+these sites are consumed (i.e. are reacted) according to kinetics of fi rst order in H and 
+fi rst order in M:
+∂
+∂ =− M
+t
+k MH PEB
+4 (6.6)
+where k4 is the rate constant of the amplifi cation reaction (cross-linking, deblocking, etc.) 
+and tPEB is the bake time. Assuming that H is constant (an assumption that will be eliminated later in this chapter), Equation (6.6) can be solved:
+MM k Ht = − 0e 4 PEB (6.7)
+(Note: Although H+
+ is not consumed by the reaction, the value of H is not locally constant. 
+Diffusion during the PEB and acid loss mechanisms cause local changes in the acid concentration, thus requiring the use of a reaction–diffusion system of equations as discussed 
+below. The approximation that H is constant is a useful one, however, that gives insight 
+into the reaction as well as accurate results under some conditions.)
+It is useful here to normalize the concentrations to some initial values. This results in 
+a normalized acid concentration h and normalized unreacted sites m:
+h H
+G m M
+M == 00
+ (6.8)
+Equations (6.4) and (6.7) become
+h
+m
+CIt
+Kth
+=−
+=
+−
+−
+1e
+e amp PEB
+ (6.9)
+where Kamp = G0k4. The result of the PEB is an amplifi ed latent image m(x), corresponding 
+to an exposed latent image h(x), resulting from the aerial image I(x). The amount of 
+amplifi cation (the conversion of an exposed latent image of acid into an amplifi ed latent 
+image of blocked and deblocked polymer) is a function of PEB time and temperature. 
+The time dependence in Equation (6.9) is obvious, and the temperature dependence comes 
+through the amplifi cation rate constant Kamp.
+20% 50% 30%
+OH
+C O
+O
+O
+CH−C2H5
+t-Butyl Ester Terpolymer Acetal
+O−C2H5
+Figure 6.1 Examples of 248-nm blocking groups: the high activation t-butyl ester; and the 
+low activation acetal
+
+
+## Page 5
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 227
+Like most rate constants, the temperature dependence of Kamp can be described by an 
+Arrhenius relation:
+KA E RT amp re a = − / (6.10)
+where Ar is the Arrhenius coeffi cient for this reaction (1/s), Ea is the activation energy 
+(cal/mole or J/mole), R is the universal gas constant (1.98717 cal/mole-K or 8.31431 J/
+mole-K), and T is the absolute temperature (K). Typical values for activation energies as 
+a function of blocking group are given in Table 6.1. The resulting Kamp at the PEB temperature tends to be in the range of 0.02–0.1 s−1
+.
+Equations (6.9) reveal an interesting symmetry between exposure dose, given by It, 
+and a kind of ‘thermal dose’. Consider the case of a small exposure dose (It << 1/C) so 
+that the amount of acid generated is small. Equations (6.9) will become
+h CIt
+m K t CIt
+≈
+≈ − e amp PEB
+ (6.11)
+If we defi ne the effective thermal dose as KamptPEB/C, then there exists a reciprocity 
+between exposure dose and thermal dose. Cutting exposure dose in half and doubling the 
+thermal dose will result in the same chemical change at the end of the amplifi cation reaction. As we shall see in the following section, however, the true picture is complicated 
+by the effects of diffusion.
+6.2.2 Diffusion
+The above analysis of the kinetics of the amplifi cation reaction assumed a locally constant 
+concentration of acid H. Although this could be exactly true in some circumstances, it is 
+typically only an approximation, and is often a poor approximation. In reality, the acid 
+diffuses during the bake. The standard diffusion equation takes the form
+∂
+∂ =∇ ∇ Ht
+DH H
+PEB
+() (6.12)
+where DH is the diffusivity of acid in the photoresist. Solving this equation requires a 
+number of things: two boundary conditions for each dimension, one initial condition and 
+knowledge of the diffusivity as a function of position and time.
+The solution of Equation (6.12) can now be performed if the diffusivity of the acid in 
+the photoresist is known. Unfortunately, this solution is complicated by two very important factors: the diffusivity is a strong function of temperature and, most probably, the 
+Table 6.1 Typical values for amplifi cation reaction 
+activation energies as a function of blocking group
+Blocking Group (248-nm 
+resists) Activation Energy (kcal/mol)
+t-BOC 30
+t-Butyl Ester 22
+Acetal 15
+
+
+## Page 6
+
+228 Fundamental Principles of Optical Lithography
+extent of amplifi cation. Since the temperature is changing with time during the bake, the 
+diffusivity will be time dependent. The concentration dependence of diffusivity results 
+from an increase in free volume for typical positive resists: as the amplifi cation reaction 
+proceeds, the polymer blocking group evaporates resulting in a decrease in fi lm thickness 
+but also an increase in free volume (and probably a change in the glass transition temperature as well). Since the acid concentration is time and position dependent, the diffusivity in Equation (6.12) must be determined as a part of the solution of Equation (6.12) 
+by an iterative method. The resulting simultaneous solution of Equations (6.7) and (6.12) 
+is called a reaction–diffusion system.
+The temperature dependence of the diffusivity can be expressed in a standard Arrhenius 
+form:
+DT A E RT 0() / = − re a (6.13)
+where D0 is a general diffusivity. A full treatment of the amplifi cation reaction would 
+include a thermal model of the hot plate in order to determine the actual time–temperature 
+history of the wafer (see Chapter 5). To simplify the problem, an ideal temperature distribution can be assumed – the temperature of the resist is zero (low enough for no diffusion or reaction) until the start of the bake, at which time it immediately rises to the fi nal 
+bake temperature, stays constant for the duration of the bake, then instantly falls back to 
+zero.
+The concentration dependence of the diffusivity is less obvious. Several authors have 
+proposed and verifi ed the use of different models for the concentration dependence of 
+diffusion within a polymer. Of course, the simplest form (besides a constant diffusivity) 
+would be a linear model. Letting D0 be the diffusivity of acid in completely unreacted 
+resist and Df the diffusivity of acid in resist that has been completely reacted,
+D D DD m H =+ − − 00 ( )( ) f 1 (6.14)
+Here, diffusivity is expressed as a function of the extent of the amplifi cation reaction 
+1 − m. Another common form is the Fujita–Doolittle equation (see Chapter 5), which can 
+be predicted theoretically using free volume arguments. A form of that equation that is 
+convenient for calculations is:
+DD Dm
+Dm H = −+−
+
+
+ 
+ 0  2
+3
+1
+11 exp
+()
+() (6.15)
+where D2 = (1 + D3)ln(Df/D0) and D3 is an experimentally determined constant. Other 
+concentration relationships are also possible.
+While general solutions to these reaction–diffusion equations require numerical techniques, there are some special cases where analytical solutions are possible. Consider a 
+constant acid diffusivity and an ideal temperature profi le (that is, ignore the ramp up to 
+the bake temperature). Further, ignore any sources of acid loss (to be discussed in the 
+next section). Then, the solution to the reaction rate equation given in Equation (6.9) can 
+be used if the relative acid concentration is replaced by an effective acid concentration, 
+given by
+hx
+t
+h x t DPSF t
+t
+eff
+PEB
+, d
+PEB
+() ( ) = =⊗ ∫ 1 0
+0
+ (6.16)
+
+
+## Page 7
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 229
+where h(x,t = 0) is the acid concentration at the beginning of the bake and tPEB is the PEB 
+bake time. Diffusion is given by the convolution of the acid profi le with the diffusion point 
+spread function (DPSF, defi ned in Chapter 5). The effective acid concentration at a particular x-position is the average concentration at that position over time. This equation can 
+be further arranged to defi ne a reaction–diffusion point spread function, RDPSF:
+ heff(x) = h(x,0) ⊗ RDPSF
+where
+RDPSF
+t
+DPSF t
+t
+= ∫ 1
+PEB 0
+ d
+PEB
+ (6.17)
+The Gaussian diffusion kernel is affected by time integration through the diffusion 
+length, σ D = 2Dt, where D is the acid diffusivity in resist. Thus, using the 1D case as 
+an example,
+RDPSF
+tDt
+t
+x Dt t
+=
+−
+∫ 1
+4
+2 4
+PEB 0
+/ e d
+PEB
+π
+ (6.18)
+The integral is solvable, resulting in an interesting fi nal solution.
+RDPSF x xx x
+D D D
+D
+()
+/
+=− 
+
+ 
+
+
+−
+2
+22
+22 2
+2
+e erfc
+σ
+πσ σ σ
+ (6.19)
+The fi rst term on the right hand side of Equation (6.19) is nothing more than twice the 
+DPSF, and thus accounts for pure diffusion. The second term, the complimentary error 
+function times x, is a reaction term that is subtracted and thus reduces the impact of pure 
+diffusion. Each term, as well as the fi nal RDPSF, is plotted in Figure 6.2.
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+0.0 0.5 1.0 1.5 2.0 2.5
+x/s
+s
+D
+D*RDPSF
+Total
+Diffusion Term
+Erfc Term
+Figure 6.2 The 1D reaction–diffusion point spread function (RDPSF) and its component 
+terms
+
+
+## Page 8
+
+230 Fundamental Principles of Optical Lithography
+Equation (6.19) gives the RDPSF in one dimension. Extension to two or three dimensions is straightforward:
+2D ,
+3D
+: ()
+: ()
+RDPSF r Ei r r xy
+RDPSF r
+DD
+D
+=− −
+
+ 
+
+ =+
+=
+1
+2
+1
+2
+2
+2
+2
+22
+πσ σ
+πσ3
+2 22
+2
+σ
+σ
+D
+r D
+r erfc , r xyz 
+
+ 
+
+ 
+
+ 
+
+ = ++
+ (6.20)
+where Ei is the exponential integral. Once the effective acid concentration is known, the 
+amount of deblocking can be calculated as before with a simple modifi cation to Equation 
+(6.9):
+m Kth = − e amp PEB eff (6.21)
+6.2.3 Acid Loss
+Through a variety of mechanisms, acid formed by exposure of the resist fi lm can be lost 
+and thus not contribute to the catalyzed reaction to change the resist solubility. There are 
+two basic types of acid loss – loss that occurs between exposure and post-exposure bake, 
+and loss that occurs during the post-exposure bake. The fi rst type of loss leads to delay 
+time effects – the resulting lithographic patterns are affected by the delay time between 
+exposure and post-exposure bake. Delay time effects can be very severe and, of course, 
+are very detrimental to the use of such a resist in a manufacturing environment. Acid 
+loss during PEB may be detrimental (if, for example, it is nonuniform or affects only 
+the top or the bottom of the resist profi le), or it may serve the benefi cial function of stopping the reaction and limiting the sensitivity of the fi nal feature size to bake time or 
+temperature.
+The typical mechanism for delay time acid loss is the diffusion of atmospheric base 
+contaminants into the top surface of the resist. The result is a neutralization of the acid 
+near the top of the resist and a corresponding reduced amplifi cation. For a negative resist, 
+the top portion of a line is not insolubilized and resist is lost from the top of the line. For 
+a positive resist, the effects are more devastating. Suffi cient base contamination can make 
+the top of the resist insoluble, blocking dissolution into the bulk of the resist (Figure 6.3) 
+(a) (b)
+Figure 6.3 Atmospheric base contamination leads to T-top formation. Shown are line/space 
+features printed in APEX-E for: (a) 0.275-mm features with no delay; and (b) 0.325-mm 
+features with 10-minute delay between exposure and post-exposure bake (courtesy of 
+SEMATECH)
+
+
+## Page 9
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 231
+and creating a characteristic ‘T-top’-shaped resist profi le. In extreme cases, no patterns 
+are observed after development.
+The effects of acid loss due to atmospheric base contaminants can be accounted for 
+in a straightforward manner. The base diffuses from the top surface of the resist into the 
+bulk. Assuming that the concentration of base contaminant in contact with the top of the 
+resist remains constant, the diffusion equation can be solved for the concentration of base, 
+B, as a function of depth into the resist fi lm:
+BB z
+B
+= 
+
+ 
+ 0  2
+erfc
+σ
+ (6.22)
+where B0 is the base concentration at the top of the resist fi lm, z is the depth into the resist 
+(z = 0 at the top of the fi lm) and sB is the diffusion length of the base in resist. B0 will 
+be directly proportional to the concentration of base in the atmosphere by Henry’s law 
+(see Problem 6.8). The standard assumption of constant diffusivity has been made here 
+so that the diffusion length goes as the square root of the delay time and as the square 
+root of the diffusivity. Note that this equation assumes that during the post-exposure delay 
+period, the base diffusion length is much greater than the photogenerated acid diffusion 
+length. Since the acid generated by exposure for most resist systems of interest is fairly 
+strong, it is a good approximation to assume that all of the base contaminant will react 
+with acid if there is suffi cient acid present.
+Atmospheric base contamination can be devastating to chemically amplifi ed resist 
+performance because of the very nature of chemical amplifi cation. Since one photogenerated acid causes dozens of dissolution changing events during PEB, loss of even a 
+small amount of acid before the PEB will have an amplifi ed effect. Several different 
+countermeasures are usually taken to reduce the impact of atmospheric base. As Equation 
+(6.22) shows, base contamination in the resist can be reduced by reducing the atmospheric 
+base (B0) or by reducing the base diffusion length. In turn, diffusion length can be reduced 
+by reducing the base diffusivity or by reducing the delay time. In practice, all three of 
+these techniques are commonly used. Photolithography equipment is placed as far as 
+possible from sources of base contaminants (resist strippers and ammonia being common 
+examples). Imaging and resist processing tools are then enclosed and the air is fi ltered 
+with activated charcoal. The delay time between exposure and post-exposure bake is kept 
+to a minimum by directly linking the resist processing track to the step and scan exposure 
+tool. Each wafer is sent to be baked immediately after its exposure is complete. Finally, 
+the diffusivity of base in the resist is reduced by ‘annealing’ the resist. If the post-apply 
+bake temperature is set to be above the glass transition temperature of the resist polymer, 
+solvent and free volume will be annealed out of the resist (see Chapter 5). It is this free 
+volume that enables the diffusion of base into the resist, so elimination of free volume 
+greatly reduces the contaminant diffusivity.
+Another possible acid loss mechanism is base contamination from the substrate, as has 
+been observed on TiN and other nitrogen-containing substrates. These substrates are 
+thought to trap acid that diffuses down to the substrate, resulting in resist footing for a 
+positive resist. Plasma and chemical treatments of nitrogen containing substrates can 
+pacify trapping sites, but the common use of an organic bottom antirefl ection coating 
+(BARC) generally eliminates the possibility of substrate interactions. Acid can also be 
+
+
+## Page 10
+
+232 Fundamental Principles of Optical Lithography
+lost at the top surface of the resist due to evaporation. The amount of evaporation is a 
+function of the size of the acid and the degree of its interaction with the resist polymer. 
+A small acid (such as the trifl uoroacetic acid discussed above) may have very signifi cant 
+evaporation. Thus, most resists today employ fairly large acid molecules to avoid signifi -
+cant acid evaporation.
+6.2.4 Base Quencher
+Another mechanism for acid loss is intentional rather than accidental. Most modern formulations of chemically amplifi ed resists include the addition of a base quencher (compounds such as tetraoctylammonium hydroxide, for example3
+). Loaded at concentrations 
+of 5–20 % of the initial PAG loading, this base quencher (Q) is designed to neutralize 
+any photogenerated acid that comes in contact with it.
+H Q HQ K +←→eq (6.23)
+Acid–base neutralization reactions tend to be equilibrium reactions, but in this case the 
+equilibrium constant Keq is large due to the strength of the acid, meaning the reaction 
+favors heavily the formation of the salt HQ. Thus, it is a good approximation to ignore 
+the reversible nature of the reaction and replace the equilibrium constant with a standard 
+forward reaction rate constant, kQ.
+For low exposure doses, the small amount of photoacid generated will be neutralized 
+by the base quencher and amplifi cation will not take place (Figure 6.4). Only when the 
+exposure rises above a certain threshold will the amount of acid be suffi cient to completely 
+neutralize all of the base quencher and have leftover acid that can cause deblocking during 
+PEB. The main purpose of the base quencher is to neutralize the low levels of acid that 
+might diffuse into the nominally unexposed regions of the wafer, thus making the fi nal 
+resist linewidth less sensitive to acid diffusion. In addition, base quencher will reduce the 
+sensitivity of the resist to airborne base contaminants.
+The simple description of base quenching behavior above is made more complicated 
+by the fact that the quencher will, in general, diffuse during the post-exposure bake. 
+Base quencher diffusion can take on any of the concentration and temperature dependencies described above for acid diffusion. The difference in diffusivity between the acid 
+and the base becomes an important descriptor of lithographic behavior for these types of 
+Q(x)
+H(x)
+H(x)
+Q(x)
+(a) (b)
+Figure 6.4 The effect of quencher (Q) on the acid latent image H(x): (a) after exposure 
+but before the quenching reaction; and (b) after the quenching reaction (assuming Kquench
+>> Kamp)
+
+
+## Page 11
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 233
+resists. Rate equations for the acid and base, for the case of constant diffusivity, are given 
+by
+d
+d
+d
+d
+quench
+quench
+h
+t
+ K hq D h
+q
+t
+ K hq D q
+H
+Q
+=− + ∇
+=− + ∇
+2
+2
+ (6.24)
+where Kquench (= kQG0) is the normalized quenching reaction rate constant and q (= Q/G0) 
+is the normalized base quencher concentration. The impact of diffusion can be understood 
+qualitatively by examining Figure 6.4b. If acid diffuses, but base does not, the zero points 
+(the points at which the acid and base completely neutralize each other) will move toward 
+the outside. If the base diffuses but the acid does not, the opposite will occur and the zero 
+points will move in toward the center of the fi gure. There will be some combination of 
+acid and base diffusion (diffusion lengths about equal) that will leave the zero point stationary. Note that diffusion is driven by the change in the gradient of the diffusing species 
+(a second derivative), so that it is a combination of the diffusivities of the acid and the 
+base and the shape of the latent image that determines which direction the zero point will 
+move.
+If diffusion is ignored and Kquench >> Kamp, the impact of a base quencher is to fi rst 
+order a dose offset – one must generate enough acid to overcome the quencher before 
+amplifi cation can occur. Thus, the simple (nondiffusion) kinetic result of Equation (6.9) 
+becomes
+m hq
+m hq
+K t hq =>
+=<
+−− e when
+when
+amp PEB () 0
+0
+1 0
+ (6.25)
+where the ‘0’ subscript refers to the initial condition (at the beginning of the PEB). Note 
+that in the formulation of the above equation, h represents the relative acid concentration 
+generated upon exposure, but before any quenching takes place.
+The impact of base quencher is most readily seen by comparing latent images of resist 
+formulations with and without quencher. When both resist formulations are exposed at 
+the dose-to-size, with all other processing parameters the same, the latent image slope 
+improves dramatically near the resist feature edge when quencher is added (Figure 6.5).
+6.2.5 Reaction–Diffusion Systems
+The combination of a reacting system and a diffusing system is called a reaction–diffusion 
+system. The solution of such a system is the simultaneous solution of Equations (6.6) 
+and (6.12) using Equation (6.4) as an initial condition and possibly Equation (6.14) or 
+(6.15) to describe the reaction-dependent diffusivity. Of course, any or all of the acid loss 
+mechanisms can also be included.
+The coupling of reaction and diffusion can be made more explicit. The Byers–Petersen 
+model for chemically amplifi ed reactions4 is a superset of the simpler chemically amplifi ed models discussed above. In this model, the amplifi cation reaction is thought to occur 
+by two sequential steps: fi rst, acid diffuses to the reaction site; then, acid reacts at that 
+site (an idea fi rst described by the Polish physicist Marian von Smoluchowski5 in 1917). 
+If the diffusion step is very fast, the overall rate is controlled by the rate of the reaction 
+
+
+## Page 12
+
+234 Fundamental Principles of Optical Lithography
+itself (the amplifi cation is said to be reaction-controlled). If, however, the diffusion is 
+very slow, the overall rate of amplifi cation will be controlled by the rate of diffusion of 
+acid to the site (a diffusion-controlled amplifi cation rate). If Kreact is the rate constant for 
+the reaction step, and KdiffDH is the rate constant (equal to the Smoluchowski trap rate 
+normalized in the same way as Kamp) for the diffusion step, the overall amplifi cation reaction rate constant will have the form
+K K KD
+K KD
+H
+H
+amp
+react diff
+react diff
+= +
+ (6.26)
+where DH is the diffusivity of the acid.
+Note that if Kdiff is very large, then even for moderate values of acid diffusivity the 
+kinetics will be reaction-controlled and Equation (6.26) will become
+KK amp react = (6.27)
+and the Byers–Petersen model will revert to the original chemically amplifi ed resist model 
+given above. In general, the activation energies for Kreact and for DH will be different and 
+it is possible for the overall reaction to switch from diffusion-controlled to reactioncontrolled as a function of PEB temperature. For example, if the activation energy for the 
+diffusion portion of the reaction is much smaller than the reaction activation energy, the 
+overall reaction will be reaction-controlled at lower temperatures and diffusion-controlled 
+at higher temperatures (Figure 6.6). Kdiff represents the likelihood that the acid will be 
+captured by a blocked site so that the reaction can occur. In the diffusion-controlled 
+region, Kreact is very high and
+K K D D aG N amp diff == H HA 4π 0 (6.28)
+where a is the capture distance for the deblocking reaction (once the acid approaches the 
+reaction site closer than the capture distance, a deblocking reaction is possible).
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+–130 –65 0 65 130
+Horizontal Position (nm)
+Relative Blocked Polymer
+q0 = 0
+q0 = 0.15
+Figure 6.5 The effect of quencher on the shape of the latent image. Both resists have identical processing, except that the dose for each is adjusted to be the dose-to-size (130-nm lines 
+and spaces)
+
+
+## Page 13
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 235
+As was discussed at the end of section 6.2.1, there is a trade-off in chemically amplifi ed 
+resists between exposure dose and thermal dose. Ignoring diffusion and acid loss, there 
+is an approximate reciprocity between the two forms of dose. Generally, thermal dose is 
+increased by an increase in the bake temperature (for production throughput reasons, PEB 
+time is generally varied only over a small window). However, as the above discussion 
+has shown, diffusion also varies exponentially with PEB temperature. Since there is an 
+upper limit to the desired diffusion length of acid (and of base quencher), there is a practical upper limit to the temperature that can be used. And because of the exponential nature 
+of the thermal dose with temperature, there is a practical minimum temperature that still 
+provides for a low-enough dose to give good exposure tool throughput. Typically, the 
+useful range of PEB temperatures for chemically amplifi ed resists is at most 20 °C.
+6.3 Measuring Chemically Amplifi ed Resist Parameters
+Since most chemically amplifi ed resists do not bleach, the traditional optical transmittance 
+experiment for measuring the ABC parameters gives no information about C. Other 
+approaches have been devised to measure C that take advantage of the strength of the 
+acid being generated in a chemically amplifi ed resist. Direct measurement of the acid 
+concentration is possible using titration, or indirectly using fl uorescence. Alternatively, 
+resist formulations with varying amounts of added base can be used to measure acid 
+generation by determining the dose required to overcome the added base.
+Deblocking during the chemical amplifi cation reaction leads to the generation of volatile components that evaporate out of the resist during PEB. This slightly unpleasant side 
+effect of amplifi cation can be used as a way to measure the kinetics of the amplifi cation 
+reaction.6
+ Evaporation of volatile components at the relatively high PEB temperatures 
+0.000001
+0.00001
+0.0001
+0.001
+0.01
+0.1
+1
+10
+100
+0.0022 0.0024 0.0026 0.0028 0.003 0.0032
+1/Absolute Temperature
+Rate Constant (1/s)
+Reaction
+Diffusion
+Overall
+DiffusionControlled
+Region
+ReactionControlled
+Region
+Figure 6.6 An Arrhenius plot (log of the rate constant versus the inverse of absolute 
+temperature) for Kamp when the diffusion and amplifi cation rate constants have different activation energies (diffusion activation energy = 26.5kcal/mol; reaction activation energy =
+45kcal/mol)
+
+
+## Page 14
+
+236 Fundamental Principles of Optical Lithography
+used allows the fi lm to relax and shrink. For a large open-frame exposure, the thickness 
+loss after PEB is directly proportional to the average amount of deblocking that takes 
+place through the thickness of the fi lm (a good BARC should be used to avoid standing 
+waves). If the maximum amount of fi lm shrinkage, corresponding to 100 % deblocking 
+of the polymer, can be measured, fi lm shrinkage after PEB can be directly related to the 
+fractional amount of blocked groups left. By measuring fi lm shrinkage versus dose, both 
+the quencher concentration and the amplifi cation rate constant can be obtained. By repeating this measurement at different PEB temperatures, the activation energy of the amplifi cation can also be measured.
+Figure 6.7 shows an example of the PEB kinetics measured using the PEB thickness 
+loss measurement technique. Initially, no thickness loss is observed because the doses 
+are not large enough to overcome the base quencher present in the resist. Past the dose 
+required to neutralize all of the base quencher, the blocked fraction decreases as an exponential function, with the rate of decrease dependent on the amplifi cation rate constant 
+(and thus on the temperature). This fi gure also illustrates one of the major diffi culties of 
+this technique. Because the PEB time is fi xed, there is no guarantee that even at the highest 
+temperatures and highest exposure doses the resist will approach 100 % deblocking. It is 
+quite diffi cult to ensure that the measurement of the 100 % deblocking thickness loss used 
+to calibrate this technique does in fact correspond to 100 % deblocking.
+A more direct method of measuring chemical kinetics during PEB involves the use of 
+Fourier transform infrared (FTIR) spectroscopy. Absorbance peaks as a function of wavelength indicate specifi c bonds in the various chemical species in the resist. As bonds are 
+broken and formed during amplifi cation, peaks of the FTIR spectrum appear and disappear, providing a quantifi able measure of the extent of reaction. FTIR equipment mounted 
+directly above the PEB hot plate can measure these spectra in real time during the bake. 
+However, since silicon is mostly transparent to IR light, a backside wafer coating of metal 
+is required to provide a refl ected signal to detect,7
+ or a hole in the hot plate must be used 
+for measurement in transmission mode.8
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0 50 100 150 200
+Exposure Dose (mJ/cm2)
+Fraction Blocked
+100 ºC
+110 ºC
+120 ºC
+Figure 6.7 Example of PEB amplifi cation kinetics measured by using thickness loss after PEB 
+to estimate the fraction of polymer that remains blocked
+
+
+## Page 15
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 237
+The most diffi cult parameters to measure for chemically amplifi ed resists are the acid 
+and base diffusivities (the diffi culties increase if these diffusivities vary with extent of 
+amplifi cation). In general, these parameters are empirically determined by matching predictions to experimental linewidth data.
+6.4 Stochastic Modeling of Resist Chemistry
+The theoretical descriptions of lithography given so far in this book make an extremely 
+fundamental and mostly unstated assumption about the physical world being described: 
+the so-called continuum approximation. Even though light energy is quantized into 
+photons and chemical concentrations are quantized into spatially distributed molecules, 
+the descriptions of aerial images and latent images ignore the discrete nature of these 
+fundamental units and use instead continuous mathematical functions. For example, the 
+very idea of chemical concentration assumes that the volume one is interested in is large 
+enough to contain many, many molecules so that an average number of molecules per 
+unit volume can be used. While we can mathematically discuss the idea of the concentration of some chemical species at a point in space, in reality this concentration must be 
+an average extended over a large enough region. While in most cases the volumes of 
+interest are large enough not to worry about this distinction, when trying to understand 
+lithography down to the nanometer level the continuum approximation begins to break 
+down.
+When describing lithographic behavior at the nanometer level, an alternate approach, 
+and in a very real sense a more fundamental approach, is to build the quantization of light 
+as photons and matter as atoms and molecules directly into the models used. Such an 
+approach is called stochastic modeling, and involves the use of random variables and 
+probability density functions to describe the statistical fl uctuations that are expected. Of 
+course, such a probabilistic description will not make deterministic predictions – instead, 
+quantities of interest will be described by their probability distributions, which in turn are 
+characterized by their moments, such as the mean and variance.
+6.4.1 Photon Shot Noise
+Consider a light source that randomly emits photons at an average rate of L photons per 
+unit time into some area A. Assume further that each emission event is independent. Over 
+some small time interval dt (smaller than 1/L and small enough so that it is essentially 
+impossible for two photons to be emitted during that interval), either a photon is emitted 
+or it is not (a binary proposition). The probability that a photon will be emitted during 
+this interval will be Ldt. Consider now some long time T (>> dt). What can we expect 
+for the number of photons emitted during the period T? This basic problem is called a 
+Bernoulli trial and the resulting probability distribution is the well-known binomial distribution. If N = T/dt, the number of time intervals in the total time, then the probability 
+that exactly n photons will be emitted in this time period, P(n), will be
+Pn
+N
+n Lt Lt N
+N nn
+Lt Lt n Nn n Nn ( ) ( )( ) !
+( )! ! = ( )( ) 
+
+ 
+
+ −= − − −− dd dd 11 (6.29)
+
+
+## Page 16
+
+238 Fundamental Principles of Optical Lithography
+The binomial distribution is extremely cumbersome to work with as N gets large. If, 
+however, NLdt = TL remains fi nite as N goes to infi nity, the binomial distribution converges to another, more manageable equation called the Poisson distribution:
+lim ( ) ( ) ()
+N !
+n Nn
+n N TL
+n Lt Lt TL
+→∞ n
+ −−
+
+ 
+
+ dd e 1−= (6.30)
+Since there is no limit to how small dt can be made, letting dt go to zero will by default 
+make N go to infi nity for any nonzero time interval T and nonzero photon emission 
+rate L. In general, the Poisson distribution is a good approximation to the binomial 
+distribution whenever TL > 1 (that is, you expect to see more than one photon in the 
+allotted time).
+The Poisson distribution can be used to derive the statistical properties of photon emission. The expectation value of n [that is, the mean number of photons that will be emitted 
+in a time interval T, denoted by the notation E(n) or 〈n〉] is TL (a very reasonable result 
+since L was defi ned as the average rate of photon emission):
+n E n nP n
+n TL
+n
+TL
+n T
+n
+n
+TL
+n
+TL
+n
+n
+≡=
+== − =
+=
+∞
+−
+=
+∞
+−
+=
+∞
+∑
+∑∑
+() ()
+()
+!
+()
+( )!
+0
+01 1
+ee L TL
+n TL TL
+m
+m
+e−
+=
+∞
+∑ = ()
+( )! 0
+ (6.31)
+The variance (the standard deviation squared) is also TL.
+σn E n n E n n TL 2 2 2 2 ≡− ()  
+ = () −= (6.32)
+To use these statistical properties, we must convert from number of photons to a more 
+useful measure, intensity. If n photons cross an area A over a time interval T, the intensity 
+of light will be
+I n
+TA
+hc = 
+
+
+λ  (6.33)
+The mean value of this intensity will be
+I n
+TA
+hc L
+A
+hc = 
+
+
+ = 
+
+λλ  (6.34)
+The standard deviation of the intensity can also be computed from the properties of the 
+Poisson distribution.
+σ λ In σ
+TA
+hc I
+TL
+I
+n = 
+
+
+ == 1 (6.35)
+As this equation shows, the uncertainty of getting the mean or expected intensity grows 
+as the number of photons is reduced, a phenomenon known as shot noise. Perhaps a more 
+useful form is to consider the standard deviation as a fraction of the average value.
+σσ λ In
+In n I TA
+hc == = 
+
+
+
+
+
+ 
+
+
+− 1 12/
+ (6.36)
+
+
+## Page 17
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 239
+The shot noise (the relative uncertainty in the actual intensity that the resist will see) 
+increases with decreasing intensity, exposure time and area of concern.
+As an example, consider a 193-nm exposure of a resist with a dose-to-clear of 10 mJ/
+cm2
+. At the resist edge, the mean exposure energy (=〈I〉T) will be on the order of the 
+dose-to-clear. At this wavelength, the energy of one photon, hc/l, is about 1.03 × 10−18 J. 
+For an area of 1 × 1 nm, the mean number of photons during the exposure, from Equation 
+(6.34), is about 97. The standard deviation is about 10, or about 10 % of the average. For 
+an area of 10 nm × 10 nm, the number of photons increases by a factor of 100, and the 
+relative standard deviation decreases by a factor of 10, to about 1 %. Since these are 
+typical values for a 193-nm lithography process, we can see that shot noise contributes a 
+noticeable amount of uncertainty as to the actual dose seen by the photoresist when 
+looking at length scales less than about 10 nm.
+For Extreme Ultraviolet Lithography (EUVL), the situation will be considerably worse. 
+At a wavelength of 13.5 nm, the energy of one photon will be 1.47 × 10−17 J, about 15 times 
+greater than at 193 nm. Also, the goal for resist sensitivity will be to have EUV resists that 
+are 2–4 times more sensitive than 193-nm resists (though it is unclear whether this goal 
+will be achieved). Thus, the number of photons will be 30–60 times less for EUV than for 
+a 193-nm lithography. A 1 × 1 nm area will see only two to three photons, and a 100-nm2
+area will see on the order of 200 photons, with a standard deviation of 7 %.
+6.4.2 Chemical Concentration
+As mentioned above, there really is no such thing as concentration at a point in space 
+since the chemical species is discrete, not continuous. Concentration, the average number 
+of molecules per unit volume, exhibits counting statistics identical to photon emission. 
+Let C be the average number of molecules per unit volume, and dV a volume small enough 
+so that at most one molecule may be found in it (thus requiring that the concentration be 
+fairly dilute, so that the position of one molecule is independent of the position of other 
+molecules). The probability of fi nding a molecule in that volume is just CdV. For some 
+larger volume V, the probability of fi nding exactly n molecules in that volume will be 
+given by a binomial distribution exactly equivalent to that for photon counting. And, for 
+any reasonably large volume (CV > 1), this binomial distribution will also be well approximated by a Poisson distribution.
+Pn CV
+n
+n
+CV () ()
+! = − e (6.37)
+The average number of molecules in the volume will be CV, and the variance will also 
+be CV. The relative uncertainty in the number of molecules in a certain volume will be
+σn
+n n CV == 11 (6.38)
+[The requirement that the concentration be ‘dilute’ can be expressed as an upper limit to 
+the Poisson distribution – for a given molecule size, saturation occurs at some nmax molecules in the volume V. So long as P(nmax) is small, the mixture can be said to be dilute.9
+]
+As an example, consider a 193-nm resist that has an initial PAG concentration of 3 % 
+by weight, or a concentration of about 0.07 mole/liter (corresponding to a density of 
+
+
+## Page 18
+
+240 Fundamental Principles of Optical Lithography
+1.2 g/ml and a PAG molecular weight of 500 g/mole). Converting from moles to molecules 
+with Avogadro’s number, this corresponds to 0.042 molecules of PAG per cubic nanometer. In a volume of (10 nm)3
+, the mean number of PAG molecules will be 42 (see Figure 
+6.8). The standard deviation will be 6.5 molecules, or about 15 %. For 248-nm resists, 
+the PAG loading is typically 3 times higher or more, so that closer to 150 PAG molecules 
+might be found in a (10-nm)3 volume, for a standard deviation of 8 %. Note that when 
+the mean number of molecules in a given volume exceeds about 20, the Poisson distribution can be well approximated with a Gaussian distribution.
+As mentioned briefl y above, Poisson statistics apply only for reasonably low concentrations. The random distribution of molecules assumes that the position of each molecule 
+is independent of all the others. As concentrations get higher, the molecules begin to 
+‘crowd’ each other, reducing their randomness. In the extreme limit, molecules become 
+densely packed and the uncertainty in concentration goes to zero. This saturation condition is a function of not only the concentration, but the size of the molecule as well. To 
+avoid saturation, the volume fraction occupied by the molecules under consideration must 
+be small.
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+0.30
+0 5 10 15
+Number of PAGs per Volume Element
+Probability
+V = (4 nm)3
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0.14
+0 10 20 30
+Number of PAGs per Volume Element
+Probability
+V = (6 nm)3
+0.00
+0.01
+0.02
+0.03
+0.04
+0.05
+0.06
+0.07
+0 20 40 60 80
+Number of PAGs per Volume Element
+Probability
+V = (10 nm)3
+(a) (b)
+(c)
+Figure 6.8 Example Poisson distributions for a typical 193-nm resist (G0NA = 0.042/nm3): 
+(a) volume of 64nm3
+; (b) volume of 216nm3; and (c) volume of 1000nm3. For (c), a 
+Gaussian distribution with the same mean and standard deviation as the Poisson distribution 
+is shown as a solid line
+
+
+## Page 19
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 241
+6.4.3 Some Mathematics of Binary Random Variables
+The mathematical approach to be taken below in considering the stochastic nature of 
+molecular events (such as absorption, reaction or diffusion) is to defi ne a binary random 
+variable to represent the result of that event for a single molecule. For example, we 
+may let y be a random variable that represents whether a given single PAG molecule 
+was converted to acid or remains unexposed by the end of the exposure process. Thus, 
+y = 1 if the event has happened, and y = 0 if the event has not happened. Then, by 
+considering the kinetics of the event or some other physical model of how that event 
+might happen, we assign a probability P to the event. Since the event is binary, P(y = 1) 
+= 1 − P(y = 0).
+We next consider some properties of the random variable y. In particular, what is the 
+mean and variance of y? The mean value of y uses the defi nition of the expectation value 
+for a discrete random variable:
+y E y yP y P P P i
+i
+≡= = + = i
+=
+( ) ( ) ( ) ( ) () () () ∑01,0 0 11 1 (6.39)
+Likewise, the variance of y is
+σ y E y y Ey y 2 2 2 2 ≡− ( ) () () =− (6.40)
+But, since y is binary, y2 = y and
+σ y yy y y 2 2 =− = − () 1 (6.41)
+Thus, if an appropriate probability for a molecular event can be assigned, the mean and 
+variance of the binary random variable y, representing that event for a single molecule, 
+can easily be calculated. Of course, these results are simply the properties of a binomial 
+distribution, which is the probability distribution of a binary random variable. Interestingly, the random variable y has no uncertainty at the extremes of the event process (〈y〉
+= 1 or 〈y〉 = 0), and maximum uncertainty when 〈y〉 = 0.5.
+Now consider a collection of molecules. Suppose a volume V contains some number 
+n molecules. After the event process is complete (e.g. at the end of exposure), the number 
+of molecules Y in that volume that underwent the event will be
+Yyi
+i
+n
+= =
+∑1
+ (6.42)
+where yi is the discrete random variable representing the state of the ith molecule found 
+in this volume (each event in the volume is assumed independent). For a given n, the 
+mean and variance of Y can be readily computed:
+Yn y ny
+n
+i
+i
+n
+Yn y
+i
+n
+y
+==
+==
+=
+=
+∑
+∑
+1
+22
+1
+2 σ σσ
+ (6.43)
+where the notation 〈a|b〉 signifi es the mean value of a for a given b.
+
+
+## Page 20
+
+242 Fundamental Principles of Optical Lithography
+But n itself is not a fi xed quantity and will in general follow a Poisson statistical distribution, as discussed in section 6.4.2. To fi nd the mean value of Y including the statistical 
+variation of n,
+EY Y Yn n
+n yn nn ny
+n
+n
+n
+n
+n
+n
+() !! == = = −
+=
+∞
+−
+=
+∞
+∑∑ ee 00
+ (6.44)
+Likewise, the variance of Y can be computed from
+σY E Y Y EY Y 2 2 2 2 =− () =− () (6.45)
+Starting the calculation of the expectation value of Y2
+,
+EY E y E yy E E yy i
+i
+n
+ij
+j
+n
+i
+n
+ij () ( ) 2
+1
+2
+1 1
+= 
+
+ 
+
+
+
+
+
+
+
+ = 
+
+ 
+
+ = == =
+∑∑∑
+j
+n
+i
+n
+= =
+∑∑ 
+
+ 
+
+ 1 1
+ (6.46)
+Assuming that the exposure state of each molecule is independent of the states of the 
+others,
+E yy E y i j
+E yy E y E y i j
+ij
+ij i j
+( ) ()
+( ) ()( )
+==
+=≠
+2 ,
+,
+ (6.47)
+giving
+E Y E n n y nE y E n y n y E n E n yy ( ) [ ( ) ( )] [ ] ( ) ( ) 2 2 22 2 2 2 22 = − + = += + 1 σσ (6.48)
+But, since
+En n n () 22 2 =+ σ (6.49)
+we can combine Equations (6.45), (6.48) and (6.49) to give
+σ σσ Y ny yn 2 2 22 =+ (6.50)
+The variance of n, for a Poisson distribution, is just the mean value of n. Thus,
+σσ Yy ny 2 2 2 =+ () (6.51)
+Using the variance of y from Equation (6.41),
+σY n y y y ny Y 2 2 = +−  () 1  
+ == (6.52)
+Like the Poisson distribution of molecules before the event process begins, the variance 
+of the fi nal distribution is equal to its mean. In the sections below, these simple results 
+will be applied to the specifi c chemical events of exposure, diffusion and reaction.
+6.4.4 Photon Absorption and Exposure
+What is the probability that a photon will be absorbed by a molecule of light-sensitive 
+material in the resist? Further, what is the probability that a molecule of sensitizer will 
+react to form an acid? As discussed above, there will be a statistical uncertainty in the 
+number of photons in a given region of resist, a statistical uncertainty in the number of 
+PAG molecules, and additionally a new statistical uncertainty in the absorption and exposure event itself.
+
+
+## Page 21
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 243
+Consider a single molecule of PAG. First-order kinetics of exposure was used to derive 
+Equation (6.3), the concentration of PAG remaining after exposure (and, as well, the 
+concentration of acid generated) in the continuum approximation (this is also called the 
+mean-fi eld solution to the kinetics of exposure). From a stochastic modeling perspective, 
+this kinetic result represents a probability density function for reaction: G/G0 is the fraction of PAG that is unreacted in some large volume, and by the Law of Large Numbers 
+this must be the probability that any given PAG will remain unexposed. Let y be a random 
+variable that represents whether a given single PAG molecule remains unexposed or was 
+converted to acid by the end of the exposure process. Thus y = 0 means an acid has been 
+generated (PAG has reacted), and y = 1 means the PAG has not been exposed (no acid 
+generated). A kinetic analysis of exposure gives us the probability for each of these states, 
+given a certain intensity-in-resist I:
+Py I Py I CIt CIt ( ) () = =− = = −− 01 1 e, e (6.53)
+For a given intensity, the mean value of y can be calculated using the defi nition of a discrete probability expectation value:
+yI P I CIt == − () 1e (6.54)
+Likewise, the variance of y for a given intensity is
+σ yI CIt CIt yy 2 =− () 11 =− −− ee () (6.55)
+Note that the above equations were carefully derived under the assumption of a given 
+intensity of light. However, we know from our discussion of photon counting statistics 
+that I is a probabilistic function [the aerial image intensity I(x) can be thought of as proportional to the probability of fi nding a photon at position x]. Thus, the mean and variance 
+of y must take into account this probabilistic nature. Letting n be the number of photons 
+exposing a given area A over an exposure time t [related to I by Equation (6.33)], it will 
+be useful to defi ne a new constant:
+CIt n hc C
+A
+a
+NA A
+M
+A
+M == 
+
+ 
+
+ == − ψψ λ
+σ which leads to ΦΦ abs (6.56)
+where the last two equations come from the microscopic absorption analysis presented 
+in Chapter 5. The term y is the exposure shot noise coeffi cient, and is equal to the exposure quantum effi ciency multiplied by the ratio of the PAG absorption cross section to 
+the area of statistical interest. Since the exposure quantum effi ciency is typically in the 
+0.3–0.7 range and the PAG absorption cross section is on the order of 1 Å2 for 193-nm 
+resists, for most areas of interest this exposure shot noise coeffi cient will be much less 
+than 1.
+Using this exposure shot noise coeffi cient to convert intensity to number of photons, 
+the total probability becomes
+Py n PynPn
+n
+n y
+n
+n y
+n
+n
+n
+n
+n
+n
+( ) ( )()
+() !
+!
+and
+e e for
+e e for
+==
+−=
+=
+ −−
+−−
+10
+1
+ψ
+ψ
+
+
+
+
+
+
+ (6.57)
+
+
+## Page 22
+
+244 Fundamental Principles of Optical Lithography
+y yP y n n
+n y n
+n
+n
+n
+n
+== ∑∑ ∑=
+∞
+−−
+=
+∞
+( ) () !and e e 00
+ψ (6.58)
+Evaluating the summation (and recognizing the Taylor series expansion of an 
+exponential),
+y n
+n
+n
+n
+n
+n ==
+−
+−
+=
+∞
+−− ∑() −
+!
+() e
+ee e
+ψ ψ
+0
+1 (6.59)
+When y is small, the exact expression (6.59) can be approximated as
+y nn
+n CIt CIt
+=≈
+= [] ==
+−− − −
+− − −− −
+−
+ee
+e e ee
+( ) (.) e
+/ / []
+1 05
+12 12
+ψ 2 ψψ
+ψ ψ ψψ2 2
+2
+1
+n CIt 2 Ct I / ()
+= − ee σ
+ (6.60)
+This fi nal approximate form can be derived in an alternate way. For a reasonable number 
+of photons (greater than about 20), the Poisson distribution of photons is well approximated by a normal distribution of the same mean and variance. A normal distribution for 
+I will result in a log-normal distribution for y. The fi nal equation on the right-hand side 
+of Equation (6.60) is the well-known result for the mean of a log-normal distribution.
+As often happens when taking statistical distributions into account, the mean value of 
+the output of the function is not equal to the function evaluated at the mean value of the 
+input. Another approximate form for the mean value of y is
+yy y y y CIt ≈+ = − c cc c ( ) where e ψ
+2 ln( ) (6.61)
+Since (yc)ln(yc) is always negative (it goes between zero and about −0.37), the mean value 
+of y is always less than the value of the function y evaluated at the mean value of the 
+intensity. When averaging over a large area, y goes to zero, so that yc can be thought of 
+as the mean value of y when averaged over a large area (that is, in the continuum limit). 
+As the area over which we average our results decreases, the mean value of y (which is 
+the same as the mean value of the relative acid concentration, as we will see below) 
+decreases due to shot noise.
+The mean value and uncertainty of the state of one acid molecule after exposure can 
+now be translated into a mean and uncertainty of the overall acid concentration after 
+exposure. Consider a volume V that initially contains some number n0−PAG PAG molecules. 
+After exposure, the number of photogenerated acid molecules Y will be
+Yyi
+i
+n
+= =
+−
+∑1
+0 PAG
+ (6.62)
+Assuming that each exposure event is independent, the results from section 6.4.3 give the 
+mean of Y:
+Yn y = 0 PAG − (6.63)
+The variance becomes
+σ σψ Y Ct n YY YY 2 I 22 2 2= + −= + − 11 () ( ) () ee (6.64)
+
+
+## Page 23
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 245
+Since y will in general be small,
+σψ ψ Y Y Y n Y Y CIt Y Y CIt
+n
+2 2 2 2
+2 2
+≈+ =+ =+ () () () (6.65)
+The variance of Y has two components. The Poisson chemical distribution gives the fi rst 
+term, 〈Y〉. Photon shot noise adds a second term, inversely proportional to the mean 
+number of photons.
+At this point it is useful to relate the number of acid molecules per unit volume Y to 
+the concentration of acid H, and the initial number of PAGs n0−PAG to the initial PAG 
+concentration G0.
+HG Y
+NV
+G n
+AA NV =− = −
+00
+0 , PAG (6.66)
+We can also defi ne a relative acid concentration h to be
+h H
+G
+G
+G
+Y
+n
+n
+n
+Y
+n ==− = − −
+−
+0 −−
+0
+00
+0
+PAG 00
+PAG
+PAG PAG
+ (6.67)
+The means of these quantities can be related by
+h H
+G
+Y
+n = =− =− y 00−
+11 PAG
+ (6.68)
+Using Equation (6.67),
+σ
+σ h
+h Y
+n
+Y
+n
+2
+0
+2
+0
+2 =+ −
+−PAG −PAG
+ (6.69)
+Finally, using Equation (6.65), the variance in acid concentration will be
+σh
+h
+n
+hh
+n
+2
+0
+2 11
+=+ () − () −
+−PAG
+[ ln ] (6.70)
+This fi nal result, which accounts for photon fl uctuations, uncertainty in the initial concentration of photoacid generator, and the probabilistic variations in the exposure reaction 
+itself, is reasonably intuitive. The fi rst term on the right-hand side of Equation (6.70) is 
+the expected Poisson result based on exposure kinetics – the relative uncertainty in the 
+resulting acid concentration after exposure goes as one over the square root of the mean 
+number of acid molecules generated within the volume of interest. For large volumes 
+and reasonably large exposure doses, the number of acid molecules generated is large 
+and the statistical uncertainty in the acid concentration becomes small. For small volumes 
+or low doses, a small number of photogenerated acid molecules results in a large 
+uncertainty in the actual number within that volume. The second term accounts for photon 
+shot noise. For the case of the (10 nm)3
+ of 193-nm resist given above, the standard deviation in initial acid concentration near the resist edge (where the mean acid concentration 
+will be about 0.4) will be >20 %. For 193-nm resists, the impact of photon shot noise is 
+minimal compared to variance in acid concentration caused by simple molecular position 
+uncertainty.
+
+
+## Page 24
+
+246 Fundamental Principles of Optical Lithography
+6.4.5 Acid Diffusion, Conventional Resist
+In Chapter 5, diffusion was treated using a Gaussian diffusion point spread function 
+(DPSF) – the latent image after diffusion is the initial latent image convolved with a 
+Gaussian, whose standard deviation s is called the diffusion length. From a stochastic 
+modeling perspective, the Gaussian represents a probability distribution: for a particle 
+initially at some position, the Gaussian DPSF, given by
+DPSF r = −− () 2 2 32 2 22πσ // σ e (6.71)
+represents the probability density of fi nding that particle some distance r from its original 
+location. This probability distribution is itself derived from a stochastic look at the possible motions of the particle during the bake. Given that the particle can randomly move 
+in any possible direction at a particular speed determined by its diffusivity, and can change 
+directions randomly, the resulting path of the particle is called a random walk. Averaging 
+over all possible random walk paths produces the Gaussian probability distribution (when 
+the diffusivity is constant).
+How does diffusion affect the statistical fl uctuations of concentration? The latent image 
+of acid after exposure, h(x,y,z), as used in the continuum approximation, is actually the 
+mean relative concentration 〈h〉, with a variance given by Equation (6.70). Ignoring the 
+photon shot noise, the probability distribution for the number of acids in a given volume 
+is approximately Poisson. Now consider a PEB process that causes only diffusion of acid 
+(such as for a conventional resist). The mean acid concentration will ‘diffuse’ as was 
+described in the continuum approximation of Chapter 5, convolving the initial acid latent 
+image with the DPSF. The stochastic uncertainty in acid concentration will still be given 
+by Equation (6.70), but with a new mean ‘after diffusion’ concentration of acid 〈h*〉. 
+Ignoring photon shot noise,
+σh
+A
+h
+NV * h h DPSF * = =⊗ ,* (6.72)
+The proof of this result (which will be sketched briefl y here) becomes evident by considering fi rst the diffusion of a single acid molecule, located at some initial position 
+designated by the subscript i. Defi ning a binary random variable yi to represent whether 
+that molecule is found in some small volume dV located a distance ri from its original 
+location,
+Py V i ri ( )( ) == −− 12 2 32 2 22πσ // σ ed (6.73)
+This binary random variable will follow all of the properties derived in section 6.4.3:
+y Py y y i i yi i == = − i () ( ) 11 2 , σ (6.74)
+If, instead of one acid molecule at a certain location which then diffuses, there are ni acid 
+molecules at this location that then diffuse, the total number of acid molecules in that 
+volume dV will be Yi, again with the properties derived in section 6.4.3:
+Y y Y ny Y i ik
+k
+n
+i ii Y i
+i
+== =i
+=
+∑1
+2 ,, σ (6.75)
+
+
+## Page 25
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 247
+Adding up the contributions from all of the locations that could possibly contribute 
+acid molecules into the volume dV produces the convolution result of Equation (6.72).
+YY
+Y Y ny n V
+i
+i
+i ii
+i i
+i r
+i
+i
+=
+== = ()
+∑
+∑∑ ∑ − − 2 2 32 2 22
+πσ σ / / ed
+ (6.76)
+Here, a summation over i is equivalent to an integration over all space, so that the fi nal 
+summation becomes an integral, which in this case becomes a convolution.
+Y n DPSF =⊗ (6.77)
+How does diffusion affect the variance of the post-diffusion concentration?
+σY
+i
+i
+i
+i
+j
+j
+i
+EY Y
+E Y E Y E Y Y E YY
+22 2
+2
+2
+=−
+= 
+
+ 
+
+
+
+
+ 
+
+ = 
+
+ 
+ ∑ ∑∑  =
+()
+() ( j
+i j
+ik jl
+l
+n
+k
+n
+i j
+E Eyy
+j i
+∑∑ ∑ ) () =∑∑ ∑
+
+
+ 
+
+ =1 =1
+ (6.78)
+Since the diffusion of a given molecule is independent of all of the other molecules,
+E y y E y ik jl
+E y y E y E y ik jl
+ik jl ik
+ik jl ik jl
+( ) ()
+( ) ( )( )
+==
+=≠
+2 ,
+,
+ (6.79)
+As a result, the variance follows in the same way as shown in section 6.4.3:
+σσ YY
+i
+i Y 22 == ∑ (6.80)
+Thus, diffusion does not intrinsically increase the uncertainty in acid concentration due 
+to the extra stochastic process of the random walk, nor does it intrinsically ‘smooth out’
+any uncertainties through the process of diffusion. Only through a change in the mean 
+concentration does diffusion affect the uncertainty in the concentration. For a typical 
+conventional resist, the concentration of exposure products near the edge of the resist 
+feature does not change appreciably due to diffusion during PEB. Thus, it is unlikely 
+that diffusion will have a signifi cant impact on the concentration statistics near the 
+resist line edge.
+6.4.6 Acid-Catalyzed Reaction–Diffusion
+Of course, for a chemically amplifi ed resist acid diffusion is accompanied by one or more 
+reactions. In this section and the next, we’ll consider only the polymer deblocking reaction (acid-quencher neutralization will be discussed in a following section). In the continuum limit, the amount of blocked polymer left after the PEB is given by
+MM
+h xyx
+t
+h x y z t DPSF t
+Kth
+t
+=
+= =⊗
+−
+0
+0
+1 0
+e
+,, ,,, d
+amp PEB eff
+eff
+PEB
+( ) (( ) )
+PEB
+,,, ∫ = =⊗ h x y z t RDPSF () 0 (6.81)
+As before, the latent image of acid after exposure, h(x,y,z, t = 0) used in the continuum 
+approximation is actually the mean acid concentration 〈h〉, with a standard deviation given 
+
+
+## Page 26
+
+248 Fundamental Principles of Optical Lithography
+above. The effective acid concentration, however, has a very specifi c interpretation: it is 
+the time average of the acid concentration at a given point. The interesting question to 
+be answered, then, is whether this time-averaging effect of diffusion coupled with the 
+acid-catalyzed reaction affects the uncertainty in the effective acid concentration compared to the original acid concentration uncertainty.
+To determine the statistical properties of the effective acid concentration, we’ll begin 
+as we did for the pure diffusion case in the previous section by looking at the diffusion 
+of a single molecule of acid. Let the binary random variable yi(t) represent whether that 
+molecule is found in some small volume dV located a distance ri from its original location, during the interval of time between t and t + dt.
+P y t V Dt i ri ( () ) ( ) == = −− 12 2 2 32 2 2 22πσ σ // σ e d, (6.82)
+For ni acid molecules at this location that then diffuse, the total number of acid molecules 
+in that volume dV and over the same time interval will be Yi(t), again with the properties 
+derived in the previous section:
+Yt y t Yt n yt Yt i ij
+j
+n
+i ii Y i
+i
+i () () () () () = == =
+∑1
+2 ,, σ (6.83)
+Adding up the contributions from all of the locations that could possibly contribute acid 
+molecules into the volume dV during the interval of time between t and t + dt produces 
+the standard convolution result:
+Yt Yt
+Y t n y t n DPSF t
+i
+i
+ii
+i
+() ()
+() () ()
+=
+= =⊗
+∑
+∑ (6.84)
+So far, the results are identical to that for pure diffusion since we have only considered 
+how many acids are in the volume at time t. We now wish to integrate over time, from 
+0 to tPEB.
+Y
+t
+Yt t
+Y
+t
+Yt t
+t
+n DPSF t t
+t
+tt
+=
+= =⊗
+∫
+∫
+1
+11
+0
+00
+PEB
+PEB PEB
+d
+dd
+PEB
+PEB P
+()
+() ()
+EB
+∫ =⊗ n RDPSF
+ (6.85)
+Thus, as expected, the effective acid concentration used in the continuum approximation 
+is in fact the mean value of a stochastic random variable. The uncertainty of Y, however, 
+involves some extra complications. Proceeding as we have done in the past,
+σY
+t
+EY Y
+EY
+t
+E Yt t
+t
+22 2
+2
+2
+0
+2
+11
+=−
+= 
+
+ 
+
+
+
+
+
+
+
+
+
+ = ∫
+()
+( ) () PEB PEBd
+PEB
+2
+00
+2
+0
+1
+E Yt t Yt t
+t
+EYtYt
+tt
+t
+() ( )
+( ) ()
+dd
+PEB PEB
+PE
+PEB
+∫∫ ′′ 
+
+ 
+
+
+= () ′ PEB B
+dd ∫ ∫ tt′
+t
+0
+ (6.86)
+
+
+## Page 27
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 249
+What is different in this case compared to previous derivations is that Y(t′) and Y(t) are 
+not independent. If an acid fi nds itself in the volume of interest at time t, the probability 
+of fi nding that same acid in the same volume at time t′ will be greater than if the acid 
+had not been found in the volume at time t. Thus, there will be some correlation between 
+Y(t′) and Y(t) that will be strongest when t′ is close to t, and diminish as the difference 
+between the two times increases.
+Applying the defi nition of Y(t) to Equation (6.86),
+EY
+t
+E yt yt t t ij
+j
+n
+i
+kl
+l
+n
+k
+t ik
+( ) () ( ) 2
+2
+0 11
+1 = ′ 
+
+ 
+
+ ′
+==
+∑∑ ∑ ∑ PEB
+d d
+PEB PEB
+∫ ∫ 0
+t
+ (6.87)
+For ij ≠ kl (that is, for different acid molecules), there can be no correlation through time. 
+Thus, the only time correlation comes from the same acid molecule venturing into the 
+volume at different times. Changing the order of integration to bring the time integration 
+inside and the spatial integration to the outside, we are interested in fi nding
+Λ= ′ 
+
+ 
+
+ ′
+==
+∫ ∫ ∑∑ 1
+2
+0 0 11 t
+E yt yt t t P
+ij
+j
+n
+il
+l
+t t ii n
+EB
+d d
+PEB PEB
+() ( ) (6.88)
+Since the only correlation through time exists when j = l,
+E y t y t E n n y t y t nE y t y t j
+j
+n
+l
+l
+n
+() ( ) [ ( ) () ( ) ( () ( ==
+∑∑ ′ 
+
+ 
+
+ =− ′ + ′ 11
+1))] (6.89)
+Following along the same lines as the derivation given in section 6.4.3, we obtain
+σY
+t t
+n CovPSF
+CovPSF
+t
+Eytyt t t
+2
+2
+0 0
+1
+=⊗
+= ′′ ∫ ∫ PEB
+d d
+PEB PEB
+( ( ) ( )) (6.90)
+where CovPSF is a new function that I call the ‘covariance point spread function’.
+Consider the unphysical case of y(t) and y(t′) being perfectly correlated. In that case, 
+y(t)y(t′) = y(t) (since y is a binary variable) and the CovPSF is equal to the RDPSF. Thus, 
+perfect correlation over the bake time produces the result that
+σY n RDPSF Y 2 =⊗ = (6.91)
+indicating that the fi nal effective acid concentration would retain an approximately Poisson 
+distribution. Without perfect correlation, the CovPSF will differ from the RDPSF and the 
+variance will be different from the Poisson result.
+Since y(t) is a binary random variable, the expectation value is equal to the probability 
+that both conditions are true (that is, the acid found its way into the volume at both time 
+t and time t′).
+Eyt yt Pyt yt Pyt yt Pyt ( ( ) ( )) ( ( ) ( ) ) ( ( ) ( ) ) ( ( ) ) ′ = ′ = == 1 1 11 1 and ′ == = (6.92)
+The conditional probability is governed by the difference in time between t and t′.
+P yt yt V Dt t
+r
+( ( ) () )
+/
+′ = == = − ′
+−
+11
+2
+2
+22 2
+2 e d,
+σ
+πσ
+σ (6.93)
+
+
+## Page 28
+
+250 Fundamental Principles of Optical Lithography
+where the one-dimensional case is shown for convenience.
+Thus, the CovPSF can be written as
+CovPSF V
+Dt t
+t
+tt
+t
+r Dt r D t t t t
+= − ′ ′
+− −− ′
+∫ ∫ de d e d PEB
+PEB // PEB
+4 2
+44
+0 0
+22
+π
+ (6.94)
+where again the 1D version is shown for convenience. The inner integral over t’ can be 
+readily evaluated:
+1
+4
+2 4
+0 πDt t t
+t
+tt
+t
+RDPSF t t t r Dt t t
+PEB
+/ PEB
+PEB
+PEB
+e d
+PEB −− ′
+− ′ ′ = − −+ ∫ ()
+t
+RDPSF t PEB
+() (6.95)
+Unfortunately, the next integral does not appear to have an analytical solution. Some 
+properties of the integral, however, can be determined. When r = 0, the integral evaluates 
+to
+CovPSF r V () == + Dt 
+
+
+ 0 = 1
+2
+1 2 2
+d 2 , PEB σπ
+σ (6.96)
+A numerical integration shows that the 1D CovPSF is very similar to the RDPSF, but 
+with the diffusion length replaced by s/2:
+CovPSF r V x xV RDP
+x
+() ≈− 
+
+ 
+
+ 
+
+ 
+
+ =
+− de erfc d /
+2
+4
+2
+42
+2
+2
+2
+22
+σ πσ σ σσ
+σ
+SF σ
+2
+
+
+
+ (6.97)
+A comparison of this approximate form with a numerical integration of Equation (6.94) 
+is shown in Figure 6.9.
+The impact of the CovPSF can now be determined. The shape of the CovPSF is very 
+similar to that of the RDPSF, but with an effective diffusion length that is less by a factor 
+of 2. Since the effective acid concentration near the line edge does not differ appreciably 
+s
+ss
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+1.6
+1.8
+0.0 0.5 1.0 1.5
+r/
+*CovPSF*(2 /d
+V)
+Approximate
+Figure 6.9 Comparison of the approximate 1D CovPSF of Equation (6.97) with a numerical 
+evaluation of the defi ning integral in Equation (6.94)
+
+
+## Page 29
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 251
+from the acid concentration when convolved with the RDPSF, the same will be true when 
+convolved with this portion of the CovPSF. Thus, the effective acid concentration and its 
+standard deviation can be approximated as
+h h RDPSF
+V h
+D
+h
+eff
+eff
+d
+=⊗
+σ ≈ σσ
+2
+ (6.98)
+The rest of the CovPSF simply gives the ratio dV/2sD, where sD is the overall diffusion 
+length. In this context, dV is the (one-dimensional) capture volume for the deblocking 
+reaction. In other words, dV/2 represents how close the acid must come to a blocked site 
+before it can potentially participate in a deblocking reaction (called the capture range, a). 
+As Equation (6.98) indicates, when the acid diffusion length exceeds the capture range 
+of the deblocking reaction, the impact of the diffusing catalyst is to ‘smooth out’ the statistical fl uctuations present in the original acid distribution.
+While the above derivation used the one-dimensional form of the diffusion probability, 
+the extension to three dimensions is straightforward. For a problem of dimensionality p
+(p = 1, 2 or 3),
+σ
+σ h σ D
+p
+h
+a eff ≈ 
+
+ 
+
+
+2
+ (6.99)
+where a is the deblocking reaction capture distance. In other words, if the acid diffuses 
+a distance less than the reaction capture range, the catalytic nature of the amplifi cation 
+reaction actually increases the stochastic variation in the effective acid concentration 
+compared to the original acid concentration. If, however, the diffusion length is 
+greater than this capture range, the time-averaging effect of the catalytic reaction 
+will smooth out stochastic roughness. It is not diffusion, per se, that reduces stochastic 
+uncertainty, but rather the diffusion of a reaction catalyst that does so. Since in real resist 
+systems the diffusion length will invariably be greater than the reaction capture distance, 
+the net affect will always be a reduction in the effective acid concentration standard 
+deviation.
+6.4.7 Reaction–Diffusion and Polymer Deblocking
+The stochastics of the deblocking of a single blocked site will follow along the same lines 
+as the single PAG exposure analysis of section 6.4.4. Let y be a random variable that 
+represents whether a given single blocked site remains blocked by the end of the PEB. 
+Thus y = 1 means the site remains blocked, and y = 0 means the site has been deblocked. 
+As before, the continuum kinetic analysis gives us the probability that a single site is 
+deblocked for a given effective acid concentration.
+Py h Py h Kth Kth ( |) ( ) = = = =− −− 1 01 eff eff e, e amp PEB eff amp PEB eff (6.100)
+The probability distribution of heff, however, is not obvious. While the relative acid 
+concentration has a Poisson distribution, the time-averaging effect on the acid diffusion 
+turns the discrete acid random variable into a continuous effective acid random 
+variable.
+
+
+## Page 30
+
+252 Fundamental Principles of Optical Lithography
+It will be reasonable to assume that heff is normally distributed with mean and standard 
+deviations as given in the previous section. Thus, the mean value of y becomes
+yh
+y
+h
+Kth hh h = − −− ()
+−∞
+∞
+∫ 1
+2
+2 2 2
+πσ
+σ
+eff
+amp PEB eff eff eff eff (e )e d /
+eff
+= − ee amp PEB eff Kt h Kt amp PEB heff
+1
+2
+2 () σ
+ (6.101)
+The random variable y has a log-normal probability distribution and Equation (6.101) can 
+be recognized as the standard result for a log-normal distribution.
+The total number of blocked groups remaining in a certain small volume will be given 
+by Y.
+Yyi
+i
+n
+= =
+−
+∑1
+0 block
+ (6.102)
+The mean of Y can be easily computed, as before.
+Yn y = 0 block − (6.103)
+The variance of Y can be found with a result similar to that for photon shot noise during 
+exposure:
+σ σ
+Y
+Kt YY 2 h 2 2
+=+ − ()1 () e amp PEB eff (6.104)
+From the defi nitions of M and Y,
+M n
+NV
+M Y
+NV m M
+AA M 0
+0
+0
+= =≡ −blocked ,, (6.105)
+Thus,
+my = (6.106)
+and
+σ
+σσ m
+MY
+Mn
+2
+2
+0
+2
+2
+0
+2 ==
+−blocked
+ (6.107)
+giving
+σ σ
+m
+m Kt
+n
+2 m h
+0
+2 2
+=+ −1 −blockede amp PEB eff () () (6.108)
+For small levels of effective acid uncertainty,
+σσ
+σ mh
+m h
+n mKt mn mm 2
+0
+2 2
+0
+2 ≈+ =+ () −− blocked
+amp PEB
+blocked
+eff
+ef ( ) ln f
+heff
+
+
+ 
+
+
+2
+ (6.109)
+As before, the fi rst term captures the Poisson uncertainty due to the initial distribution of 
+blocked polymer. The second term captures the infl uence of the effective acid concentration uncertainty. Combining this expression with Equation (6.99) for the variance of the 
+effective acid concentration,
+
+
+## Page 31
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 253
+σ
+σ
+σ m
+h
+D
+p m
+n mm h
+2 a
+0
+2
+2
+=+ () 
+
+ 
+
+ 
+
+ 
+
+ −blocked
+ln (6.110)
+Finally, using Equation (6.70) for the variance of the acid concentration,
+σ
+σ m
+D
+p m
+n
+mm
+h
+ah
+n
+2 hh
+0
+2
+0
+11
+=+ 
+
+ 
+
+ 
+
+ 
+
+ + −− ()
+−− blocked PAG
+ln ( )ln  []
+
+ 
+
+
+2
+n (6.111)
+Or, in a slightly different form,
+σ
+σ
+m
+D
+p
+mn m Kt ahn
+ h
+
+ 
+
+ =+ () 
+
+ 
+
+ + () −
+−−
+2
+0
+2
+0
+11
+blocked
+amp PEB
+PAG
+ln 1 2  [] () −
+
+ 
+
+ h
+n (6.112)
+While the above equations show how fundamental parameters affect the resulting variance in the fi nal blocked polymer concentration, interpretation is somewhat complicated 
+by the fact that these parameters are not always independent. In particular, the Byers–
+Petersen model of Equation (6.26) shows a relationship between KamptPEB and sDa. For 
+the case where the PEB temperature puts the deblocking reaction in the diffusioncontrolled regime, Equation (6.28) can be expressed as
+K t aG N amp PEB =2 DA
+2 πσ 0 (6.113)
+When used in Equation (6.112), for the 3D case (p = 3), and ignoring photon shot noise, 
+the result is
+σ
+πσ
+σ
+m
+DA mn m D
+aG N ah
+n
+
+
+ 
+
+ =+ () 
+
+ 
+
+ 
+
+ 
+−−
+2
+0
+2 0
+2 3
+0
+1 2 blocked PAG 
+
+=+ 
+
+ 
+
+
+=+
+−
+−
+1 2
+11 2
+0
+2
+5
+2 0
+0
+2
+nm
+a
+V
+hn
+V MNm
+D
+A
+D
+blocked
+() PAG
+()
+π
+σ
+πσ ahG NA 5 0
+
+
+ 
+
+
+ (6.114)
+While this result is interesting, it is unlikely that resist will be processed at temperatures 
+high enough to put the PEB reaction fully into the diffusion-controlled regime.
+Using the example of a typical 193-nm resist, M0NA = 1.2 /nm3
+, G0NA = 0.042 /nm3
+and KamptPEB = 2. Consider the case of 〈h〉 = 〈heff〉 = 0.3, sD/9 = 5 and p = 3. For a (10 nm)3
+volume, sh/〈h〉 ≈ 0.28 and sheff/〈heff〉 ≈ 0.025. The remaining blocked polymer will have 
+〈m〉 = 0.55 and sm = 0.023, or about 4.3 %. For a (5 nm)3 volume, sm = 0.064, or about 
+11 %. The factors that have the largest impact are the diffusion length and the volume of 
+resist under examination, as shown in Figure 6.10.
+6.4.8 Acid–Base Quenching
+Interestingly, the acid–base neutralization reaction poses the greatest challenge to 
+stochastic modeling. While acid concentrations in chemically amplifi ed resists are low, 
+base quencher concentrations are even lower, leading to greater statistical uncertainty in 
+
+
+## Page 32
+
+254 Fundamental Principles of Optical Lithography
+concentration for small volumes. Further, since the reaction is one of annihilation, statistical variations in acid and base concentrations can lead effectively to acid–base segregation, with clumps of all acid or all base.10 Such clumping is likely to lead to low-frequency 
+line edge roughness that is easily discernable from the higher-frequency roughness that 
+will be predicted with the stochastic models presented above. Further discussion of this 
+interesting and diffi cult topic is beyond the scope of this book. Thus, while acid–base 
+quenching is extremely important in its impact on LER, it will not be considered in the 
+model being developed here.
+The stochastic descriptions of exposure and reaction–diffusion in chemically amplifi ed 
+resist will be used in Chapter 9 to develop a model for line-edge roughness.
+Problems
+6.1. Equation (6.9) provides the (no diffusion or acid loss) kinetic solution for the blocking group concentration in a chemically amplifi ed resist. Under the assumption that 
+h is locally constant,
+(a) Derive an expression for the relative bake time sensitivity of m (i.e. calculate 
+dm/dlntPEB).
+(b) Derive an expression for the relative temperature sensitivity of m (i.e. calculate 
+dm/dlnT). From this, will a low activation energy resist or a high activation 
+energy resist be more sensitive to temperature variations?
+(c) Does the presence of base quencher change the bake time or temperature sensitivity of m?
+6.2. Plot the effective thermal dose versus temperature for a resist with an amplifi cation 
+reaction Ea = 25.0 kcal/mol and Ar = exp(28.0) s−1, and an exposure rate constant C
+= 0.05 cm2/mJ. Use a temperature range from 100 to 140 °C and assume a PEB time 
+of 60 seconds.
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0 5 10 15 20
+sD/a
+m/m
+s
+V = (3 nm)3
+V = (10 nm)3
+V = (5 nm)3
+Figure 6.10 The relative uncertainty of the relative blocked polymer concentration as a 
+function of the volume (= length cubed) under consideration and the diffusion length of acid 
+for a two-dimensional problem. Typical 193-nm resist values were used: G0NA = 0.042/nm3
+, 
+M0NA = 1.2/nm3
+, KamptPEB = 2, and for an exposure such that <h> = 0.4
+
+
+## Page 33
+
+ Chemically Amplifi ed Resists: Exposure and Bake Chemistry 255
+6.3. What is the impact of increasing the PAG loading (the initial concentration of PAG) 
+on the effective thermal dose for a given PEB process?
+6.4. Derive the simplifi ed Fujita–Doolittle Equation (6.15) from the full Fujita–Doolittle 
+equation given in Chapter 5. What assumptions have to be made?
+6.5. Ignoring diffusion and acid loss mechanisms, derive an expression for the catalytic 
+chain length (the number of deblocking events per acid molecule). At what dose 
+will this catalytic chain length be at its maximum? What is the maximum value for 
+the catalytic chain length?
+6.6. One possible acid loss mechanism is called acid trapping, where acid is consumed 
+by being trapped within the resist. Ignoring diffusion and all other acid loss mechanisms, this acid loss mechanism is governed by
+∂
+∂ =− Ht
+kH PEB
+5
+ Under these conditions, derive an expression for the concentration of blocked sites 
+at the end of the PEB.
+6.7. For x >> sD, derive a simplifi ed ‘large argument’ approximation to the 1D reaction–
+diffusion point spread function.
+6.8. Henry’s law (fi rst formulated in 1803) states that the amount of a gas which will 
+dissolve into a solution is directly proportional to the partial pressure of that gas 
+above the solution, and is generally found to be true only at low concentrations. 
+When applied to a solid, the amount of a substance that is adsorbed onto the surface 
+of the solid (the surface concentration) is proportional to the partial pressure of the 
+substance in the atmosphere. The constant of proportionality, called the Henry’s 
+law constant, is dependent on both materials. Suppose ammonia is in the atmosphere at a concentration of 100 ppb (parts per billion), and that the Henry’s law 
+constant for ammonia in photoresist is 30 liters-atm/mol at room temperature. What 
+is B0, the surface concentration of ammonia?
+6.9. Derive an expression for the total amount of base contaminant found inside a 
+resist, assuming that Equation (6.22) applies and that sB << resist thickness. If one 
+wanted to reduce this total amount of base contaminant by a factor of 2, how much 
+would the post-exposure delay time have to be reduced (all other factors held 
+constant)?
+6.10. Why does the addition of base quencher reduce the sensitivity of the resist to airborne base contaminants?
+6.11. For the deblocking kinetics data of Figure 6.7, assume a resist with an exposure 
+rate constant C = 0.03 cm2
+/mJ, and a PEB time of 60 seconds.
+(a) If the resist shows no deblocking until a dose of 8 mJ/cm2, what is the relative 
+quencher loading for the resist?
+(b) Estimate the amplifi cation rate constant for each temperature shown.
+(c) What is the activation energy for the amplifi cation reaction?
+6.12. Assuming that a certain amount of acid is required to achieve a desired lithographic 
+effect (that is, assuming the mean concentration of photogenerated acid is fi xed), 
+how low can the mean number of photons go before photon shot noise exceeds the 
+PAG loading shot noise? Assume, for example, that 〈h〉 = 0.3 and 〈n0−PAG〉/V =
+0.05 /nm3, and the region of interest is (10 nm)3.
+
+
+## Page 34
+
+256 Fundamental Principles of Optical Lithography
+6.13. Suppose for a given process that 〈h〉 = 0.3 and 〈m〉 = 0.5. Further, assume that 
+photon shot noise can be neglected and that 〈n0−blocked〉/〈n0−PAG〉 = 30. Considering 
+the total uncertainty of the fi nal blocked polymer concentration for a 1D problem, 
+how large must sD/a be in order to make the contribution of acid uncertainty equal 
+to the Poisson uncertainty of the deblocking reaction?
+6.14. As Equation (6.111) shows, increasing acid diffusion during PEB reduces the stochastic uncertainty caused by acid concentration fl uctuations. Is there a limit as to 
+how much this uncertainty can be reduced (that is, is there a practical maximum 
+value for the acid diffusion length)? Explain.
+6.15. Qualitatively, how will the presence of base quencher affect the variance of fi nal 
+blocked polymer concentration?
+References
+ 1 Ito, H. and Willson, C.G., 1984, Applications of photoinitiators to the design of resists for 
+semiconductor manufacturing, in Polymers in Electronics, ACS Symposium Series 242, 
+11–23.
+ 2 Willson, C.G., Ito, H. and Frechet, J.M.J., 1982, L’amplifi cation chimique appliquée au développement de polymères utilisables comme résines de lithographie, Colloque Internationale 
+sur la Microlithographie: Microcircuit Engineering, 82, 261.
+ 3 Miya, Y., Toishi, K. and Hashimoto, K. US Patent 6,893,792.
+ 4 Petersen, J. and Byers, J., 1996, Examination of isolated and grouped feature bias in positive 
+acting, chemically amplifi ed resist systems, Proceedings of SPIE: Advances in Resist Technology and Processing XIII, 2724, 163–171.
+ 5 von Smoluchowski, M., 1917, Versuch Einer Mathematischen Theorie der Koagulationskinetik 
+Kolloier Lösungen, Z. Phys. Chem., 92, 129–168.
+ 6 Byers, J., Petersen, J. and Sturtevant, J., 1996, Calibration of chemically amplifi ed resist 
+models, Proceedings of SPIE: Advances in Resist Technology and Processing XIII, 2724, 
+156–162.
+ 7 Gamsky, C.J., Dentinger, P.M., Howes, G.R. and Taylor, J.W., 1995, Quantitative analysis of 
+chemically amplifi ed negative photoresist using mirror-backed infrared refl ection absorption 
+spectroscopy, Proceedings of SPIE: Advances in Resist Technology and Processing XII, 2438, 
+143.
+ 8 Sekiguchi, A., Mack, C.A., Isono, M. and Matsuzawa, T., 1999, Measurement of parameters 
+for simulation of deep UV lithography using a FT-IR baking system, Proceedings of SPIE:
+Advances in Resist Technology and Processing XVI, 3678, 985–1000.
+ 9 Byers, J., private communication.
+10 ben-Avraham, D. and Havlin, S., 2000, Diffusion and Reactions in Fractals and Disordered 
+Systems, Cambridge University Press (Cambridge, UK), Chapter 13.

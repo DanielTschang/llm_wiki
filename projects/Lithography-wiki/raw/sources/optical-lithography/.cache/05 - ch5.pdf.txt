@@ -1,0 +1,1774 @@
+## Page 1
+
+5
+Conventional Resists: Exposure and 
+Bake Chemistry
+Photoresists work by converting a spatial distribution of energy (the projected image of 
+a photomask) into a spatial distribution of solubility of the resist in a developer. The fi rst 
+step in this chemical process is exposure, where a light-sensitive component of the resist 
+forms a latent image in response to the aerial image. For so-called ‘conventional’ resists 
+used for g-line and i-line exposures, the exposure products directly change the solubility 
+of the resist. For a chemically amplifi ed resist (discussed in the next chapter), a postexposure bake is used to thermally induce a second chemical reaction, the product of 
+which changes the solubility of the resist. In both cases, understanding the nature of the 
+image transfer from a light distribution to a chemical distribution requires an understanding of the chemical kinetics of each of the reactions.
+While this chapter deals with conventional resists, which are used only for the older 
+g-line and i-line lithography processes, virtually all of the topics discussed here apply to 
+chemically amplifi ed resists as well. In a sense, chemically amplifi ed resists are a technological superset of conventional resists. Thus, the discussion of chemically amplifi ed 
+resists in the next chapter will assume a familiarity with the material in this chapter.
+5.1 Exposure
+The kinetics of photoresist exposure is intimately tied to the phenomenon of absorption. 
+The discussion below begins with a description of absorption, followed by the photochemical kinetics of exposure.
+5.1.1 Absorption
+The fi rst law of photochemistry (also called the Grotthuss–Draper law) states quite 
+simply that only light that is absorbed is effective at causing chemical change. Thus a 
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+192 Fundamental Principles of Optical Lithography
+photochemical reaction, such as the exposure of photoresist, must necessarily begin with 
+the absorption of light. The phenomenon of absorption can be viewed on a macroscopic 
+or a microscopic scale. On the macroscopic level, absorption is described by the familiar 
+Lambert and Beer laws, which give a linear relationship between absorbance and path 
+length multiplied by the concentration of the absorbing species. On the microscopic level, 
+a photon is absorbed by an atom or molecule, promoting an electron to a higher energy 
+state. Both methods of analysis yield useful information needed to describe the effects of 
+light on a photoresist.
+The basic law of absorption is an empirical one called Lambert’s law. It was expressed 
+by Johann Heinrich Lambert in 1760, though it was in fact fi rst proposed some years 
+earlier by Pierre Bouguer and is sometimes called the Lambert–Bouguer law. It can be 
+expressed in differential form as
+d
+d
+I
+z
+=−αI (5.1)
+where I is the intensity of light traveling in the z-direction through a medium, and a is 
+the absorption coeffi cient of the medium and has units of inverse-length. This law is 
+basically a single photon absorption probability equation: the probability that a photon 
+will be absorbed over some small distance traveled is proportional to the photon fl ux 
+(i.e. the intensity). In a homogeneous medium (i.e. a is not a function of z), Equation 
+(5.1) may be integrated to yield
+Iz I z () = − 0e α (5.2)
+where z is the distance the light has traveled through the medium and I0 is the intensity 
+at z = 0. Note that the integrated form of the Lambert’s law requires a homogeneous 
+material. If the medium is inhomogeneous, Equation (5.2) becomes
+Iz I Abs z () () = − 0e (5.3)
+where Abs z z z the absorbance
+z
+() ( ) = ′′ = ∫α d
+0
+When working with electromagnetic radiation, it is often convenient to describe the 
+radiation by its complex electric fi eld vector. The propagation of an electric fi eld through 
+some material can implicitly account for absorption by using a complex index of refraction n for the material such that
+n =+niκ (5.4)
+The imaginary part of the index of refraction k is related to the absorption coeffi cient by
+α πκ λ = 4/ (5.5)
+where l is the vacuum wavelength of the propagating light. Note that the sign of the 
+imaginary part of the index in Equation (5.4) depends on the sign convention chosen for 
+the phasor representation of the electric fi eld (see Chapter 2).
+In 1852, August Beer showed that for dilute solutions of an absorbing material in a 
+nonabsorbing solvent, the absorption coeffi cient is proportional to the concentration of 
+the absorbing species in the solution:
+
+
+## Page 3
+
+ Conventional Resists: Exposure and Bake Chemistry 193
+αsolution = aCii (5.6)
+where ai is the molar absorption coeffi cient (sometimes called the extinction coeffi cient) 
+of some absorbing species labeled i (given by ai = aıMW/r, where ai is the absorption 
+coeffi cient of the pure material, MW is its molecular weight, r is its density) and Ci is 
+the concentration. The stipulation that the solution be dilute expresses a fundamental 
+limitation of Beer’s law. At high concentrations, where absorbing molecules are close 
+together, the absorption of a photon by one molecule may be affected by a nearby molecule. Since this interaction is concentration dependent, it causes deviation from the linear 
+relation of Equation (5.6). Also, an apparent deviation from Beer’s law occurs if the real 
+part of the index of refraction changes appreciably with concentration. Thus, the validity 
+of Beer’s law should always be verifi ed experimentally over the concentration range of 
+interest.
+While generally described for solutions, Beer’s law can also be applied to solid mixtures. For an N component homogeneous solid, the overall absorption coeffi cient 
+becomes
+αT ii
+i
+N
+= aC
+=
+∑1
+ (5.7)
+The linear addition of absorption terms presumes that Beer’s law holds across components, i.e. that the absorption by one material is not infl uenced by the presence of the 
+other materials. Of the total amount of light absorbed, the fraction of light that is absorbed 
+by component i is given by
+I
+I
+Ai aC
+AT
+ii
+T
+= α
+ (5.8)
+where IAT is the total light absorbed by the fi lm, and IAi is the light absorbed by component 
+i.
+We will now apply the concepts of macroscopic absorption to a typical positive 
+photoresist. For g-line (436 nm) and i-line (365 nm) lithography, the most common 
+resists are of the diazonaphthoquinone/novolac variety. These positive photoresists are 
+made up of three major components: a base novolac resin that gives the resist its structural 
+properties and etch resistance; a photoactive compound (PAC; this is the light-sensitive 
+component in the resist, also known as the sensitizer) called a diazonaphthoquinone 
+(DNQ); and a solvent that renders these components into liquid form for spin coating. 
+(Although photoresist drying during post-apply bake is intended to drive off solvents, a 
+resist may contain up to 10 % solvent after a typical post-apply bake – see section 5.2.2.) 
+Denoting the resin R, the sensitizer M and the solvent S, a fourth component appears 
+during exposure: exposure products P generated by the reaction of M with ultraviolet 
+(UV) light.
+MP →UV (5.9)
+Applying Beer’s law, the absorption coeffi cient a is then
+α = +++ a M aP aR aS M PRS (5.10)
+
+
+## Page 4
+
+194 Fundamental Principles of Optical Lithography
+Since P is being produced and M is disappearing through the exposure process, this equation makes it clear the a will be changing during exposure. If M0 is the initial sensitizer 
+concentration (i.e. with no exposure), the stoichiometry of the exposure reaction gives
+PM M =−0 (5.11)
+Equation (5.10) may be rewritten as
+α =+ Am B (5.12)
+where A = (aM − aP) M0
+ B = aPM0 + aRR + aSS
+ m = M/M0 = the relative sensitizer concentration.
+A and B are called the bleachable and nonbleachable absorption coeffi cients, respectively, and make up the fi rst two Dill photoresist parameters.1
+ Other nonbleachable components of the photoresist (such as a dye additive, leveling agents to reduce striations 
+during spin coating, etc.) are added to the B term above. Note that when A > 0, the photoresist will become more transparent as it is exposed (that is, the photoresist ‘bleaches’). 
+If A is negative, the resist will darken upon exposure.
+The quantities A and B are experimentally measurable and can be easily related to 
+typical resist absorbance curves, measured using a UV spectrophotometer. When the resist 
+is fully exposed, M = 0 and
+αexposed = B (5.13)
+Similarly, when the resist is unexposed, m = 1 (M = M0) and
+αunexposed =+ AB (5.14)
+From this, A may be found by
+A =− αα unexposed exposed (5.15)
+Thus, A(l) and B(l) may be determined from the UV absorbance curves of unexposed 
+and completely exposed resist (Figure 5.1). A more complete description of the measurement of A and B will be given at the end of this chapter.
+As mentioned previously, Beer’s law is empirical in nature and consequently should 
+be verifi ed experimentally. In the case of positive photoresists, this means formulating 
+resist mixtures with differing sensitizer to resin ratios and measuring the resulting A
+parameters. Previous work has shown that Beer’s law was valid for a typical conventional 
+photoresist over the full practical range of sensitizer concentrations.2
+5.1.2 Exposure Kinetics
+The kinetics of exposure is best understood by considering absorption on the microscopic 
+scale. On a microscopic level, the absorption process can be thought of as photons 
+being absorbed by an atom or molecule causing an outer electron to be promoted to a 
+higher energy state. The absorption of a photon can have three possible results: the 
+absorbed energy can be dissipated as heat (lattice vibrations); it can be re-emitted as 
+another photon (fl uorescence); or it can lead to a chemical reaction. It is the third outcome 
+
+
+## Page 5
+
+ Conventional Resists: Exposure and Bake Chemistry 195
+that is important for the sensitizer since it is the absorption of UV light that leads to 
+the chemical conversion of M to P as seen in Equation (5.9). Einstein fi rst quantifi ed 
+absorption on a microscopic (quantum) scale in 1916–1917 by using probabilities of 
+possible absorption events. Here, we will ignore stimulated absorption by assuming a 
+reasonably low light intensity so that at any given time relatively few molecules will be 
+in the excited state.
+Consider a substance M being exposed to quasi-monochromatic radiation. Since the 
+speed of light is constant in a given material, the Lambert law can be converted to a 
+kinetic absorption equation by letting dz = vdt where v is the speed of light (the rate at 
+which new photons arrive). The rate of photon absorption by the molecule M is proportional to NM (the number density of M), the number of photons, and the molecule’s 
+absorption cross section sM−abs:
+−= −
+d
+d abs
+ϕ σϕ M
+MM M
+t
+vN (5.16)
+where jM is the number density of photons. The intensity I is an energy fl ux – the amount 
+of energy per unit area per second – and can be related to the photon fl ux (the photon 
+density times the speed the photons are traveling) multiplied by the energy of one 
+photon:
+Iv hc = M
+
+
+
+ ϕ λ (5.17)
+where h is Planck’s constant and c is the speed of light in vacuum. Einstein’s relation for 
+photon absorption is
+−= 
+
+ 
+ −  = d
+d
+/ abs E
+ϕ σ M λ MM M
+t
+N
+hc
+I N B Iv (5.18)
+Wavelength (nm)
+0.0
+0.3
+0.6
+0.9
+1.2
+1.5
+300 340 380 420 460 500
+A
+B
+Resist
+A and 
+B (1/
+µm)
+Figure 5.1 Resist parameters A and B as a function of wavelength measured with a UV 
+spectrophotometer for a typical g-line resist (a 5-arylsulfonate DNQ)
+
+
+## Page 6
+
+196 Fundamental Principles of Optical Lithography
+where BE is Einstein’s coeffi cient of absorption for material M (the probability per unit 
+time per unit energy density of the radiation fi eld that the photon will be absorbed by a 
+molecule of M, sometimes written as B12). Note that I/v represents the energy density of 
+the photons.
+In order to relate Equation (5.18) to measurable quantities, one must relate the microscopic theory to macroscopic observations. The absorption cross section of the molecule 
+M can be related to its molar absorptivity by
+σ
+α M
+M
+M
+M
+N
+a
+N −abs == A
+ (5.19)
+where NA is Avogadro’s number (6.022 × 1023 atoms/mol). Einstein’s coeffi cient of 
+absorption for material M is the speed of light times the absorption cross section divided 
+by the energy of one photon:
+Bv
+hc n h
+a
+nN h M
+MM
+E abs
+abs
+A
+= 
+
+ 
+
+ = 
+
+ 
+ −  = − σ
+λσ λ λ (5.20)
+where n is the refractive index of the resist.
+As an example of the use of this microscopic absorption analysis, consider a typical 
+g-line resist of density 1.2 g/ml. For a PAC with molecular weight 400 g/mol formulated 
+at 30 % by weight, the initial PAC concentration will be 0.9 molar (moles/liter). Since aP
+is very small for these resists, aM is about equal to the Dill bleachable absorption coeffi -
+cient divided by the initial PAC concentration. For A = 0.63 mm−1, this gives aM = 7 ×
+106 cm2/mol. The resulting PAC absorption cross section is about 0.12 Å2. Since the 
+energy of one photon at this wavelength is 4.56 × 10−19 J, the resulting Einstein coeffi cient 
+of absorption is about 4.7 × 105 m3/J-s.
+The actual chemistry of diazonaphthoquinone exposure is given by3
+SO2
+R
+UV 
+O
+N2
+SO2
+R
+C=O
++ N2
+H2O
+SO2
+R
+COOH
+ (5.21)
+where R is a moderate to large molecular weight ballast group (in some cases R is connected 
+to the polymer resin). The DNQ converts to an indene intermediate before converting to its 
+fi nal product, a carboxylic acid. It is interesting to note that nitrogen gas is given off (it diffuses quickly out of the fi lm during exposure) and that water is required for this reaction. 
+Water is supplied by the humidity in the atmosphere, which is one reason why clean room 
+humidity levels are tightly controlled (usually at a set point of around 40 % relative humidity). If the relative humidity of the clean room environment drops below about 30 %, the 
+above DNQ exposure reaction will not go to completion. Instead, the intermediate ketene 
+will slowly react with the novolac resin to form an ester (more on this in section 5.2.1).
+The chemical reaction in Equation (5.9) can be rewritten in a more general form as
+MM k P k
+k
+1
+2
+→ 3
+← * → (5.22)
+
+
+## Page 7
+
+ Conventional Resists: Exposure and Bake Chemistry 197
+where M is the sensitizer, M* is the sensitizer molecule in an excited state, P is the indene 
+carboxylic acid (product), and k1, k2, k3 are the rate constants for each reaction. Simple 
+kinetics can now be applied. The proposed mechanism in Equation (5.22) assumes that 
+all reactions are fi rst order. Thus, the rate equation for each species can be written.
+d
+d *
+d*
+d *
+d
+d *
+M
+t
+kM kM
+M
+t
+kM k k M
+P
+t
+kM
+=−
+= −+
+=
+21
+1 23
+3
+() (5.23)
+A system of three coupled linear fi rst-order differential equations can be solved exactly 
+using Laplace transforms and the initial conditions
+Mt M
+M t Pt
+()
+( )( )
+==
+== ==
+0
+0 00
+0
+*
+ (5.24)
+However, if one uses the steady-state approximation, the solution becomes much simpler. 
+This approximation assumes that in a very short time the excited molecule M* comes to 
+a steady state, i.e. M* is formed as quickly as it disappears. In mathematical form,
+d*
+d
+M
+t = 0 (5.25)
+The intermediate M* does indeed come to a steady state quickly, on the order of 10−8
+seconds or faster.4 Thus,
+d
+d
+M
+t =−KM (5.26)
+where K kk
+kk = +
+13
+23
+The overall rate constant K is proportional to the intensity of the exposure radiation. 
+The rate constant k1 will be proportional to the rate of photon absorption (by the Grotthuss–Draper law), which in turn is proportional to the photon fl ux (by Lambert’s law), 
+and thus the intensity. A more useful form of Equation (5.26) is then
+d
+d
+m
+t =−CIm (5.27)
+where the relative sensitizer concentration m (= M/M0) has been used and C is the standard 
+exposure rate constant and the third Dill photoresist parameter (collectively, the three Dill 
+parameters are also called the ABC parameters). A more thorough microscopic analysis 
+of the exposure process allows this exposure rate constant to be broken down into the 
+product of the absorption cross section of the sensitizer and the quantum yield of the 
+reaction (the fraction of absorbed photons that produce the chemical change, Φ):
+C
+hc
+B
+v
+a
+N hc M
+M = 
+
+ 
+ Φ −  == ΦΦ
+σ
+λλ abs
+E
+A
+ (5.28)
+
+
+## Page 8
+
+198 Fundamental Principles of Optical Lithography
+Maximum resist sensitivity comes from high quantum effi ciency, all absorption coming 
+from the sensitizer, and an absorption coeffi cient adjusted to be one over the thickness of 
+the resist (see Problem 5.2).
+A solution to the exposure rate Equation (5.27) is simple if the intensity within the 
+resist is constant throughout the exposure (i.e. when A = 0). Integrating Equation (5.27) 
+gives
+m CIt = − e (5.29)
+where Dose I t It
+t
+== ∫ d
+0
+ for the case of constant intensity during the exposure process.
+This result illustrates an important property of fi rst-order kinetics called reciprocity. The 
+amount of chemical change is controlled by the product of light intensity and exposure 
+time. Doubling the intensity and cutting the exposure time in half will result in the exact 
+same amount of chemical change. This product of intensity and exposure time is called 
+the exposure dose or exposure energy. This idea can be made more usefully explicit by 
+relating the exposure dose at some point inside the resist to the exposure dose incident 
+on the resist. For either the simple case of absorption as shown in Equation (5.2) or (5.3), 
+or for the more general case of standing waves in the resist fi lm as described in Chapter 
+4, the intensity in the resist I(z) is always directly proportional to the incident intensity 
+Iinc. Thus,
+I xyz I I xyz () () ,, ,, = inc r (5.30)
+where Ir is the relative intensity, that is, the intensity in the resist assuming a unit incident 
+intensity. Equation (5.29) can now be rewritten as
+m x y z CDose I x y z ( ) exp[ ( )] ,, ,, =− inc r (5.31)
+where Doseinc is the incident exposure dose. Reciprocity exists whenever all instances of 
+exposure time and incident intensity can be replaced by incident dose in an expression 
+for the fi nal latent image m(x,y,z).
+Reciprocity failures can occur when mechanisms other than the fi rst-order kinetics 
+shown here become signifi cant. For example, an insuffi cient supply of water during 
+exposure can lead to reciprocity failure if high intensity exposures use up water in the 
+resist fi lm faster than water from the atmosphere can diffuse back into the photoresist. 
+Reciprocity failure can also result from high intensities that heat up the resist during 
+exposure, causing a temperature-dependent change in the molar absorptivity or the 
+quantum yield.
+For many resists, especially the conventional DNQ resists popular for g-line and i-line 
+exposure, the intensity within the resist is not constant during exposure. In fact, many 
+resists bleach upon exposure, that is, they become more transparent as the sensitizer M
+is converted to product P. This corresponds to a positive value of A, as seen, for example, 
+in Figure 5.1. Since the intensity varies as a function of exposure time, this variation must 
+be known in order to solve the exposure rate equation. In the simplest possible case, a 
+resist fi lm coated on a substrate of the same index of refraction, only absorption affects 
+the intensity within the resist. Thus, Lambert’s law of absorption, coupled with Beer’s 
+law, could be applied:
+
+
+## Page 9
+
+ Conventional Resists: Exposure and Bake Chemistry 199
+d
+d
+I
+z
+=− + () Am B I (5.32)
+where Equation (5.12) was used to relate the absorption coeffi cient to the relative sensitizer concentration. Equations (5.29) and (5.32) are coupled, and thus become fi rst-order 
+nonlinear partial differential equations that must be solved simultaneously. Equations 
+(5.29) and (5.32) were fi rst solved analytically by Herrick:5
+z
+y
+yA y B y mz
+mz
+= −− =
+∫ d
+[ ( ) ln( )] ()
+()
+1 0
+ (5.33)
+where y is a dummy variable for the purposes of integration, and
+Iz I A mz B mz
+A m Bm () () [ ( )] ln[ ( )][ ( )] ln[ ( )] = −−−− 0 110 0 (5.34)
+The sensitizer concentration at the top of the resist, m(0), is obtained from the nonbleaching solution [Equation (5.29)] since the intensity at the top of a bleaching resist on a 
+nonrefl ecting substrate does not change during exposure. For many g-line and i-line 
+resists, A >> B. Thus, at least near the beginning of exposure, B can often be safely 
+neglected (i.e. Am >> B). Under these conditions, the integral in Equation (5.33) can be 
+solved exactly (by setting B = 0) giving
+mz m
+mm
+Iz
+I
+mz
+mm
+Az
+Az
+() ()
+( ) [ ( )]
+()
+()
+()
+() () [
+= +−
+= −
+− = +
+−
+−
+0
+01 0
+0
+1
+10 0
+e
+e
+10 0 − = −
+−
+m
+mz
+m Az
+Az
+( )]
+()
+e ()
+e
+ (5.35)
+Although an analytical solution exists for the simple problem of exposure with absorption only, in more realistic problems the variation of intensity with depth in the fi lm is 
+more complicated than Equation (5.32). In fact, the general exposure situation results in 
+the formation of standing waves, as discussed in Chapter 4. Thus, numerical solutions to 
+the time-varying intensity and chemical composition of the fi lm during exposure will 
+almost certainly be required whenever a bleaching photoresist fi lm is used.
+The fi nal result of exposure is the conversion of an image intensity in resist Ir(x,y,z) 
+into a latent image m(x,y,z). Figure 5.2 illustrates a one-dimensional case.
+5.2 Post-Apply Bake
+Baking a resist may have many purposes, from removing solvent to causing chemical 
+amplifi cation. In addition to the intended results, baking may also cause numerous unintended outcomes. For example, the light-sensitive component of the resist may decompose 
+at temperatures typically used to remove solvent. The solvent content of the resist can 
+impact diffusion and amplifi cation rates for a chemically amplifi ed resist. Also, all aspects 
+of baking will probably affect the dissolution properties of the resist. Baking a photoresist 
+remains one of the most complicated and least understood steps in the lithographic 
+process.
+
+
+## Page 10
+
+200 Fundamental Principles of Optical Lithography
+The post-apply bake (PAB) process, also called a softbake or a prebake, involves drying 
+the photoresist after spin coating by removing excess solvent. There are four major effects 
+of removing solvent from a photoresist fi lm: (1) fi lm thickness is reduced and stabilized 
+(i.e. becomes relatively independent of the time spent waiting for exposure and development); (2) post-exposure bake and development properties are changed; (3) adhesion is 
+improved; and (4) the fi lm becomes less tacky and thus less susceptible to particulate 
+contamination. Unfortunately, there are other consequences of baking many photoresists. 
+For conventional resists, the photosensitive component may begin to decompose at temperatures greater than about 70 °C6
+ (for chemically amplifi ed resists, decomposition 
+begins at much higher temperatures). Thus, one must search for the optimum post-apply 
+bake conditions that will maximize the benefi ts of solvent evaporation while maintaining 
+a tolerable level of sensitizer decomposition.
+5.2.1 Sensitizer Decomposition
+When heated to temperatures above about 70–80 °C, the sensitizer of a DNQ-type positive 
+photoresist begins to decompose to a nonphotosensitive product. The initial reaction 
+mechanism is thought to be identical to that of the sensitizer reaction during ultraviolet 
+exposure.6,7
+SO2
+R
+∆
+O
+N2
+SO2
+R
+C=O
++ N2 X (5.36)
+The possible identity of the product or products X will be discussed below.
+To determine the concentration of sensitizer M as a function of post-apply bake time 
+and temperature, consider the fi rst-order decomposition reaction,
+(a) (b)
+–500 –300 –100 100 300 500
+0.0
+0.3
+0.6
+0.9
+1.2
+1.5
+Aerial Image Intensity
+Horizontal Position (nm)
+–500 –300 –100 100 300 500
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+Relative PAC Concentration
+Horizontal Position (nm)
+Figure 5.2 The exposure process takes an aerial image (a) and converts it into a latent 
+image (b)
+
+
+## Page 11
+
+ Conventional Resists: Exposure and Bake Chemistry 201
+MX →∆ (5.37)
+If we let M′
+0 be the concentration of sensitizer before post-apply bake and M0 the concentration of sensitizer after post-apply bake, simple kinetics tells us that
+d
+d
+e
+b
+b
+M
+t
+KM
+M M Kt
+m
+T
+T
+Kt T
+0
+0
+00
+=−
+= ′ −
+′= −
+exp( ) (5.38)
+where tb is the post-apply bake time, KT is the decomposition rate constant at the absolute 
+temperature T and m′ = M0/M′
+0, the fraction of sensitizer remaining after the bake. The 
+dependence of KT upon temperature can be described by the Arrhenius equation,
+KA T E RT = − r / e a (5.39)
+where Ar is the Arrhenius coeffi cient, Ea is the activation energy of the reaction, R is the 
+universal gas constant (1.98717 cal/mole-K or 8.31431 J/mole-K), and T is the absolute 
+temperature (K). Thus, the two parameters Ea and Ar allow us to know m′ as a function 
+of the post-apply bake conditions, provided Arrhenius behavior is followed. In polymer 
+systems, caution must be exercised since bake temperatures near the glass transition 
+temperature sometimes lead to non-Arrhenius behavior. For normal post-apply bakes of 
+typical photoresists, the Arrhenius model appears well founded.
+The effect of this decomposition is a change in the chemical makeup of the photoresist. 
+Thus, any parameters which are dependent upon the quantitative composition of the resist 
+are also dependent upon post-apply bake. The most important of these parameters fall 
+into three categories: (1) optical (exposure) parameters such as the resist absorption coeffi cient; (2) diffusion parameters during post-exposure bake; and (3) development parameters such as the development rates of unexposed and completely exposed resist. A 
+technique will be described to measure Ea and Ar and thus begin to quantify these effects 
+of post-apply bake.
+In the Dill model of exposure described in the previous section, the exposure of a positive photoresist can be characterized by the three parameters A, B and C, as given in 
+Equations (5.12) and (5.29). These expressions do not explicitly take into account the 
+effects of post-apply bake on the resist composition. To do so, we can modify Equation 
+(5.12) to include absorption by the component X:
+B aM aR aX = ++ P RX 0 (5.40)
+where aX is the molar absorption coeffi cient of the decomposition product X (and the 
+absorption term for the solvent has been neglected for simplicity). The stoichiometry of 
+the decomposition reaction gives
+XM M = 00 ′ − (5.41)
+Thus,
+B aM aR a M M = ++ P RX 0 00 () ′ − (5.42)
+Let us consider two cases of interest, no bake (NB) and full bake (FB). When there is 
+no post-apply bake (meaning no decomposition), M0 = M′
+0 and
+
+
+## Page 12
+
+202 Fundamental Principles of Optical Lithography
+A a aM
+B aM aR
+MP
+PR
+NB
+NB
+=− ′
+= ′ +
+() 0
+0
+ (5.43)
+We shall defi ne ‘full bake’ as a post-apply bake which decomposes all of the sensitizer. 
+Thus M0 = 0 and
+A
+B aM aR XR
+FB
+FB
+=
+= ′ +
+0
+0
+ (5.44)
+Using these special cases in our general expressions for A and B, we can show explicitly 
+how these two parameters vary with sensitizer decomposition:
+A Am
+BB B B m
+= ′
+=− − ′
+NB
+FB FB NB ()
+ (5.45)
+The A parameter decreases linearly as decomposition occurs, and B typically increases 
+slightly (since BFB is typically slightly higher than BNB).
+The development rate, as we shall see in Chapter 7, is dependent on the concentration 
+of PAC in the photoresist. However, the product X can also have a large effect on the 
+development rate. There are two likely products and the most common outcome of a 
+post-apply bake decomposition is a mixture of the two. The fi rst product is formed via 
+the reaction below and is identical to the product of UV exposure.
+SO2
+R
+C=O
++ H2O
+SO2
+R
+COOH
+(5.46)
+As can be seen, this reaction requires the presence of water. A second reaction, which 
+does not require water, is the esterifi cation of the ketene with the novolac resin.
+SO2
+R
+C=O
+SO2
+R
+CO
+Resin 
+O
+CH3
+OH
+CH3
+OH
+CH3
+(5.47)
+Both possible products have a dramatic effect on dissolution rate. The carboxylic acid is 
+very soluble in developer and enhances dissolution. The formation of carboxylic acid can 
+be thought of as a blanket exposure of the resist. The dissolution rate of unexposed resist 
+(rmin) will increase due to the presence of the carboxylic acid. The dissolution rate of fully 
+exposed resist (rmax), however, will not be affected. Since the chemistry of the dissolution 
+process is unchanged, the basic shape of the development rate function will also remain 
+
+
+## Page 13
+
+ Conventional Resists: Exposure and Bake Chemistry 203
+unchanged. The ester, on the other hand, is very diffi cult to dissolve in aqueous solutions 
+and thus retards the dissolution process. It will have the effect of decreasing rmax, although 
+the effects of ester formation on the full dissolution behavior of a resist are not well 
+known.
+If the two mechanisms given in Equations (5.46) and (5.47) are taken into account, the 
+rate Equation (5.38) will become
+d
+d
+HO2
+M
+t
+kM k M 0 =− − 10 2 0 [] (5.48)
+where k1 and k2 are the rate constants of Equations (5.46) and (5.47), respectively. For a 
+given concentration of water in the resist fi lm, [H2O], this reverts to Equation (5.38) 
+where
+K kk T =+12[] HO2 (5.49)
+Thus, the relative importance of the two reactions will depend not only on the ratio of 
+the rate constants but on the amount of water in the resist fi lm. The concentration of water 
+is a function of atmospheric conditions during the bake and the past history of the resistcoated wafer.
+Examining Equation (5.45), one can see that the parameter A can be used as a means 
+of measuring m′, the fraction of sensitizer remaining after post-apply bake. Thus, by 
+measuring A as a function of post-apply bake time and temperature, one can determine 
+the activation energy and the corresponding Arrhenius coeffi cient for the proposed decomposition reaction. Figure 5.3a shows the variation of the resist parameter A with post-apply 
+bake conditions for one particular resist.8
+ According to Equations (5.38) and (5.45), this 
+variation should take the form
+A
+A
+A
+A
+Kt
+Kt
+T
+T
+NB
+NB
+b
+e b =
+
+
+ 
+
+ =−
+−
+ln
+ (5.50)
+Thus, a plot of ln(A) versus bake time should give a straight line with a slope equal to 
+−KT. This plot is shown in Figure 5.3b. Knowing KT as a function of temperature, one 
+can determine the activation energy and Arrhenius coeffi cient from Equation (5.39). One 
+should note that the parameters ANB, BNB and BFB are wavelength dependent, but Ea and 
+Ar are not.
+Figure 5.3 shows an anomaly in which there is a lag time before decomposition occurs. 
+This lag time is the time it took the wafer and wafer carrier to reach the temperature of 
+the convection oven. Equation (5.38) can be modifi ed to accommodate this phenomena,
+′= −− () m Kt t T e b wup (5.51)
+where twup is the warm-up time. A lag time of about 11 minutes was observed when convection oven baking a 1/4″-thick glass substrate in a wafer carrier. For a silicon wafer on 
+a proximity hot plate, the warm-up time is on the order of 15–20 seconds.
+From the data presented in Figure 5.3b, the activation energy is 30.3 Kcal/mol and 
+the natural logarithm of the Arrhenius coeffi cient (in 1/minute) is 35.3. Thus, a 100 °C, 
+
+
+## Page 14
+
+204 Fundamental Principles of Optical Lithography
+30-minute convection oven post-apply bake would decompose 11 % of the photoactive 
+compound. The nature of the decomposition product (the identity of X) will also affect 
+the value of BFB. If thermal decomposition leads to generation of both carboxylic acid 
+and ester, only the ester will affect the change of B from BNB to BFB. In this case, Equation 
+(5.44) must be modifi ed to take into account the fraction of PAC that decomposes into 
+ester, f, by replacing aX with aXf + (1 − f)aP.
+The examples given above for photoactive compound decomposition all involve DNQ/
+novolac resist systems used at g-line and i-line exposure wavelengths. For these systems, 
+typical bake temperatures always result in some (hopefully small) amount of sensitizer 
+decomposition. However, for chemically amplifi ed resists, the photoacid generators are 
+much more thermally stable . Typical post-apply bake temperatures result in essentially 
+no thermal decomposition of the chemically amplifi ed sensitizer.
+–4.5
+–4.0
+–3.5
+–3.0
+–2.5
+–2.0
+–1.5
+–1.0
+–0.5
+0.0
+0.5
+0
+Bake Time (minutes)
+80 ºC
+95 ºC
+110 ºC
+125 ºC
+Ln(
+A/ANB)
+15 30 45 60 75 90
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+0 20 40 60 80 100 120
+Bake Time (minutes)
+80 ºC
+95 ºC
+110 ºC
+125 ºC
+A (1/
+µm)
+(b)
+(a)
+Figure 5.3 The variation of the resist absorption parameter A with post-apply bake time 
+and temperature for Kodak 820 resist at 365 nm (a convection oven bake was used): (a) 
+linear plot, and (b) logarithmic plot
+
+
+## Page 15
+
+ Conventional Resists: Exposure and Bake Chemistry 205
+5.2.2 Solvent Diffusion and Evaporation
+Thermal processing of photoresists (post-apply bake and post-exposure bake) can dramatically infl uence resist performance in a number of ways. It is well known that residual 
+solvent has a powerful infl uence on the dissolution rate of thin polymer fi lms and that 
+post-apply bake (PAB) determines the resist’s residual solvent content. However, quantitative determination of the infl uence of bake conditions on residual solvent is diffi cult. 
+In order to describe solvent evaporation during the baking of a photoresist, a model for 
+how the diffusivity varies during the bake (that is, as a function of the changing photoresist 
+fi lm composition) must be established. In this section, a historical review of the Fujita–
+Doolittle equation for solvent diffusivity is given. Then, modifi cations to this equation 
+are proposed to improve its accuracy and dynamic range as needed for its use in describing PAB.
+The infl uence of temperature, molecular weight and chemical composition on the 
+physical and mechanical properties of polymers is a diffi cult but important topic of study. 
+Since the early 1950s the use of a ‘free-volume’ description of physical relaxation phenomena in polymers and other materials has proven extremely useful. Although the idea 
+that the free, unoccupied volume in a liquid or solid greatly infl uences the physical properties of the material is quite old, it was fi rst applied successfully by Arthur Doolittle in 
+1951.9
+Doolittle described the infl uence of temperature on the viscosity of a liquid in two 
+steps: the viscosity depends on the free volume in the liquid, and this free volume depends 
+on temperature. The fraction of the volume of a liquid which is free, that is, unoccupied 
+by the molecules of the liquid, was expressed as
+v
+VV
+V f = − 0 (5.52)
+where vf is the free volume fraction, V is the volume that a specifi ed mass of the liquid 
+occupies at some temperature T, and V0 is the volume occupied by the liquid extrapolated 
+to zero absolute temperature assuming no phase change. The assumption here is that the 
+‘liquid’ extrapolated to absolute zero will contain no free volume and that the thermal 
+expansion of the liquid is due completely to the creation of free volume. Although the 
+fi rst assumption seems quite reasonable, the second is probably less accurate. Thermal 
+expansion of the liquid will undoubtedly lead to free volume formation, but the increased 
+vibrations of the liquid molecules will also lead to an increased ‘occupied’ volume, the 
+volume that is occupied by the molecule to the exclusion of other molecules. Doolittle’s 
+free volume expression can be modifi ed by multiplying by z, the fraction of the increased 
+volume which is actually free. Thus,
+v
+VV
+V f = − ζ 0 (5.53)
+where the magnitude of z for a liquid is probably close to unity, but for a solid could be 
+considerably smaller.
+The diffi culty in measuring the free volume is in determining the value of V0. Doolittle 
+attempted this by measuring the density of a liquid as a function of temperature, fi tting 
+this data to an empirical equation, then extrapolating to zero temperature. With this 
+
+
+## Page 16
+
+206 Fundamental Principles of Optical Lithography
+empirically determined temperature dependence for the free volume of the liquid, Doolittle then showed that experimental viscosity data as a function of temperature behaved 
+as
+η = A Bv e / f (5.54)
+where h is the viscosity and A and B are empirical constants. Equation (5.54) was found 
+to match the experimental data over a wider range of temperatures much better than any 
+of the other empirical expressions in common use at the time, lending credence to this 
+free volume interpretation. Interestingly, the experimental value of B obtained by Doolittle was very close to unity (0.9995) and the free volume of the liquid ranged from 0.22 
+to 0.68 over the temperatures studied.
+Others began applying the ideas of free volume to polymer systems. Describing both 
+viscosity and diffusion processes in polymers by the same mechanism, Bueche10 calculated the probability that suffi cient free volume would be available to allow movement 
+of the polymer. Relaxation processes (i.e. processes that are limited by the movement of 
+the polymer) were thought to include such phenomena as viscous fl ow and diffusion. 
+Thus, describing the rate at which a polymer moved was the fi rst step in defi ning other 
+relaxation rates. Since the polymer segments are vibrating as a function of temperature, 
+the volume occupied by the polymer will have a thermodynamically controlled probability 
+distribution about the average volume per polymer segment. If the volume occupied by 
+the polymer segment exceeds some critical volume, the polymer segment can move or 
+‘jump’ to a new confi guration. Thus, by integrating the volume probability from this 
+critical volume to infi nity, the frequency of jumps can be determined. In turn, the viscosity 
+is almost completely controlled by this jump frequency. By comparing this theory with 
+experimental polymer viscosity data, the temperature dependence of the average volume 
+of a polymer segment was deduced.
+For temperatures above the glass transition temperature of the polymer, Bueche 
+described the polymer volume by
+VV T = ++ Tg() 1 12 () αα (5.55)
+where VTg is the volume at the glass transition temperature, a1 is the coeffi cient of thermal 
+expansion of the solid-like polymer below the glass transition temperature, and a1 + a2
+is the thermal expansion coeffi cient of the liquid-like polymer above the glass transition 
+temperature. This abrupt change in the coeffi cient of thermal expansion is considered one 
+of the fundamental indicators of the glass transition phenomenon. Both a1 and a2 typically 
+have magnitudes on the order of 5 × 10−4 K−1 for most polymers.
+Fox and Flory measured the specifi c volume of polystyrene11 and polyisobutylene12 as 
+a function of temperature for many molecular weights and found that Equation (5.55) was 
+quite adequate. Bueche and Fox and Flory went on to speculate that of the total volume 
+expansion given by Equation (5.55), only the a2 term resulted in the generation of free 
+volume. Essentially, they argued that z of Equation (5.53) was very small for the solidlike behavior of the polymer, and that the excess volume that comes from thermal expansion above the glass transition temperature is all free volume. Thus,
+v v TT
+v v TT TT
+fg g
+fg g g
+=≤
+=+ − ≥
+,
+α ( ), 2
+ (5.56)
+
+
+## Page 17
+
+ Conventional Resists: Exposure and Bake Chemistry 207
+where Tg is the glass transition temperature and vg is the fractional free volume 
+at Tg.
+The power of the free volume approach to relaxation mechanisms is that the fundamental relationship of the relaxation mechanism to free volume is independent of the 
+mechanism by which free volume changes. Fujita, Kishimoto and Matsumoto13 used this 
+fact to expand the Doolittle model to include the effect of small amounts of solvent in 
+the polymer. Solvent dissolved in a polymer results in additional free volume which in 
+turn increases diffusivity and decreases viscosity. Fujita et al. modifi ed the free volume 
+Equation (5.56) to include solvent content:
+v v TT fg g s =+ − + α βφ 2() (5.57)
+where fs is the fractional volume of solvent and b describes the fraction of this 
+solvent volume which can be considered free. Here, Tg is usually considered the glass 
+transition temperature of the completely dry (no dissolved solvent) polymer. For the 
+polymethyl acrylate polymer and four different solvents studied by Fujita, b was found 
+to be 0.19.
+The Fujita–Doolittle equation has been used extensively to characterize the change in 
+solvent diffusivity with changing solvent concentration. There are, however, constraints 
+to this approach that have led some workers in this fi eld to criticize its use and to look 
+to alternate expressions. In particular, higher solvent concentration causes a dilution of 
+the polymer-induced free volume with the addition of solvent. A correction for this effect 
+gives14
+v v TT f sg g s =− + − + () ( ) 1 φ α φβ 2 (5.58)
+Equation (5.58) is a more accurate form of the Fujita free volume expression which is 
+valid for higher concentrations of solvent, while still requiring the same number of parameters as the original free volume expression.
+The fi nal expression for free volume, Equation (5.58), can now be combined with the 
+Doolittle equation to give a modifi ed Fujita–Doolittle equation for the diffusivity D of a 
+solvent in a polymer matrix as a function of temperature and solvent content.
+DA Bv = − e / f (5.59)
+Letting D0 be the minimum diffusivity, that is the diffusivity in the limit of no solvent 
+content and T = Tg,
+DA Bv
+0 = − e / g (5.60)
+Thus, Equation (5.59) can be rearranged as
+ D = D0e−B(1/vf −1/vg)
+where
+v v TT f sg g s =− + − + () ( ) 1 φ α φβ 2 (5.61)
+It will often be more convenient to describe the solvent content as a mass fraction rather 
+than a volume fraction. Letting x be the mass fraction and r the density,
+
+
+## Page 18
+
+208 Fundamental Principles of Optical Lithography
+x
+v xv T T x
+v
+s
+s
+p
+s
+f sg g s
+p
+s
+g
+p
+s
+≈
+=− + − + ′
+′ = +− 
+
+ 
+
+ ≈
+ρ
+ρ
+φ
+αβ
+β ρ
+ρ
+β ρ
+ρ
+() ( ) 1
+1
+2
+ρ
+ρ
+β p
+s
+(5.62)
+where the subscripts ‘s’ and ‘p’ refer to solvent and polymer, respectively.
+Based on previous work, the order of magnitude for each of the terms in Equation 
+(5.62) is known. Doolittle and Williams et al.
+15 found B to be approximately 1.0, while 
+Fujita et al. found B = 0.73. Cohen and Turnbull16 limit B to be between 0.5 and 1 (their 
+so-called geometric factor). The Williams, Landel and Ferry (WLF) equation predicts 
+vg = 0.025 and a2 = 4.8 × 10−4
+ K−1, but further work by Ferry17 found values of vg/B
+between 0.013 and 0.07, with most of the data between 0.02 and 0.035, and values of a2
+between 1 and 11 × 10−4 K−1, with most data between 3 and 5 × 10−4 K−1. Fox and Flory 
+found a2 = 3 × 10−4 K−1. Fujita found b to be 0.19, and in any case it must be ≤1.0. The 
+value of b′ should be similar. From these typical numbers and the diffusivity model given 
+above, one can see that the diffusivity of solvent changes by four to six orders of magnitude during the course of a typical post-apply bake.
+Using this solvent diffusion model, one can predict the impact of PAB time and temperature on the fi nal resist thickness and the resulting solvent distribution as a function 
+of depth into the resist at the end of the bake. Such modeling provides for a very interesting result. Any combination of initial resist thickness and initial solvent content that produces a certain fi nal resist thickness always results in essentially the same solvent 
+distribution in the resist at the end of the bake. Figure 5.4 shows the distribution of solvent 
+left in the resist at the end of a 60-second bake of various temperatures using the parameters from Table 5.1.
+Another consequence of using the modifi ed Fujita–Doolittle equation is a prediction 
+of how solvent diffusivity varies with temperature. Using the parameters from Table 5.1, 
+0.00
+0.02
+0.04
+0.06
+0.08
+0.10
+0.12
+0 100 200 300 400 500
+Depth into Resist (nm)
+Solvent Mass Fraction
+90 ºC
+100 ºC
+110 ºC
+Figure 5.4 Predicted variation of solvent concentration as a function of depth into the resist 
+at the end of a 60-second post-apply bake
+
+
+## Page 19
+
+ Conventional Resists: Exposure and Bake Chemistry 209
+and assuming a solvent mass fraction of 0.05, an Arrhenius plot of solvent diffusivity is 
+given in Figure 5.5. There is a large discontinuity at the glass transition temperature, since 
+the model assumes such a discontinuity as a consequence of Equation (5.56). Note that 
+above the glass transition temperature, the behavior is non-Arrhenius, that is, the curve 
+is not perfectly linear in the Arrhenius plot of Figure 5.5.
+5.2.3 Solvent Effects in Lithography
+Residual solvent in the fi lm after baking can have two signifi cant effects on the lithographic 
+performance of a photoresist. Just as residual solvent increases the free volume and thus 
+the diffusivity of solvent during PAB, any residual solvent at post-exposure bake will 
+increase the diffusivity of exposure products. For a chemically amplifi ed resist, especially 
+when baking in a diffusion-controlled temperature regime, this increase in acid diffusivity 
+can have a quite large impact. Figure 5.6 shows an example where the top portion of the 
+resist exhibits standing waves while the rest of the resist does not. Reduced solvent content 
+at the top of the resist leads to reduced acid diffusion during PEB and (as will be discussed 
+in the following section ) less smoothing out of the standing wave pattern.
+Table 5.1 Typical solvent diffusion parameters in 
+photoresist
+Parameter Value
+B 0.737
+b′ 0.351
+vg 0.0289
+a2 (1/K) 8.7E-04
+Tg (°C) 110.5
+D0 (nm2/s) 0.0967
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+0.00245 0.0025 0.00255 0.0026 0.00265 0.0027
+1/Absolute Temperature (K)
+ln(Diffusivity)
+fs = 0.05
+fs = 0.10
+Tg
+Figure 5.5 Temperature dependence of solvent diffusivity (using the parameters from Table 
+5.1 and assuming a solvent mass fractions of 0.05 and 0.1) showing an essentially fi xed diffusivity below the glass transition temperature
+
+
+## Page 20
+
+210 Fundamental Principles of Optical Lithography
+As Figure 5.5 showed, diffusivity grows almost exponentially as a function of the 
+temperature above Tg. Thus, for the post-exposure bake to cause appreciable diffusion (as 
+will be discussed in the next section ), the PEB temperature must be above the Tg of the 
+resist. However, as seen above, the Tg of a resist fi lm is a function of the amount of solvent 
+in the resist, and thus a function of the post-apply bake conditions. For a suffi ciently long 
+post-apply bake, the Tg of the resist fi lm approaches the post-apply bake temperature. For 
+shorter bakes, the resist fi lm Tg will be somewhat below the PAB temperature. Thus, as 
+a simple rule of thumb, the PEB temperature must be the same or greater than the PAB 
+temperature in order for appreciable diffusion to occur during PEB.
+Secondly, residual solvent can impact resist dissolution rates, affecting both the average 
+dissolution rate and the variation of dissolution rate with exposure dose (Table 5.2). 
+Unfortunately, this behavior is rarely well characterized for any given resist material.
+5.3 Post-exposure Bake Diffusion
+Many attempts have been made to reduce the standing wave effect and thus increase 
+linewidth control and resolution. One particularly useful method is the post-exposure, 
+predevelopment bake as described by Walker.19 A 100 °C oven bake for 10 minutes was 
+found to reduce the standing wave ridges on a resist sidewall signifi cantly. This phenomenon can be explained quite simply as due to the diffusion of sensitizer in the resist (which 
+Figure 5.6 Lower solvent content at the top of this 248-nm resist leads to reduced acid diffusion during PEB, and thus the presence of standing waves only at the top of the resist 
+(photo courtesy of John Petersen, used with permission)
+Table 5.2 Development rmax and n values (see Chapter 7) fi tted to measured dissolution 
+rate data as a function of PAB temperature (and thus, solvent content) for a thick i-line 
+resist18
+Temperature (°C) wt.% Solvent rmax (nm/s) Develop n
+70 21.1 104.3 1.71
+80 19.5 90.3 1.77
+90 17.8 78.9 1.96
+
+
+## Page 21
+
+ Conventional Resists: Exposure and Bake Chemistry 211
+acts as a dissolution inhibitor for a conventional resist, see Chapter 7) during the hightemperature bake. A mathematical model which predicts the results of such a postexposure bake (PEB) is described below.
+In general, molecular diffusion is governed by Fick’s Second Law of Diffusion, which 
+states (in one dimension, r)
+∂
+∂ = ∂∂
+∂
+∂
+
+
+
+
+C
+tr
+D C
+r
+A
+A
+A (5.63)
+where CA is the concentration of species A, DA is the diffusion coeffi cient of A at some 
+temperature T, and t is the time that the system is at temperature T. A more general form 
+is
+∂
+∂ =∇ ∇ Ct
+DC A () AA (5.64)
+In many cases, it is quite accurate to assume that the diffusivity is independent of concentration (and thus position). Under these conditions, this differential equation can be 
+solved given a set of boundary conditions (two for each dimension) and an initial distribution of A.
+Consider one possible initial condition known as the impulse source (a delta function 
+of concentration). At some point x0, there are N moles of substance A and at all other 
+points there is no A. Thus, the concentration at x0 is infi nite. For boundary conditions, 
+assume zero concentration as r goes to ±∞ for all time. Given this initial distribution of 
+A and these boundary conditions, the solution to Equation (5.63) is the Gaussian distribution function,
+Cx N r A / () = e−
+2 2
+2 22
+πσ
+σ (5.65)
+where σ = 2Dt A is the diffusion length, and r = x − x0.
+In practice there are no impulse sources. Instead, we can approximate an impulse source 
+as having some concentration C0 over some small distance ∆x centered at x0, with zero 
+concentration outside of this range. An approximate form of Equation (5.65) is then
+Cx Cx r A / () ≅ e 0 −
+2
+2
+2
+∆ 22
+πσ
+σ (5.66)
+This solution is fairly accurate if ∆x << s. If there are two ‘impulse’ sources located at 
+x1 and x2, with initial concentrations C1 and C2 each over a range ∆x, the concentration 
+of A at x after diffusion is
+Cx CCx rr A // () =+ ee 
+
+ 
+
+ 1 −−
+2
+2 2
+2
+2
+22
+1
+22 222
+πσ πσ
+σσ ∆ (5.67)
+where r1 = x − x1 and r2 = x − x2.
+If there are a number of sources, Equation (5.67) becomes
+Cx x C
+n n rn
+A / () = e−
+∑ ∆
+2 2
+2 22
+πσ
+σ (5.68)
+
+
+## Page 22
+
+212 Fundamental Principles of Optical Lithography
+Extending the analysis to a continuous initial distribution C0(x), Equation (5.68) 
+becomes
+C x Cx x xx A / () ( )ed () = ′
+−∞
+∞
+′ −− ′
+∫ 1
+2 2 0 2 22
+πσ
+σ (5.69)
+where x′ is now the distance from the point x. Equation (5.69) is simply the convolution 
+(denoted by ⊗) of the original concentration profi le with a Gaussian:
+C x C x fx A() () () =⊗ 0 (5.70)
+where fx x () = 1 −
+2 2
+2 22
+πσ
+σ e /
+This equation can now be made to accommodate two-dimensional diffusion:
+C xy C xy f xy A() () () , ,, =⊗ 0 (5.71)
+where
+f xy
+r xy
+r () ,e / =
+=+
+1 −
+2 2
+2
+22
+22
+πσ
+σ
+Three-dimensional diffusion can similarly be calculated (as shown below).
+From this formulation of diffusion, one can see that the diffusion impulse response 
+function of Equation (5.65) or its higher dimensional equivalents is analogous to the 
+imaging point spread function of Chapter 2. Thus, f(r) is sometimes referred to as the 
+diffusion point spread function (DPSF).
+We are now ready to apply our solution to the diffusion of sensitizer in a conventional 
+photoresist during a post-exposure bake. For the full three-dimensional case, the sensitizer 
+distribution after exposure can be described by m(x,y,z), where m is the relative sensitizer 
+concentration. According to Equation (5.71) the relative sensitizer concentration after a 
+post-exposure bake, m*(x,y,z), is given by
+m xyz m x y z xx yy zz * ,, , , e / () () () (( ) ( ) ( ) ) = ′′′ 1 −− ′ +− ′ +− ′
+2 2 32
+2 22
+πσ
+/2 2 σ ddd ′′′
+−∞
+∞
+∫ ∫∫ xyz (5.72)
+or,
+m x y z m x y z DPSF * ,, ,, ( )( ) =⊗ (5.73)
+For a given latent image, the only parameter that needs to be specifi ed to solve Equation 
+(5.72) is the diffusion length s, or equivalently, the diffusion coeffi cient DA and the 
+bake time t. In turn, DA is a function of the bake temperature T (by the Arrhenius 
+equation for temperature ranges which do not traverse the glass transition temperature) 
+and, of course, the resist system used. Unfortunately, it is quite diffi cult to measure 
+the diffusivity of sensitizer in photoresist. From Walker’s work, one can estimate the 
+values of Ea and D0 for the resist studied to be about 35 Kcal/mol and 3.2 × 1021 nm2/s, 
+respectively.
+The diffusion model can now be used to simulate the effects of a post-exposure bake 
+on standing waves for a conventional resist (Figure 5.7). Obviously, the major effect is 
+
+
+## Page 23
+
+ Conventional Resists: Exposure and Bake Chemistry 213
+the smoothing out of the standing waves. Less obvious from these pictures is the gradual 
+degradation of the photoresist image itself. The trade-off between these two effects puts 
+a signifi cant constraint on the acceptable values of the diffusion length. In order to remove 
+standing waves, the diffusion length must be on the order of or larger than half of the 
+standing wave period. But to avoid degrading the feature itself, diffusion length must be 
+much smaller than the smallest feature size being printed.
+From Chapter 4, recall that the standing wave period is l/2nresist where nresist is the 
+resist refractive index (the period will be slightly less than this for oblique illumination). 
+For i-line exposure of a typical resist, this puts the half period at about 55 nm. Thus, 
+diffusion lengths must be at about this magnitude or larger to completely remove 
+standing waves. Since i-line resists are rarely used to resolve features less than about 
+300 nm, the requirement that diffusion length is much less than feature size is also 
+realized. However, for 248-nm lithography this is no longer the case. The standing 
+wave half period is about 35–40 nm, but features smaller than 130 nm are regularly 
+imaged. Thus, to remove standing waves effectively, the diffusion length must approach 
+one-third of the feature size, a fraction that is too large to avoid signifi cant image 
+degradation. As a result, for 248- and 193-nm lithography, standing waves are reduced 
+using bottom antirefl ection coatings rather than relying solely on diffusion during PEB. 
+Additionally, it is important to remember that a post-exposure bake, while capable 
+of reducing or eliminating standing waves, will have no impact on the photoresist 
+swing curve. Since bottom antirefl ection coatings can be very effective at reducing both 
+standing waves and swing curves, they have become the preferred solution for critical 
+lithography levels.
+5.4 Detailed Bake Temperature Behavior
+In the discussion of section 5.2.1, a somewhat clumsy approach of adding a ‘warm-up 
+time’ to the bake analysis was used to account for the noninstantaneous heating of the 
+resist. By modeling the heat transfer from the hot plate to the wafer, a more accurate and 
+(a) (b) (c)
+Figure 5.7 Typical i-line photoresist profi le simulations (using PROLITH) for resist on silicon 
+as a function of the PEB diffusion length: (a) 20 nm, (b) 40 nm and (c) 60 nm
+
+
+## Page 24
+
+214 Fundamental Principles of Optical Lithography
+detailed picture can be drawn of how the temperature of the wafer varies with time during 
+the bake.
+We can approximate the temperature profi le of the resist on a typical wafer baking 
+(track) system by the following differential equation (called a lumped capacitance model 
+for heat transfer):20,21
+ρ δ CL T
+t
+k p T T hT T d
+d
+air =− − − − plate ambient ( )( ) (5.74)
+where r is the density of silicon, Cp is the specifi c heat capacity of silicon, L is the 
+thickness of the wafer, T is the temperature of the resist-coated wafer, kair is the thermal 
+conductivity of air, d is the thickness of the gap between the hot plate and the wafer, and 
+h is a heat transfer coeffi cient for the convective heat lost from the top surface of the 
+wafer to the surroundings. In this model, the term on the left side represents the thermal 
+mass of the wafer, and the terms on the right side represent heat transfer on the bottom 
+side of the wafer from the hot plate and heat loss from the top of the wafer to the surroundings. Note that the thermal mass of the photoresist is extremely small compared to 
+that of the wafer, so that it can be ignored. Also, the thermal conductivity of silicon is 
+high enough that the temperature gradient from the bottom to the top of the wafer can 
+also be ignored. Radiative heat transfer mechanisms are small enough to be ignored as 
+well.
+The solution to this lumped capacitance heat transfer model is
+TT T T t =− − − ** e initial / () τ (5.75)
+where Tinitial is the initial temperature of the wafer, T* is the equilibrium (infi nite time) 
+temperature given by
+T
+k T hT
+k h
+*
+air
+plate ambient
+air
+=
++
++
+δ
+δ
+ (5.76)
+and t is the time constant for heating (or possibly cooling) the wafer,
+τ ρ
+δ
+=
++
+CL
+k h
+p
+air
+ (5.77)
+Some typical values for the constants in these thermal model equations are given in Table 
+5.3.
+We can now describe the full temperature profi le of the resist on a typical wafer 
+track system with a three-stage model for heat transfer to the resist-coated wafer: a proximity hot plate bake as described above; a short time for transfer from the hot plate to 
+a chill plate; and then proximity cooling on the chill plate. During the second stage 
+where the wafer is transferred from the hot plate to the chill plate, the gap d is assumed 
+to be very large so that the fi rst term on the right side of Equation (5.74) is unimportant, 
+and the second term on the right side is assumed to represent heat loss from the top 
+
+
+## Page 25
+
+ Conventional Resists: Exposure and Bake Chemistry 215
+and bottom wafer surfaces. An example of such a full temperature profi le is shown in 
+Figure 5.8.
+The impact of the time variation of temperature will depend of course on the activation 
+energy of the reactions in question. For a nonzero activation energy, the result will be a 
+time variation of the rate ‘constant’. For each rate constant k, an effective rate constant 
+can be defi ned as
+k
+t
+kt t
+t
+eff
+b
+d
+b
+= ∫
+1
+0
+() (5.78)
+where tb is the overall bake cycle time.
+It is interesting to note that the equilibrium temperature T* is not equal to the temperature of the hot plate, as shown by Equation (5.76). The fact that the equilibrium temperaTable 5.3 Typical values for silicon wafer properties
+Parameter Value Units
+L (wafer thickness), 300-mm-diameter wafer 0.775 mm
+L (wafer thickness), 200-mm-diameter wafer 0.725 mm
+L (wafer thickness), 150-mm-diameter wafer 0.675 mm
+L (wafer thickness), 100-mm-diameter wafer 0.525 mm
+Cp (silicon molar heat capacitance) @ 25 °C 19.8 J/K-mole
+Cp (silicon molar heat capacitance) @ 125 °C 22.3 J/K-mole
+r (silicon density) 2.33 g/cm3
+Atomic weight of silicon 28.09 g/mole
+kair (air thermal conductivity) at sea level, 20 °C 0.025 W/m-K
+kair (air thermal conductivity) at sea level, 100 °C 0.031 W/m-K
+h (convection heat transfer coeffi cient) 5–10 W/m2
+-K
+0
+20
+40
+60
+80
+100
+0 20 40 60 80 100
+Time (seconds)
+Resist Temperature (ºC)
+Hot Plate Chill Plate Xfer
+Figure 5.8 Typical wafer bake profi le (60-second bake followed by a 10-second transfer to 
+a chill plate)
+
+
+## Page 26
+
+216 Fundamental Principles of Optical Lithography
+ture of the wafer is usually very close to the hot plate temperature indicates that heating 
+across the gap is the dominant heat transfer mechanism. This is because the gap spacing 
+d is very small, typically about 0.15–0.2 mm, so that
+when , * air
+plate
+air
+plate ambient
+k hT T h
+k
+TT
+δ
+δ
+>> ≈ − − () (5.79)
+Even if signifi cant variations in d across the wafer are present, the value of T* will still 
+be dominated by the temperature of the hot plate, and good temperature uniformity can 
+be achieved. By contrast, variations in the gap spacing can have a large effect on the time 
+constant t, as seen in Equation (5.77). Again, assuming h is small, the hot plate rise time 
+will be directly proportional to d.
+when , air
+air
+k h CL
+k
+p
+δ τ δρ >> ≈ (5.80)
+Variations in the gap spacing can be due to misalignment of the ceramic pins that control 
+the gap spacing in the proximity plate, or due to nonfl atness of the silicon wafer – the 
+warp of a 200- and 300-mm wafers can be up to 0.075 and 0.1 mm, respectively (see 
+Figure 5.9).
+The lumped capacitance model solution of Equations (5.75)–(5.77) has several limitations. When solving the differential Equation (5.74), all of the terms in the equation except 
+the wafer temperature are assumed to be constant. Obviously, the accuracy of the solution 
+will depend on the accuracy of these assumptions. As Table 5.3 indicates, the heat capacity 
+of silicon will vary by about 10 % during a typical bake (a 100 °C temperature range or 
+so), and the thermal conductivity of air will vary by 25 %. With a coeffi cient of linear 
+expansion of about 2.5 × 10−6/K, the density of silicon will change by less than 0.1 % over 
+a 100 °C temperature range. Wafer thickness will typically vary between 1 and 2 % across 
+the wafer. The convective heat transfer coeffi cient can change signifi cantly with air fl ow, 
+which will change as the air above the wafer heats up and depends on the design of the 
+hot plate chamber. Likewise, the ambient temperature is ill-defi ned when the hot plate is 
+not in an open environment and can change from wafer to wafer if the hot plate chamber 
+lid is not temperature controlled. But possibly the most signifi cant problem is the assumption that the hot plate temperature is constant. Just as the wafer temperature is affected by 
+the proximity of the hot massive plate beneath it, the hot plate is affected by the cold wafer. 
+When a new wafer is placed on a hot plate, the surface temperature of the plate can drop 
+by 1–2 °C, requiring 5–10 seconds to heat back up to its set point temperature.
+Wafer
+High Thermal Mass Hot Plate
+Figure 5.9 Proximity bake of a wafer on a hot plate showing (in a highly exaggerated way) 
+how wafer warpage leads to a variation in proximity gap (drawing not to scale)
+
+
+## Page 27
+
+ Conventional Resists: Exposure and Bake Chemistry 217
+The thermal model here also assumes a one-dimensional geometry, so that variations 
+in temperature in the plane of the wafer are ignored. Besides edge effects that can cause 
+a temperature difference at the edge of the wafer versus the middle, wafer warpage as 
+depicted in Figure 5.9 will lead to thermal gradients and thus heat transfer in the plane 
+of the wafer, somewhat mitigating the temperature variations that would be predicted 
+from a 1D model.22
+5.5 Measuring the ABC Parameters
+Dill proposed a single, simple experiment for measuring the ABC parameters.1 The photoresist to be measured is coated in a nonrefl ecting transparent substrate (e.g. glass, quartz 
+or similar material). The resist is then exposed by a normally incident parallel beam of 
+light at the wavelength of measurement. At the same time, the intensity of the light transmitted through the substrate is measured continuously. The output of the experiment, 
+transmitted intensity as a function of exposure time, is then analyzed to determine the 
+resist ABC parameters. A typical experimental setup is shown in Figure 5.10. By measuring the incident exposing light intensity, the output of the experiment becomes overall 
+transmittance as a function of incident exposure dose, T(E). Figure 5.11 shows a typical 
+result. Assuming careful measurement of this function, and a knowledge of the thickness 
+of the photoresist, all that remains is the analysis of the data to extract the ABC
+parameters.
+Note that the effectiveness of this measurement technique rests with the nonzero value 
+of the resist bleachable absorption parameter A. If the photoresist does not change its 
+optical properties with exposure (i.e. if A = 0), then measuring transmittance will provide 
+no insight into the exposure reaction, making C unobtainable by this method. Other 
+methods for determining C for the case when A = 0 are discussed briefl y in Chapter 6.
+Analysis of the bleaching experimental data is greatly simplifi ed if the experimental 
+conditions are adjusted so that the simple exposure and absorption Equations (5.29) and 
+(5.32) apply exactly. This means that light passing through the resist must not refl ect at 
+UP
+Light Source 
+Collimating
+Lens
+Bandpass
+Filter
+Resist-Coated 
+Glass Substrate
+Light Meter
+A/D
+Figure 5.10 Experimental confi guration for the measurement of the ABC parameters
+
+
+## Page 28
+
+218 Fundamental Principles of Optical Lithography
+the resist–substrate interface. Further, light passing through the substrate must not refl ect 
+at the substrate–air interface. The fi rst requirement is met by producing a transparent 
+substrate with the same index of refraction as the photoresist. The second requirement is 
+met by coating the backside of the substrate with an interference-type antirefl ection 
+coating.
+Given such ideal measurement conditions, Dill showed that the ABC parameters can 
+be obtained from the transmittance curve by measuring the initial transmittance T(0), the 
+fi nal (completely exposed) transmittance T(∞) and the initial slope of the curve. The 
+relationships are:
+A
+D
+T
+T
+B
+D
+T
+T
+C AB
+AT T
+=  ∞
+
+ 
+
+
+=−  ∞
+
+ 
+
+
+= +
+−
+1
+0
+1
+01 0
+12
+ln ()
+()
+ln ()
+( )[ ( )]T
+T
+12 E E 0
+d
+d =
+(5.81)
+where D is the resist thickness, E is the exposure dose, and T12 is the transmittance of the 
+air–resist interface and is given approximately, for a resist index of refraction nresist, by
+T n
+n 12
+2
+1 1
+1 =− −+
+
+
+ 
+
+ resist
+resist
+ (5.82)
+Although graphical analysis of the data is quite simple, it suffers from the common 
+problem of errors when measuring the slope of experimental data. As a result, the value 
+of C (and to a lesser extent, A) obtained often contains signifi cant error. Dill also proposed 
+a second method for extracting the ABC parameters from the data. Again assuming that 
+the ideal experimental conditions had been met, the ABC parameters could be obtained 
+by directly solving the two coupled differential Equations (5.27) and (5.32), and fi nding 
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+0 200 400 600 800 1000
+Exposure Dose (mJ/cm2)
+Transmittance
+Figure 5.11 Typical transmittance curve of a positive g- or i-line bleaching photoresist 
+measured using an apparatus similar to that pictured in Figure 5.10
+
+
+## Page 29
+
+ Conventional Resists: Exposure and Bake Chemistry 219
+the values of A, B and C for which the solution best fi ts the experimental data. Obviously, 
+fi tting the entire experimental curve is much less sensitive to noise in the data than taking 
+the slope at one point.
+Typical values for ABC parameters for several types of resists are given in Table 5.4.
+As discussed above, one impact of post-apply baking for conventional resists is the 
+decomposition of sensitizer. Since it is the sensitizer that bleaches, a loss of sensitizer 
+results in a decrease in the value of A. Figure 5.12 shows two example transmittance 
+curves measured for an i-line resist baked at two different temperatures.
+Problems
+5.1. Assuming a plane wave traveling through a uniform material, derive Equation 
+(5.5).
+5.2. For a resist fi lm of a given thickness, there is one value of the absorption coeffi cient 
+that maximizes the amount of light absorbed by the resist at the bottom. (This can 
+be seen by looking at the extremes. When a is zero, all of the incident light makes 
+Table 5.4 Typical values for resist ABC parameters
+Resist Type A (mm−1
+) B (mm−1) C (cm2
+/mJ) Refractive 
+Index
+g-line (436 nm) 0.6 0.05 0.015 1.65
+i-line (365 nm) 0.9 0.05 0.018 1.69
+248 nm 0.0 0.50 0.05 1.76
+193 nm 0.0 1.20 0.05 1.71
+Dyed Unchanged Increased by 
+0.3–0.5
+Unchanged Approximately 
+unchanged
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0 100 200 300 400
+Exposure Dose (mJ/cm2)
+Transmittance
+80 ºC 
+125 ºC
+Figure 5.12 Two transmittance curves for Kodak 820 resist at 365 nm. The curves are for 
+a convection oven post-apply bake of 30 minutes at the temperatures shown
+
+
+## Page 30
+
+220 Fundamental Principles of Optical Lithography
+it to the bottom, but none is absorbed. When a is infi nite, no light makes it to the 
+bottom, so none is absorbed there. Thus, in between these two extremes there must 
+be a maximum.) For a resist of thickness D, and assuming a homogenous material 
+and a nonrefl ecting substrate, what value of a maximizes the amount of light 
+absorbed by the resist at the bottom?
+5.3. An i-line resist has the following properties:
+ A = 0.85 mm−1
+ B = 0.05 mm−1
+ C = 0.018 cm2/mJ
+ Refractive index = 1.72
+ The resist is coated to a thickness of 1.1 mm on a glass substrate optically matched 
+to the photoresist.
+(a) At the beginning of exposure, what percentage of the incident light makes it to 
+the bottom of the resist?
+(b) The photoresist is exposed so that 55 % of the sensitizer is converted at the top 
+of the resist. Give your best estimate of what percentage of the incident light 
+makes it to the bottom of the resist at the end of the exposure. Explain why 
+this estimate is not exact.
+5.4. For most conventional (g- and i-line) resists, aM >> aP. For this case, show that a 
+measurement of bleachable absorption coeffi cient as a function of wavelength, 
+A(l), can be used to determine how the exposure rate constant C varies with 
+wavelength.
+5.5. Derive Equations (5.35).
+5.6. Reciprocity during exposure is seen for the case of a nonbleaching resist by transforming Equation (5.29) to Equation (5.31) – all instances of incident intensity and 
+exposure time can be replaced by incident dose.
+(a) Show that the fi rst Equation (5.35) obeys reciprocity.
+(b) Show that the general fi rst-order exposure Equation (5.27) results in reciprocity 
+regardless of the effects of bleaching.
+5.7. Suppose that a resist was found to produce the same thickness after PAB for a 
+95 °C, 300-second bake, a 100 °C, 60-second bake, or a 105 °C, 17-second bake. If 
+the DNQ of that resist decomposes with an activation energy of 31 Kcal/mole and 
+ln(Ar) = 37 (1/minute), which bake is preferable from a thermal decomposition 
+perspective?
+5.8. The modifi ed Fujita–Doolittle Equation (5.61) predicts a temperature dependence 
+for solvent diffusivity which is not the Arrhenius equation. Using the parameters 
+from Table 5.1 and assuming 10 % solvent volume fraction, create an Arrhenius 
+plot (log [diffusivity] vs. 1/absolute temperature) for solvent diffusivity from 115 
+to 130 °C. How close is this to true Arrhenius behavior? Find a best estimate for 
+Ar and Ea based on this plot.
+5.9. Solve the 1D diffusion equation for a ‘fi xed source’ boundary condition (diffusion 
+of a constant concentration of material at the surface of a very thick resist). Assume 
+the diffusivity is constant and
+
+
+## Page 31
+
+ Conventional Resists: Exposure and Bake Chemistry 221
+ C(z,0) = 0
+ C(0,t) = C0
+ C(∞,t) = 0
+5.10. Solve the 1D diffusion equation for the ‘initial source’ boundary condition (diffusion of a given amount material at the surface of a very thick resist). Assume the 
+diffusivity is constant and
+ C(z,0) = 0
+ dC(0,t)/dt = 0
+ C(∞,t) = 0
+Czt z Q () , d constant
+0
+0
+∞
+∫ ==
+5.11. For a typical 300-mm silicon wafer baked at a hot plate temperature of 100 °C 
+(ambient temperature of 20 °C), and assuming a proximity gap of 0.2 mm, 
+calculate:
+(a) The equilibrium wafer temperature (T*) and the rise time of the bake (t).
+(b) The equilibrium wafer temperature and the rise time of the bake if the proximity 
+gap were increased to 0.3 mm.
+(c) At what proximity gap distance would the coeffi cient of conduction (heat 
+transfer from the hot plate across the gap) equal that of convection (thermal 
+transfer from the top of the wafer)?
+5.12. For a typical 300-mm silicon wafer baked at a hot plate temperature of 100 °C and 
+a proximity gap of 0.2 mm, the equilibrium wafer temperature was found to vary 
+by ±0.2 °C across the wafer. How much wafer warpage would be needed to explain 
+all of this temperature variation?
+5.13. Derive Equation (5.79).
+5.14. From the transmittance curve in Figure 5.11, estimate the values of A, B and C. 
+The resist thickness used was 0.75 mm and the measurement was performed in the 
+standard way. Assume a typical i-line resist.
+References
+ 1 Dill, F.H., Hornberger, W.P., Hauge, P.S. and Shaw, J.M., 1975, Characterization of positive 
+photoresist, IEEE Transactions on Electron Devices, ED-22, 445–452.
+ 2 Mack, C.A., 1988, Absorption and exposure in positive photoresist, Applied Optics, 27, 
+4913–4919.
+ 3 Dammel, R., 1993, Diazonaphthoquinone-based Resists, SPIE Tutorial Texts, Vol. TT 11 
+(Bellingham, WA).
+ 4 Albers, J. and Novotny, D.B., 1980, Intensity dependence of photochemical reaction rates for 
+photoresists, Journal of the Electrochemical Society, 127, 1400–1403.
+ 5 Herrick, C.E., Jr., 1966, Solution of the partial differential equations describing photo-decomposition in a light-absorbing matrix having light-absorbing photoproducts, IBM Journal of 
+Research and Development, 10, 2–5.
+
+
+## Page 32
+
+222 Fundamental Principles of Optical Lithography
+ 6 Dill, F.H. and Shaw, J.M., 1977, Thermal effects on the photoresist AZ1350J, IBM Journal 
+of Research and Development, 21, 210–218.
+ 7 Shaw, J.M., Frisch, M.A. and Dill, F.H., 1977, Thermal analysis of positive photoresist fi lms 
+by mass spectrometry, IBM Journal of Research and Development, 21, 219–226.
+ 8 Mack, C.A. and Carback, R.T., 1985, Modeling the effects of prebake on positive resist processing, Proceedings of the Kodak Microelectronics Seminar, 155–158.
+ 9 Doolittle, A.K., 1951, Studies in Newtonian fl ow. II. The dependence of the viscosity of liquids 
+on free-space, Journal of Applied Physics, 22, 1471–1475.
+10 Bueche, F., 1953, Segmental mobility of polymers near their glass temperature, Journal of 
+Chemical Physics, 21, 1850–1855.
+11 Fox, T.G. and Flory, P.J. 1950, Second-order transition temperatures and related properties in 
+polystyrene. I. Infl uence of molecular weight, Journal of Applied Physics, 21, 581–591.
+12 Fox, T.G. and Flory, P.J., 1951, Further studies on the melt viscosity of polyisobutylene, 
+Journal of Physical and Colloid Chemistry, 55, 221–234.
+13 Fujita, H., Kishimoto, A. and Matsumoto, K., 1960, Concentration and temperature dependence of diffusion coeffi cients for systems polymethyl acrylate and n-alkyl acetates, Transactions of the Faraday Society, 56, 424–437.
+14 Mack, C.A., 1998, Modeling solvent effects in optical lithography, PhD Thesis, University of 
+Texas at Austin.
+15 Williams, M.L., Landel, R.F. and Ferry, J.D., 1955, The temperature dependence of relaxation 
+mechanisms in amorphous polymers and other glass-forming liquids, Journal of the American 
+Chemical Society, 77, 3701–3706.
+16 Cohen, M.H. and Turnbull, D., 1959, Molecular transport in liquids and gases, Journal of 
+Chemical Physics, 31, 1164–1169.
+17 Ferry, J.D., 1980, Viscoelastic Properties of Polymers, 3rd edition, John Wiley & Sons, Ltd 
+(New York, NY).
+18 Mack, C.A., Mueller, K.E., Gardiner, A.B., Qiu, A., Dammel, R.R., Koros, W.G. and Willson, 
+C.G., 1997, Diffusivity measurements in polymers, part 1: lithographic modeling results, 
+Proceedings of SPIE: Advances in Resist Technology and Processing XIV, 3049, 355–362.
+19 Walker, E.J., 1975, Reduction of photoresist standing-wave effects by post-exposure bake, 
+IEEE Transactions on Electron Devices, ED-22, 464–466.
+20 Mack, C.A., DeWitt, D.P., Tsai, B.K. and Yetter, G., 1994, Modeling of solvent evaporation 
+effects for hot plate baking of photoresist, Proceedings of SPIE: Advances in Resist Technology and Processing XI, 2195, 584–595.
+21 Smith, M.D., Mack, C.A. and Petersen, J.S., 2001, Modeling the impact of thermal history 
+during post exposure bake on the lithographic performance of chemically amplifi ed resists, 
+Proceedings of SPIE: Advances in Resist Technology and Processing XVIII, 4345, 1013–
+1021.
+22 Tay, A., Ho, W.K. and Hu, N., 2007, An in situ approach to real-time spatial control of steadystate wafer temperature during thermal processing in microlithography, IEEE Transactions on 
+Semiconductor Manufacturing, 20, 5–12.

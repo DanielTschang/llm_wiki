@@ -1,0 +1,836 @@
+{
+  "version": 1,
+  "updatedAt": 1790978214029,
+  "files": {
+    "purpose.md": {
+      "hash": "bc8af6725f851c075fae86028a9cb744",
+      "size": 816,
+      "mtimeMs": 1790967145554
+    },
+    "raw/sources/optical-lithography/01 - ch1.pdf": {
+      "hash": "99e466c30511a84d0aaa648f36a60a89",
+      "size": 528483,
+      "mtimeMs": 1790966693329
+    },
+    "raw/sources/optical-lithography/02 - ch2.pdf": {
+      "hash": "66b5794d8fb2c4cf0d33e0784a08e128",
+      "size": 672948,
+      "mtimeMs": 1790966693402
+    },
+    "raw/sources/optical-lithography/03 - ch3.pdf": {
+      "hash": "4a2d2b5d38be682628164a4cef6e63b3",
+      "size": 1244510,
+      "mtimeMs": 1790966693466
+    },
+    "raw/sources/optical-lithography/04 - ch4.pdf": {
+      "hash": "5d4a3fd82712deadcb615ae9f10c52aa",
+      "size": 1246532,
+      "mtimeMs": 1790966693530
+    },
+    "raw/sources/optical-lithography/05 - ch5.pdf": {
+      "hash": "45925b25134cea1affbe127f4b605a18",
+      "size": 550815,
+      "mtimeMs": 1790966693605
+    },
+    "raw/sources/optical-lithography/06 - ch6.pdf": {
+      "hash": "2533b14590fd36cd307d169510eb7a74",
+      "size": 571230,
+      "mtimeMs": 1790966693645
+    },
+    "raw/sources/optical-lithography/07 - ch7.pdf": {
+      "hash": "719a2255de9a8c9bcc0d80323b837fa4",
+      "size": 477958,
+      "mtimeMs": 1790966693692
+    },
+    "raw/sources/optical-lithography/08 - ch8.pdf": {
+      "hash": "b7effa80c9111c3eadd5fae26749cc6b",
+      "size": 1614419,
+      "mtimeMs": 1790966693761
+    },
+    "raw/sources/optical-lithography/09 - ch9.pdf": {
+      "hash": "670a58ed9e1b6a53605ba5b4026106a7",
+      "size": 593636,
+      "mtimeMs": 1790966693808
+    },
+    "raw/sources/optical-lithography/10 - ch10.pdf": {
+      "hash": "6555957bd616795151bfd4586a45df86",
+      "size": 1031729,
+      "mtimeMs": 1790966693850
+    },
+    "schema.md": {
+      "hash": "ec14ae1b9b74f6e10d81af4d810386aa",
+      "size": 3340,
+      "mtimeMs": 1790967145552
+    },
+    "wiki/comparisons/alternating-psm-與-attenuated-psm-比較.md": {
+      "hash": "3a7097aa88fcda81eca0c57945d05efc",
+      "size": 1629,
+      "mtimeMs": 1790978213260
+    },
+    "wiki/comparisons/barc-與-tarc-比較.md": {
+      "hash": "23e4c169fd58907a4ffc68a659b46837",
+      "size": 1606,
+      "mtimeMs": 1790973704391
+    },
+    "wiki/comparisons/overlay-與-pattern-placement-error-比較.md": {
+      "hash": "9c881e3a764555a03b2e4efc4affe7f5",
+      "size": 1296,
+      "mtimeMs": 1790976754906
+    },
+    "wiki/comparisons/peb-擴散與-barc-的駐波抑制比較.md": {
+      "hash": "57718af8fc203420b64eca27503be947",
+      "size": 1293,
+      "mtimeMs": 1790974339098
+    },
+    "wiki/comparisons/rule-based-與-model-based-opc-比較.md": {
+      "hash": "ef5fa1871cae64f8022b7d66461105cd",
+      "size": 1486,
+      "mtimeMs": 1790978213259
+    },
+    "wiki/comparisons/stepper-與-step-and-scan-成像比較.md": {
+      "hash": "608e39ce7ab4cb44ca9c49d00727a1d6",
+      "size": 1748,
+      "mtimeMs": 1790971804275
+    },
+    "wiki/concepts/adi-與重工.md": {
+      "hash": "46ed20ae4372485c9ce9a60f6722c43e",
+      "size": 793,
+      "mtimeMs": 1790969293441
+    },
+    "wiki/concepts/aim.md": {
+      "hash": "96c15790a6db8cb6edf85509ce7772d4",
+      "size": 1055,
+      "mtimeMs": 1790976754887
+    },
+    "wiki/concepts/alternating-psm.md": {
+      "hash": "458594e14e53fb2368338e108379814c",
+      "size": 1873,
+      "mtimeMs": 1790978213252
+    },
+    "wiki/concepts/attenuated-psm.md": {
+      "hash": "4b462b78756f6ba7e729e049287a30a5",
+      "size": 2076,
+      "mtimeMs": 1790978213254
+    },
+    "wiki/concepts/base-quencher.md": {
+      "hash": "8d134e5abb346609a7f691be3c2bd18d",
+      "size": 1412,
+      "mtimeMs": 1790975124988
+    },
+    "wiki/concepts/byers-petersen-model.md": {
+      "hash": "aad6957617d9735bd3069d2fc9b24852",
+      "size": 1394,
+      "mtimeMs": 1790975124992
+    },
+    "wiki/concepts/cauchy-equation.md": {
+      "hash": "3a0c4ab96f59c8366c190f534ea5298e",
+      "size": 970,
+      "mtimeMs": 1790973704386
+    },
+    "wiki/concepts/critical-ionization-model.md": {
+      "hash": "ac85a598898e5560d44ce96cbf4c89cc",
+      "size": 1144,
+      "mtimeMs": 1790975885713
+    },
+    "wiki/concepts/dill-abc-參數.md": {
+      "hash": "2a93a787768cd4a14a1cb918f50e2bd2",
+      "size": 1875,
+      "mtimeMs": 1790974339081
+    },
+    "wiki/concepts/enhanced-kinetic-model.md": {
+      "hash": "fb8e324b6f7afd8c467c648341df02ba",
+      "size": 1569,
+      "mtimeMs": 1790975885709
+    },
+    "wiki/concepts/flare.md": {
+      "hash": "115996ce0d3dfeee28855ca80db8dac0",
+      "size": 1324,
+      "mtimeMs": 1790971803640
+    },
+    "wiki/concepts/fourier-optics.md": {
+      "hash": "bdd9b02475461e85716462e3e0ef379a",
+      "size": 1324,
+      "mtimeMs": 1790970638775
+    },
+    "wiki/concepts/jones-pupil.md": {
+      "hash": "cb0bf773747ded27377f0dbc3bbbcd67",
+      "size": 1506,
+      "mtimeMs": 1790971804058
+    },
+    "wiki/concepts/köhler-illumination.md": {
+      "hash": "78ffaa8290e0ed92e0c3ddf84e433582",
+      "size": 1147,
+      "mtimeMs": 1790970639040
+    },
+    "wiki/concepts/lumped-parameter-model.md": {
+      "hash": "0570734bcde3697d63f82a3c6cbd9e72",
+      "size": 1576,
+      "mtimeMs": 1790975885722
+    },
+    "wiki/concepts/mask-error-enhancement-factor.md": {
+      "hash": "caa1c2db3cec91ab4e72a6c05f59c5e3",
+      "size": 2156,
+      "mtimeMs": 1790976754891
+    },
+    "wiki/concepts/moores-law.md": {
+      "hash": "c934a69b1f336c7b47f9f6cfca011515",
+      "size": 1251,
+      "mtimeMs": 1790969293418
+    },
+    "wiki/concepts/nils-與影像邊緣品質.md": {
+      "hash": "3dc1ad818bde0834169864ee2e983706",
+      "size": 1391,
+      "mtimeMs": 1790971804134
+    },
+    "wiki/concepts/notch-model.md": {
+      "hash": "a8f6a3345bd0125dc507ff0b8dd32762",
+      "size": 1215,
+      "mtimeMs": 1790975885711
+    },
+    "wiki/concepts/oai.md": {
+      "hash": "097b01f868269e174df4997f5266c7f7",
+      "size": 1921,
+      "mtimeMs": 1790978213248
+    },
+    "wiki/concepts/opc.md": {
+      "hash": "029f4286fe4f67140db4e7d529b99254",
+      "size": 1752,
+      "mtimeMs": 1790978213244
+    },
+    "wiki/concepts/original-mack-model.md": {
+      "hash": "4c47b5b93c311da487a9d331f658a9c4",
+      "size": 1535,
+      "mtimeMs": 1790975885707
+    },
+    "wiki/concepts/overlay-控制.md": {
+      "hash": "f9a19ce7d98cb429a4726c8f7ae5f30e",
+      "size": 1918,
+      "mtimeMs": 1790976754892
+    },
+    "wiki/concepts/peb-擴散與-dpsf.md": {
+      "hash": "699dbf0a644ac960602a067c75f875e0",
+      "size": 1666,
+      "mtimeMs": 1790974339087
+    },
+    "wiki/concepts/photoacid-generator.md": {
+      "hash": "6ce65a6ff32b61e7c18c58cc17872145",
+      "size": 1239,
+      "mtimeMs": 1790975124980
+    },
+    "wiki/concepts/psm.md": {
+      "hash": "655d0b483f4e74a64cc3f418e50cb426",
+      "size": 1214,
+      "mtimeMs": 1790978213250
+    },
+    "wiki/concepts/radiometric-correction.md": {
+      "hash": "6110e2f87e8d40bdf4630448599d61b6",
+      "size": 1088,
+      "mtimeMs": 1790970638937
+    },
+    "wiki/concepts/rdpsf.md": {
+      "hash": "40d651495c688a0c8ed9a9e934bd5541",
+      "size": 1289,
+      "mtimeMs": 1790975124990
+    },
+    "wiki/concepts/ret.md": {
+      "hash": "2128e1e87ebf063118a5524a1f84d693",
+      "size": 1729,
+      "mtimeMs": 1790978213242
+    },
+    "wiki/concepts/sraf.md": {
+      "hash": "bf29eb8480ad37ff5782853f63b439ff",
+      "size": 1544,
+      "mtimeMs": 1790978213246
+    },
+    "wiki/concepts/swing-curves.md": {
+      "hash": "da48f275ef1f40466f77215df2a08e5a",
+      "size": 2075,
+      "mtimeMs": 1790973704378
+    },
+    "wiki/concepts/tarc.md": {
+      "hash": "80ea5b1ae9466dec05b88159d510461d",
+      "size": 1310,
+      "mtimeMs": 1790973704380
+    },
+    "wiki/concepts/variable-threshold-resist-model.md": {
+      "hash": "4bcebb061c6d7ddc7ccb34866a261706",
+      "size": 1309,
+      "mtimeMs": 1790975885724
+    },
+    "wiki/concepts/修正-fujita-doolittle-模型.md": {
+      "hash": "41dbc40c992857da1ab193dd97af11bf",
+      "size": 1808,
+      "mtimeMs": 1790974339085
+    },
+    "wiki/concepts/光學微影.md": {
+      "hash": "3b9ed655f5d91cf10b8dc2315c898f75",
+      "size": 1114,
+      "mtimeMs": 1790969293388
+    },
+    "wiki/concepts/光阻內成像.md": {
+      "hash": "91f09fc8e4a548407d932fa6ce4b88c7",
+      "size": 2534,
+      "mtimeMs": 1790973704382
+    },
+    "wiki/concepts/光阻化學隨機建模.md": {
+      "hash": "154c1cfceb9cde407aea8176f08ad586",
+      "size": 2052,
+      "mtimeMs": 1790975124994
+    },
+    "wiki/concepts/光阻烘烤.md": {
+      "hash": "2ea9aaeceb9b2c0d31db4ea23486ea68",
+      "size": 1033,
+      "mtimeMs": 1790969293430
+    },
+    "wiki/concepts/光阻理論對比度與量測對比度.md": {
+      "hash": "f35797801d39ef2a27dfb22366676a4e",
+      "size": 2027,
+      "mtimeMs": 1790975885718
+    },
+    "wiki/concepts/化學放大型光阻.md": {
+      "hash": "dd1cb33b3228563e8c91b3a3532dd36a",
+      "size": 731,
+      "mtimeMs": 1790969293437
+    },
+    "wiki/concepts/向量成像與偏振.md": {
+      "hash": "3fde27d0286c60a3de048c9219ea120b",
+      "size": 1563,
+      "mtimeMs": 1790971804028
+    },
+    "wiki/concepts/圖案倒塌.md": {
+      "hash": "77f534d0e6c060e3cbe732581de9e6e0",
+      "size": 1763,
+      "mtimeMs": 1790976754898
+    },
+    "wiki/concepts/圖案轉移.md": {
+      "hash": "34fdd269add50451bc1113852292ddd6",
+      "size": 784,
+      "mtimeMs": 1790969293393
+    },
+    "wiki/concepts/數值孔徑與解析度.md": {
+      "hash": "793512435954e7b7cf89cd19532bd938",
+      "size": 1414,
+      "mtimeMs": 1790970638856
+    },
+    "wiki/concepts/旋轉塗佈.md": {
+      "hash": "972afe1c41addde5f12f4b394ed27bb7",
+      "size": 878,
+      "mtimeMs": 1790969293426
+    },
+    "wiki/concepts/曝光互易性.md": {
+      "hash": "26c9fa265ea4fcc32a806186d15a3a7b",
+      "size": 1176,
+      "mtimeMs": 1790974339083
+    },
+    "wiki/concepts/有效吸收係數.md": {
+      "hash": "c93955dbff7629d27481467345d80f97",
+      "size": 1703,
+      "mtimeMs": 1790973704384
+    },
+    "wiki/concepts/浸潤微影.md": {
+      "hash": "79d9da355b78b122bea9827a17f3f6c3",
+      "size": 1477,
+      "mtimeMs": 1790971804090
+    },
+    "wiki/concepts/潛像梯度與-chemical-contrast.md": {
+      "hash": "5369315c303b2f0afce327b047caac04",
+      "size": 2260,
+      "mtimeMs": 1790977491164
+    },
+    "wiki/concepts/焦距與曝光製程窗口.md": {
+      "hash": "1c2fa7ae2c16feaf048971ba54239119",
+      "size": 2130,
+      "mtimeMs": 1790976754889
+    },
+    "wiki/concepts/空間同調與部分同調.md": {
+      "hash": "50ec66bce2eee8451555e6eabc280fb3",
+      "size": 1465,
+      "mtimeMs": 1790970638806
+    },
+    "wiki/concepts/線端縮短.md": {
+      "hash": "136bea796335b0a10491816b0362edf4",
+      "size": 1399,
+      "mtimeMs": 1790976754894
+    },
+    "wiki/concepts/線邊緣粗糙度.md": {
+      "hash": "f86b98499c405b25e18de934375cbeab",
+      "size": 1911,
+      "mtimeMs": 1790977491167
+    },
+    "wiki/concepts/聚合物去保護反應.md": {
+      "hash": "d5410b06d372900ffd403f31fda23a0b",
+      "size": 1290,
+      "mtimeMs": 1790975124983
+    },
+    "wiki/concepts/自然解析度.md": {
+      "hash": "c914fdb06ecb4be0bb2198ea3635a880",
+      "size": 1747,
+      "mtimeMs": 1790978213255
+    },
+    "wiki/concepts/蝕刻選擇比與光阻輪廓.md": {
+      "hash": "674c55db71c5c056725f83a4a5795d87",
+      "size": 1178,
+      "mtimeMs": 1790969293398
+    },
+    "wiki/concepts/表面抑制.md": {
+      "hash": "34dd6fc9c58b1e69165204fc2a984abc",
+      "size": 1523,
+      "mtimeMs": 1790975885715
+    },
+    "wiki/concepts/酸損失與曝光後延遲.md": {
+      "hash": "b89a19b6eedba45fb1d63c5afd553b61",
+      "size": 1276,
+      "mtimeMs": 1790975124985
+    },
+    "wiki/concepts/鏡頭像差與-zernike-polynomial.md": {
+      "hash": "c80ca4cefe88fadee277c7199bf69449",
+      "size": 1555,
+      "mtimeMs": 1790971803590
+    },
+    "wiki/concepts/關鍵形狀誤差與邊緣位置誤差.md": {
+      "hash": "d1486aef0b9c18ef3c5876fba9494f47",
+      "size": 1396,
+      "mtimeMs": 1790976754896
+    },
+    "wiki/concepts/離子植入遮罩.md": {
+      "hash": "1976b5685f07fa381ca3a88e9e02566d",
+      "size": 906,
+      "mtimeMs": 1790969293402
+    },
+    "wiki/concepts/離焦與焦深.md": {
+      "hash": "f9b00fda4dbe311da70bbb5316da38ad",
+      "size": 1846,
+      "mtimeMs": 1790971803621
+    },
+    "wiki/concepts/顯影路徑與最短時間原理.md": {
+      "hash": "3014719f83c072f12d0046d430db5be6",
+      "size": 1508,
+      "mtimeMs": 1790975885720
+    },
+    "wiki/concepts/駐波與-barc.md": {
+      "hash": "80d42a53ea6a217b55ffb53e8b3e841a",
+      "size": 854,
+      "mtimeMs": 1790969293433
+    },
+    "wiki/concepts/點擴散函數.md": {
+      "hash": "2e2aedd4153da60ad1bd1e01d4ba83ee",
+      "size": 1272,
+      "mtimeMs": 1790970638894
+    },
+    "wiki/entities/apex-e.md": {
+      "hash": "13d9184e46d6453ec61bc7a157181758",
+      "size": 985,
+      "mtimeMs": 1790975124974
+    },
+    "wiki/entities/august-köhler.md": {
+      "hash": "fe19e07aeb2cf728273b51935fffe549",
+      "size": 676,
+      "mtimeMs": 1790970638749
+    },
+    "wiki/entities/az-7500.md": {
+      "hash": "7db8bb9756fee9600af407b480e91a42",
+      "size": 692,
+      "mtimeMs": 1790969293371
+    },
+    "wiki/entities/bossung-j-w.md": {
+      "hash": "fda2f63acad9b647b55c16afc7cc8d13",
+      "size": 827,
+      "mtimeMs": 1790976754883
+    },
+    "wiki/entities/chris-mack.md": {
+      "hash": "d02188c7351ab37e60c48f9abaceb95c",
+      "size": 684,
+      "mtimeMs": 1790969293268
+    },
+    "wiki/entities/development-rate-monitor.md": {
+      "hash": "92c50b6011e0681537b29153c562bac4",
+      "size": 1083,
+      "mtimeMs": 1790975885705
+    },
+    "wiki/entities/dnq.md": {
+      "hash": "17bd95641c1682bc8dd0905b3b6490c9",
+      "size": 1328,
+      "mtimeMs": 1790974339074
+    },
+    "wiki/entities/e-c-kintner.md": {
+      "hash": "c0541033a928791ddaf99f4abd2013da",
+      "size": 750,
+      "mtimeMs": 1790970638723
+    },
+    "wiki/entities/frechet-j-m-j.md": {
+      "hash": "4332ff7b8954061252111affec48e3a4",
+      "size": 822,
+      "mtimeMs": 1790975124964
+    },
+    "wiki/entities/gca-corp.md": {
+      "hash": "3251ee6e47d93dd43fecfc3aa1589847",
+      "size": 562,
+      "mtimeMs": 1790969293361
+    },
+    "wiki/entities/gordon-moore.md": {
+      "hash": "b142e48d8b433090f4cfa782eef0446e",
+      "size": 799,
+      "mtimeMs": 1790969293277
+    },
+    "wiki/entities/h-h-hopkins.md": {
+      "hash": "6e9e76fd23a82dac45f0091b534ddeeb",
+      "size": 796,
+      "mtimeMs": 1790970638703
+    },
+    "wiki/entities/hmds.md": {
+      "hash": "7fce9b6e2bb8659bb9b5aa2e8c8df2cf",
+      "size": 782,
+      "mtimeMs": 1790969293377
+    },
+    "wiki/entities/ibm.md": {
+      "hash": "1e7dd2c8615ac84799a5ac72d27383ab",
+      "size": 787,
+      "mtimeMs": 1790975124967
+    },
+    "wiki/entities/intel.md": {
+      "hash": "661ff968ca21fa07da79857e63a8decf",
+      "size": 741,
+      "mtimeMs": 1790969293309
+    },
+    "wiki/entities/ito-h.md": {
+      "hash": "baed14cae4291a8e2e8eb2e6684275f5",
+      "size": 834,
+      "mtimeMs": 1790975124960
+    },
+    "wiki/entities/itrs.md": {
+      "hash": "d945a424591d8e07354fb96cae878ba1",
+      "size": 682,
+      "mtimeMs": 1790969293328
+    },
+    "wiki/entities/kodak-820.md": {
+      "hash": "c1162ec29fa22e3c876f6eebdffaf912",
+      "size": 1075,
+      "mtimeMs": 1790974339079
+    },
+    "wiki/entities/lord-rayleigh.md": {
+      "hash": "9b5cf303546787260e3f083ab733dc6e",
+      "size": 877,
+      "mtimeMs": 1790971803512
+    },
+    "wiki/entities/marc-levenson.md": {
+      "hash": "7b8511eed585491420530ed08df689ab",
+      "size": 1249,
+      "mtimeMs": 1790978213240
+    },
+    "wiki/entities/marian-von-smoluchowski.md": {
+      "hash": "8f2adf09c0312ad03e05c0651a5f0f06",
+      "size": 812,
+      "mtimeMs": 1790975124977
+    },
+    "wiki/entities/novolac.md": {
+      "hash": "9c29c02b5bdd912846d1f346ae0eb241",
+      "size": 1052,
+      "mtimeMs": 1790974339076
+    },
+    "wiki/entities/ntrs.md": {
+      "hash": "5bd1cdaafab9e5ac4c900a1f2833543d",
+      "size": 721,
+      "mtimeMs": 1790969293323
+    },
+    "wiki/entities/perkin-elmer.md": {
+      "hash": "90d50d3ee3ef90e002317d618cc196b4",
+      "size": 628,
+      "mtimeMs": 1790969293334
+    },
+    "wiki/entities/polyhydroxystyrene.md": {
+      "hash": "9a78fd874305831ae348f750b45e3d2f",
+      "size": 1089,
+      "mtimeMs": 1790975124969
+    },
+    "wiki/entities/prolith.md": {
+      "hash": "93ecb10c6a232a43910d210d781bd906",
+      "size": 643,
+      "mtimeMs": 1790970638682
+    },
+    "wiki/entities/semi-p35-1106.md": {
+      "hash": "a7d5681a6789fca178d00f210c39d971",
+      "size": 892,
+      "mtimeMs": 1790976754877
+    },
+    "wiki/entities/semiconductor-industry-association.md": {
+      "hash": "369b8756e00de2ada064b6eecfb07225",
+      "size": 635,
+      "mtimeMs": 1790969293317
+    },
+    "wiki/entities/svg-lithography.md": {
+      "hash": "394abe3b0131275231346b0a8ee9681b",
+      "size": 635,
+      "mtimeMs": 1790969293366
+    },
+    "wiki/entities/t-butoxycarbonyl.md": {
+      "hash": "f2deaf7994fbc1d3ff8835f42b5ec24f",
+      "size": 941,
+      "mtimeMs": 1790975124972
+    },
+    "wiki/entities/tanaka-t.md": {
+      "hash": "0601fac2c58d37da046d14c473a3ae8f",
+      "size": 946,
+      "mtimeMs": 1790976754885
+    },
+    "wiki/entities/thmr-ip3650.md": {
+      "hash": "7123f5449532133134db1929f6f19851",
+      "size": 971,
+      "mtimeMs": 1790975885703
+    },
+    "wiki/entities/tim-brunner.md": {
+      "hash": "491f43bb503b991636c376dcbf4b1371",
+      "size": 1078,
+      "mtimeMs": 1790976754879
+    },
+    "wiki/entities/tmah.md": {
+      "hash": "cc51d12ebda888f00a9687ae995fe870",
+      "size": 652,
+      "mtimeMs": 1790969293382
+    },
+    "wiki/entities/wilhelm-maurer.md": {
+      "hash": "5cec9a91404068f044ae5d8eeb88937e",
+      "size": 811,
+      "mtimeMs": 1790976754881
+    },
+    "wiki/entities/willson-c-g.md": {
+      "hash": "f7a89c678e19adeffa739b4f43b57879",
+      "size": 812,
+      "mtimeMs": 1790975124962
+    },
+    "wiki/findings/apex-e-在-026-n-下的選擇性溫度峰值.md": {
+      "hash": "4920c43e06d74762d1d8056db7e2909a",
+      "size": 1273,
+      "mtimeMs": 1790975885730
+    },
+    "wiki/findings/az-7500-植入深度冪律擬合.md": {
+      "hash": "94588fdfd8b4110e583ff6453dee400c",
+      "size": 1072,
+      "mtimeMs": 1790969293446
+    },
+    "wiki/findings/kodak-820-的-pab-熱分解參數.md": {
+      "hash": "4c428aa55a89aaf9f3bab497d2fb7187",
+      "size": 1334,
+      "mtimeMs": 1790974339096
+    },
+    "wiki/findings/sraf-提高示例重疊-dof.md": {
+      "hash": "d6ec56469dbea809ef9a1337f5284157",
+      "size": 1270,
+      "mtimeMs": 1790978213262
+    },
+    "wiki/findings/低-k1-光阻對比度影響-meef.md": {
+      "hash": "b6b8b1582fd042212d350bfd4c016986",
+      "size": 1273,
+      "mtimeMs": 1790976754908
+    },
+    "wiki/findings/化學放大型光阻存在梯度最佳-peb.md": {
+      "hash": "c3a3f0ec76e1675a295403ceeb8fc2be",
+      "size": 1545,
+      "mtimeMs": 1790977491174
+    },
+    "wiki/findings/圖案倒塌先於-cd-規格失效.md": {
+      "hash": "1d545a090e1023ebbbd67defbba17953",
+      "size": 1111,
+      "mtimeMs": 1790976754910
+    },
+    "wiki/findings/無酸損失-rdpsf-保留較多-fourier-振幅.md": {
+      "hash": "39edf0e35ac87e5ad27606aebe0f16e0",
+      "size": 1383,
+      "mtimeMs": 1790977491171
+    },
+    "wiki/findings/酸擴散造成-ler-雜訊與梯度權衡.md": {
+      "hash": "48af9fb9e8f6aa394df9e443959e2394",
+      "size": 1302,
+      "mtimeMs": 1790977491176
+    },
+    "wiki/findings/非零-dof-要求下存在最佳-na.md": {
+      "hash": "5e33dcc952fee51da691b8114dd13073",
+      "size": 1409,
+      "mtimeMs": 1790978213264
+    },
+    "wiki/index.md": {
+      "hash": "c1d2d053cb56ecf2134d1748c820b850",
+      "size": 10025,
+      "mtimeMs": 1790978213281
+    },
+    "wiki/log.md": {
+      "hash": "0ca5878b72df5bf24cb5aaf1278acc1e",
+      "size": 6200,
+      "mtimeMs": 1790978213266
+    },
+    "wiki/methodology/abbe-成像計算法.md": {
+      "hash": "9ffb4b5e46f8834d6a5ec71bb821262b",
+      "size": 1235,
+      "mtimeMs": 1790970639073
+    },
+    "wiki/methodology/abc-透射率全曲線擬合.md": {
+      "hash": "dd5e36e80650edb80216e45397994527",
+      "size": 1373,
+      "mtimeMs": 1790974339089
+    },
+    "wiki/methodology/barc-穩健最佳化.md": {
+      "hash": "1c3489750773b72b122ead2bd08f6f28",
+      "size": 1907,
+      "mtimeMs": 1790973704389
+    },
+    "wiki/methodology/composite-cd-空間分解.md": {
+      "hash": "61eb217eb2348107dbe4f30bc1926b6f",
+      "size": 1538,
+      "mtimeMs": 1790976754900
+    },
+    "wiki/methodology/drm-顯影參數萃取.md": {
+      "hash": "02515e27b569c91cb52da7c712499a61",
+      "size": 1587,
+      "mtimeMs": 1790975885726
+    },
+    "wiki/methodology/hopkins-成像計算法.md": {
+      "hash": "1be92960aba177703fcaffed3c0a34f3",
+      "size": 1172,
+      "mtimeMs": 1790970639136
+    },
+    "wiki/methodology/kintner-成像計算法.md": {
+      "hash": "5c2adf7b7d578f944222d4303c54123f",
+      "size": 1179,
+      "mtimeMs": 1790970639307
+    },
+    "wiki/methodology/model-based-opc-校準與迭代.md": {
+      "hash": "702e4aafee3a2bbb7b6b365cfdbc2d74",
+      "size": 2006,
+      "mtimeMs": 1790978213257
+    },
+    "wiki/methodology/nils-defocus-最佳化與曝光裕度校準.md": {
+      "hash": "0b1b49e74e8152e28470d0b5f9cdd7eb",
+      "size": 2263,
+      "mtimeMs": 1790977491169
+    },
+    "wiki/methodology/overlay-fingerprint-表徵.md": {
+      "hash": "294a63779093b05623517396c2b5e079",
+      "size": 1491,
+      "mtimeMs": 1790976754902
+    },
+    "wiki/methodology/peb-膜厚損失動力學量測.md": {
+      "hash": "a1feaf8e4821d7d5ddac92b2a6c80b13",
+      "size": 1525,
+      "mtimeMs": 1790975124997
+    },
+    "wiki/methodology/practical-contrast-量測.md": {
+      "hash": "7d75e2bca071821ba2129c1078b9d745",
+      "size": 1428,
+      "mtimeMs": 1790975885728
+    },
+    "wiki/methodology/sum-of-coherent-sources.md": {
+      "hash": "8991b0b069f72c1749972044a5e7b3e9",
+      "size": 1208,
+      "mtimeMs": 1790970639215
+    },
+    "wiki/methodology/以-a-量測-pac-熱分解.md": {
+      "hash": "f23415ee5b275efb9be4ee1f64c3eb57",
+      "size": 1436,
+      "mtimeMs": 1790974339091
+    },
+    "wiki/methodology/即時-ftir-peb-反應量測.md": {
+      "hash": "4c1718a1a59baba94cb8fcaf85c167fb",
+      "size": 1276,
+      "mtimeMs": 1790975124999
+    },
+    "wiki/methodology/含像差與離焦的瞳孔建模.md": {
+      "hash": "117cbf71b6504d5a304fb26f9bd927e6",
+      "size": 1627,
+      "mtimeMs": 1790971804168
+    },
+    "wiki/methodology/大型島形圖案-flare-量測.md": {
+      "hash": "80c839ff3311676743f1e99bf56301f6",
+      "size": 1403,
+      "mtimeMs": 1790971804231
+    },
+    "wiki/methodology/晶圓烘烤熱歷程建模.md": {
+      "hash": "5b68d84111e303ccd8262c8648277e55",
+      "size": 1692,
+      "mtimeMs": 1790974339093
+    },
+    "wiki/methodology/雙標靶劑量與焦距監控.md": {
+      "hash": "e827a52366e9a4a6d93997b169bb7ef0",
+      "size": 1571,
+      "mtimeMs": 1790976754904
+    },
+    "wiki/overview.md": {
+      "hash": "3a6b8de12b70516be93fe9f2f947b45c",
+      "size": 210,
+      "mtimeMs": 1790967145532
+    },
+    "wiki/queries/swing-ratio-極值厚度差是否為半週期.md": {
+      "hash": "e7b4f262ff01988b5b9ff87455954dda",
+      "size": 1484,
+      "mtimeMs": 1790973704393
+    },
+    "wiki/queries/不等酸與-quencher-擴散係數如何影響-nils-與-ler-最佳化.md": {
+      "hash": "1d22d7055e863f33cc9bb085d4e66f73",
+      "size": 1577,
+      "mtimeMs": 1790977491180
+    },
+    "wiki/queries/製程窗口橢圓應採何種聯合覆蓋率.md": {
+      "hash": "a81fc1e67d037c9c7e2542c7c752f8ac",
+      "size": 1291,
+      "mtimeMs": 1790976754913
+    },
+    "wiki/queries/隨機曝光事件定義是否一致.md": {
+      "hash": "cf120a380d8b41e045a7a7bd5799f0ed",
+      "size": 1342,
+      "mtimeMs": 1790975125001
+    },
+    "wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md": {
+      "hash": "262541da2645d74938acaa3f9b609643",
+      "size": 7214,
+      "mtimeMs": 1790969293263
+    },
+    "wiki/sources/19-optical-lithography--8-02-ch2--k73j1g.md": {
+      "hash": "4ba5515ac5699f5945e069a7503b2c9a",
+      "size": 9758,
+      "mtimeMs": 1790970638549
+    },
+    "wiki/sources/19-optical-lithography--8-03-ch3--s477p8.md": {
+      "hash": "6cbb2212ecab7e4ed2ee0ae0d27929a9",
+      "size": 10097,
+      "mtimeMs": 1790971803340
+    },
+    "wiki/sources/19-optical-lithography--8-04-ch4--ccwms.md": {
+      "hash": "507dcf32f70c9c043c4626dd819dddc7",
+      "size": 8433,
+      "mtimeMs": 1790973704375
+    },
+    "wiki/sources/19-optical-lithography--8-05-ch5--x0rq4s.md": {
+      "hash": "1ad0d8902fb81f3e1163dab707bd1b3e",
+      "size": 9560,
+      "mtimeMs": 1790974339072
+    },
+    "wiki/sources/19-optical-lithography--8-06-ch6--1wif8.md": {
+      "hash": "be7fc8690ecf5c163237c2ac49c2daa5",
+      "size": 7783,
+      "mtimeMs": 1790975124958
+    },
+    "wiki/sources/19-optical-lithography--8-07-ch7--dxj4cs.md": {
+      "hash": "e47bfda4aedc03dbe6d35dffc7eeaade",
+      "size": 9437,
+      "mtimeMs": 1790975885700
+    },
+    "wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md": {
+      "hash": "d2b1415df10c5120b9a794d23f5b8c26",
+      "size": 9038,
+      "mtimeMs": 1790976754875
+    },
+    "wiki/sources/19-optical-lithography--8-09-ch9--1xlwz30.md": {
+      "hash": "bae51cf0d3f0d349c817bfc5e2b3b60b",
+      "size": 7051,
+      "mtimeMs": 1790977491161
+    },
+    "wiki/sources/19-optical-lithography--9-10-ch10--y2hwiy.md": {
+      "hash": "63943487add7951350d9636a6dcc84ee",
+      "size": 9167,
+      "mtimeMs": 1790978213237
+    },
+    "wiki/synthesis/微影資訊傳遞與-cd-誤差傳播.md": {
+      "hash": "0444e306d6fb3593ea3015b68b906bcb",
+      "size": 2399,
+      "mtimeMs": 1790977491178
+    }
+  }
+}

@@ -1,0 +1,280 @@
+[
+  {
+    "id": "msg_1791129662327_9_emq858",
+    "role": "user",
+    "content": "overlay是什麼？ 有什麼相關的文件嗎？",
+    "timestamp": 1791129662327,
+    "conversationId": "conv_1791129660682_tu3foy"
+  },
+  {
+    "id": "msg_1791129677090_10_cqiwu5",
+    "role": "assistant",
+    "content": "## overlay 是什麼？\n\n**overlay（疊對）** 指的是新微影層相對於晶圓上既有圖形的位置誤差控制。它與 *registration*（registration 衡量圖形相對**絕對座標網格**的位置）不同，兩者不可混用。核心頁面見 [[overlay 控制]]（`wiki/concepts/overlay-控制.md`）。\n\n### 主要內容\n\n**量測偏差**\n- box-in-box：以兩側間隙差的一半估計位置差，可抵消對稱 CD 變化，但無法抵消不對稱。\n- [[aim]]：利用多條帶改善精密度與製程穩健性。\n- 本章採 `TIS = Overlay(0°) + Overlay(180°)` 的定義；固定 TIS 可校正，其變動才增加不確定度。\n- WIS（晶圓誘發位移）由標靶不對稱造成，可能與量測焦距交互作用，不保證能用固定偏移修正。\n\n**模型及可識別性**\n- 基本線性模型含晶圓與場內各兩個旋轉、倍率項，加上共用的兩個平移項，共 10 個係數。\n- 平移無法單從此模型分離為晶圓或 reticle 來源；backlash 另加入兩個隨掃描方向改號的平移項。\n- 高階畸變、reticle registration 及 stage signature 需額外表徵 → [[overlay fingerprint 表徵]]。殘差不能未經檢查便視為純隨機。\n\n**批次處置**\n- overlay 資料可用於批次放行、曝光工具設定修正及量測診斷。\n- 稀疏量測點的最大值未必代表未取樣區域；較有意義的是結合模型與誤差估計，預測每個 die 的 overlay-limited yield，再比較良率損失與重工成本。\n- 可修正項是對已處理批次的回溯估計；用於下一批次的 APC 仍依賴誤差的時間穩定性。\n\n---\n\n## 相關文件\n\n| 頁面 | 類型 | 說明 |\n|------|------|------|\n| `wiki/concepts/overlay-控制.md` | concept | overlay 控制主頁：量測偏差、模型、批次處置 |\n| `wiki/methodology/overlay-fingerprint-表徵.md` | methodology | overlay fingerprint 表徵（工具匹配等） |\n| `wiki/comparisons/overlay-與-pattern-placement-error-比較.md` | comparison | overlay 與 pattern placement error（PPE）的區分 |\n| `wiki/concepts/aim.md` | concept | AIM 標靶 |\n| `wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md` | source | 主要來源：Optical Lithography ch8，§8.4 |\n| `wiki/index.md` | overview | 索引（可查所有相關頁面） |\n\n延伸關聯（圖譜）：`adi-與重工`、以及 tag `量測` 下的其他條目。\n\n若你需要，我可以把上述整理成一份綜合頁（synthesis）或補上「overlay 控制」目前缺的細節。",
+    "timestamp": 1791129677090,
+    "conversationId": "conv_1791129660682_tu3foy",
+    "references": [
+      {
+        "title": "overlay 控制",
+        "path": "wiki/concepts/overlay-控制.md",
+        "kind": "wiki",
+        "snippet": "--- type: concept title: overlay 控制 created: 2026-10-03 updated: 2026-10-03 tags: [微影, overlay, 量測] related: [ai..."
+      },
+      {
+        "title": "overlay fingerprint 表徵",
+        "path": "wiki/methodology/overlay-fingerprint-表徵.md",
+        "kind": "wiki",
+        "snippet": "--- type: methodology title: overlay fingerprint 表徵 created: 2026-10-03 updated: 2026-10-03 tags: [overlay, 量測, 工具匹配..."
+      },
+      {
+        "title": "overlay 與 pattern placement error 比較",
+        "path": "wiki/comparisons/overlay-與-pattern-placement-error-比較.md",
+        "kind": "wiki",
+        "snippet": "--- type: comparison title: overlay 與 pattern placement error 比較 created: 2026-10-03 updated: 2026-10-03 tags: [ove..."
+      },
+      {
+        "title": "SRAF 提高示例重疊 DOF",
+        "path": "wiki/findings/sraf-提高示例重疊-dof.md",
+        "kind": "wiki",
+        "snippet": "# SRAF 提高示例重疊 DOF: # SRAF 提高示例重疊 DOF"
+      },
+      {
+        "title": "Wiki Index",
+        "path": "wiki/index.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "...-error-enhancement-factor]] — Mask Error Enhancement Factor (MEEF) - [[concepts/overlay-控制]] — overlay 控制 - [[concepts/線端縮短]] — 線端縮短 - [[concepts/關鍵形狀誤差與邊緣位置誤差]] — 關鍵形...",
+        "graphRelations": [
+          "SRAF 提高示例重疊 DOF",
+          "overlay fingerprint 表徵",
+          "overlay 控制",
+          "overlay 與 pattern placement error 比較",
+          "半導體製造中的微影控制"
+        ]
+      }
+    ],
+    "agentSteps": [
+      {
+        "id": "backend-0-skills.load-completed",
+        "type": "tool_result",
+        "tool": "project_file_read",
+        "message": "35 skill(s) available",
+        "status": "success",
+        "timestamp": 1791129662451
+      },
+      {
+        "id": "backend-1-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "overlay",
+        "status": "running",
+        "timestamp": 1791129663625
+      },
+      {
+        "id": "backend-2-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 5 new, mode=hybrid, tokenHits=10, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1791129671668
+      },
+      {
+        "id": "backend-3-wiki.read_page-started",
+        "type": "tool_call",
+        "tool": "project_file_read",
+        "message": "wiki/concepts/overlay-控制.md",
+        "status": "running",
+        "timestamp": 1791129673066
+      },
+      {
+        "id": "backend-4-wiki.read_page-completed",
+        "type": "tool_result",
+        "tool": "project_file_read",
+        "message": "read wiki/concepts/overlay-控制.md\n--- type: concept title: overlay 控制 created: 2026-10-03 updated: 2026-10-03 tags: [微影, overlay, 量測] related: [aim, overlay-fingerprint-表徵, overlay-與-pattern-placement-error-比較, adi-與重工, 19-optical-lithography--8-08-ch8--1az2fh0] sources: [\"optical-lithography/08 - ch8.pdf\"] --- # overlay 控制 overlay 控制管理新微影層相對晶圓既有圖形的位置誤差。registration 則衡量圖形相對絕對座標網格的位置，兩者不可混用。 ## 量測偏差 box-in-box 以兩側間隙差的一半估計位置差，可抵消對稱 CD 變化，不能抵消不對稱。[[aim]]利用多條帶改善精密度與製程穩健性。 本章採用 \\(TIS=Overlay(0^\\circ)+Overlay(180^\\circ)\\) 的定義。固定 TIS 可校正，其變動才增加不確定度。WIS 是標靶不對稱造成的晶圓誘發位移，且可能與量測焦距交互作用，不保證可用固定偏移修正。 ## 模型及可識別性 基本線性模型包含晶圓與場內各兩個旋轉、倍率項，加上共用的兩個平移項，共 10 個係數。平移無法單從此模型分離為晶圓與 reticle 來源。 backlash 加入兩個隨掃描方向改號的平移項。高階畸變、reticle registration 及 stage signature 則需額外表徵；見 [[overlay-fingerprint-表徵]]。殘差不能未经檢查便視為純隨機。 ## 批次處置 overlay 資料可用於批次放行、曝光工具設定修正及量測診斷。稀疏量測點的最大值未必代表未取樣區域；較有意義的做法是结合模型與誤差估計，預測每個 die 的 overlay-limited yield，再比較良率損失與重工成本。 可修正項是對已處理批次的回溯估計；用於下一批次的 APC 仍依賴誤差的時間穩定性。與圖形特定位置誤差的區分見 [[overlay-與-pattern-placement-error-比較]]。 來源：[[19-optical-lithography--8-08-ch8--1az2fh0]]，§8.4。\nKnowledge context: {\"backlinks\":[\"wiki/concepts/aim.md\",\"wiki/index.md\",\"wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md\"],\"linkCount\":7,\"outgoingLinks\":[\"19-optical-lithography--8-08-ch8--1az2fh0\",\"aim\",\"overlay-fingerprint-表徵\",\"overlay-與-pattern-placement-error-比較\"],\"tags\":[\"微影\",\"overlay\",\"量測\"]}",
+        "status": "success",
+        "timestamp": 1791129673079
+      }
+    ]
+  },
+  {
+    "id": "msg_1791129680131_11_xcf7bp",
+    "role": "user",
+    "content": "cut od你會知道是什麼嗎?",
+    "timestamp": 1791129680131,
+    "conversationId": "conv_1791129660682_tu3foy"
+  },
+  {
+    "id": "msg_1791129696435_12_grx5kk",
+    "role": "assistant",
+    "content": "## 「cut OD」我知道的是什麼？\n\n老實說：**單憑這個 wiki 的內容，我無法確認「cut OD」是一個已收錄的術語。** 我先說明我對它的理解，再說明資料庫裡的實際狀況。\n\n### 我的理解（一般半導體製程用語）\n\n- **OD** = *oxide definition*（也有寫成 *active area / OD layer*），指 CMOS 製程中定義**主動區（源／汲與通道）**的遮罩層，用來界定哪裡要有場氧化層、哪裡要保留矽表面做元件。\n- **cut OD** 通常指**把原本連續的 OD 圖形切開**的一道遮罩或一個 OPC/設計步驟：例如把大塊 OD 切成彼此隔離的主動區島嶼、或在 OD 中開出隔離用的切口（cut）。在 double patterning / 先進節點流程裡，也可能是指某個 OD 層的「cut mask」（切斷遮罩）。\n- 這與 **cut mask／cut layer** 的一般模式一致：連續圖形先形成，再用一道「cut」把它斷開，以突破單次曝光的間距限制。\n\n### 這個 wiki 的實際狀況\n\n- 檢索相關頁面（overlay 控制、圖案轉移、OPC、RET/解析度增強等多個條目）**都沒有出現「cut OD」的定義或討論**。\n- 最接近的相關概念是 [[圖案轉移]]（`wiki/concepts/圖案轉移.md`）、[[opc]]（`wiki/concepts/opc.md`）與 [[ret]]／解析度增強技術條目——它們處理圖案化與遮罩修正，但沒有觸及 OD 層的 cut 步驟。\n- 也就是說：**目前缺少可靠來源，我不該替你補上一個聽起來合理但未經此 wiki 佐證的定義。**\n\n### 建議\n\n如果你要的是這個專案內可引用的說法，需要補一份來源（例如討論 OD / active area 定義、cut mask 或 double patterning 的製程文件），我可以據此新增一個 entity/concept 頁（例如 `wiki/concepts/cut-od.md`），並連到 [[圖案轉移]] 與 [[opc]]。你手上若有該定義出處，直接貼給我，我就照其內容整理。",
+    "timestamp": 1791129696435,
+    "conversationId": "conv_1791129660682_tu3foy",
+    "references": [
+      {
+        "title": "overlay 控制",
+        "path": "wiki/concepts/overlay-控制.md",
+        "kind": "wiki",
+        "snippet": "--- type: concept title: overlay 控制 created: 2026-10-03 updated: 2026-10-03 tags: [微影, overlay, 量測] related: [ai..."
+      },
+      {
+        "title": "overlay 與 pattern placement error 比較",
+        "path": "wiki/comparisons/overlay-與-pattern-placement-error-比較.md",
+        "kind": "wiki",
+        "snippet": "--- type: comparison title: overlay 與 pattern placement error 比較 created: 2026-10-03 updated: 2026-10-03 tags: [ove..."
+      },
+      {
+        "title": "overlay fingerprint 表徵",
+        "path": "wiki/methodology/overlay-fingerprint-表徵.md",
+        "kind": "wiki",
+        "snippet": "--- type: methodology title: overlay fingerprint 表徵 created: 2026-10-03 updated: 2026-10-03 tags..."
+      },
+      {
+        "title": "光學微影基礎與半導體製程整合",
+        "path": "wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md",
+        "kind": "wiki",
+        "snippet": "... Principles of Optical Lithography: The Science of Microfabrication* 第 1 章 *Introduction to Semiconductor Lithography*，涵蓋第 1–28 頁。章節將微影視為成像、光阻化學、熱處理、顯影、量測與圖案轉移共同構..."
+      },
+      {
+        "title": "Wiki Index",
+        "path": "wiki/index.md",
+        "kind": "wiki",
+        "source": "Graph",
+        "snippet": "...concepts/attenuated-psm]] — attenuated PSM - [[concepts/自然解析度]] — 自然解析度 - [[methodology/model-based-opc-校準與迭代]] — model-based OPC 校準與迭代 - [[comparisons/rule-based...",
+        "graphRelations": [
+          "OAI",
+          "overlay fingerprint 表徵",
+          "overlay 控制",
+          "overlay 與 pattern placement error 比較",
+          "光學微影基礎與半導體製程整合"
+        ]
+      },
+      {
+        "title": "光阻顯影動力學、對比度與顯影路徑",
+        "path": "wiki/sources/19-optical-lithography--8-07-ch7--dxj4cs.md",
+        "kind": "wiki",
+        "snippet": "...cal-lithography, photoresist, development] related: [chris-mack, original-mack-model, enhanced-kinetic-model, notch-model, critical-ionization-model, 表面抑制, 光阻理論對比..."
+      },
+      {
+        "title": "圖案轉移",
+        "path": "wiki/concepts/圖案轉移.md",
+        "kind": "wiki",
+        "snippet": "...created: 2026-10-03 updated: 2026-10-03 tags: [製程整合, 圖案化] related: [光學微影, 蝕刻選擇比與光阻輪廓, 離子植入遮罩] sources: [\"optical-lithography/01 - ch1.pdf\"] --- # 圖案轉移  圖案轉移將光阻圖案轉..."
+      },
+      {
+        "title": "低 k1 光阻對比度影響 MEEF",
+        "path": "wiki/findings/低-k1-光阻對比度影響-meef.md",
+        "kind": "wiki",
+        "snippet": "...tags: [模擬, 光阻對比度, MEEF] related: [mask-error-enhancement-factor, original-mack-model, 光阻理論對比度與量測對比度] sources: [\"optical-lithography/08 - ch8.pdf\"] source: \"[[19-o..."
+      },
+      {
+        "title": "Kodak 820",
+        "path": "wiki/entities/kodak-820.md",
+        "kind": "wiki",
+        "snippet": "--- type: entity title: Kodak 820 created: 2026-10-03 updated: 2026-10-03 tags: [光阻, PAB, 熱分解] related: [dn..."
+      },
+      {
+        "title": "光阻內成像：駐波與 swing curves",
+        "path": "wiki/sources/19-optical-lithography--8-04-ch4--ccwms.md",
+        "kind": "wiki",
+        "snippet": "...2)\\)。  多層底膜可整合為複數有效反射係數。其幅值控制干涉幅度，相位控制振盪位置與光阻底部曝光；因此，僅追蹤強度反射率不足以預測 footing、undercut 或 CD 變動。本章 nitride／oxide／silicon 案例中，約 ±20 nm 的 nitride 厚度變化已造成顯著輪廓差異，但不是通用臨界值。..."
+      },
+      {
+        "title": "SEMI P35-1106",
+        "path": "wiki/entities/semi-p35-1106.md",
+        "kind": "wiki",
+        "snippet": "...Metrology*。  ## 本章引用用途  [[19-optical-lithography--8-08-ch8--1az2fh0]]在 feature model 與 CD 定義的討論中引用此標準。CD 的意義取決於模型與擬合方式；例如梯形底寬、側壁角及高度只是複雜輪廓的低參數近似。  本次來源提供標準的引用及使用脈..."
+      },
+      {
+        "title": "解析度增強技術與可製造解析度",
+        "path": "wiki/sources/19-optical-lithography--9-10-ch10--y2hwiy.md",
+        "kind": "wiki",
+        "snippet": "...timized for a 260-nm pitch  Figure 10.15: assist bars: 50 nm (k1 = 0.17), wafer dimensions bias OPC: overlapping DOF = 300nm scattering bars: overlapping DOF = 400nm  Fi..."
+      },
+      {
+        "title": "半導體製造中的微影控制",
+        "path": "wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md",
+        "kind": "wiki",
+        "snippet": "...CD/\\partial v_i\\)。  焦距與曝光具有非線性及交互作用，作者將一階式主要視為理解工具，而非完整計算模型。  CD 本身亦依賴 feature model 與擬合準則。即使輪廓已知，梯形底寬、指定高度的寬度及側壁直線擬合仍可能給出不同結果；離焦示例中的差異可超過 5%。相關术語引用 [[semi-p35-11..."
+      },
+      {
+        "title": "OPC",
+        "path": "wiki/concepts/opc.md",
+        "kind": "wiki",
+        "snippet": "...phy, OPC, EPE] related: [19-optical-lithography--9-10-ch10--y2hwiy, ret, sraf, model-based-opc-校準與迭代, rule-based-與-model-based-opc-比較, 線端縮短, 光阻理論對比度與量測對比度] source..."
+      }
+    ],
+    "agentSteps": [
+      {
+        "id": "backend-0-skills.load-completed",
+        "type": "tool_result",
+        "tool": "project_file_read",
+        "message": "35 skill(s) available",
+        "status": "success",
+        "timestamp": 1791129680281
+      },
+      {
+        "id": "backend-1-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "cut OD overlay 切割 開放區域",
+        "status": "running",
+        "timestamp": 1791129681672
+      },
+      {
+        "id": "backend-2-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 5 new, mode=hybrid, tokenHits=116, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1791129683653
+      },
+      {
+        "id": "backend-3-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "cut OD 定義 光阻 圖案 切割",
+        "status": "running",
+        "timestamp": 1791129684672
+      },
+      {
+        "id": "backend-4-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 4 new, mode=hybrid, tokenHits=130, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1791129687550
+      },
+      {
+        "id": "backend-5-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "cut OD cut-on-defocus 光阻 顯影 切割",
+        "status": "running",
+        "timestamp": 1791129688264
+      },
+      {
+        "id": "backend-6-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 1 new, mode=hybrid, tokenHits=117, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1791129689945
+      },
+      {
+        "id": "backend-7-wiki.search-started",
+        "type": "tool_call",
+        "tool": "wiki_search",
+        "message": "cut OD critical dimension 定義",
+        "status": "running",
+        "timestamp": 1791129691408
+      },
+      {
+        "id": "backend-8-wiki.search-completed",
+        "type": "tool_result",
+        "tool": "wiki_search",
+        "message": "5 result(s), 4 new, mode=hybrid, tokenHits=75, vectorHits=10, graphHits=1",
+        "status": "success",
+        "timestamp": 1791129692594
+      }
+    ]
+  }
+]

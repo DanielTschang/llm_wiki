@@ -1,0 +1,17 @@
+{
+  "sessionId": "conv_1791009138188_6sohls",
+  "projectId": "c5c6dd1f-12bf-4c37-b00a-ae10d4688fb5",
+  "messages": [
+    {
+      "role": "user",
+      "content": "overlay是什麼？ 有什麼相關的文件嗎？",
+      "timestamp": 1791009162875
+    },
+    {
+      "role": "assistant",
+      "content": "## overlay 是什麼？\n\n**overlay（疊對）** 指新微影層相對晶圓上既有圖形的**位置誤差**——也就是這一層圖案有沒有準確套疊在底層圖案上。這是微影製程中最關鍵的良率指標之一，因為多層疊構的半導體元件要求每一層都對準前一層。\n\n一個容易混淆的鄰近概念是 **registration（配準）**，它衡量圖形相對**絕對座標網格**的位置。兩者不可混用（見 `wiki/concepts/overlay-控制.md`）。\n\n### 核心要點\n\n- **量測偏差**：`box-in-box` 標靶以兩側間隙差的一半估計位置差，可抵消對稱的 CD 變化，但無法抵消不對稱。`aim` 標靶利用多條帶改善精密度與製程穩健性。\n- **TIS 與 WIS**：本章採用 \\(TIS = Overlay(0^\\circ) + Overlay(180^\\circ)\\)。固定 TIS 可校正，其**變動**才增加不確定度。WIS（晶圓誘發位移）源自標靶不對稱，可能與量測焦距交互作用，不保證能用固定偏移修正。\n- **線性模型**：基本模型含晶圓與場內各兩個旋轉、倍率項，加上共用的兩個平移項，共 **10 個係數**。注意平移無法單從此模型分離出晶圓與 reticle 來源；backlash 則加入兩個隨掃描方向改號的平移項。高階畸變、reticle registration、stage signature 需要額外表徵。殘差**不能未經檢查就視為純隨機**。\n- **批次處置**：overlay 資料可用於批次放行、曝光工具設定修正及量測診斷。稀疏量測點的最大值未必代表未取樣區域；較有意義的做法是結合模型與誤差估計，預測每個 die 的 overlay-limited yield，再比較良率損失與重工成本。可修正項是對已處理批次的回溯估計；用於下一批次的 APC 仍依賴誤差的時間穩定性。\n\n### 相關文件\n\n| 頁面 | 類型 | 說明 |\n|------|------|------|\n| `wiki/concepts/overlay-控制.md` | concept | overlay 控制主頁 |\n| `wiki/concepts/aim.md` | concept | AIM 標靶（改善量測精密度） |\n| `wiki/methodology/overlay-fingerprint-表徵.md` | methodology | overlay fingerprint 表徵（工具匹配等） |\n| `wiki/comparisons/overlay-與-pattern-placement-error-比較.md` | comparison | overlay 與 pattern placement error 的區分 |\n| `wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md` | source | 來源章節「半導體製造中的微影控制」§8.4 |\n\n若你想往下深入，最自然也最常被引用的是 **`overlay-fingerprint-表徵`**（描述高階畸變、reticle registration、stage signature 的表徵方法），以及 **`overlay-與-pattern-placement-error-比較`**（釐清 overlay 與圖形特定位置誤差的邊界）。",
+      "timestamp": 1791009162875
+    }
+  ],
+  "updatedAt": 1791009162875
+}

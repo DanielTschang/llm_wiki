@@ -1,0 +1,1064 @@
+[
+  {
+    "type": "suggestion",
+    "title": "核對植入原始研究與來源排版",
+    "description": "AZ 7500 的擬合缺少完整測試條件與誤差；另需回查 PDF 的 μm／mm、式（1.3）及 HMDS 拼寫，才能安全補入更多定量資訊。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/01 - ch1.pdf",
+    "affectedPages": [
+      "wiki/findings/az-7500-植入深度冪律擬合.md",
+      "wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md"
+    ],
+    "searchQueries": [
+      "Glawischnig Parks 1996 SIMS modeling ion implants photoresist AZ 7500",
+      "Chris Mack 2007 optical lithography chapter 1 yield cost equation 1.3",
+      "HMDS photoresist silanol vapor priming adhesion"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-acdfb2a9",
+    "resolved": false,
+    "createdAt": 1790969293513
+  },
+  {
+    "type": "suggestion",
+    "title": "驗證 AZ 7500 植入模型的適用範圍",
+    "description": "取得 Glawischnig and Parks（1996）原始研究，核對植入能量、劑量、光阻處理條件及擬合誤差。釐清 Gaussian 尾端近似與實際穿透劑量的差異，才能判斷遮罩厚度公式是否足以支援製程估算，以及能否外推至其他光阻。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/01 - ch1.pdf",
+    "affectedPages": [
+      "wiki/findings/az-7500-植入深度冪律擬合.md",
+      "wiki/concepts/離子植入遮罩.md"
+    ],
+    "searchQueries": [
+      "\"Glawischnig\" \"Parks\" \"SIMS and modeling of ion implants into photoresist\"",
+      "\"AZ 7500\" ion implantation projected range straggle",
+      "photoresist ion implantation mask thickness Gaussian tail transmitted dose"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-3698d698",
+    "resolved": false,
+    "createdAt": 1790969293513
+  },
+  {
+    "type": "suggestion",
+    "title": "重建最低成本與最高利潤的尺寸模型",
+    "description": "式（1.3）因文字擷取損壞而未完整保存，最高利潤模型也缺少可重現的推導。應先核對原 PDF，再檢驗良率曲線、售價與尺寸關係及晶圓產能假設如何改變最佳尺寸，避免將 87 nm 與 80 nm 的教學案例誤讀為一般結論。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/01 - ch1.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-01-ch1--cmoy1o.md",
+      "wiki/concepts/moores-law.md"
+    ],
+    "searchQueries": [
+      "\"Chris Mack\" \"Fundamental Principles of Optical Lithography\" \"1.3\" yield",
+      "semiconductor manufacturing feature size yield cost profit optimization model",
+      "semiconductor die cost yield model wafer throughput selling price"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-8dfb7eca",
+    "resolved": false,
+    "createdAt": 1790969293513
+  },
+  {
+    "type": "suggestion",
+    "title": "回查 Moore’s Law 的計數與倍增週期原始依據",
+    "description": "現有頁面完全依賴教材轉述。比對 Moore 的 1965、1975 與 1995 年原文，確認最低每元件成本、元件數與電晶體數的切換，以及一年、兩年與約 18 個月倍增各自的時間範圍和指標，能提升核心歷史論述的可追溯性。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/01 - ch1.pdf",
+    "affectedPages": [
+      "wiki/concepts/moores-law.md",
+      "wiki/entities/gordon-moore.md",
+      "wiki/entities/intel.md"
+    ],
+    "searchQueries": [
+      "Gordon Moore \"Cramming more components onto integrated circuits\" 1965 minimum cost",
+      "Gordon Moore \"Progress in digital integrated electronics\" 1975",
+      "Gordon Moore \"Lithography and the future of Moore’s law\" 1995"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-6edd07bb",
+    "resolved": false,
+    "createdAt": 1790969293513
+  },
+  {
+    "type": "suggestion",
+    "title": "核對公式轉錄與正規化",
+    "description": "Table 2.1 的 circ 變換係數、式 (2.73)–(2.74) 的 PSF 正規化、式 (2.46) 的介質閾值及 Kintner 權重定義需要人工回查原 PDF。來源頁已保留差異與不確定性，尚不宜直接用於數值實作。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/02 - ch2.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-02-ch2--k73j1g.md",
+      "wiki/concepts/點擴散函數.md",
+      "wiki/methodology/kintner-成像計算法.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles Optical Lithography chapter 2 errata",
+      "circular aperture Fourier transform Airy PSF normalization",
+      "Kintner 1978 partially coherent imagery weights"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-ac646fc9",
+    "resolved": false,
+    "createdAt": 1790970641056
+  },
+  {
+    "type": "suggestion",
+    "title": "核對公式係數、介質閾值與權重定義",
+    "description": "回查原 PDF 與可靠光學參考資料，釐清 Table 2.1 的 circ 變換係數、式 (2.73)–(2.74) 的 PSF 正規化、evanescent wave 閾值中的折射率，以及 Kintner 權重的反三角函數分支。這些尚未核定的細節會直接影響數值實作，應區分 OCR 損壞、原文筆誤及正規化慣例。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/02 - ch2.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-02-ch2--k73j1g.md",
+      "wiki/concepts/點擴散函數.md",
+      "wiki/methodology/kintner-成像計算法.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles of Optical Lithography chapter 2 errata",
+      "circular aperture Fourier transform Airy point spread function normalization refractive index evanescent waves",
+      "Kintner 1978 Method for the calculation of partially coherent imagery"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-efceddf4",
+    "resolved": false,
+    "createdAt": 1790970641056
+  },
+  {
+    "type": "suggestion",
+    "title": "標量遮罩近似何時失效",
+    "description": "現有頁面記錄了遮罩尺寸與起伏的經驗條件，但缺乏誤差量化。應比較 Kirchhoff boundary condition 與嚴格電磁計算，確認遮罩結構、入射角、偏振及高 NA 對空中像與臨界尺寸的影響，避免將經驗尺度當作可靠性保證。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/02 - ch2.pdf",
+    "affectedPages": [
+      "wiki/concepts/fourier-optics.md",
+      "wiki/concepts/數值孔徑與解析度.md",
+      "wiki/sources/19-optical-lithography--8-02-ch2--k73j1g.md"
+    ],
+    "searchQueries": [
+      "optical lithography Kirchhoff thin mask approximation rigorous electromagnetic simulation accuracy",
+      "high NA lithography mask topography polarization aerial image critical dimension scalar vector comparison"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-0a89e7e3",
+    "resolved": false,
+    "createdAt": 1790970641056
+  },
+  {
+    "type": "suggestion",
+    "title": "比較成像計算法的精度與計算成本",
+    "description": "Abbe、Hopkins 與 SOCS 頁面已有理論關係，但沒有可驗證的取樣、截斷或效能判準。應尋找可重現基準，於相同遮罩與光學配置下比較空中像誤差、臨界尺寸誤差、記憶體需求及預計算成本，並確認 SOCS 所需項數如何隨來源形狀與瞳孔變化。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/02 - ch2.pdf",
+    "affectedPages": [
+      "wiki/methodology/abbe-成像計算法.md",
+      "wiki/methodology/hopkins-成像計算法.md",
+      "wiki/methodology/sum-of-coherent-sources.md"
+    ],
+    "searchQueries": [
+      "lithography Abbe Hopkins SOCS benchmark accuracy computation time",
+      "sum of coherent sources lithography eigenvalue truncation aerial image critical dimension error",
+      "Pati Kailath 1994 Phase-shifting masks for microlithography automated design mask requirements"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-0486dfd7",
+    "resolved": false,
+    "createdAt": 1790970641056
+  },
+  {
+    "type": "suggestion",
+    "title": "原始 PDF 與引用量測的校對",
+    "description": "請核對書頁 88 的焦移斜率單位、書頁 92 的島形尺寸、書頁 95 的散射寬度、書頁 107 的脈衝平均根號及書頁 115 的 Jones pupil 索引。圖 3.17 的 Mack and Kaufman 作者標示與參考編號亦不一致；在將引用量測另立 finding 頁之前，宜確認原頁與原論文。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/03 - ch3.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-03-ch3--s477p8.md",
+      "wiki/concepts/jones-pupil.md",
+      "wiki/methodology/大型島形圖案-flare-量測.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles Optical Lithography 2007 errata Jones pupil",
+      "Kroyan Bendik 2000 excimer laser bandwidth lithographic performance focus wavelength",
+      "Mack Kaufman 1988 Mask bias submicron optical lithography flare"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-26b39820",
+    "resolved": false,
+    "createdAt": 1790971805070
+  },
+  {
+    "type": "suggestion",
+    "title": "原始公式、單位與量測出處的校對",
+    "description": "數處擷取疑誤仍影響模型實作與量測設計：焦移斜率的 µm/pm、島形尺寸及散射寬度的 µm、脈衝平均的平方根，以及 Jones pupil 的對角索引。應核對原始 PDF、勘誤及引用論文，並確認圖 3.17 的 Mack and Kaufman 作者與參考編號；未確認前不宜將數值當成已驗證的量測依據。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/03 - ch3.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-03-ch3--s477p8.md",
+      "wiki/concepts/jones-pupil.md",
+      "wiki/methodology/大型島形圖案-flare-量測.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles Optical Lithography 2007 errata Jones pupil",
+      "\"Modeling the effects of excimer laser bandwidths on lithographic performance\"",
+      "\"Mask bias in submicron optical lithography\" flare"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-c9326193",
+    "resolved": false,
+    "createdAt": 1790971805070
+  },
+  {
+    "type": "suggestion",
+    "title": "NILS 如何對應實際光阻製程窗口",
+    "description": "現有頁面定義了 NILS，但尚缺乏其與曝光裕度、CD 對劑量敏感度及光阻輪廓的定量連結。宜結合本書後續章節與實驗研究，比較閾值模型、含 resist bias 的模型及完整光阻模擬，釐清相同 NILS 是否能跨光阻、膜層與圖案條件預測相同製程窗口。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/03 - ch3.pdf",
+    "affectedPages": [
+      "wiki/concepts/nils-與影像邊緣品質.md",
+      "wiki/concepts/圖案轉移.md",
+      "wiki/sources/19-optical-lithography--8-03-ch3--s477p8.md"
+    ],
+    "searchQueries": [
+      "Chris Mack NILS exposure latitude resist process window",
+      "normalized image log slope photoresist CD dose sensitivity experimental",
+      "lithography NILS variable threshold resist bias model"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-dc9600f9",
+    "resolved": false,
+    "createdAt": 1790971805070
+  },
+  {
+    "type": "suggestion",
+    "title": "高 NA 焦深模型的可比性與預測限制",
+    "description": "現有頁面已指出 Rayleigh 準則的假設，但尚未定量比較近軸公式、精確離焦模型及有限面積 dipole 照明的預測差異。宜固定圖案、介質與影像品質門檻進行比較，再分開評估提高 NA、縮小圖案時的變化，避免將理想雙光束的焦深優勢或固定圖案的浸潤增益誤當成完整製程窗口增益。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/03 - ch3.pdf",
+    "affectedPages": [
+      "wiki/concepts/離焦與焦深.md",
+      "wiki/concepts/浸潤微影.md",
+      "wiki/concepts/數值孔徑與解析度.md"
+    ],
+    "searchQueries": [
+      "high NA lithography exact defocus Rayleigh depth of focus partial coherence",
+      "dipole illumination finite source size depth of focus lithography",
+      "immersion lithography depth of focus fixed pitch numerical aperture comparison"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-e4e039c4",
+    "resolved": false,
+    "createdAt": 1790971805070
+  },
+  {
+    "type": "suggestion",
+    "title": "核對薄膜強度公式與原版勘誤",
+    "description": "第 4.142 式反射乘積可能涉及符號／共軛問題，第 4.143 式對隨機非偏振光的加權也與前文取平均的定義有張力。請比對原版或作者勘誤，再決定是否建立專門公式核對頁；目前來源摘要已將兩式標為暫不重用。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/04 - ch4.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-04-ch4--ccwms.md",
+      "wiki/queries/swing-ratio-極值厚度差是否為半週期.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles Optical Lithography errata 4.142 4.143",
+      "Fresnel reverse reflection coefficient sign unpolarized reflectance average",
+      "Chris Mack swing ratio adjacent extrema thickness period errata"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-bb45e3f4",
+    "resolved": false,
+    "createdAt": 1790973704408
+  },
+  {
+    "type": "suggestion",
+    "title": "核對 swing ratio 厚度差與強度公式的疑似勘誤",
+    "description": "相鄰極大與極小的厚度差在原文被稱為完整週期，可能使吸收修正項產生倍數誤差；第 4.142 式的反射乘積與第 4.143 式的非偏振加權亦有內部張力。應比對原版、作者勘誤及獨立推導，確認哪些是 OCR 問題、哪些需要修正公式，並追蹤對劑量誤差預算的影響。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/04 - ch4.pdf",
+    "affectedPages": [
+      "wiki/queries/swing-ratio-極值厚度差是否為半週期.md",
+      "wiki/sources/19-optical-lithography--8-04-ch4--ccwms.md",
+      "wiki/concepts/swing-curves.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles Optical Lithography errata swing ratio 4.62",
+      "Chris Mack Fundamental Principles Optical Lithography equations 4.142 4.143",
+      "Fresnel reverse reflection coefficient unpolarized reflectance average"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-99a9dd03",
+    "resolved": false,
+    "createdAt": 1790973704408
+  },
+  {
+    "type": "suggestion",
+    "title": "以實驗與聯合容差驗證 BARC 劑量誤差預算",
+    "description": "目前 BARC 穩健最佳化主要依據解析模型與個別參數容差，尚缺同時改變光阻、BARC 與底膜厚度的驗證。值得尋找包含光學常數量測、照明條件、圖案 pitch、CD 與輪廓資料的研究，判定低反射率何時仍不足以控制 CD，以及開放場 dose-to-clear 能否可靠預測圖案製程窗口。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/04 - ch4.pdf",
+    "affectedPages": [
+      "wiki/methodology/barc-穩健最佳化.md",
+      "wiki/concepts/swing-curves.md",
+      "wiki/concepts/光阻內成像.md"
+    ],
+    "searchQueries": [
+      "193 nm BARC resist thickness variation CD swing experimental dose budget",
+      "bottom antireflective coating optical constants thickness uncertainty high NA process window",
+      "dose to clear swing curve patterned critical dimension correlation BARC"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-f91c2835",
+    "resolved": false,
+    "createdAt": 1790973704408
+  },
+  {
+    "type": "suggestion",
+    "title": "核對原 PDF 的單位與公式",
+    "description": "表 5.4、習題 5.3 與 5.14 的 mm／µm，以及式 5.81 和習題 5.10 的導數條件存在擷取疑點。請核對原頁後再用於計算；自由體積在 Tg 的連續性也應與正文「large discontinuity」措辭分開確認。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/05 - ch5.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-05-ch5--x0rq4s.md",
+      "wiki/concepts/修正-fujita-doolittle-模型.md",
+      "wiki/methodology/abc-透射率全曲線擬合.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles Optical Lithography chapter 5 Table 5.4 ABC parameters",
+      "Dill photoresist transmittance ABC parameters 1975",
+      "Fujita Doolittle photoresist solvent diffusivity glass transition"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-1bc41138",
+    "resolved": false,
+    "createdAt": 1790974339116
+  },
+  {
+    "type": "suggestion",
+    "title": "核對曝光參數單位與擴散邊界條件",
+    "description": "表 5.4 與習題中的 mm／µm 不一致、式 5.81 的 C 公式排版不清，以及習題 5.10 的導數條件，仍需核對原 PDF 或原始文獻。這些疑點會直接影響參數量級、量測實作與擴散解，應在任何計算前釐清。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/05 - ch5.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-05-ch5--x0rq4s.md",
+      "wiki/methodology/abc-透射率全曲線擬合.md",
+      "wiki/concepts/peb-擴散與-dpsf.md"
+    ],
+    "searchQueries": [
+      "\"Fundamental Principles of Optical Lithography\" \"5.81\"",
+      "\"Characterization of positive photoresist\" Dill 1975 transmittance ABC",
+      "\"Fundamental Principles of Optical Lithography\" \"5.10\" diffusion"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-6af547ff",
+    "resolved": false,
+    "createdAt": 1790974339116
+  },
+  {
+    "type": "suggestion",
+    "title": "定量界定 DNQ 曝光互易性的失效條件",
+    "description": "現有頁面列出缺水與曝光加熱機制，卻缺少配方、膜厚、濕度及光強共同決定失效的量測證據。追查強度相依反應與水分輸運研究，可避免將約 30% 相對濕度誤當成通用門檻，並區分漂白回饋與真正的互易性失效。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/05 - ch5.pdf",
+    "affectedPages": [
+      "wiki/concepts/曝光互易性.md",
+      "wiki/entities/dnq.md",
+      "wiki/concepts/dill-abc-參數.md"
+    ],
+    "searchQueries": [
+      "\"Intensity dependence of photochemical reaction rates for photoresists\" Albers Novotny 1980",
+      "DNQ novolac photoresist reciprocity failure humidity water diffusion exposure intensity"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-f1fcf1e7",
+    "resolved": false,
+    "createdAt": 1790974339116
+  },
+  {
+    "type": "suggestion",
+    "title": "驗證有限膜厚與溶劑梯度下的 PEB 平滑近似",
+    "description": "Gaussian DPSF 假設無限域與固定 D，但本章同時指出表面殘餘溶劑較少，可能造成深度相依擴散。比較有限膜厚、無通量邊界與 D(z,T) 模型，並分開處理 PAC 與酸擴散，可判定半個駐波週期的經驗尺度何時仍可靠，以及表面輪廓會產生多大偏差。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/05 - ch5.pdf",
+    "affectedPages": [
+      "wiki/concepts/peb-擴散與-dpsf.md",
+      "wiki/concepts/修正-fujita-doolittle-模型.md",
+      "wiki/comparisons/peb-擴散與-barc-的駐波抑制比較.md"
+    ],
+    "searchQueries": [
+      "photoresist post exposure bake sensitizer diffusion finite film no flux boundary standing waves",
+      "photoresist residual solvent depth profile acid diffusion post exposure bake",
+      "\"Modeling solvent effects in optical lithography\" Mack 1998"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-07b303f8",
+    "resolved": false,
+    "createdAt": 1790974339116
+  },
+  {
+    "type": "suggestion",
+    "title": "查核隨機曝光方程與原版勘誤",
+    "description": "§6.4.4 的未曝光 PAG 定義、Equation (6.59) 平均值方向及後續酸計數存在內部不一致。需要對照原版頁面與作者勘誤，才能確定可安全使用的曝光變異公式。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/06 - ch6.pdf",
+    "affectedPages": [
+      "wiki/queries/隨機曝光事件定義是否一致.md",
+      "wiki/concepts/光阻化學隨機建模.md"
+    ],
+    "searchQueries": [
+      "Chris Mack Fundamental Principles Optical Lithography errata equation 6.59",
+      "chemically amplified resist stochastic exposure unreacted PAG photon shot noise"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-5ab48dcb",
+    "resolved": false,
+    "createdAt": 1790975125030
+  },
+  {
+    "type": "contradiction",
+    "title": "隨機曝光事件定義與平均值方向不一致",
+    "description": "§6.4.4 將 y=1 定義為未曝光 PAG，但後續又用於產酸計數；Equation (6.59) 的平均值方向也與文字敘述相反。需核對原版 Equations (6.53)–(6.70) 與勘誤，並由人工判斷下游酸濃度變異公式是否仍可採用。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/06 - ch6.pdf",
+    "affectedPages": [
+      "wiki/queries/隨機曝光事件定義是否一致.md",
+      "wiki/concepts/光阻化學隨機建模.md"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-4d33619d",
+    "resolved": false,
+    "createdAt": 1790975125030
+  },
+  {
+    "type": "suggestion",
+    "title": "酸鹼中和的隨機聚集如何影響低頻線邊粗糙度",
+    "description": "本章明確排除 acid–base quenching 的隨機模型，因此現有內容尚不能判斷 quencher 改善平均潛像斜率後，是否同時改善 LER。應追蹤中和造成的空間相關性，並比較 quencher loading、酸／鹼擴散與 LER 空間頻譜的模型及實驗證據。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/06 - ch6.pdf",
+    "affectedPages": [
+      "wiki/concepts/base-quencher.md",
+      "wiki/concepts/光阻化學隨機建模.md"
+    ],
+    "searchQueries": [
+      "chemically amplified resist stochastic acid base quenching segregation line edge roughness power spectral density",
+      "photoresist quencher loading acid base diffusion low frequency LER experimental"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-19a1cf97",
+    "resolved": false,
+    "createdAt": 1790975125030
+  },
+  {
+    "type": "suggestion",
+    "title": "多維催化時間平均降噪近似的適用邊界",
+    "description": "現有降噪尺度關係主要依據一維 CovPSF 推導及數值比較；來源宣稱多維延伸直接成立，但尚缺有限捕獲體積、有限膜厚與表面酸損失條件下的驗證。應查核多維近似及其短時間極限，避免將降噪收益外推至不合理的零擴散情境。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/06 - ch6.pdf",
+    "affectedPages": [
+      "wiki/concepts/光阻化學隨機建模.md",
+      "wiki/concepts/rdpsf.md"
+    ],
+    "searchQueries": [
+      "Chris Mack chemically amplified resist covariance point spread function three dimensional capture radius",
+      "stochastic reaction diffusion photoresist time averaged acid concentration finite film boundary acid loss"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-5e9f99b8",
+    "resolved": false,
+    "createdAt": 1790975125030
+  },
+  {
+    "type": "suggestion",
+    "title": "膜縮法完全去保護基準的獨立驗證",
+    "description": "膜縮法需要完全去保護的校準點，但高曝光量與高溫不保證達成此條件。應查閱原始量測研究，確認如何以 FTIR 或其他化學分析驗證去保護終點，並區分去保護膜縮、殘留溶劑逸散與熱致密化，以提高反應速率及 quencher loading 的辨識可靠性。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/06 - ch6.pdf",
+    "affectedPages": [
+      "wiki/methodology/peb-膜厚損失動力學量測.md",
+      "wiki/methodology/即時-ftir-peb-反應量測.md"
+    ],
+    "searchQueries": [
+      "Byers Petersen Sturtevant 1996 Calibration of chemically amplified resist models thickness loss deprotection",
+      "chemically amplified resist film shrinkage FTIR complete deprotection calibration residual solvent"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-cd3caba8",
+    "resolved": false,
+    "createdAt": 1790975125030
+  },
+  {
+    "type": "suggestion",
+    "title": "顯影模型能否辨識微觀機制？",
+    "description": "現有頁面說明擬合成功不等於機制驗證，但未整理哪些獨立實驗能區分表面反應、顯影劑輸送與 critical ionization model。建議追溯原始機制研究，比較分子量、去保護比例與顯影液濃度的控制實驗，並評估 DRM 參數的唯一性與不確定度。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/07 - ch7.pdf",
+    "affectedPages": [
+      "wiki/concepts/critical-ionization-model.md",
+      "wiki/concepts/original-mack-model.md",
+      "wiki/methodology/drm-顯影參數萃取.md"
+    ],
+    "searchQueries": [
+      "\"The mechanism of phenolic polymer dissolution: a new perspective\"",
+      "photoresist dissolution Mack model parameter identifiability DRM",
+      "phenolic polymer dissolution critical ionization experimental molecular weight"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-0d082fee",
+    "resolved": false,
+    "createdAt": 1790975885759
+  },
+  {
+    "type": "suggestion",
+    "title": "薄光阻中表面抑制與本體速率能否分離？",
+    "description": "來源指出表面效應尺度可能接近整層薄光阻厚度，但目前沒有驗證表面／本體分離假設的實驗證據。建議搜尋膜厚系列與深度解析量測，區分表面去保護不足、顯影界面抑制及溶脹，確認經驗式與 practical contrast 可分離假設的適用範圍。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/07 - ch7.pdf",
+    "affectedPages": [
+      "wiki/concepts/表面抑制.md",
+      "wiki/methodology/practical-contrast-量測.md",
+      "wiki/concepts/光阻理論對比度與量測對比度.md"
+    ],
+    "searchQueries": [
+      "ultrathin photoresist dissolution surface inhibition thickness dependence",
+      "chemically amplified resist dissolution depth deprotection swelling surface inhibition",
+      "photoresist time to clear contrast dose depth separability"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-cd6fbaaa",
+    "resolved": false,
+    "createdAt": 1790975885759
+  },
+  {
+    "type": "suggestion",
+    "title": "LPM 與 VTR 對實驗輪廓的適用邊界",
+    "description": "目前列出的誤差只比較近似模型與完整 LPM，尚不能判斷它們相對實際 CD 或最短時間前緣模型的準確度。建議尋找含曝光、離焦與膜厚掃描的實驗校準資料，特別檢驗欠曝光及接近可印出極限時，分段路徑與忽略垂直顯影時間造成的偏差。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/07 - ch7.pdf",
+    "affectedPages": [
+      "wiki/concepts/lumped-parameter-model.md",
+      "wiki/concepts/variable-threshold-resist-model.md",
+      "wiki/concepts/顯影路徑與最短時間原理.md"
+    ],
+    "searchQueries": [
+      "lithography lumped parameter model experimental validation CD dose focus",
+      "variable threshold resist model experimental calibration lithography",
+      "photoresist development segmented path eikonal model comparison"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-db068811",
+    "resolved": false,
+    "createdAt": 1790975885759
+  },
+  {
+    "type": "suggestion",
+    "title": "核對來源單位與接點電阻敘述",
+    "description": "請核對 PDF 中 Figure 8.22 附近 DOF 的 mm／µm 單位，以及頁碼 303 的 contact resistance「proportional to the area」敘述。摘要已保留抽取資料並註明疑義；核對前不宜把歷史數值用作計算基準。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/08 - ch8.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md"
+    ],
+    "searchQueries": [
+      "Chris Mack 2007 lithography Figure 8.22 depth of focus 0.40 0.52",
+      "Fundamental Principles Optical Lithography contact resistance proportional area errata"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-172bc3b3",
+    "resolved": false,
+    "createdAt": 1790976754946
+  },
+  {
+    "type": "suggestion",
+    "title": "將製程窗口的聯合覆蓋率轉換為良率預測",
+    "description": "現有頁面已區分二維 3σ 橢圓與一維 99.7% 覆蓋率，但尚未建立實際計算方法。建議研究如何利用焦距／劑量協方差、系統性與隨機誤差混合分布，直接計算窗口內機率，並確認其與 die 層級良率的關係；這會實質改善 DOF 與製程能力的判讀。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/08 - ch8.pdf",
+    "affectedPages": [
+      "wiki/queries/製程窗口橢圓應採何種聯合覆蓋率.md",
+      "wiki/concepts/焦距與曝光製程窗口.md"
+    ],
+    "searchQueries": [
+      "lithography focus exposure process window yield probability correlated errors",
+      "lithography process window Gaussian systematic errors Monte Carlo yield",
+      "bivariate normal confidence ellipse chi square joint coverage"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-3df55163",
+    "resolved": false,
+    "createdAt": 1790976754946
+  },
+  {
+    "type": "contradiction",
+    "title": "核對來源單位與接點電阻的面積依賴",
+    "description": "DOF 示例的抽取文字使用 mm，圖軸則使用 µm；原文亦稱接點電阻與面積成正比，卻描述縮小 CD 會增加電阻。這些疑義已註記但尚未解決，需人工核對原 PDF 與可能的勘誤，決定正文採用的單位及修正註記，避免後續計算沿用錯誤。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/08 - ch8.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-08-ch8--1az2fh0.md"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-8c59ae3e",
+    "resolved": false,
+    "createdAt": 1790976754946
+  },
+  {
+    "type": "suggestion",
+    "title": "驗證光阻對比度降低 MEEF 的實驗適用範圍",
+    "description": "目前對比度與 MEEF 的關係僅來自調整 Original Mack model 參數 n 的虛擬光阻模擬。應尋找同時量測 mask CD、晶圓 CD 與光阻對比度的實驗，區分對比度、PEB 擴散、膜厚及照明條件的影響，確認模擬趨勢能否支持材料選擇，而非僅反映模型參數設定。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/08 - ch8.pdf",
+    "affectedPages": [
+      "wiki/findings/低-k1-光阻對比度影響-meef.md",
+      "wiki/concepts/mask-error-enhancement-factor.md",
+      "wiki/concepts/光阻理論對比度與量測對比度.md"
+    ],
+    "searchQueries": [
+      "photoresist contrast MEEF experimental mask error enhancement factor",
+      "resist dissolution selectivity Mack model MEEF experimental validation",
+      "photoresist contrast acid diffusion mask error enhancement factor"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-fa3854c3",
+    "resolved": false,
+    "createdAt": 1790976754946
+  },
+  {
+    "type": "suggestion",
+    "title": "核對原 PDF 的單位與符號",
+    "description": "來源正文的部分長度單位呈現 mm，與圖軸 microns 或圖說 nm 不一致；另有 η 被擷取成 h、m* 被標示為 deblocked concentration 的問題。請回查原始 PDF 排版，再採錄具體離焦設定；目前頁面已保留警示而未擅自修正那些數值。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/09 - ch9.pdf",
+    "affectedPages": [
+      "wiki/sources/19-optical-lithography--8-09-ch9--1xlwz30.md",
+      "wiki/methodology/nils-defocus-最佳化與曝光裕度校準.md"
+    ],
+    "searchQueries": [
+      "Chris Mack 2007 chapter 9 NILS defocus Figure 9.7",
+      "Fundamental Principles Optical Lithography chapter 9 blocked polymer eta"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-8bcb3f5e",
+    "resolved": false,
+    "createdAt": 1790977491208
+  },
+  {
+    "type": "suggestion",
+    "title": "驗證不等酸與 quencher 擴散係數下的梯度與 LER 最佳化",
+    "description": "目前含 quencher 的解析結果限定酸與 quencher 擴散係數相同，而 LER 模型又忽略 quencher。需尋找耦合反應—擴散模型與實驗資料，在相同 CD 目標下比較最大潛像梯度與最小 LER 的 PEB 條件，確認現有最佳化結論能否延伸至較一般的光阻系統。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/09 - ch9.pdf",
+    "affectedPages": [
+      "wiki/queries/不等酸與-quencher-擴散係數如何影響-nils-與-ler-最佳化.md",
+      "wiki/findings/酸擴散造成-ler-雜訊與梯度權衡.md"
+    ],
+    "searchQueries": [
+      "chemically amplified resist acid quencher unequal diffusivity latent image gradient line edge roughness",
+      "photoresist stochastic reaction diffusion quencher PEB optimization finite development contrast"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-99d18a0f",
+    "resolved": false,
+    "createdAt": 1790977491208
+  },
+  {
+    "type": "suggestion",
+    "title": "確認 NILS 曝光裕度校準的實驗有效範圍",
+    "description": "目前定量校準主要依據單一 UV6 模擬案例，尚缺實測支持。值得查找配對的 NILS–defocus 與 focus–exposure matrix 資料，確認線性校準在不同圖案、膜厚與製程條件下的誤差，以及何時因顯影路徑或 isofocal bias 而失效。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/09 - ch9.pdf",
+    "affectedPages": [
+      "wiki/methodology/nils-defocus-最佳化與曝光裕度校準.md",
+      "wiki/sources/19-optical-lithography--8-09-ch9--1xlwz30.md"
+    ],
+    "searchQueries": [
+      "NILS exposure latitude experimental calibration focus exposure matrix photoresist",
+      "normalized image log slope exposure latitude isofocal bias development path validation"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-e401b5d7",
+    "resolved": false,
+    "createdAt": 1790977491208
+  },
+  {
+    "type": "missing-page",
+    "title": "isofocal bias 對焦深與梯度最佳化的限制",
+    "description": "來源明確指出梯度法無法捕捉 isofocal bias 對焦深的影響，但目前沒有專頁解釋其機制。補足其與 Bossung 曲線、最佳曝光劑量及製程窗口的關係，可避免將 NILS 門檻推算的焦深誤認為完整製程焦深。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/09 - ch9.pdf",
+    "affectedPages": [
+      "wiki/methodology/nils-defocus-最佳化與曝光裕度校準.md",
+      "wiki/concepts/焦距與曝光製程窗口.md",
+      "wiki/synthesis/微影資訊傳遞與-cd-誤差傳播.md"
+    ],
+    "searchQueries": [
+      "optical lithography isofocal bias Bossung curves depth of focus",
+      "Chris Mack isofocal bias NILS gradient optimization"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-66afbac3",
+    "resolved": true,
+    "createdAt": 1790977491208,
+    "resolvedAction": "auto-resolved"
+  },
+  {
+    "type": "suggestion",
+    "title": "跨焦距與曝光的 OPC 最佳化能否改善共同製程窗口",
+    "description": "現有方法頁描述名義條件下的 EPE 迭代，尚缺跨 focus／dose 最佳化的量化比較。建議尋找使用相同圖案、模型校準資料與光罩複雜度限制的研究，比較共同製程窗口、最差 EPE 與運算成本，釐清名義形狀改善是否轉化為可製造解析度。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/10 - ch10.pdf",
+    "affectedPages": [
+      "wiki/methodology/model-based-opc-校準與迭代.md",
+      "wiki/comparisons/rule-based-與-model-based-opc-比較.md"
+    ],
+    "searchQueries": [
+      "process window aware OPC nominal OPC comparison edge placement error focus dose",
+      "robust optical proximity correction overlapping process window mask complexity"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-209d5473",
+    "resolved": false,
+    "createdAt": 1790978213295
+  },
+  {
+    "type": "suggestion",
+    "title": "forbidden pitches 的條件依賴性與可避免範圍",
+    "description": "目前僅有最小節距 1.3–1.7 倍的歷史經驗範圍，尚未建立 source shape、SRAF 配置規則與光阻條件如何改變低裕度區間的證據。建議追查原始研究與後續比較，並將主特徵 DOF 和 SRAF 不列印約束一起納入，避免把此比例當作固定版圖禁區。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/10 - ch10.pdf",
+    "affectedPages": [
+      "wiki/concepts/oai.md",
+      "wiki/concepts/sraf.md"
+    ],
+    "searchQueries": [
+      "\"Forbidden pitches for 130-nm lithography and below\"",
+      "forbidden pitch lithography source shape SRAF placement resist process window",
+      "intermediate pitch subresolution scattering bars depth of focus"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-0648ea6a",
+    "resolved": false,
+    "createdAt": 1790978213295
+  },
+  {
+    "type": "suggestion",
+    "title": "PSM 相位容差如何轉換為位置誤差與共同製程窗口規格",
+    "description": "現有比較指出 Alt-PSM 主要出現位置偏移、EPSM 主要出現焦點位移，但尚無可操作的容差設定方法。建議尋找相位量測與光罩誤差研究，區分平均相位偏差及跨 reticle 的局部變動，分別建立 CD、EPE 與共同製程窗口的誤差預算；不能直接將來源的 10° 示例當作統一容差。",
+    "sourcePath": "/Users/danieltschang/Projects/llm_wiki/projects/Lithography-wiki/raw/sources/optical-lithography/10 - ch10.pdf",
+    "affectedPages": [
+      "wiki/concepts/alternating-psm.md",
+      "wiki/concepts/attenuated-psm.md",
+      "wiki/comparisons/alternating-psm-與-attenuated-psm-比較.md"
+    ],
+    "searchQueries": [
+      "alternating phase shift mask phase error defocus pattern placement tolerance",
+      "attenuated phase shift mask phase uniformity best focus process window metrology",
+      "EPSM mask cleaning phase variation lithographic performance"
+    ],
+    "options": [
+      {
+        "label": "Create Page",
+        "action": "Create Page"
+      },
+      {
+        "label": "Skip",
+        "action": "Skip"
+      }
+    ],
+    "id": "review-c7e80938",
+    "resolved": false,
+    "createdAt": 1790978213295
+  }
+]

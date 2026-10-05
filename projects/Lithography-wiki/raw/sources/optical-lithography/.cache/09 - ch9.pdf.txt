@@ -1,0 +1,2989 @@
+## Page 1
+
+9
+Gradient-Based Lithographic 
+Optimization: Using the Normalized 
+Image Log-Slope
+There are many approaches for optimizing a lithographic process. Very commonly, the 
+focus–exposure matrix is used to measure depth of focus (which includes a sensitivity to 
+both dose and focus errors) and the process is optimized to maximize the depth of focus 
+for select critical features. Such experimental optimization efforts are most effective and 
+effi cient when guided by appropriate theory. Here, the gradient-based approach to lithographic optimization, using the well-known image log-slope, is presented. By calculating 
+and then optimizing the gradients of the image that is projected and recorded into a photoresist through focus, a clear direction for maximizing depth of focus is seen. This 
+approach can also be thought of as a fi rst-order propagation of errors analysis – a Taylor 
+series approach to how input variations affect the output of CD. Small errors in exposure 
+dose affect CD depending on the focus-dependent slope of the image at the nominal line 
+edge.
+9.1 Lithography as Information Transfer
+This chapter will focus on CD control using exposure latitude and the variation of exposure latitude through focus as the basic metrics of CD control. The approach taken here 
+will view lithography as a sequence of information transfer steps (Figure 9.1). A designer 
+lays out a desired pattern in the form of simple polygon shapes. This layout data drive a 
+mask writer so that the information of the layout becomes a spatial variation of transmittance (chrome and glass, for example) of the photomask. The information of the layout 
+has been transferred, though not perfectly, into the transmittance distribution of the mask. 
+Next, the mask is used in a projection imaging tool to create an aerial image of the mask. 
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+370 Fundamental Principles of Optical Lithography
+However, due to the diffraction limitations of the wavelength and lens numerical aperture, 
+the information transmitted to the wafer is reduced (see Chapter 2). The aerial image is 
+an imperfect representation of the information on the mask. Aberrations, fl are and other 
+nonidealities degrade the image quality further (see Chapter 3). This aerial image is projected into the resist where the variation of transmittance with angle, resist refraction and 
+substrate refl ection makes the image in resist different than the aerial image (see Chapter 
+4). Exposure then produces a latent image of exposed and unexposed sensitizer concentration, which now contains some portion of the information originally stored as an aerial 
+image (see Chapter 5). Post-exposure bake changes this latent image into a new latent 
+image through diffusion (for a conventional resist) or reaction and diffusion (for a chemically amplifi ed resist), with the result being a loss of information in the latent image (see 
+Chapter 6). Finally, development convents the latent image into an image of development 
+rates, which then is transformed into the fi nal resist profi le via the development path (see 
+Chapter 7).
+At each stage of this sequence, there is potential for information loss. The fi nal developed resist image is not a perfect representation of the original design data. By defi ning 
+metrics of information content at each stage of this sequence of information transfer steps, 
+a systematic approach toward maximizing the information contained in the fi nal image 
+can be found. The information contained in each image propagates through the lithography process, from the formation of an aerial image I(x) and image in resist, to the exposure 
+of a photoresist by that image to form a latent image of chemical species m(x) or h(x), to 
+post-exposure bake where diffusion and possibly reactions create a new latent image
+m*(x), and fi nally to development where the latent image produces a development rate 
+image r(x) that results in the defi nition of the feature edge (a one-dimensional example 
+is used throughout this chapter for simplicity).
+9.2 Aerial Image
+Projection imaging tools, such as scanners, steppers, or step-and-scan tools, project an 
+image of a mask pattern into air, and then ultimately into the photoresist. The projected 
+Design
+Mask
+Aerial Image
+Latent Image
+Developed Resist Image
+Image in Resist
+PEB Latent Image
+Figure 9.1 The lithography process expressed as a sequence of information transfer steps
+
+
+## Page 3
+
+ Gradient-Based Lithographic Optimization 371
+image in air is called the aerial image, a distribution of light intensity as a function of 
+spatial position within (or near) the image plane. The aerial image is the source of the 
+information that is exposed into the resist, forming a gradient in dissolution rates that 
+enables the three-dimensional resist image to appear during development. The quality of 
+the aerial image dictates the amount of information provided to the resist, and subsequently the quality and controllability of the fi nal resist profi le.
+How do we judge the quality of an aerial image? If, for example, aerial images are 
+known for two different values of the partial coherence, how do we objectively judge 
+which is better? Historically, the problem of image evaluation has long been addressed 
+for applications such as photography. The classical metric of image quality is the image 
+contrast (Figure 9.2). Given a mask pattern of equal lines and spaces, the image contrast 
+is defi ned by fi rst determining the maximum light intensity (in the center of the image of 
+the space) and the minimum light intensity (in the center of the line) and calculating the 
+contrast as
+Image Contrast II
+II = −+
+max min
+max min
+ (9.1)
+Since the goal is to create a clearly discernible bright/dark pattern, ideally Imin should be 
+much smaller than Imax, giving a contrast approaching 1.0 for a high-quality (‘highcontrast’) image.
+Although this metric of image quality is clear and intuitive, it suffers from some problems when applied to lithographic images. First of all, the metric is only strictly defi ned 
+for equal lines and spaces. Although it is possible to modify the defi nition of image contrast to apply, for example, to an isolated line or to a contact hole, it is not clear that these 
+modifi ed defi nitions are useful or comparable to each other. It is clearly impossible to 
+apply this metric to an isolated edge. Secondly, the image contrast is only useful for patterns near the resolution limit. For large features, the image contrast is essentially 1.0, 
+regardless of the image quality. Finally, and most importantly, the image contrast is not 
+directly related to practical metrics of lithographic quality, such as resist linewidth 
+control.
+Fundamentally, the image contrast metric samples the aerial image at the wrong 
+place. The center of the space and the center of the line are not the important regions of 
+the image to worry about. What is important is the shape of the image near the nominal 
+line edge. The edge between bright and dark determines the position of the resulting 
+Imin
+Mask
+Image
+Imax
+Figure 9.2 Image contrast is the conventional metric of image quality used in photography 
+and other imaging applications, but is not directly related to lithographic quality
+
+
+## Page 4
+
+372 Fundamental Principles of Optical Lithography
+photoresist edge. This transition from bright to dark within the image is the source of the 
+information as to where the photoresist edge should be. The steeper the intensity transition, the better the edge defi nition of the image, and as a result the better the edge defi nition of the resist pattern. If the lithographic property of concern is the control of the 
+photoresist linewidth (i.e. the position of the resist edges), then the image metric that 
+affects this lithographic result is the slope of the aerial image intensity near the desired 
+photoresist edge.
+The slope of the image intensity I as of function of position x (dI/dx) measures the 
+steepness of the image in the transition from bright to dark. However, to be useful it must 
+be properly normalized. For example, if one simply doubles the intensity of the light, the 
+slope will also double, but the image quality will not be improved. (This is because 
+intensity is a reciprocal part of exposure dose, which is adjusted to correctly set the fi nal 
+feature size in photoresist.) Dividing the slope by the intensity will normalize out this 
+effect. The resulting metric is called the image log-slope (ILS):
+ILS
+I
+I
+x
+I
+x == 1d
+d
+d
+d
+ln( ) (9.2)
+where this log-slope is measured at the nominal (desired) line edge (Figure 9.3). Note 
+that a relative change in image intensity is the same as a relative change in exposure dose, 
+so that the ILS is also a relative exposure energy gradient. Since variations in the photoresist edge positions (linewidths) are typically expressed as a percentage of the nominal 
+linewidth, the position coordinate x can also be normalized by multiplying the log-slope 
+by the nominal linewidth w, to give the normalized image log-slope (NILS).
+NILS w I
+x = d
+d
+ln( ) (9.3)
+The NILS is the best single metric to judge the lithographic usefulness of an aerial 
+image.1–3
+Since the NILS is a measure of image quality, it can be used to investigate how optical 
+parameters affect image quality. One of the most obvious examples is defocus, where the 
+NILS decreases as the image goes out of focus. Figure 9.4a shows the aerial image of a 
+space at best focus, and at two levels of defocus. The ‘blurred’ images obviously have a 
+lower ILS at the nominal line edge compared to the in-focus image. By plotting the logslope or the NILS as a function of defocus, one can quantify the degradation in aerial 
+Mask
+Image
+Figure 9.3 Image Log-Slope (or the Normalized Image Log-Slope, NILS) is the best single 
+metric of image quality for lithographic applications
+
+
+## Page 5
+
+ Gradient-Based Lithographic Optimization 373
+image quality as a function of defocus (Figure 9.4b). This log-slope defocus curve provides a very important tool for understanding how focus affects a lithographic process. 
+For example, suppose one assumes that there is a minimum acceptable NILS value, below 
+which the aerial image is not good enough to provide adequate resist images or linewidth 
+control. In Figure 9.4b, for example, a minimum acceptable NILS value of 1.5 would 
+mean that this imaging process can tolerate about ±0.14 mm of defocus and still get aerial 
+images of acceptable quality. Thus, an estimate of the minimum acceptable NILS can lead 
+to an estimate of the depth of focus. Note that, in general, the focus response of an aerial 
+image is symmetric about best focus. When this is the case, the log-slope defocus curve 
+is usually plotted only for positive values of defocus.
+To see how the log-slope defocus curve can be used to understand imaging, consider 
+the effects of wavelength and numerical aperture on the focus behavior of an aerial image. 
+Figure 9.5a shows how the NILS of a 0.25-mm line/space pattern degrades with defocus 
+for three different wavelengths (365, 248 and 193 nm), all other lithographic parameters 
+held constant. It is clear from the plot that the lower wavelength provides better image 
+quality for the useful range of defocus. For a given minimum acceptable value of NILS, 
+the lower wavelength will allow acceptable performance over a wider range of focus. One 
+could conclude that, for a given feature being imaged, a shorter wavelength provides 
+better in-focus performance and better depth of focus.
+The impact of numerical aperture (NA) is a bit more complicated, as evidenced in 
+Figure 9.5b. Here, the log-slope defocus curves for three different numerical apertures 
+(again, for a 0.25-mm line/space pattern) cross each other. If one picks some minimum 
+acceptable NILS value, there will be an optimum NA which gives the maximum depth 
+of focus (for example, a minimum NILS value of 2.5 has the best depth of focus when 
+NA = 0.6). Using a numerical aperture above or below this optimum reduces the depth 
+of focus.
+(a) (b)
+0.0
+–150 –100 –50 0 50 100 150
+Horizontal Position (nm)
+Relative Intensity
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+In Focus
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+4.0
+4.5
+–0.2 –0.1 0 0.1 0.2
+Defocus (microns)
+Normalized Image Log-Slope
+Figure 9.4 The effect of defocus is to (a) ‘blur’ an aerial image, resulting in (b) reduced 
+log-slope as the image goes out of focus (150-nm space on a 300-nm pitch, NA = 0.93, l =
+193nm)
+
+
+## Page 6
+
+374 Fundamental Principles of Optical Lithography
+NILS values are easy and fast to calculate and provide a simple yet valuable metric of 
+image quality. As an example of using this metric, the log-slope defocus curve is one of 
+the easiest ways to quantify the impact of defocus on image quality. By using this tool, 
+we have quickly arrived at two fundamental imaging relationships: when imaging a given 
+mask pattern, (1) lower wavelengths give better depth of focus, and (2) there is an 
+optimum NA that maximizes the depth of focus. But to make the best use of the NILS 
+as an image metric, one must relate the NILS numerical value to lithographically measurable quantities. How does one determine the minimum acceptable NILS? If the NILS is 
+increased from 2.0 to 2.5, what is the lithographic impact? More fundamentally, why is 
+NILS a good image metric?
+The answers to these questions lie with the fact that NILS is directly related to the 
+printed feature’s exposure latitude (as will be shown in subsequent sections of this 
+chapter). Exposure latitude describes the change in exposure dose that results in a given 
+change in linewidth. Mathematically, it can be expressed as one over the slope of a critical 
+dimension (CD) versus exposure dose (E) curve, ∂ CD/∂ E. Since both CD and dose variations are most usefully expressed as a percentage of their nominal values, the more useful 
+expression of exposure latitude is ∂ lnCD/∂ lnE. For the simplifying case of a perfect, 
+infi nite contrast photoresist the exposure latitude can be related to NILS by
+∂
+∂ = lnln
+E
+CD
+NILS 1
+2 (9.4)
+To put this in more familiar terms, if we defi ne exposure latitude to be the range of exposure, as a percentage of the nominal exposure dose, that keeps the resulting feature width 
+within ±10 % of the nominal size, then for an infi nite contrast resist the exposure latitude 
+can be approximately related to NILS by
+%Exposure Latitude NILS ≈∗ 10 (9.5)
+(a) (b)
+0
+1
+2
+3
+4
+5
+6
+0 0.2 0.4 0.6 0.8
+Defocus (microns)
+NILS
+NA = 0.5
+NA = 0.6
+NA = 0.7
+0
+1
+2
+3
+4
+5
+6
+7
+0 0.2 0.4 0.6 0.8
+Defocus (microns)
+NILS
+365 nm
+248 nm
+193 nm
+Figure 9.5 Using the log-slope defocus curve to study lithography: (a) lower wavelengths 
+give better depth of focus (NA = 0.6, s = 0.5, 250-nm lines and spaces), and (b) there is an 
+optimum NA for maximizing depth of focus (l = 248 nm, s = 0.5, 250-nm lines and 
+spaces)
+
+
+## Page 7
+
+ Gradient-Based Lithographic Optimization 375
+(the approximation comes from the assumption that NILS is constant over the 
+±10 % CD range). Thus, in a perfect world (i.e. a perfect photoresist), the impact of 
+NILS can be easily related to a lithographically useful metric: each unit increase in 
+NILS gives us 10 % more exposure latitude. Unfortunately, the real world is not so perfect 
+and infi nite contrast photoresists have yet to enter the commercial market. The real impact 
+of NILS on exposure latitude is somewhat reduced from the above ideal. In general, 
+Equation (9.5) can be modifi ed to account for the nonideal nature of photoresists to 
+become
+%Exposure Latitude NILS ≈− αβ () (9.6)
+where a and b are empirically determined constants. b can be interpreted as the minimum 
+NILS required to get an acceptable image in photoresist to appear. a then is the added 
+exposure latitude for each unit increase in NILS above the lower limit b. By the end of 
+this chapter, a more accurate and physically meaningful relationship between NILS and 
+exposure latitude will be derived.
+The values of a and b can be determined by comparing a calculated NILS-versusdefocus curve to experimentally measured exposure latitude-versus-defocus data. Figure 
+9.6 shows a simulation of such an experiment for a typical case. Once calibrated, a 
+minimum acceptable exposure latitude specifi cation (say, 10 %) can be translated directly 
+into a minimum acceptable NILS value (in this case, 1.7). Since a and b are resist and 
+process dependent, the minimum acceptable NILS must be also. And of course, the 
+requirements for the minimum acceptable exposure latitude will impact the required NILS 
+directly. Thus, either using Equation (9.5) for the ideal case, or Equation (9.6) for a 
+calibrated resist case, a quantitative valuation of the importance of NILS can readily 
+be made.
+0
+5
+10
+15
+20
+25
+30
+35
+40
+012345
+NILS
+Exposure Latitude (%)
+%EL = 8.9(NILS – 0.5)
+Figure 9.6 Typical correlation between NILS and exposure latitude (simulated data, l =
+248nm, NA = 0.6, s = 0.5, 500nm of UV6 on ARC on silicon, printing 250-nm lines and 
+spaces through focus)
+
+
+## Page 8
+
+376 Fundamental Principles of Optical Lithography
+The NILS is a generic metric of aerial image quality. Thus, it can be used to optimize 
+any parameter that affects image quality. Some typical use cases include:
+• Optimizing numerical aperture (NA) and partial coherence (s)
+• Investigating off-axis illumination parameters
+• Comparing phase-shifting mask designs
+• Understanding the impact of optical proximity correction (OPC) on image quality and 
+optimizing OPC
+• Examining the impact of aberrations, polarization and fl are.
+As an example, consider the fi rst use case, optimizing NA and s (the so-called optimum 
+stepper problem). Most steppers and scanners made today have software-controlled variable numerical aperture and variable partial coherence. For a given feature or features, 
+the goal is to pick the settings that maximize lithographic quality. Using the NILS as a 
+proxy for lithographic quality, there are two basic optimization approaches: (1) for a given 
+level of defocus, fi nd the settings that produce the maximum NILS, or (2) for a given 
+minimum acceptable NILS (that is, a given minimum allowed exposure latitude), fi nd the 
+settings that maximize depth of focus.
+Figure 9.7 shows an example where the defocus is set to equal the built-in focus errors 
+of the process (0.2 mm in this case), and contours of constant NILS are plotted as a function of NA and s (l = 248 nm printing 130-nm lines on a 360-nm pitch). The maximum 
+NILS of 1.24 is achieved when NA = 0.72 and s = 0.72. This optimum is sensitive to the 
+amount of defocus used. If the defocus requirement can be lowered to 0.16 mm, the 
+optimum stepper settings for this problem become NA = 0.76 and s = 0.64 producing a 
+maximum NILS of 1.43.
+1.2
+1.05
+0.3
+0.9
+Partial Coherence
+0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9
+0.90
+0.85
+0.80
+0.70
+0.60
+0.50
+0.75
+0.65
+0.55
+Numerical Aperture
+Figure 9.7 One approach to the optimum stepper problem is to pick a fi xed amount of 
+defocus (0.2mm) and fi nd the settings that maximize the NILS (l = 248nm, 130-nm lines on 
+a 360-nm pitch, contours of constant NILS)
+
+
+## Page 9
+
+ Gradient-Based Lithographic Optimization 377
+9.3 Image in Resist
+As described in Chapter 4, the image in resist will differ from the aerial image due to the 
+different effi ciencies of coupling plane wave energy into the resist as a function of angle 
+and polarization. For a refl ective substrate, each incident angle will produce a different 
+refl ectivity swing curve, so that for a given resist thickness each incident angle will have 
+a different transmittance into the photoresist. For a nonrefl ective substrate, the transmittance of the air–resist interface creates an angular and polarization dependence. Figure 
+9.8 illustrates these two cases.
+The electric fi eld aerial image can be thought of as the sum of planes waves, each with 
+magnitude an, combining to form the image. For the case of TE-polarization,
+Exz an ikx ikz
+nN
+N
+nn () sin cos , ee = =−
+∑ θθ (9.7)
+where z is the distance from the plane of best focus, qn represents the angle of the 
+nth diffraction order with respect to the optical axis, and ±N diffraction orders are used 
+to form the image. The image in resist can be calculated in the same way, but with 
+the magnitude of each plane wave modifi ed by the infl uence of the photoresist (see 
+Chapter 4):
+aa nn
+n
+n nDn
+z r / e eff ≡ +
+− τθ
+ρθρ θτθ
+12 α
+12 23 2
+2
+1
+()
+() ()() (9.8)
+where qn now represents the angle of the nth diffraction order in resist, aeff is the effective 
+absorption coeffi cient, as defi ned in Chapter 4, and z is the depth into the resist. For the 
+(a) (b)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0.0 0.2 0.4 0.6 0.8 1.0
+Sine(incident angle)
+Resist Reflectivity
+TM-pol.
+TE-pol.
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+TE-pol.
+TM-pol.
+Resist Reflectivity
+0.0 0.2 0.4 0.6 0.8 1.0
+Sine(incident angle)
+Figure 9.8 Intensity refl ectivity between air and resist of plane waves as a function of incident angle and polarization for (a) resist on silicon, and (b) resist on an optically matched 
+substrate (l = 248nm, resist n = 1.768 + i0.009868)
+
+
+## Page 10
+
+378 Fundamental Principles of Optical Lithography
+case when a reasonably good BARC is used (|r23| << 1), the impact of the fi lm stack is 
+dominated by the transmittance of the air–resist interface and absorption in the resist:
+aa nn n z n
+r / ≈ e− τθ αθ 12 2 () ( cos ) (9.9)
+Once the impact of the resist fi lm is properly accounted for and the image in resist has 
+been calculated, the image log-slope concept can readily be applied to the image in resist. 
+As before, the image-log slope and the NILS, evaluated at the nominal resist edge for the 
+image in resist, will serve as the metric of information content of the image in resist. 
+Additionally, defocus of the image as it propagates through the thickness of the resist 
+means that the location of the image must also be specifi ed. In general, the bottom of the 
+resist will be used for calculating NILS, though sometimes the middle of the resist will 
+prove more convenient.
+9.4 Exposure
+The NILS is, fundamentally, an aerial image or image in resist metric. It can be thought 
+of as a measure of the amount of information contained in the image that defi nes the 
+proper position of the desired photoresist edge. The information in this image propagates 
+through exposure into a latent image of exposed and unexposed resist, where a similar 
+metric must be defi ned to judge the quality of the latent image. Consider a simple yet 
+common case: a resist with fi rst-order kinetics (almost always the case) whose optical 
+properties do not change with exposure dose (commonly the case for chemically amplifi ed 
+resists). For such a case, the latent image m(x,y,z) is related to the intensity in the resist 
+Ir(x,y,z) by
+m x y z CI x y z t ( ) exp( ( ) ) ,, ,, =− r (9.10)
+where C is the exposure rate constant of the resist, t is the exposure time, and m is the 
+relative concentration of light-sensitive resist material (see Chapter 5).
+Equation (9.10) is the exposure image transfer function, translating an image in resist 
+into a latent image. From our experience with using the NILS, one would expect that a 
+slope or gradient of the latent image would serve as a good metric of latent image quality. 
+The slope of the latent image (at the nominal feature edge position, for example) can 
+easily be derived by taking the derivative of Equation (9.10), giving (for a simple 1D 
+case)4
+∂
+∂ = ∂∂
+m
+x mm Ix
+ln( ) ln (9.11)
+Thus, the latent image gradient is directly proportional to the image log-slope (and thus 
+the normalized latent image gradient is proportional to NILS). This entirely logical result 
+is very satisfying, since it means that all efforts to improve the NILS will result directly 
+in an improved latent image gradient.
+Equation (9.11) reveals another important factor in latent image quality. The term 
+m ln(m), which relates the image log-slope to the latent image gradient, is exposure 
+dependent (m being the relative amount of resist sensitizer that has not been exposed at 
+
+
+## Page 11
+
+ Gradient-Based Lithographic Optimization 379
+the point where the latent image gradient is being described). A simple thought experiment 
+reveals the necessity for a dose dependence to latent image quality. At the two extremes 
+of zero dose and infi nite dose, the fi nal latent image becomes a uniform chemical distribution [m(x,y,z) = 1 for zero dose, and m(x,y,z) = 0 for infi nite dose]. Thus, the gradient of 
+the latent image is zero at these extremes and no information is transferred to the wafer. 
+But obviously the gradient is nonzero at doses in between these extremes. By the Mean 
+Value Theorem of calculus, there must be a dose which maximizes the latent image 
+gradient.
+A plot of −mln(m) versus m shows that there is one exposure dose (one value of m) 
+that will maximize the latent image quality (Figure 9.9). When m = e−1 ≈ 0.37, the value 
+of −m ln(m) reaches its maximum and the full information of the aerial image is transferred into the resist during exposure. It is interesting to note that when m = 1 (no exposure) and m = 0 (complete exposure of the resist), the latent image gradient is zero and 
+no information is transferred from the aerial image into the resist, as expected.
+There are many interesting implications that come from the simple observation of 
+the existence of an optimum exposure dose. Often, dose is used as a ‘dimension dial’, 
+adjusting dose to obtain the desired feature size without regard to any process latitude 
+implications. If the dose is near the optimum, this approach is valid. If, however, the 
+dose used is signifi cantly off from optimum (say, very underexposed compared to the 
+peak of Figure 9.9), changing dose will affect both dimension and overall latent image 
+quality.
+The above discussion assumes a resist that does not bleach. Since g-line and i-line 
+resist materials generally exhibit a large amount of bleaching, some attempts to describe 
+how bleaching affects the latent image gradient will be useful. In general, the combined 
+effects of bleaching with the propagation of the image from top to bottom of the 
+resist yield a very complex picture. However, a few approximations can greatly simplify 
+this picture without greatly sacrifi cing the accuracy of the derived latent image 
+gradient.
+0.00
+0.05
+0.10
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40
+0 0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0
+Relative Sensitizer Concentration, m
+–m ln(
+m)
+Figure 9.9 Plot revealing the existence of an optimum exposure, the value of m at which 
+the latent image gradient is maximized. Note that m = 1 corresponds with unexposed resist, 
+while m = 0 is completely exposed resist
+
+
+## Page 12
+
+380 Fundamental Principles of Optical Lithography
+When only absorption affects how the intensity varies with depth into a bleaching resist 
+(that is, when there are no standing waves and when the defocusing of the image through 
+the resist is ignored), Lambert’s law of absorption coupled with Beer’s law gives
+d
+d
+I
+z
+=− + () Am B I (9.12)
+The coupled Equations (9.10) and (9.12) were solved in Chapter 5 to give
+z
+y
+yA y B y mz
+mz
+= −− =
+∫ d
+[ ( ) ln( )] ()
+()
+1 0
+ (9.13)
+where y is a dummy variable for the purposes of integration, and
+I xz I x A mxz B mxz
+A mx B mx () () [ ( )] ln[ ( )]
+[ ( )] ln[ ( ) ,, ,,
+,, = −−
+−− 0 1
+10 0 ]
+ (9.14)
+Differentiating Equation (9.13) with respect to x gives the interesting result that
+∂
+∂ = 
+
+ 
+
+
+∂
+∂ =
+m
+x
+mxzI xz
+mx Ix
+m
+x z
+( )( )
+( )( )
+,,
+,, 00 0
+ (9.15)
+But at the top of the resist, bleaching does not affect the solution to the kinetic rate equation so that Equations (9.10) and (9.11) still apply at the top of the resist. Thus,
+∂
+∂ = ∂
+∂ =
+m
+x
+mxz mxz
+I
+x z
+( )ln[ ( )] ln ,, 0 (9.16)
+This derivation shows that Equation (9.16) coupled with Equation (9.13) is a more general 
+result for the latent image gradient after exposure and that Equation (9.11) is a special 
+case of (9.16) when z = 0 or when A = 0 (since the image log-slope is not a function of 
+z when there is no bleaching).
+Calculating the gradient of the latent image when bleaching is occurring still involves 
+the numerical integration of Equation (9.13). However, for the special case of B = 0 an 
+analytical solution is possible. As was shown in Chapter 5,
+mxz
+mx
+mx mx
+B Az () ()
+( ) [ ( )] , ,, ,e = when+− = −
+0
+01 0
+0 (9.17)
+which allows Equation (9.16) to be written as
+∂
+∂ = +−
+
+
+ 
+
+
+∂ −
+−
+m
+x
+mx mx
+mx mx
+Az
+Az
+( )ln[ ( )]
+( ( ) [ ( )] )
+, ,e ln
+, ,e
+00
+01 0 2
+I
+x
+mx mx
+m
+x
+z
+Az
+Az z
+∂
+= +−
+
+
+ 
+
+
+∂
+∂
+=
+−
+− =
+0
+2 01 0 0
+e
+( ( ) [ ( )] ) , ,e
+ (9.18)
+By plotting Equation (9.18), Figure 9.10 shows that bleaching results in an increased 
+latent image gradient. Like the contrast enhancement layers discussed in Chapter 4, 
+bleaching allows greater transmittance of light in the bright spaces relative to the edges 
+
+
+## Page 13
+
+ Gradient-Based Lithographic Optimization 381
+between lines and spaces, which necessarily have a lower image intensity. As a result, 
+the light near the edge of the feature is more highly absorbed than light in the center of 
+the space. The transmitted image I(x,z) will have a higher slope than the image at the top 
+of the resist. Interestingly, the optimum level of exposure remains very close to the nonbleaching case: m(x,z) ≈ e−1
+.
+9.5 Post-exposure Bake
+The post-exposure bake takes the latent image of exposure products and creates a new 
+latent image at the end of the bake, m*(x). For a conventional resist, diffusion will spread 
+out the latent image. For a chemically amplifi ed resist, diffusion is accompanied by reaction to form a new latent image.
+9.5.1 Diffusion in Conventional Resists
+Fickean diffusion, where the diffusivity of the diffusing material remains constant, can 
+be treated as a simple convolution problem (as described in Chapter 5). If m(x) is the 
+original latent image (the spatial distribution of chemical species in the resist), the new 
+latent image after diffusion m*(x) can be found by convolving the original chemical distribution with a Gaussian sometimes referred to as the diffusion point spread function 
+(DPSF):
+m x m x DPSF m x * ed D
+/ D () () () () =⊗ = −−
+−∞
+∞
+∫ 1
+2
+22 2
+πσ
+ττ τσ (9.19)
+where sD is the diffusion length. While a one-dimensional case is shown here, it is easy 
+to extend the convolution to two or three dimensions (though things do get more complex 
+when boundary conditions are applied).
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0 0.2 0.4 0.6 0.8 1.0
+Relative Sensitizer Concentration m(z)
+Relative Latent Image Gradient
+Az = 0
+Az = 1
+Az = 2
+Figure 9.10 Bleaching (increasing values of Az) results in increased latent image gradient 
+at the bottom of the resist (shown here is the special case where B = 0)
+
+
+## Page 14
+
+382 Fundamental Principles of Optical Lithography
+Consider now a generic latent image for a repeating line/space pattern of pitch p
+described as a Fourier series:
+m x a nx p n
+n
+N
+( ) cos( ) = =
+∑ 2 0
+π / (9.20)
+where a pattern symmetrical about x = 0 is assumed so that there are no sine terms in the 
+series. Larger values of n represent higher-frequency terms (harmonics) in the image, 
+though a typical minimum pitch pattern will have an upper limit of N = 2 or 3. The effect 
+of diffusion on this latent image can be calculated by plugging Equation (9.20) into the 
+convolution integral (9.19) giving
+m x a nx p n
+n
+N
+*( ) cos( ) = * / =
+∑ 2 0
+π (9.21)
+where aa nn np * e D = −2 2 ( /) . πσ
+Diffusion can be thought of as simply a reduction of each of the n > 0 Fourier coeffi -
+cients of the latent image. Obviously, a greater diffusion length leads to a greater degradation of the latent image (an is reduced). But it is the diffusion length relative to the pitch 
+that matters. Thus, for the same diffusion length, smaller pitch patterns are degraded more 
+than larger pitch patterns. Also, the higher-frequency (larger n) terms degrade faster than 
+the lower-frequency terms. In fact, each frequency term can be said to have an effective 
+diffusion length equal to nsD and it is the ratio of this effective diffusion length to the 
+pitch that determines the amount of damping for that frequency component (Figure 
+9.11).
+The effect of diffusion on the latent image gradient (LIG) is complicated by the fact 
+that the rate of diffusion is driven by the change in the concentration gradient. Thus, in 
+general the latent image gradient after diffusion will not be directly proportional to 
+the gradient before diffusion – it will be infl uenced by the shape of the latent image to a 
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+0.00 0.05 0.10 0.15 0.20
+nσD/pitch
+an*/an
+Figure 9.11 Effect of diffusion on the latent image frequency components for a dense line
+
+
+## Page 15
+
+ Gradient-Based Lithographic Optimization 383
+distance of a few diffusion lengths away. However, an approximate response can be 
+obtained by assuming that the latent image for a small pitch pattern, and thus the effect 
+on the gradient, is dominated by the n = 1 Fourier component of the latent image. The 
+change in the latent image gradient due to diffusion can then be approximated as the 
+change in a1:
+∂∂
+∂∂ ≈ mx
+mx
+a
+a
+*/
+/
+1
+*
+1
+ (9.22)
+This simple result can be generalized for any pattern (not just patterns with a very small 
+pitch) to become
+∂
+∂ ≈ ∂∂ = ∂∂ = ∂∂
+m −− −
+x
+m
+x
+m
+x
+m
+x
+* L tDL t ee e σπ π τ / // PEB PEB 22 2 2 2 2 (9.23)
+where L is a characteristic length related to the width of the edge region (the range over 
+which the original latent image gradient is nonzero). For a pattern of small lines and 
+spaces, L is equal to the half-pitch of the pattern. Obviously, increased diffusion (indicated 
+by a larger diffusion length) results in a greater degradation of the latent image gradient 
+(Figure 9.12). Also, sharper edges (smaller values of L) are more sensitive to diffusion, 
+showing a greater fractional decline in the latent image gradient for a given diffusion 
+length. The second (middle) form of Equation (9.23) replaces the diffusion length with 
+2DtPEB where D is the diffusivity and tPEB is the bake time. Finally, the left-hand form 
+of the equation defi nes a characteristic pattern diffusion time t = L2/(Dp2). The bake time 
+must be kept much less than this characteristic pattern diffusion time in order to prevent 
+signifi cant latent image degradation due to diffusion.
+9.5.2 Chemically Amplifi ed Resists – Reaction Only
+For chemically amplifi ed resists, diffusion during PEB is accompanied by a reaction that 
+changes the photogenerated acid latent image into a latent image of blocked and deblocked 
+0.70
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+0.0 0.05 0.10 0.15 0.20 0.25 0.30
+σD/L
+Fractional LIG after PEB
+0.70
+0.75
+0.80
+0.85
+0.90
+0.95
+1.00
+0.0 0.1 0.2 0.3 0.4 0.5 0.6 0.7
+(σD p/L)
+2
+Fractional LIG after PEB
+Figure 9.12 Increased diffusion (shown by the dimensionless quantity sD/L, the diffusion 
+length over the width of the edge region) causes a decrease in the latent image gradient 
+(LIG) after PEB
+
+
+## Page 16
+
+384 Fundamental Principles of Optical Lithography
+polymer. Since reaction and diffusion occur simultaneously, rigorous evaluation of the 
+impact on the latent image gradient is required. However, as a start we will look at the 
+impact of the reaction without diffusion. Ignoring the possibilities of acid loss before or 
+during the PEB, a simple mechanism for a fi rst-order chemical amplifi cation would give 
+(from Chapter 6)
+mx hx *e f () () = −α (9.24)
+where af = KamptPEB is the amplifi cation factor, proportional to the PEB time and exponentially dependent on PEB temperature. This simple expression points out the trade-off 
+between exposure dose and thermal dose. A higher exposure dose generates more acid 
+(larger value of h), requiring less PEB (lower value of af) to get the same result (same 
+value of m*). For a given level of required amplifi cation, thermal and exposure doses can 
+be exchanged so long as afh is kept constant.
+The gradient of this new latent image after amplifi cation is then
+∂
+∂ = ∂
+∂
+
+
+
+ =−  −−
+
+
+
+∂
+∂
+m
+x mm h
+h
+x mm hh
+h
+I
+x
+* ** ** ln( ) ln( ) 1 11 ( )ln( ) ln (9.25)
+The gradient of the deprotection latent image relative to the image log-slope is often called 
+the chemical contrast:
+∂
+∂
+∂
+∂ = ∂
+∂ = m
+x
+I
+x
+m
+E
+* * chemical contrast ln
+ln (9.26)
+For a given latent image after exposure [that is, given h(x)], the optimum latent image 
+after amplifi cation occurs when m* = e−1
+, giving afh = 1. For a given required level 
+of amplifi cation (given value of m*), the trade-off between thermal and exposure dose 
+can be optimized to give the maximum latent image gradient after PEB. This occurs 
+when
+111
+h
+h
+x
+hh
+h
+h ∂
+∂ ∝ −− =→ ( )ln( ) maximum when 0 (9.27)
+In other words, the optimum latent image gradient after PEB occurs when using a 
+low dose (h → 0) and a high level of amplifi cation (Figure 9.13). Carrying this idea to 
+its extreme, however, invalidates the assumption that no diffusion occurs, since higher 
+levels of amplifi cation necessitate higher levels of acid diffusion. Thus, the true trade-off 
+between thermal and exposure dose must take into account the effects of diffusion as 
+well.
+9.5.3 Chemically Amplifi ed Resists – Reaction–Diffusion
+When diffusion is included with amplifi cation, the situation becomes more complex. Diffusion during post-exposure bake is accompanied by a deblocking reaction that changes 
+the solubility of the resist. Thus, it is not the fi nal, postdiffusion distribution of exposure 
+reaction products that controls development but rather the integral over time of these 
+exposure products. Things become even more complicated when acid loss is accounted 
+
+
+## Page 17
+
+ Gradient-Based Lithographic Optimization 385
+for. In particular, the presence of base quencher (that also may diffuse) leads to both 
+complexity and advantage in tailoring the fi nal latent image shape. However, for the 
+simplifi ed case of no acid loss, an analytical solution is possible.
+Letting h(x, t = 0) be the concentration of acid (the exposure product) at the beginning 
+of the post-exposure bake (PEB), an effective acid latent image can be defi ned as
+hx
+t
+h x t DPSF t h x
+t
+DPSF t
+tt
+eff
+PEB PEB
+, d, d
+PEB PEB
+() ( ) ( ) = =⊗ = ⊗ ∫ 1 00 1
+00
+∫
+=⊗ h x RDPSF () ,0
+ (9.28)
+where RDPSF is the reaction–diffusion point spread function (see Chapter 6). This effective acid concentration distribution heff(x) can be used to calculate the reaction kinetics of 
+the PEB as if no diffusion had taken place. In other words, the effects of diffusion are 
+separable from the reaction for the case of no acid loss. The RDPSF then becomes analogous to the DPSF of a conventional resist.
+For the 1D case, the Gaussian diffusion kernel is affected by time integration through 
+the diffusion length, σ D = 2Dt , where D is the acid diffusivity in resist. Thus,
+RDPSF
+tDt
+t
+x Dt t
+=
+−
+∫ 1
+4
+2 4
+PEB 0
+/ e d
+PEB
+π
+ (9.29)
+The integral is solvable, resulting in an interesting fi nal solution:
+RDPSF x x erfc x x() =− 
+
+ 
+
+
+−
+2
+22
+22 2
+2
+e /
+D D D
+σ D
+πσ σ σ
+ (9.30)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+0 0.2 0.4 0.6 0.8 1.0
+Relative Sensitizer Concentration, m = 1 – h
+–mln(m)/(1
+–m)
+Figure 9.13 For a chemically amplifi ed resist with a given required amount of amplifi cation, 
+the exposure dose (and thus relative sensitizer concentration m) is optimum as the dose 
+approaches zero (m → 1), assuming negligible diffusion
+
+
+## Page 18
+
+386 Fundamental Principles of Optical Lithography
+The fi rst term on the right-hand side of Equation (9.30) is nothing more than twice the 
+DPSF, and thus accounts for pure diffusion. The second term, the complimentary error 
+function times x, is a reaction term that is subtracted and thus reduces the impact of pure 
+diffusion.
+One of the most important properties of the RDPSF is that it falls off in x much faster 
+than the DPSF with the same diffusion length. The full-width half-maximum for the DPSF
+is about 2.35sD, but for the RDPSF it is about sD. Also, invoking a large argument 
+approximation for the erfc,
+RDPSF x
+DPSF x x
+x
+()
+() ≈ 
+
+
+ 2 >>
+2 σ
+σ D , D (9.31)
+In other words, a reaction–diffusion resist system can tolerate more diffusion than a conventional resist system.
+To further compare reaction–diffusion to pure diffusion, consider again the impact of 
+diffusion (and reaction–diffusion) on the latent image. As before, we’ll use a generic latent 
+image for a repeating line/space pattern of pitch p described as a Fourier series:
+h x a nx p n
+n
+N
+( ) cos( ) ,/ 02 0= =
+∑ π (9.32)
+where a pattern symmetrical about x = 0 is assumed so that there are no sine terms in the 
+series. The effect of pure diffusion, calculated as a convolution with the DPSF, is simply 
+a reduction in the amplitude of each harmonic, as shown in Equation (9.21). In the reaction–diffusion case, we convolve Equation (9.32) with the RDPSF, which results in an 
+analytical solution:5
+h x a nx p n
+n
+N
+*( ) cos( ) = * / =
+∑ 2 0
+π
+where
+aa
+np nn
+np
+* e
+/
+D/
+D
+=  −
+
+ 
+
+
+− 1
+2
+2
+2
+2 ()
+()
+πσ
+πσ
+ (9.33)
+Consider the special case of x = p/4 and N = 3 (that is, at the nominal line edge of a very 
+small line/space pattern), a case that will prove useful later:
+hp a a
+hp a a
+()
+()
+/,
+*/ *
+40
+4
+02
+02
+=−
+=− (9.34)
+Figure 9.14 compares the effects of pure diffusion with reaction–diffusion on the 
+amplitudes of the Fourier coeffi cients. As can be seen, pure diffusion causes a much faster 
+degradation of the Fourier components than reaction–diffusion for the same diffusion 
+length. For example, if one is willing to allow a particular Fourier component to fall in 
+amplitude by 20 %, a reaction–diffusion system with no acid loss can tolerate about 50 % 
+more diffusion than a pure diffusion resist. In fact, for reasonably small nsD/p, one can 
+
+
+## Page 19
+
+ Gradient-Based Lithographic Optimization 387
+compare the diffusion-only case to a reaction–diffusion system using a Taylor series 
+expansion of the exponential:
+Diffusion * e/
+Reaction-Diffusio
+D/ : () D
+a ()
+a
+np n
+n
+np = ≈− −22 2
+12 πσ πσ
+n * e
+/
+/ D/
+D
+: D () ()
+() a
+a np
+np n
+n
+np
+= − ≈−
+− 1
+2
+1
+2
+2
+2
+2 πσ
+πσ
+πσ
+ (9.35)
+The two are roughly equivalent if the reaction–diffusion system has a diffusion length 
+2 larger than the diffusion-only case (or a diffusivity that is twice as large).
+As with pure diffusion for conventional resist, we can approximate the impact of 
+reaction–diffusion on the fi nal latent image gradient by assuming the n = 1 order of the 
+latent image Fourier series dominates. Thus,
+∂
+∂ ≈ ∂
+∂
+ −
+
+ 
+
+
+− h
+x
+h
+xL
+L eff /
+D
+e
+/
+D 1
+2
+22 2 2
+22 2
+σπ
+σπ
+ (9.36)
+Combining now all of the terms of exposure, reaction–diffusion impact on h(x), and reaction to give m*, the fi nal gradient of the deblocked concentration can be calculated. The 
+exposure term gives
+h h
+x
+hh I
+x
+CIt =− ∂
+∂ =− () () − ∂
+∂
+− 1 11 e which leads to ln ln (9.37)
+Reaction converts the effective acid concentration to a blocked polymer concentration:
+m m
+x m hx
+h * e which leads to * * f eff
+f
+eff = ∂
+∂ =− ∂∂
+−α α (9.38)
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+1.1
+0.00 0.05 0.10 0.15 0.20 0.25
+nσ D/pitch
+DPSF
+RDPSF
+an*/an
+Figure 9.14 Effect of diffusion on the latent image frequency components for a dense line, 
+comparing pure diffusion (DPSF) to reaction–diffusion (RDPSF)
+
+
+## Page 20
+
+388 Fundamental Principles of Optical Lithography
+Combining Equations (9.36) through (9.38),
+∂
+∂ ≈− − () () − ∂∂
+m −
+x
+m hh I
+x
+* *( e )f 1 1 11
+η
+ηα ln ln (9.39)
+where
+η
+πσ π
+τ = ==
+22
+2
+2
+2 2
+D 1
+LK t amp PEB amp amp
+D
+LK K
+The term h represents the ratio of the rate of diffusion for this feature to the rate of 
+reaction. The only remaining step is to relate heff to h at the nominal line edge. Taking 
+the simple case described in Equation (9.34),
+hp a a aa
+p
+p
+eff
+/
+D
+/ * e
+/
+D
+() ()
+()
+4 1
+22 02 02
+22
+2
+2
+=−=−  −
+
+ 
+
+
+− πσ
+πσ
+ (9.40)
+Expanding the exponential as a Taylor’s series,
+h aa p p eff D D =− − + − // 
+
+
+ 02 24 12 4
+3 ( ) ( ) ... πσ πσ 2 (9.41)
+To avoid excessive degradation of the latent image due to diffusion, a typical value for 
+2psD/p would be 0.5 or less. Typical latent images will have a2 about one order of magnitude smaller than a0. Thus, one can approximate heff for the typical case as
+h aaa p h eff D ≈−+ ≈ 022 / to an error of 5% or less 2 () 2πσ ∼ (9.42)
+In other words, at the line edge the acid concentration doesn’t change much due to diffusion. As a result, a fi nal expression for the latent image gradient becomes
+∂
+∂ ≈ −− − ∂∂
+m −−
+x
+hh I
+x
+* h ee f eff f
+eff eff
+1 11 1
+η
+α ηα ( )( )ln( ) ln (9.43)
+Figure 9.15 uses Equation (9.43) to show how the latent image gradient (LIG) varies 
+with af (which is proportional to PEB time). At low levels of amplifi cation (small PEB 
+time), the gradient is amplifi cation controlled and increased bake produces an improved 
+gradient. At long PEB times, the gradient becomes diffusion controlled and increased 
+bake reduces the gradient due to diffusion. Thus, there is an optimum bake time (optimum 
+af) that produces the maximum LIG of blocked polymer concentration.
+The goal now becomes one of fi nding the optimum fi nal deblocked concentration m* 
+(equivalently, the optimum heff) and the optimum level of amplifi cation af for a given 
+value of h. The optimum af can be determined for a given value of m* or for a given 
+value of heff:
+optimum h
+hh
+h
+α
+η
+η f
+eff
+eff eff
+eff =− +−
+−−
+
+
+ 
+
+ = 11 +
+11
+ln( ) 1
+( )ln( )
+ln
+heff
+
+
+ 
+
+ (9.44)
+Figure 9.16 provides numerical results of the values of af and m* that produce the 
+maximum latent image gradient as a function of h. Figure 9.17 shows the resulting 
+
+
+## Page 21
+
+ Gradient-Based Lithographic Optimization 389
+0.0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.9
+1.0
+0 20 40 60 80 100
+PEB time (sec) or 10αf
+Relative LIG (after PEB)
+Total Gradient
+Amplification
+Diffusion
+(a) (b)
+0 0.2 0.4 0.6 0.8 1
+η = p 2
+D/(L2Kamp)
+0
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+αf
+0.35
+0.40
+0.45
+0.50
+0.55
+0.60
+0 0.2 0.4 0.6 0.8 1
+Optimum 
+m*
+η = p 2
+D/(L2Kamp)
+Figure 9.15 Including diffusion with amplifi cation, there is an optimum PEB to maximize 
+the latent image gradient (LIG), shown here relative to the maximum possible LIG. For this 
+example, Kamp = 0.1s
+−1
+, t = 200 seconds and the exposure dose is chosen to give the maximum 
+gradient for each PEB time
+Figure 9.16 The optimum value of (a) the amplifi cation factor, and (b) the deblocked concentration in order to maximize the fi nal latent image gradient, as a function of h
+maximum latent image gradient. For the case of h = 0 (no diffusion), the solution matches 
+the results given in the previous section. As the relative amount of diffusion increases, 
+the optimum amplifi cation factor quickly falls. A knee in this response at about h = 0.1 
+(and af ≈ 3) marks a transition from high to low sensitivity of the optimum amplifi cation 
+factor to h. Typical values of h for commercial resists are on the order of 0.1–0.2, so that 
+optimum amplifi cation factors are near 3 and the optimum deblocking concentration at 
+
+
+## Page 22
+
+390 Fundamental Principles of Optical Lithography
+the line edge is about 0.45. The optimum fi nal LIG (relative to the image log-slope) for 
+this range of h is about 0.25, a reduction of about 1/3 from the no-diffusion optimum 
+LIG (see Figure 9.17).
+From the results shown in Figure 9.17, it is clear that a reduction in diffusion relative 
+to amplifi cation (that is, a reduction in D/Kamp and thus h) can lead to improved fi nal 
+latent image gradient. Also, for a given D/Kamp the value of h grows as feature size shrinks 
+so that D/Kamp must be continually improved with each new lithography technology generation just to keep h constant. Since both diffusivity and the amplifi cation rate constant 
+are temperature dependent, changing temperature will likely change their ratio. Using an 
+Arrhenius equation for each term,
+D
+K AA
+A
+E RT
+E RT
+E E RT
+amp
+rD /
+rK / r / e
+e
+e aD
+aK
+aD aK == ′
+−
+−
+−− () (9.45)
+The difference in activation energies between diffusion and reaction determines 
+whether high- or low-temperature bakes produce lower h and thus better latent image 
+gradients.
+The dependence of h with temperature is more complicated when the Byers–Petersen 
+model is used. Recalling from Chapter 6, the overall amplifi cation rate constant depends 
+on the acid diffusivity as
+K K KD
+K KD amp
+react diff
+react diff
+= +
+ (9.46)
+Thus, the ratio of diffusivity to amplifi cation becomes
+D
+K K
+D
+amp diff react K
+=+
+1 (9.47)
+0.10
+0.15
+0.20
+0.25
+0.30
+0.35
+0.40
+0 0.2 0.4 0.6 0.8 1
+–(d
+m*/d
+x)/ILS
+η = p 2D/(L2Kamp)
+Figure 9.17 The optimum value of the fi nal latent image gradient (relative to the image 
+log-slope), as a function of h
+
+
+## Page 23
+
+ Gradient-Based Lithographic Optimization 391
+In general, Kdiff is not expected to vary much with temperature. Thus, if the resist operates 
+in the diffusion-controlled regime (Kreact >> KdiffD), h will be relatively insensitive to 
+temperature. However, in the reaction-controlled regime (Kreact << KdiffD), h will have the 
+temperature dependence shown in Equation (9.45).
+9.5.4 Chemically Amplifi ed Resists – Reaction–Diffusion with Quencher
+The analysis of the previous section is very helpful for understanding the role of diffusion 
+in a simple reaction–diffusion system with no acid loss. However, all serious chemically 
+amplifi ed resists include base quenchers – a benefi cial source of acid loss. In general, 
+quencher greatly complicates any efforts to analytically solve for the fi nal latent image 
+or the fi nal latent image gradient. However, for one special case, the above analysis 
+applies even when quencher is present. If the acid–quencher reaction is very fast compared to diffusion (typically a very good assumption), and the base quencher has exactly 
+the same diffusivity as the acid, then the initial acid concentration at the start of the PEB 
+h(x,0) is simply reduced by the background quencher concentration. [Note that for a 
+Fourier series representation of the initial acid latent image such as Equation (9.32), the 
+impact of quencher is then just a reduction of the value of a0.] Negative acid concentrations represent the concentration of base quencher, so that both acid and base diffusion 
+are properly calculated using the convolution of Equation (9.28). Of course, negative 
+values of heff(x), the effective acid concentration, should be set to zero before performing 
+any amplifi cation calculations.
+For quencher of relative initial concentration q0, the acid gradient after exposure and 
+initial quenching becomes, in regions of excess acid,
+hq h
+x
+hq hq I
+x
+CIt =− − ∂
+∂ = −− −− ∂∂
+− 1 11 e which leads to ( )ln( ) 0 00
+ln (9.48)
+The resulting fi nal latent image gradient becomes
+∂
+∂ ≈ − −− −− ∂∂
+m −−
+x
+hq hq I
+x
+* h ee f eff f
+eff eff
+1 11 1 00 η
+α ηα ( )( )ln( ) ln (9.49)
+The value of af to maximize the fi nal latent image gradient is
+optimum hq
+hq hq
+αf
+eff
+eff eff
+=− + −−
+−− −−
+
+
+ 
+
+ = 11
+11
+0 1
+00
+ln( )
+( )ln( ) η
+η ln h
+h
+eff
+eff
+ +
+
+ 
+
+ (9.50)
+The impact of quencher on the optimum gradient is seen in Figure 9.18. Quencher allows 
+the process to be run at higher h values while still providing a good latent image gradient. 
+For the q = 0.1 case in this fi gure, an h value that is about 0.23 higher will give the same 
+optimum gradient compared to the no-quencher case. Alternately, for a given h, higher 
+q0 allows for a higher optimum gradient. Thus, the presence of quencher signifi cantly 
+relaxes the constraints placed on diffusion, allowing higher-diffusing resists to work well 
+for smaller features. Figure 9.19 shows the values of af and m* that produce the optimum 
+gradient.
+Note that in Figure 9.18, the two curves for nonzero quencher are only plotted down 
+to some critical value of h (called hc). When h < hc, the optimum m* approaches 1 (see 
+
+
+## Page 24
+
+392 Fundamental Principles of Optical Lithography
+0.10
+0.12
+0.14
+0.16
+0.18
+0.20
+0.22
+0.24
+0.26
+0.28
+0.30
+–(d
+m*/d
+x)/ILS
+η = p 2D/(L2Kamp)
+q0 = 0
+q0 = 0.1
+q0 = 0.2
+0 0.5 1.0 1.5
+(a) (b)
+0.3
+0.4
+0.5
+0.6
+0.7
+0.8
+0.0 0.5 1.0 1.5
+Optimum 
+m*
+η =p 2
+D/(L2Kamp)
+q = 0 
+q = 0.1 
+q = 0.2 
+0
+1
+2
+3
+4
+5
+0.0 0.5 1.0 1.5
+η = p 2
+D/(L2Kamp)
+Optimum
+αf
+q = 0
+q = 0.1 
+q = 0.2 
+Figure 9.18 The optimum value of the fi nal latent image gradient (relative to the image 
+log-slope), as a function of h for cases with and without quencher
+Figure 9.19 The optimum value of (a) the amplifi cation factor, and (b) the deblocked concentration in order to maximize the fi nal latent image gradient, as a function of h for different 
+quencher loadings
+Figure 9.19). For this case, the best latent image gradient occurs when the point at which 
+quencher just eliminates all acid (that is, h = 0) is placed at the nominal line edge. The 
+resulting LIG is quite high (see Problem 9.8):
+∂∂ ≈− − mx
+ILS qq
+*/
+max
+( )ln( ) 1 11 00 η
+ (9.51)
+
+
+## Page 25
+
+ Gradient-Based Lithographic Optimization 393
+Of course, real development processes require some level of deblocking at the line edge 
+so that this maximum gradient cannot be practically attained. Nonetheless, operating 
+below hc and putting the h = 0 point very near the nominal line edge result in very steep 
+latent image gradients. A plot of hc as a function of quencher loading is shown in Figure 
+9.20.
+9.6 Develop
+In one sense, the goal of selective exposure of resist with an aerial image is to create a 
+solubility differential: exposed and unexposed regions of the photoresist give rise to 
+regions of higher and lower solubility, measured as a development rate (resist removal 
+rate in nanometers per second). The information contained in the aerial image (or image 
+in resist) I(x) is used to expose the photoresist to form a latent image m(x) or h(x), which 
+is modifi ed by the post-exposure bake to create a new latent image m*(x), and fi nally 
+developed based on a development rate ‘image’ r(x) that results in the defi nition of the 
+feature edge.
+The fundamental chemical response of interest is the change in dissolution rate as a 
+function of the exposure dose seen by the resist. A plot of development rate r versus 
+exposure dose E on a log-log scale is called a Hurter–Driffi eld (H–D) curve (Figure 9.21) 
+and allows for the defi nition of the photoresist contrast, g. Quite simply, the photoresist 
+contrast is the slope of the development rate H–D curve (see Chapter 7).
+γ ≡ ∂
+∂
+ln
+ln
+r
+E (9.52)
+Note that photoresist contrast is actually a function of exposure, g (E).
+The photoresist contrast is a measure of the discrimination of the resist with respect to 
+exposure. Higher contrast means that a given change in dose will result in a greater change 
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1.4
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+q0
+Critical
+η
+Figure 9.20 Numerically determined values of the critical h value (hc) for different quencher 
+loadings
+
+
+## Page 26
+
+394 Fundamental Principles of Optical Lithography
+in development rate. This point can be seen clearly using the lithographic imaging equation, derived from the defi nition of photoresist contrast:
+∂
+∂ = ∂∂
+∂
+∂ = ln () r ln lnx
+E I
+x
+w r
+x
+γγ or NILS (9.53)
+The quality of the development rate image, described by a gradient in the dissolution rate, 
+is determined by the product of the image log-slope and the photoresist contrast function. 
+To create a large solubility differential, one would like a good aerial image (large image 
+log-slope), a good photoresist (large photoresist contrast) and an optimized process (an 
+exposure dose chosen to use the maximum of the photoresist contrast function).
+Breaking up the response of development to exposure into separate latent and development rate images allows us to relate the development rate gradient to the latent image 
+gradient:
+∂
+∂ = ∂∂
+∂
+∂
+ln ln r
+x
+r
+m
+m
+* x
+* (9.54)
+where m* is the concentration of the chemical species (after post-exposure bake) that 
+affects the dissolution rate. For example, for a chemically amplifi ed resist m* would represent the concentration of blocked polymer. From Equations (9.53) and (9.54), one can 
+see that the defi nition of photoresist contrast encompasses the exposure, post -exposure 
+bake and development steps in order to relate the fi nal development rate gradient to the 
+original source of the information being imprinted in the resist, the image log-slope.
+The variation of development rate with m* can take on many forms, but a simple one 
+can be used here to illustrate the expected response. The model of development shown 
+10
+Exposure Dose (mJ/cm2)
+1
+10
+100
+Development Rate (nm/s)
+100 1000
+Figure 9.21 Typical development rate function of a positive photoresist (one type of Hurter–
+Driffi eld curve)
+
+
+## Page 27
+
+ Gradient-Based Lithographic Optimization 395
+here (called the reaction-controlled version of the original kinetic development model) 
+provides for a typical nonlinear development rate function:
+rr m r n = −+ max min () 1* (9.55)
+where rmax and rmin represent the maximum and minimum development rates, respectively 
+(rmax >> rmin is assumed), and n is called the dissolution selectivity parameter and controls 
+how nonlinear the development response will be. Using this model of dissolution rate,
+∂
+∂ =− − − 
+
+
+
+ln r min
+m
+n
+m
+r
+** 1 r 1 (9.56)
+Figure 9.22 shows a plot of Equation (9.56) as a function of m* for n = 5 (a low to medium 
+contrast resist) and n = 10 (a medium to high contrast resist). Adjusting the process to 
+set the peak of this curve at the nominal feature edge is a key part of process 
+optimization.
+From Equation (9.56), it is easy to show that the maximum gradient occurs when
+− ∂
+∂ = ln min
+r
+m r nr * is a maximum when (9.57)
+The maximum gradient will occur at a value of m* given by
+− ∂
+∂ =−  −
+
+ 
+
+
+ln ( )
+max
+min
+max
+r
+m m nrr
+n
+* when * 1 1 1
+ (9.58)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+0 0.2 0.4 0.6 0.8 1.0
+Relative Concentration m*
+−∂lnr/∂m*
+n = 5
+n = 10
+Figure 9.22 One component of the overall photoresist contrast is the variation in development rate r with chemical species m*, shown here for the reaction-controled version of the 
+original kinetic development rate model (rmax = 100nm/s, rmin = 0.1nm/s)
+
+
+## Page 28
+
+396 Fundamental Principles of Optical Lithography
+Thus, the maximum gradient is
+− ∂
+∂ = −− =− −
+
+
+ 
+
+
+ln ( ) () max ()
+max
+min
+r
+m
+n
+m n rnr
+n
+**
+1
+1
+1
+1
+1
+ (9.59)
+For the full kinetic rate model,
+rr am
+am r
+n
+n = +−
++− max min + ( )( )
+()
+11
+1
+*
+* (9.60)
+and the equivalent gradient is
+∂
+∂ =− − − 
+
+
+ +−
+
+
+ 
+
+ ln
+()
+r min
+m
+n
+m
+r
+r
+a
+am n ** * 1
+1
+1 (9.61)
+Figure 9.23 shows that again there will be an optimum inhibitor concentration to maximize the development rate gradient, and that this optimum will depend on the value of 
+the dissolution selectivity parameter. The maximum gradient occurs when the development rate is given by
+r nr
+n m
+m
+n
+n
+=
++− −
+−
+min
+() ()
+()
+11 1
+1
+*
+th
+ (9.62)
+The maximum gradient is then
+− ∂
+∂ = −
+−
+− −
+−
++ −
++
+
+ 
+−
+ln ( )
+()
+()
+()
+max ()
+r
+m
+n
+m
+m
+m
+n
+n
+m
+n
+n
+**
+*
+*
+1 th
+1
+1 1
+1
+1 1
+1
+1 n
+n () 1− m
+
+
+
+
+
+
+
+
+
+
+th
+ (9.63)
+0
+10
+20
+30
+40
+50
+60
+70
+80
+0.5 0.6 0.7 0.8 0.9 1.0
+Relative Concentration m*
+n = 5
+n = 10
+n = 20
+−∂lnr/∂m*
+Figure 9.23 Development rate gradient with inhibitor concentration for the original kinetic 
+development rate model (rmax = 100nm/s, rmin = 0.1nm/s, mth = 0.7)
+
+
+## Page 29
+
+ Gradient-Based Lithographic Optimization 397
+As n increases, the optimum inhibitor concentration approaches the threshold inhibitor 
+concentration, mth. For large n, the maximum gradient occurs when
+1 11 1
+2
+1
+1
+− ≈− + 
+
+ 
+
+ 
+
+ 
+
+ −
+− mm ≈ n
+r
+r
+m
+m
+n
+n * and * th
+th
+( ) ln ()
+()
+min
+max
+r
+r
+min
+max
+ (9.64)
+giving
+− ∂
+∂ ≈ −
+−+ 
+
+ 
+
+ 
+
+ 
+
+
+− ln ( )
+( ) ln max min
+max
+min
+r
+m
+n
+m n
+r
+r
+r
+r
+* th
+1
+11 1
+2
+1 max
+min
+max
+1 1
+1
++ −
++
+
+ 
+
+
+
+
+
+
+
+
+
+ n
+n
+r
+r
+ (9.65)
+If the resist is a reasonably good one, so that rmax/rmin > 1000, then this large n approximation can be further simplifi ed:
+− ∂
+∂ ≈ − + −
+
+
+ 
+
+ ln
+( )( )
+ln max
+max
+min
+r
+m
+n
+mm
+r
+* 1 th th r
+1
+21 (9.66)
+This fi nal result describes the basic behavior that we wish to know: the maximum 
+log-development rate gradient is roughly proportional to n, inversely proportional to 
+1 − mth, and increases with the log of the ratio of the maximum to minimum development 
+rates.
+9.6.1 Conventional Resist
+While Equation (9.54) related the development rate gradient to the after-PEB latent image 
+gradient, in fact all of the lithographic process steps can be chained together to relate the 
+fi nal development response to the initial source of the imaging information, the aerial 
+image. For a conventional resist,
+γ = ∂
+∂
+
+
+
+
+∂
+∂
+
+
+
+
+∂
+∂
+
+
+
+
+ln
+ln
+r
+m
+m
+m
+m
+* E
+* (9.67)
+As described above, we have seen that for a resist that does not bleach,
+∂
+∂ = m
+E mm ln ln( ) (9.68)
+The impact of diffusion can approximated by
+∂
+∂ ≈ m −m
+* L e σπ / 22 2 2 (9.69)
+where s is the diffusion length and L is a characteristic width of the edge region (and is 
+roughly equal to the resolution of the lithography process). Also, diffusion does not have 
+a signifi cant impact on the concentration of the sensitizer at the line edge so that m ≈ m* 
+
+
+## Page 30
+
+398 Fundamental Principles of Optical Lithography
+at the feature edge. Combining each of these expressions with Equation (9.61) gives the 
+overall contrast:
+γ σπ =− − − 
+
+
+ +−
+
+
+ 
+
+ n −
+m
+r
+r
+a
+am mm n
+L
+1
+1
+1
+22 2 min 2
+() ( ) ln e / (9.70)
+Our goal will now be to fi nd the maximum value of this photoresist contrast. Since diffusion always degrades the contrast, the optimum will always be zero diffusivity. Thus, 
+without loss of generality, we shall omit the diffusion term from the analysis that follows. 
+The exact value of the maximum is most easily determined numerically (Figure 9.24), but 
+it will be useful to derive some general trends. Since the mlnm term varies slowly, the 
+contrast will be dominated by the development piece (∂ lnr/∂m*). Thus, for reasonably 
+large n the optimum value of m* will be approximately that given by Equation (9.64).
+mm m
+n
+r
+r * th
+th ≈+ − 
+
+ 
+
+ () ln max
+min
+1
+ (9.71)
+Thus, at this optimum
+mmm m mm
+n
+r
+r ** th th
+th th ln ln ( ln )( ) ln max
+min
+≈+
++− 
+
+ 
+
+
+11
+ (9.72)
+The maximum contrast will be approximately
+γ max
+max
+m
+ln
+()
+( ln )
+ln ≈− ln − +  −+
+
+ 
+
+ mm
+m n mm
+mm
+r
+r
+th th
+th
+th th
+1 th th
+1
+in
+() 
+
+ 
+
+ 
+
+ 
+
+ − e σπ / 22 2 2L (9.73)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+0.5 0.6 0.7 0.8 0.9 1.0
+Relative Concentration m
+Gamma
+n = 5
+n = 20
+n = 10
+Figure 9.24 Photoresist contrast as a function of inhibitor concentration for the original 
+kinetic development rate model, assuming no diffusion (rmax = 100nm/s, rmin = 0.1nm/s, mth
+= 0.7) and different values of the dissolution selectivity parameter n
+
+
+## Page 31
+
+ Gradient-Based Lithographic Optimization 399
+or, since n is reasonably high,
+γ σπ max
+ln
+() ≈− () −
+− n mm
+m
+th th L
+th
+/ e
+1
+22 2 2 (9.74)
+This fi nal approximate form matches well the full numerical calculations for the 
+maximum contrast shown in Figure 9.24 even for n as low as 5. The overall contrast is 
+maximized by minimizing diffusion, maximizing n and letting mth approach 1.
+9.6.2 Chemically Amplifi ed Resist
+For a chemically amplifi ed resist, the PEB term ∂m*/∂m is a function of the amplifi cation 
+factor af and the diffusion factor h, as described previously. Figure 9.25 shows a plot of 
+g (E,af) for the n = 5 case assuming no diffusion and the simple reaction-controlled 
+development rate equation. Without diffusion, the best performance comes from a low 
+dose and a high amplifi cation factor, as described previously.
+When diffusion is included in the analysis, the best resist will be the one that matches 
+the optimum blocked concentration to produce a good latent image gradient (for example, 
+see the curves in Figure 9.19b) with the optimum blocked concentration to maximize 
+∂ lnr/∂ m* (for example, see the curves in Figure 9.23). Thus, the mth of the development 
+function must be tuned to the value of h and quencher concentration for the resist. And, 
+0
+1
+2
+3
+4
+5
+0
+10
+20
+30
+40
+50
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+Gamma
+Amplification Factor
+Exposure Dose (mJ/cm2)
+Figure 9.25 The overall photoresist contrast (gamma) as a function of exposure dose (E) 
+and amplifi cation factor (af) for a chemically amplifi ed resist with no diffusion (h = 0, rmax =
+100nm/s, rmin = 0.1nm/s, n = 5, C = 0.05cm2
+/mJ)
+
+
+## Page 32
+
+400 Fundamental Principles of Optical Lithography
+if the quencher level is set high enough so that h is near its critical level, the maximum 
+resist contrast can approach its maximum possible level:
+γ
+η
+α max ()
+( )ln( ) ≈ . −
+ −−
+
+ 
+
+ ≈ − n m
+m
+qq m th h
+th
+th ,e f eff
+1
+11 00 (9.75)
+9.7 Resist Profi le Formation
+We have now arrived at the fi nal ‘image’ gradient, the gradient in development rate. As 
+we shall see next, the last step will be to relate this gradient to the control of the resist 
+feature edge by knowing the development path. The development path traces the surface 
+of the resist through the development cycle from the top of the undeveloped resist to a 
+point on the fi nal resist profi le (see Chapter 7). The basic equation which defi nes the 
+physical process of development is an integral equation of motion:
+t
+s
+r xyz dev
+d
+,, = ∫ ()
+ (9.76)
+where tdev is the development time, r(x,y,z) is the development rate at every point in the 
+resist, ds is a differential length along the development path, and the path integral is taken 
+along the development path. The endpoint of the development path defi nes the position 
+of the fi nal resist profi le and, consequently, the fi nal critical dimension. There is only one 
+path possible, determined by the principle of least action: the path will be that which goes 
+from start to end in the least amount of time.
+In Chapter 7, several solutions for the development path were given for certain special 
+cases. Two of these cases are described below.
+9.7.1 The Case of a Separable Development Rate Function
+An interesting and useful case to examine is when the development rate function r(x,z) 
+is separable into a function of incident dose E only and a function of the spatial variables 
+independent of dose:
+rExz f Egxz ( ) ( )( ) ,, , = (9.77)
+In general, none of the kinetic development models discussed in Chapter 7 meet this criterion. However, separability results from assuming a constant theoretical contrast. Integrating the defi nition of theoretical contrast for the case of constant contrast gives
+rxz E I xz ( ) ( ( )) ,, ∝ r γγ (9.78)
+where Ir(x,z) is the image in resist. Thus, separability can be assumed if the range of dose 
+seen over the development path is suffi ciently small to fall within the approximately linear 
+region of the H–D curve.
+As we saw in Chapter 7, separability leads to the interesting result that the path of 
+development does not change with dose – the development just follows this path at a 
+different rate. Applying this idea to the defi ning development path Equation (9.76),
+f Et xz
+gxz x
+x
+() () dev
+d
+, = + ′ ∫ 1 2
+0
+ (9.79)
+
+
+## Page 33
+
+ Gradient-Based Lithographic Optimization 401
+For example, let f(E) = Eg. If the dose is increased, the same path is used to get from x0
+to x, but it arrives in a shorter time.
+Equation (9.79) allows us to calculate exposure latitude: how a change in dose effects 
+the fi nal position on the path x for a given development time. Taking the derivative of 
+this equation with respect to log-exposure dose,
+∂
+∂ = + ′ ∂
+∂
+f
+E
+t
+z
+gxz
+x
+ln ( ) ln E dev ,
+1 2
+ (9.80)
+Solving for the exposure latitude term, ∂ x/∂ lnE,
+∂
+∂ = ∂
+∂ + ′ = ∂∂
+x
+E
+f
+E
+rxzt
+z
+f
+E
+rxzt
+ln
+ln
+ln
+( ) ln
+ln ( ) sin , , dev
+dev
+1 2 θ (9.81)
+where q is the sidewall angle of the resist profi le (which generally is close to 90°). For 
+the case of f(E) = Eg,
+∂
+∂ = x
+E
+rxzt
+ln γθ ( ) sin , dev (9.82)
+Similarly, the sensitivity of the fi nal edge position x to changes in development 
+time can also be calculated. Taking the derivative of Equation (9.79) with respect to logdevelopment time,
+∂
+∂ = xt
+rxzt
+ln ( ) sin dev
+dev , θ (9.83)
+While Equations (9.82) and (9.83) were derived to give us insight into exposure latitude 
+and development latitude, they also provide for an interesting approach to understanding 
+the development time/exposure dose trade-off. If a longer development time is used, a 
+lower dose can be used. But what combination of dose and development time will maximize CD control? For our separable development rate assumption, Equation (9.79) shows 
+us that any process that gives the correct edge position (correct CD) must have r(x,z)tdev
+= constant. But Equations (9.82) and (9.83) show us that r(x,z)tdev = constant will produce 
+a constant sensitivity to relative dose errors and relative development time errors. In other 
+words, under the assumption of constant g, any dose/develop time combination that produces the correct CD will also allow for the control of that CD with the same sensitivity 
+to relative dose errors and relative development time errors.
+9.7.2 Lumped Parameter Model
+In Chapter 7, the lumped parameter model (LPM) was used to derive a general way to 
+relate the dose E(x) required to achieve a certain CD (=2x) to the shape of the aerial image 
+I(x), using resist contrast g and the effective resist thickness Deff to describe the infl uence 
+of the photoresist on this image:
+Ex
+ED
+Ix
+Ix
+x
+x
+x ()
+()
+()
+0 ()
+1 1
+0 0
+
+
+ 
+
+ =+  ′
+
+ 
+
+ ′
+−
+∫
+γγ
+eff
+d (9.84)
+
+
+## Page 34
+
+402 Fundamental Principles of Optical Lithography
+where the starting point in the development path, x0, is generally assumed to be the middle 
+of the space for a pattern with narrow spaces. From this, it is easy to differentiate and 
+calculate the exposure latitude of the resist edge position x:
+∂
+∂ == 
+
+ 
+
+
+x
+E
+rx t D ExIx
+ln EI () ()()
+()() γγ
+γ
+dev eff 00 (9.85)
+Note that the result matches the general expression (9.82) since the LPM makes the 
+explicit assumption of segmented development so that the development path will always 
+be horizontal and sin q = 1.
+Equation (9.85) can be used for a specifi c case also derived in Chapter 7. Assuming 
+that the shape of the aerial image in the region being developed can be approximated as 
+a Gaussian (that is, assuming the log-slope of the image varies linearly with position in 
+this region), the LPM predicts
+Ex
+E D ILS
+Ix
+I
+()
+()
+()
+0 ()
+1 1
+0
+
+
+ 
+
+ ≈+ 
+
+ 
+
+
+
+
+ 
+
+
+γγ −
+γ eff
+ (9.86)
+where the approximate equal sign is used since the actual equation yields a Dawson’s 
+integral that is approximated in Equation (9.86). Note that the image log-slope, ILS, is 
+used in this equation as a function of x rather than being defi ned at the nominal line edge. 
+Substituting this specifi c result into the general LPM expression for exposure latitude 
+gives
+∂
+∂
+≈+ 
+
+ 
+
+
+x
+E ILS
+D Ix
+ln I
+()
+()
+1
+0 γ
+γ
+eff (9.87)
+Often it is convenient to substitute CD = 2x and compute the log-log slope of the 
+CD-versus-exposure dose curve:
+∂
+∂
+≈+ 
+
+ 
+
+
+ln
+ln
+()
+()
+CD
+E NILS
+D
+CD
+I CD
+I
+22 2
+0
+γ γ
+eff / (9.88)
+There are two distinct terms on the right-hand side of this expression. The fi rst, 2/NILS, 
+is a pure aerial image term and is the limiting value of the exposure latitude for the 
+case of an infi nite contrast resist (Figure 9.26). The second term is a ‘development path 
+factor’ that includes the aspect ratio of the resist (Deff/CD) and the ratio of the aerial 
+image intensity at the edge of the pattern relative to that in the center of the space (that 
+is, the exposure dose at the end of the path relative to the exposure dose at the beginning 
+of the path). This development path factor is reduced (giving better CD control) by lowering the aspect ratio of the resist, increasing the resist contrast, and reducing the aerial 
+image intensity at the dark line edge (i.e. x = CD/2) relative to the bright space center 
+(x = 0).
+
+
+## Page 35
+
+ Gradient-Based Lithographic Optimization 403
+A slightly more accurate form of Equation (9.88) can be obtained by using two terms 
+in the polynomial expansion of the Dawson’s integral. The result is
+∂
+∂
+≈ ++ 
+
+ 
+
+
+
+
+
+
+
+ln
+ln
+()
+()
+CD
+E NILS NILS
+NILS D
+CD
+I CD
+I
+2 1 22
+γ 0 γ
+γ
+eff /
+ (9.89)
+The relative difference between this equation and Equation (9.88) is generally very small 
+except for the case where the resist is very thin.
+Equation (9.88) fi nally brings all the pieces of the NILS puzzle together, describing the 
+information transfer from the aerial image through development to the fi nal resist image. 
+It relates the fractional change in CD to the fractional change in exposure dose and thus 
+its inverse defi nes the exposure latitude. The aerial image affects CD control in two ways, 
+through the NILS directly and through the development path factor. The exposure, PEB 
+and development effects can be lumped together into a photoresist contrast term, or can 
+be separated out into individual components as described earlier.
+Since the above expressions were derived specifi cally for a Gaussian aerial image, that 
+specifi c image can be used in Equation (9.88) or (9.89).
+I CD
+I
+NILS ()
+()
+/
+e
+2 /
+0
+4 = − (9.90)
+giving
+∂
+∂
+≈ ++ 
+
+ 
+
+ − ln
+ln
+CD
+E NILS NILS
+NILS D
+CD
+2 NILS 1 2 4
+γ
+γ eff γ / e (9.91)
+In this form, the exposure latitude is determined by just three factors: NILS, resist contrast 
+and the feature aspect ratio. For large gNILS, Equation (9.91) approaches the result for 
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+13579 11 13
+LPM Gamma
+dln(CD)/dln(
+E)
+2/NILS
+Figure 9.26 A plot of Equation (9.88) showing how the exposure latitude term approaches 
+its limiting value of 2/NILS as the lumped photoresist contrast increases. In this case, the resist 
+aspect ratio is 2, the ratio I(CD/2)/I(0) is 0.5 and the NILS is 2
+
+
+## Page 36
+
+404 Fundamental Principles of Optical Lithography
+an ideal threshold resist. Also, recalling the lithographic imaging equation, gNILS is the 
+normalized log-development rate gradient. Thus, optimizing this gradient helps make the 
+photoresist response approach that of an ideal resist.
+9.8 Line Edge Roughness
+When variations in the width of a resist feature occur quickly over the length of the 
+feature, this variation is called line width roughness (see Figure 9.27). When examining 
+these variations along just one edge, it is called line edge roughness (LER). LER becomes 
+important for feature sizes on the order of 100 nm or less, and can become a signifi cant 
+source of linewidth control problems for features below 50 nm. LER is caused by a 
+number of statistically fl uctuating effects at these small dimensions such as shot noise 
+(photon fl ux variations), statistical distributions of chemical species in the resist such as 
+photoacid generators (PAGs), the random walk nature of acid diffusion during chemical 
+amplifi cation, and the nonzero size of resist polymers being dissolved during 
+development.
+LER is usually characterized as the 3s deviation of a line edge from a straight line, 
+though a more complete frequency analysis of the roughness can be valuable as well. For 
+193-nm lithography, LER values of 4 nm and larger are common. The impact of LER on 
+device performance depends on the specifi c device layer and specifi c aspects of the device 
+technology. For lithography generations below 100 nm, typical specifi cations for the 3s
+LER are about 5 % of the nominal CD. It is possible that LER will become the main 
+limiter of CD control below 65-nm production.
+In Chapter 6, a stochastic model for exposure and reaction–diffusion of chemically 
+amplifi ed resists was developed. This stochastic model will now prove useful for the 
+prediction of line edge roughness. As a review, for a given volume of resist under 
+consideration, the statistical variance in the fi nal blocked polymer concentration is 
+given by
+σ
+σ m
+p m
+n mm a
+nh
+hh *
+blocked D PAG
+* ** 2
+0
+2
+0
+1 11
+=+ () 
+
+ 
+
+ + −−
+−−
+ln [( )ln( )]2
+2 hn
+
+
+ 
+
+ (9.92)
+where 〈h〉 is the mean value of the acid concentration, 〈m*〉 is the mean value of the 
+blocked polymer concentration after PEB, sD/a is the ratio of acid diffusion length to the 
+Figure 9.27 SEM pictures of photoresist features exhibiting line edge roughness
+
+
+## Page 37
+
+ Gradient-Based Lithographic Optimization 405
+capture range of the deblocking reaction, 〈n〉 is the mean number of photons (to account 
+for photon shot noise), 〈n0−PAG〉 is the mean initial number of PAGs in the control volume 
+at the start of exposure, and 〈n0−blocked〉 is the mean initial number of blocked polymer 
+groups in the volume before PEB.
+While development can also be included, for the sake of simplicity, we will assume an 
+infi nite contrast development process so that the line edge will be determined by the 
+blocked polymer latent image. Thus, a simple threshold model for the latent image will 
+determine the resist critical dimension. And, as we saw in Chapter 2 for an aerial image 
+threshold model, a Taylor series expansion of the blocked polymer concentration, cut off 
+after the linear term, allows us to predict how a small change in blocked polymer concentration (∆m*) will result in a change in edge position (∆x):
+∆ ∆x m
+mx = *d */d (9.93)
+From this, we can devise a simple qualitative model for line edge roughness. The standard 
+measure of line edge roughness, from a top-down SEM, will be proportional to the standard deviation of blocked polymer concentration divided by its gradient perpendicular to 
+the line edge:
+LER
+mx
+m ∝ σ *
+d */d (9.94)
+Thus, to achieve a low LER it will be necessary to make the standard deviation of the 
+deprotection small and make the gradient of deprotection large. Of course, a main topic 
+of this chapter was how process parameters can be used to maximize the latent image 
+gradient. From Equation (9.92) we can see how to minimize the statistical uncertainty in 
+deprotection. There is one interesting variable in common to both: acid diffusion. Increasing acid diffusion will reduce sm*, but will reduce the latent image gradient. One would 
+expect, then, an optimum level of diffusion to minimize the LER.
+To investigate the impact of diffusion on LER, we can combine Equations (9.92) and 
+(9.43) into (9.94). Thus, for the no-quencher case, and ignoring photon shot noise,
+σ
+σ
+σ
+m
+p m
+n mm anh
+m
+x
+*
+blocked D PAG
+* **
+*
+=+ () 
+
+ 
+
+ 
+
+ 
+
+
+∂
+∂ ∝
+0−−
+2
+0
+1
+1
+ln
+D
+/ D e (since L) D
+2
+2
+2
+2
+22
+2 1
+2
+1
+4
+22 2 () − ≈− 
+
+ 
+
+ << −πσ π πσ
+σ L D LL
+ (9.95)
+so that
+LER m
+n mm a
+n L
+p
+∝ − + () 
+
+ 
+
+ − −−
+σ
+σ πσ
+D
+/ e blocked D PA
+* ** D
+2
+2 0
+2
+1 0
+1 22 2 ln G h
+
+
+ 
+
+ (9.96)
+and
+LER K t m m an
+n L
+p
+∝ − − 
+
+ 
+
+ −
+σ −
+σ πσ
+D
+/ amp PEB
+D
+block
+e ** D
+2
+2
+0
+1 0
+22 2 1 ( ) ln −PAG
+ (9.97)
+
+
+## Page 38
+
+406 Fundamental Principles of Optical Lithography
+For sD << L this becomes
+LER
+L
+Kt m m an
+n
+p
+∝+ 
+
+ 
+
+ − 
+
+ 
+
+ − 1
+4
+1
+22
+2
+0
+0
+πσ
+σ
+D
+amp PEB
+D
+block ( ) ln ** −PAG
+ (9.98)
+To evaluate this expression, consider some typical values. Let M0NA = 1.2 /nm3, G0NA =
+0.042 /nm3, 〈h〉 = 0.3, 〈m*〉 = 0.6. Thus, the LER becomes
+LER a
+L
+p
+∝ − + 
+
+ 
+
+ −
+σ
+σ πσ
+D
+/ e D D
+2
+2 1 22 2 1 15 (9.99)
+Figure 9.28 shows the trend of LER versus acid diffusion for a 45-nm feature for three 
+different values of the deprotection capture range a, 1, 2 and 3 nm. In each case, there is 
+a diffusion length that minimizes the LER. Below the optimum diffusion length, LER is 
+limited by sm* so that increasing the diffusion will improve LER. Above the optimum 
+diffusion length the LER is gradient limited, so that increases in diffusion further degrade 
+the gradient and worsen the LER.
+9.9 Summary
+The above discussion traces the aerial image log-slope through to its ultimate impact on 
+exposure latitude (see Table 9.1). The resist contrast relates the original image contrast 
+to the fi nal development rate gradient, encompassing exposure, chemical amplifi cation, 
+(a) (b)
+0
+1
+2
+3
+4
+5
+0 5 10 15 20 25 30
+Acid Diffusion Length (nm)
+LER (Arb. Units)
+a = 1 nm 
+a = 3 nm 
+0
+1
+2
+3
+4
+5
+0 5 10 15 20 25 30
+Acid Diffusion Length (nm)
+LER (Arb. Units)
+a = 1 nm
+a = 3 nm 
+Figure 9.28 Prediction of LER trends for a 45-nm feature using the generic conditions found 
+in Equation (9.99) and using three values of the deblocking reaction capture range a (1, 2 
+and 3nm): (a) assuming a 2D problem, and (b) for a 3D problem
+
+
+## Page 39
+
+ Gradient-Based Lithographic Optimization 407
+diffusion and development. Since NILS degrades with focus in a predictable way, the 
+fi nal Equation (9.88) provides a simple means of capturing the impacts of both focus and 
+exposure on fi nal CD control. Obviously, this simple gradient approach has its limitations. 
+In particular, the impact of isofocal bias on depth of focus is not captured by looking only 
+at gradients. However, the gradient-based optimization embodied in the use of the normalized image log-slope has proven to be an extremely powerful theory-based guide to full 
+lithographic optimization.
+The chain rule of differentiation provides a simple approach for identifying the effects 
+of each step in the process:
+∂
+∂ = ∂∂
+
+
+
+
+∂
+∂
+
+
+
+
+∂
+∂
+
+
+
+
+∂
+∂
+
+
+
+
+ln ln
+ln
+R ln
+x
+R
+m
+m
+m
+m
+E
+I
+* x
+* (9.100)
+Comparing this equation to the lithographic imaging Equation (9.53) shows that the 
+photoresist contrast is a combined metric of exposure, PEB and development:
+γ = ∂
+∂
+
+
+
+
+∂
+∂
+
+
+
+
+∂
+∂
+
+
+
+
+ln
+ln
+R
+m
+m
+m
+m
+* E
+* (9.101)
+Table 9.1 Summary of lithography process steps and their corresponding information 
+metrics
+Process Step Information Error Sources Information Metric
+Design Polygons, binary (usually assumed 
+perfect)
+Mask Amplitude 
+transmittance, 
+tm(x,y)
+CD and registration 
+errors, corner 
+rounding, phase and 
+transmittance
+Aerial Image I(x,y) Diffraction limitation, 
+aberrations, 
+defocus, fl are, 
+polarization
+NILS
+Image in Resist I(x,y,z) Substrate refl ections/
+thin fi lm effects, 
+polarization effects, 
+defocus through the 
+resist
+NILS
+Exposure Latent Image m(x,y,z) 
+or h(x,y,z) (before 
+PEB)
+Exposure dose errors Latent image 
+gradient
+Post-exposure Bake Latent Image 
+m*(x,y,z) (after 
+PEB)
+Thermal dose errors, 
+diffusion
+Latent image 
+gradient
+Development Development Rate 
+r(x,y,z) + Resist 
+Profi le (CD, 
+sidewall angle, 
+resist loss)
+Finite contrast, rmax/rmin Development rate 
+log-slope, 
+gamma +
+exposure 
+latitude, CD 
+error
+
+
+## Page 40
+
+408 Fundamental Principles of Optical Lithography
+Problems
+9.1. Using results from Chapter 3, show that the aerial image NILS falls off approximately quadratically with defocus.
+9.2. Consider the three-beam aerial image of lines and spaces:
+I x a aa xp a xp ( ) cos( / ) cos ( / ) =+0
+2 01 122 4 24 2 ππ
+Assuming equal lines and spaces, plot pILS(x) versus x/p for 0 ≤ x ≤ p/2.
+9.3. A plot of DOF versus NA (for a given feature) looks something like
+Explain qualitatively why there is an optimum NA that maximizes the depth of 
+focus.
+9.4. Using the following approximation for exposure latitude,
+EL E
+CD = ∂
+∂ 20 ln
+ln
+graphically compare Equations (9.6) and (9.91) [let g = 10 and Deff/CD = 2]. What 
+are the best-fi t values of a and b using NILS in the range from 1.5 to 3.5?
+9.5. Using Equations (9.20) and (9.21),
+a) Derive an equation for ∂∂
+∂∂ =
+mx
+mx xp
+*/
+/ /4
+ for N = 4.
+b) For this case, derive an expression for the approximate magnitude of the relative error in Equation (9.22).
+9.6. Derive Equation (9.44) [hint: fi rst assume m* = constant, then assume heff is 
+constant].
+9.7. Show that in the limit as h → 0, Equation (9.39) becomes Equation (9.25).
+9.8. For the blocked polymer latent image when quencher is used, show that the 
+maximum relative LIG becomes
+∂∂ ≈− − mx
+ILS qq
+*/
+max
+( )ln( ) 1 11 00 η
+whenever h < hc.
+1.0
+0.8
+0.6
+0.4
+0.2
+0.0
+Numerical Aperture
+Depth of Focus (µm)
+0.70 0.75 0.85 0.90 0.95 0.80
+
+
+## Page 41
+
+ Gradient-Based Lithographic Optimization 409
+9.9. Show that at the optimum conditions (i.e. when the blocked polymer LIG is at its 
+maximum),
+11 − = +
+− e f
+eff
+αη
+ηη h
+9.10. Consider a resist obeying the original kinetic development model so that n = 12, 
+mth = 0.65, and rmax/rmin = 2000. If one desired to reformulate the resist to increase 
+the maximum log-development rate versus m* by 20 %, how much would each one 
+of these variables have to be individually changed?
+9.11. In the limit of sD >> a, derive an approximate proportionality for LER. In this 
+regime, how does increasing diffusion affect LER?
+References
+1 Levenson, M.D., Goodman, D.S., Lindsey, S., Bayer, P.W. and Santini, H.A.E., 1984, The 
+phase-shifting mask II: imaging simulations and submicrometer resist exposures, IEEE Transactions on Electron Devices, ED-31, 753–763.
+2 Levinson, H.J. and Arnold, W.H., 1987, Focus: the critical parameter for submicron lithography, 
+Journal of Vacuum Science and Technology B, B5, 293–298.
+3 Mack, C.A., Understanding focus effects in submicron optical lithography, Proceedings of 
+SPIE: Optical/Laser Microlithography, 922, 135–148 (1988), and Optical Engineering, 27, 
+1093–1100 (1988).
+4 Mack, C.A., 1987, Photoresist process optimization, KTI Microelectronics Seminar, Interface 
+’87, Proceedings, 153–167.
+5 Smith, M.D. and Mack, C.A., 2001, Examination of a simplifi ed reaction-diffusion model for 
+post exposure bake of chemically amplifi ed resists, Proceedings of SPIE: Advances in Resist 
+Technology and Processing XVIII, 4345, 1022–1036.

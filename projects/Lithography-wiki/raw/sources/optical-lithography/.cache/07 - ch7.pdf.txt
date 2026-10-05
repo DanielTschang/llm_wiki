@@ -1,0 +1,2714 @@
+## Page 1
+
+7
+Photoresist Development
+The chemistry of photoresists is designed to turn a spatial distribution of energy (the aerial 
+image) into a spatial distribution of resist solubility. Ultimately, the dissolution process 
+turns the continuous energy distribution of the projected aerial image into a binary resist 
+image: either the resist is dissolved or it remains on the wafer. Exposure and post-exposure 
+bake create latent images of chemical distributions, but it is the chemistry of dissolution 
+that has the greatest impact on the ability to discern between line and space and to control 
+the dimensions of the fi nal resist features.
+A kinetic approach to understanding development will be taken here, with a postulated 
+reaction mechanism that then leads to a development rate equation. Deviations from the 
+expected kinetic development rates at the surface of the resist, called surface induction 
+or surface inhibition, will be related empirically to the expected development rate, i.e. 
+to the bulk development rate. Next, the infl uence of developer temperature and normality are discussed. Once a basic understanding of what affects the development rate is 
+established, the traditional resist metric ‘contrast’ will be defi ned and explored. Finally, 
+to arrive at a resist profi le shape, the physical mechanism by which a spatial variation in 
+development rate turns into a fi nal resist profi le is examined by way of the development 
+path.
+7.1 Kinetics of Development
+In order to derive an analytical development rate expression, a simple kinetic model of 
+the development process will be used. This approach involves proposing a reasonable 
+mechanism for the development reaction and then applying standard kinetics to this 
+mechanism in order to derive a rate equation.
+Unfortunately, fundamental experimental evidence of the exact mechanism of photoresist development is lacking. The models presented below are reasonable, and the resulting rate equations have been shown to describe actual development rates extremely well. 
+Fundamental Principles of Optical Lithography: The Science of Microfabrication. Chris Mack.
+© 2007 John Wiley & Sons, Ltd. ISBN: 978-0-470-01893-4
+
+
+## Page 2
+
+258 Fundamental Principles of Optical Lithography
+However, faith in the exact details of the mechanism is limited by this dearth of fundamental studies. In addition, photoresists are not simple, uniform collections of model 
+compounds. Distributions of polymers with different chain lengths (molecular weights) 
+and functional groups mean that macroscopic observations refl ect average material properties that are only approximately mapped to microscopic mechanisms.
+7.1.1 A Simple Kinetic Development Model
+Our discussion here will apply to both conventional and chemically amplifi ed positive 
+photoresists, and will be generalized to negative working resists in a later section. For all 
+resist systems in common use today, the developer is a dilute aqueous solution of a base, 
+most commonly tetramethyl ammonium hydroxide (TMAH).
+Photoresist dissolution involves three processes: diffusion of the active component of 
+the developer from the bulk solution to the surface of the resist, reaction of the developer 
+with the resist, and diffusion of the product back into the solution. For this analysis, we 
+shall assume that the last step, diffusion of the dissolved resist into solution, occurs very 
+quickly so that this step may be ignored. Let us now look at the fi rst two steps in the 
+proposed mechanism. The diffusion of developer to the resist surface can be described 
+with the simple diffusion rate equation, given approximately by a simple difference 
+equation:
+r kDD DD S =− () (7.1)
+where rD is the rate of diffusion of the developer to the resist surface, D is the bulk developer concentration, DS is the developer concentration at the resist surface, and kD is the 
+rate constant (equal to the diffusivity of the developer in the solution divided by the 
+boundary layer thickness).
+We shall now propose a mechanism for the reaction of developer with the resist. It is 
+quite likely that this step is in fact a series of more detailed steps, including the diffusion 
+of the developer cation into the resist to form a thin gel layer. However, we will assume 
+a simple surface-limited reaction here. The resist is composed of large macromolecules 
+of resin R along with a dissolution inhibitor M. For the conventional DNQ/novolac resist, 
+the dissolution inhibitor is the photoactive compound itself. For a chemically amplifi ed 
+resist, dissolution is inhibited by the blocking group attached to the PHS (polyhydroxy 
+styrene) resin. The resin is somewhat soluble in the developer solution, but the presence 
+of the inhibitor makes the development rate very slow. Solubility in the resist is changed 
+by removing the inhibitor. For a conventional resist, the sensitizer converts to carboxylic 
+acid upon exposure to UV light. This carboxylic acid is highly soluble in developer, 
+enhancing the dissolution rate of the resin. For a chemically amplifi ed resist, the PEB 
+amplifi cation reaction deblocks the polymer, generating the highly soluble –OH site.
+Let us assume that n inhibitor sites must be removed from the infl uence of one 
+resin in order for the developer to dissolve that resin molecule. This n parameter, the 
+reaction order for this step in the mechanism, will turn out to be the most critical development parameter, representing the number of exposure or deblocking events that 
+work together to get one resin molecule into solution. The rate of the reaction for this 
+step is
+r kD M M n R RS =− () 0 (7.2)
+
+
+## Page 3
+
+ Photoresist Development 259
+where rR is the rate of reaction of the developer with the resist, kR is the rate constant, 
+and M0 is the initial inhibitor concentration. The two steps outlined above are in series, 
+i.e. one reaction follows the other. Thus, the two steps will come to a steady state such 
+that
+rrr RD == (7.3)
+Equating the rate equations, one can solve for DS and eliminate it from the overall rate 
+equation, giving the steady-state development rate:
+r kkDM M
+k kM M
+n
+n = −
++−
+DR
+DR
+()
+()
+0
+0
+ (7.4)
+Letting m = M/M0, the relative inhibitor concentration, Equation (7.4) becomes
+r kD m
+k kM m
+n
+nn = −
++−
+D
+DR /
+()
+()
+1
+0 1 (7.5)
+When m = 1 (resist unexposed/unreacted), the rate is zero. When m = 0 (resist completely exposed/reacted), the rate is equal to rmax where
+r kD max k kMn
+D
+DR / = 0 +1
+ (7.6)
+If we defi ne a constant a such that
+a k kMn = DR / 0 (7.7)
+the rate equation becomes
+rr am
+am
+n
+n = +−
++− max
+( )( )
+()
+11
+1 (7.8)
+Note that the simplifying constant a describes the rate constant of diffusion relative to 
+the surface reaction rate constant. A large value of a will mean that diffusion is very fast, 
+and thus less important, compared to the fastest surface reaction (for completely exposed/
+reacted resist), and the rate is reaction-controlled. When a is small, the rate is 
+diffusion-controlled.
+There are three constants that must be determined experimentally: a, n and rmax. The 
+constant a can be put in a more physically meaningful form as follows. A characteristic 
+of some experimental rate data is an infl ection point in the rate curve at values of m
+between 0.2 and 0.8. The point of infl ection can be calculated by letting
+d
+d
+at th
+2
+2 0 r
+m == mm
+giving
+a n
+n m n = +− − ()
+() () 1
+1
+1 th (7.9)
+
+
+## Page 4
+
+260 Fundamental Principles of Optical Lithography
+where mth is the value of m at the infl ection point, called the threshold inhibitor 
+concentration.
+This model so far does not take into account the nonzero dissolution rate of unexposed 
+resist (rmin). Simply adding this term to Equation (7.8) gives what has been called the 
+‘original’ kinetic model or the ‘Original Mack model’:1
+rr am
+am r
+n
+n = +−
++− max min + ( )( )
+()
+11
+1 (7.10)
+This approach assumes that the mechanism of development of the unexposed resist is 
+independent of the above-proposed development mechanism. In other words, there is a 
+fi nite dissolution of resist that occurs by a mechanism that is independent of the presence 
+of exposed photoactive compound (PAC). Note that the addition of the rmin term means 
+that the true maximum development rate is actually rmax + rmin. In most cases rmax >> rmin
+and the difference is negligible.
+Consider the case when the diffusion rate constant is large compared to the surface 
+reaction rate constant (i.e. the rate is reaction-controlled). If a >> 1, the development rate 
+Equation (7.10) will become
+rr m r n = −+ max min () 1 (7.11)
+The interpretation of a as a function of the threshold inhibitor concentration mth given by 
+Equation (7.9) means that a very large a would correspond to a large negative value of 
+mth. In other words, if the surface reaction is very slow compared to the mass transport 
+of developer to the surface there will be no infl ection point in the development rate data 
+and Equation (7.11) will apply. It is quite apparent that Equation (7.11) could be derived 
+directly from Equation (7.2) if the diffusion step were ignored.
+Figure 7.1 shows some plots of this model for different values of n. The behavior of 
+the dissolution rate with increasing n values is to make the rate function more ‘selective’ 
+0.0 0.2 0.4 0.6 0.8 1.0
+0
+20
+40
+60
+80
+100
+Development Rate (nm/s)
+Relative Inhibitor Concentration m
+n = 16
+n = 2
+Figure 7.1 Development rate plot of the original kinetic model as a function of the dissolution selectivity parameter (rmax = 100nm/s, rmin = 0.1nm/s, mth = 0.5, and n = 2, 4, 8 and 
+16)
+
+
+## Page 5
+
+ Photoresist Development 261
+between resist exposed/reacted above mth and resist exposed/reacted below mth. For this 
+reason, n is called the dissolution selectivity parameter. Also from this behavior, the 
+interpretation of mth as a ‘threshold’ concentration becomes quite evident.
+The key parameter in this development model that affects lithographic performance is 
+the dissolution selectivity n. As n goes to infi nity, the behavior seen in Figure 7.1 reaches 
+its extreme of a step function. In other words, for n = ∞ the resist becomes an ideal 
+threshold resist. Physically, this parameter represents the number of exposure or deblocking reactions that work together to cause one resin molecule to go into solution. Engineering the materials of the resist to increase n is one of the primary tasks of the resist designer. 
+In general, a high n implies a high molecular weight of the resin (for example, a large 
+number of deblocking reactions per resin means a large chain length of the resin). Unfortunately, a resist with all high molecular weight resin will tend to develop more slowly 
+(lower rmax and mth), thus degrading resist sensitivity.
+The second most important factor in resist performance is the ratio of the maximum to 
+minimum development rates, rmax/rmin. Increasing this ratio above 100 will defi nitely 
+improve lithographic performance, though there will be diminishing returns as the ratio 
+exceeds 10 000 or so.
+7.1.2 Other Development Models
+The previous kinetic model is based on the principle of dissolution enhancement. For a 
+diazonaphthoquinone (DNQ)/novolac resist, the exposure product enhances the dissolution rate of the resin/PAC mixture. For a chemically amplifi ed resist, the deblocked site 
+enhances the solubility of the blocked polymer. In reality this is a simplifi cation – there 
+are really two mechanisms at work. The inhibitor acts to inhibit dissolution of the resin 
+while the product that results from removing that inhibitor enhances dissolution. Thus, a 
+development rate expression could refl ect both of these mechanisms. A new model, call 
+the enhanced kinetic model, has been proposed to include both effects:2
+rr km
+km l
+n
+= +−
++ resin
+enh
+inh
+ ()
+()
+11
+1 (7.12)
+where kenh is the rate constant for the enhancement mechanism, n is the enhancement 
+reaction order, kinh is the rate constant for the inhibition mechanism, l is the inhibition 
+reaction order, and rresin is the development rate of the resin alone.
+For no exposure/reaction, m = 1 and the development rate is at its minimum. From 
+Equation (7.12),
+r r
+k min = 1+
+resin
+inh
+ (7.13)
+Similarly, when m = 0, corresponding to complete exposure/reaction, the development is 
+at its maximum.
+rr k max =+ () resin enh 1 (7.14)
+Thus, the development rate expression can be characterized by fi ve parameters: rmax, rmin, 
+rresin, n and l.
+
+
+## Page 6
+
+262 Fundamental Principles of Optical Lithography
+The enhanced kinetic model for resist dissolution is a superset of the reaction-controlled 
+version of the original kinetic model. If the inhibition mechanism is not important, then 
+kinh = 0. For this case, Equation (7.12) is identical to Equation (7.11) when
+r r r rk min max == , resin resin enh (7.15)
+The enhanced kinetic model of Equation (7.12) assumes that mass transport of developer 
+to the resist surface is not signifi cant. Of course, a simple diffusion of developer can be 
+added to this mechanism as was done above with the original kinetic model (see Problem 
+7.3).
+Figure 7.2 shows several plots of this model. The fi ve parameters of the enhanced 
+kinetic model give this equation more fl exibility in fi tting experimental development rate 
+curves compared to the four-parameter original kinetic model. As Figure 7.2 shows, the 
+combination of enhancing and inhibiting mechanisms can produce a sort of double threshold behavior with rates rising and lowering around a plateau at the resin development 
+rate.
+Perhaps a more intuitive way to understand the basic mechanism of the enhanced 
+kinetic rate model is with the Meyerhofer plot.3
+ This plot, such as the one shown in Figure 
+7.3, shows how the addition of increasing concentrations of inhibitor in the resist formulation (in this case DNQ added to a novolac resin) changes the original development rate 
+of the resin and increases rmax while decreasing rmin. Experimentally, the Meyerhofer plot 
+shows an approximately linear dependence of log-development rate on the initial concentration of inhibitor, M0 (Figure 7.3a). This empirical result can be explained reasonably 
+well if one assumes that kenh has a fi rst-order dependence on M0 and kinh has a second-order 
+dependence on M0, as seen in Figure 7.3b.
+Some experimentally derived r(m) behavior is not well fi t by either kinetic model 
+described above. Figure 7.4 shows the best fi t of both the original and the enhanced 
+development rate models to one set of data.4 In the region around a 0.5 inhibitor concentration, the data exhibits a ‘notch’ behavior where the actual development rate drops very 
+quickly to a value much less than that predicted by either model. This sudden drop in 
+(a) (b)
+0.0 0.2 0.4 0.6 0.8 1.0
+0
+20
+40
+60
+80
+100
+Development Rate (nm/s)
+Relative Inhibitor Concentration m
+n = 9
+n = 1 
+n = 5 
+l = 5
+0.0 0.2 0.4 0.6 0.8 1.0
+0
+20
+40
+60
+80
+100
+Development Rate (nm/s)
+Relative Inhibitor Concentration m
+l = 15 
+l = 1
+Figure 7.2 Plots of the enhanced kinetic development model for rmax = 100nm/s, rresin =
+10nm/s, rmin = 0.1nm/s with: (a) l = 9; and (b) n = 5
+
+
+## Page 7
+
+ Photoresist Development 263
+rate, resembling a notch in the otherwise slowly varying behavior, is critical to resist 
+performance because it is the region of steepest change in relative development rate versus 
+m. Thus, it is critical that a development model properly describes this region of the dissolution rate curve in order to accurately predict the behavior of the resist.
+A semiempirical model has been devised in order to better fi t the notch behavior 
+described above. This notch model begins with the simple version of the original model 
+0.1
+1
+10
+100
+1000
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+Initial Inhibitor Concentration (wt fraction)
+(a) (b)
+Development Rate (nm/s)
+0.1
+1
+10
+100
+1000
+0.00 0.05 0.10 0.15 0.20 0.25 0.30
+Initial Inhibitor Concentration (wt fraction)
+Development Rate (nm/s)
+Figure 7.3 An example of a Meyerhofer plot, showing how the addition of increasing concentrations of inhibitor increases rmax and decreases rmin: (a) idealized plot showing a log-linear 
+dependence on initial inhibitor concentration, and (b) the enhanced kinetic model assuming 
+kenh ∝ M0 and kinh ∝ M0
+2
+0.30 0.35 0.40 0.45 0.50 0.55 0.60
+0
+10
+20
+30
+40
+50
+Development Rate (nm/s)
+Relative Inhibitor Concentration m
+Figure 7.4 Comparison of experimental dissolution rate data (symbols) exhibiting the socalled ‘notch’ shape to best fi ts of the original (dotted line) and enhanced (solid line) kinetic 
+models. The data shows a steeper drop in development rate at about 0.5 relative inhibitor 
+concentration than either model predicts
+
+
+## Page 8
+
+264 Fundamental Principles of Optical Lithography
+given in Equation (7.11) and adds a notch function equivalent to the threshold behavior 
+given by Equation (7.10):
+rr m am
+am r n
+n notch
+n notch =− +−
++−
+
+
+ 
+
+ max min () + ( )( )
+()
+_
+_ 1 11
+1 (7.16)
+where
+a
+n notch
+n notch m n notch = +− () − ()
+()
+_
+_ TH_notch
+1 _
+1
+1
+The term in the square brackets of Equation (7.16) provides the notch-like behavior 
+where mth_notch is the position of the notch along the inhibitor concentration axis 
+and n_notch gives the strength of the notch. This is illustrated in Figure 7.5. Note that 
+the fi ve-parameter notch model of Equation (7.16) reverts to the original kinetic model 
+of Equation (7.10) when n = 0 and becomes equivalent to the simplifi ed kinetic model of 
+Equation (7.11) when n_notch = 1.
+Of the three models described above, about half of the resists that have been characterized are fi t well with the original kinetic model. Most of the rest are well described by 
+the enhanced kinetic model, with only a few resists needing the notch model to accurately 
+describe their dissolution properties.
+7.1.3 Molecular Weight Distributions and the Critical Ionization Model
+In each of the models above, the mechanism of surface reaction is based on the idea that 
+n dissolution-changing chemical events are required to make one polymer molecule dissolve. Real resists, however, are formulated with polymers that have a range of molecular 
+weights (that is, different polymer chain lengths). It seems unlikely that each polymer 
+molecule, regardless of its chain length, would require the same number of deblocking 
+events (taking chemically amplifi ed resists as an example) to make it soluble. Another 
+approach, called the critical ionization model, assumes that the polymer becomes soluble 
+(a) (b)
+0.30 0.35 0.40 0.45 0.50 0.55 0.60
+0
+10
+20
+30
+40
+50
+Development Rate (nm/s)
+Relative Inhibitor Concentration m
+n_notch = 60 
+n_notch = 15 
+0.30 0.35 0.40 0.45 0.50 0.55 0.60
+0
+10
+20
+30
+40
+50
+Development Rate (nm/s)
+Relative Inhibitor Concentration m
+mth notch = 0.4 
+mth notch = 0.5 
+Figure 7.5 Plots of the notch model: (a) mth_notch equal to 0.4, 0.45 and 0.5 with n_notch 
+equal to 30; and (b) n_notch equal to 15, 30 and 60 with mth_notch equal to 0.45
+
+
+## Page 9
+
+ Photoresist Development 265
+whenever some critical fraction of its blocked groups become deblocked.5 Thus, lower 
+molecular weight polymers would require fewer deblocking events (lower n) to become 
+soluble compared to higher molecular weight polymers.
+High molecular weight polymers (>5000 g/mol, for example) result in high n, but with 
+less than ideal sensitivity. By mixing in a small amount of low molecular weight polymer 
+(<500 g/mol, for example),6
+ resist sensitivity can be improved without a signifi cant reduction in average n. Mid-molecular weight resins, however, tend to degrade resolution by 
+lowering n.
+7.1.4 Surface Inhibition
+The kinetic models given above predict the development rate of the resist as a function 
+of the inhibitor concentration remaining after the resist has been exposed/reacted. There 
+are, however, other parameters that are known to affect the development rate, but that 
+were not included in these models. The most notable deviation from the kinetic theory is 
+the surface inhibition effect (Figure 7.6). The inhibition, or surface induction, effect is a 
+decrease in the expected development rate at the surface of the resist.7
+ Thus, this effect 
+is a function of the depth into the resist and requires a new description of development 
+rate.
+Several factors have been found to contribute to the surface inhibition effect. Baking 
+of the photoresist can produce surface inhibition and two possible mechanisms are thought 
+to be likely causes. One possibility is an oxidation of the resist at the resist surface, resulting in reduced development rate of the oxidized fi lm. Alternatively, the induction effect 
+may be the result of reduced solvent content near the resist surface, which also results 
+from baking the resist (see Chapter 5). Both mechanisms could be contributing to the 
+surface inhibition. Quite commonly, surface inhibition can be induced with the use of 
+surfactants (surface-acting agents) in the developer. Chemically amplifi ed resists open a 
+wide array of mechanisms for surface inhibition due to reduced amplifi cation near the 
+0.0 0.2 0.4 0.6 0.8 1.0
+0.00
+0.25
+0.50
+0.75
+1.00
+1.25
+Relative Development Rate
+Relative Depth into Resist
+Figure 7.6 Example surface inhibition with r0 = 0.1 and d = 100nm for a 1000-nm-thick 
+resist
+
+
+## Page 10
+
+266 Fundamental Principles of Optical Lithography
+resist surface (caused, for example, by acid evaporation, base contamination, or reduced 
+acid diffusion in the low-solvent surface region).
+An empirical model can be used to describe the positional dependence of the development rate. If we assume that the development rate near the surface of the resist exponentially approaches the bulk development rate, the rate as a function of depth, r(z), is
+rz r r z () [ ( ) ] = −− − B / 11 0 e δ (7.17)
+where rB is the bulk development rate, r0 is the development rate at the surface of the 
+resist relative to rB, and d is the depth of the surface inhibition layer. In several conventional resists, the induction effect has been found to take place over a depth of about 
+100 nm or less.8
+ For chemically amplifi ed resists, 200- to 300-nm inhibition depths can 
+be observed.
+A small amount of surface inhibition can be good for photoresist profi le control. Slower 
+development of the top of the resist can lead both to less resist loss for small lines, and 
+also profi les with sharper, more square tops. Too much inhibition, however, can lead to 
+T-top-shaped profi les and a loss of linewidth control. In general, moderate values of r0
+and large values of d lead to improved resist profi les without signifi cant loss of dimensional control.
+One of the most useful aspects of surface inhibition is when this effect is used to counter 
+the decrease in development rate caused by absorption in positive resists. For resist sitting 
+on a good bottom antirefl ection coating, the energy exposing the resist falls off exponentially with depth into the resist. We can approximate the impact of this absorption on the 
+variation of development rate with depth into the resist in the following way. For a conventional resist, ignoring resist bleaching and assuming small exposure doses, the sensitizer will vary with depth into the resist approximately as
+m z CDose I z CDose I z CDose z ( ) exp[ ( )] ( ) = − ≈− =− − inc r inc r inc 11 e α (7.18)
+Using the simple reaction-limited development rate Equation (7.11) and ignoring the 
+minimum development rate,
+rz r mz rz n nz ( ) ( ( )) ( ) ≈ − ≈= max − 1 0e α (7.19)
+Thus, the effect of absorption is to cause something close to an exponentially decaying 
+development rate with depth into the resist. Surface inhibition can counteract some of 
+this falloff. Reasonable results are obtained when the surface development rate is set to 
+match the development rate at the bottom of the resist and the surface inhibition depth is 
+set to match the absorption exponential decay depth.
+r n
+nD 0
+1 ≈≈ − e, α δ
+α
+ (7.20)
+where D is the resist thickness.
+Note that the observed magnitude of surface effects is often on the order of 50–100 nm. 
+Thus, for thin resist process, where the thickness of the resist is on the order of 100 nm, 
+the very idea that resist response can be separated into surface and bulk behavior is called 
+into question.
+
+
+## Page 11
+
+ Photoresist Development 267
+7.1.5 Extension to Negative Resists
+The development rate models discussed above were derived based on positive resist 
+chemistry. However, with only a slight change in interpretation, these models are perfectly 
+applicable to most negative resist chemistries. For the three models given by Equations 
+(7.10), (7.12) and (7.16), the term m represents the concentration of the species that inhibits 
+dissolution. For a conventional positive resist, this quantity is the photoactive compound. 
+For conventional negative resists, the inhibitor is the exposure product. By interpreting 
+the m in the development rate equations as the inhibitor concentration for the negative 
+resist, whatever it might be, the rate equations can be used without further modifi cation.
+7.1.6 Developer Temperature
+It is well known that the temperature of the developer solution during development can 
+have a signifi cant impact on resist performance. The speed (i.e. overall development rate) 
+varies in a complicated way with temperature, usually resulting in the counterintuitive 
+result of a ‘faster’ resist process (i.e. a process requiring lower exposure doses) at lower 
+developer temperatures. The shape of the development rate versus dose (or versus inhibitor concentration) curve will also vary considerably with temperature, leading to possibly 
+signifi cant performance differences. The effect of temperature on dissolution rate shows 
+a complicated behavior where changes in developer temperature give changes in dissolution rate that are dose dependent. At one dose, the effect of temperature on dissolution 
+rate can be very different than at another dose.9
+ Use of a dissolution rate model can simplify the description of temperature effects by showing just the change in the model 
+parameters with developer temperature.
+Figure 7.7 shows an example of how temperature can affect dissolution rate. In general, 
+one usually expects simple kinetic rate-limited reactions to proceed faster at higher 
+0 100 200 300 400 500
+0
+20
+40
+60
+80
+100 Development Rate (nm/s)
+Exposure Dose (mJ/cm2)
+30 °C
+14 °C 
+Figure 7.7 Development rate of THMR-iP3650 (averaged through the middle 20% of the 
+resist thickness) as a function of exposure dose for different developer temperatures shows 
+a change in the shape of the development dose response
+
+
+## Page 12
+
+268 Fundamental Principles of Optical Lithography
+temperatures (indicating a positive activation energy for the reaction). The behavior 
+shown in Figure 7.7 is obviously more complicated than that. At high doses, increasing 
+developer temperature does increase the development rate. But at low doses the opposite 
+is true. Thus, developer temperature has a signifi cant impact on the shape of the dissolution rate curve. Reasons have been proposed for this behavior,10 but here we will only 
+strive to accurately describe this behavior quantitatively using model parameters.
+By fi tting the dissolution rate behavior to a development model, the variation of the 
+r(m) curve with temperature can be deduced, as shown in Figure 7.8. Again, the results 
+show that at high doses (corresponding to low concentrations of inhibitor remaining), 
+higher developer temperature increases the development rate. But at low doses (high 
+concentrations of inhibitor remaining), the opposite is true. Using the terminology of the 
+original kinetic development model, increasing the developer temperature caused an 
+increase in the maximum development rate rmax and an increase in the dissolution selectivity parameter n.
+Figure 7.9 shows the fi nal results of the analysis. The two parameters rmax and n
+are plotted versus developer temperature in an Arrhenius plot. For the i-line resist 
+THMR-iP3650, the activation energies for rmax and n are 7.41 and 7.02 Kcal/mole, 
+respectively.11
+Not all resists exhibit the simple, regular behavior with developer temperature described 
+above. The chemically amplifi ed resist Apex-E, for example, shows a maximum dissolution n value at about 35 °C, as seen in the data of Table 7.1. More work is required to 
+fully understand the impact of developer temperature on a wider array of resists.
+7.1.7 Developer Normality
+TMAH developer at 0.26 N (2.38 % by weight) is extremely widely used (almost to the 
+point of being a universal standard). However, as one would expect, developer normality 
+0.0 0.2 0.4 0.6 0.8 1.0
+0
+40
+80
+120
+160
+200
+Development Rate (nm/s)
+Relative Inhibitor Concentration m
+30 °C 
+14 °C
+Figure 7.8 Comparison of the best-fi t models of THMR-iP3650 for different developer temperatures shows the effect of increasing rmax and increasing dissolution selectivity parameter 
+n on the shape of the development rate curve
+
+
+## Page 13
+
+ Photoresist Development 269
+(the concentration of TMAH) impacts dissolution rates greatly. In general, higher normality produces higher dissolution rates. Using again the model coeffi cients as a way of 
+describing the impact of developer normality on dissolution, Equation (7.6) would suggest 
+that the parameters rmax and rmin increase with an increase concentration of TMAH. The 
+important dissolution selectivity parameter n tends to have an optimum, essentially going 
+to zero at very high and very low normalities. The original kinetic model parameters rmax
+and the dissolution selectivity parameter n vary with developer normality as shown in 
+Table 7.2 for the chemically amplifi ed resist Apex-E. As the developer temperature 
+increases, the impact of different developer normalities on rmax is lessened. Although the 
+data here is limited, rmax exhibits a well-known phenomenon – there is a critical normality 
+(between about 0.1 and 0.15 N) below which development does not proceed (rmax becomes 
+zero). The combined impact of temperature and normality on the dissolution selectivity 
+n is quite complicated.
+(a) (b)
+50
+100
+200
+3.25 3.30 3.35 3.40 3.45 3.50
+1000/Developer Temperature (K)
+Dissolution rmax (nm/s)
+3
+8
+3.25 3.30 3.35 3.40 3.45 3.50
+1000/Developer Temperature (K)
+Dissolution n 5
+4
+7
+6
+Figure 7.9 Arrhenius plots of (a) the maximum dissolution rate rmax and (b) the dissolution 
+selectivity parameter n for THMR-iP3650
+Table 7.1 Developer temperature-dependent modeling parameters of Apex-E (0.26 N 
+developer)12
+Developer 
+Temperature 
+(°C) rmax (nm/s) rmin (nm/s) mth n
+5 53.1 ± 9.0 1.18 0.571 ± 0.036 3.93 ± 0.56
+10 68.0 ± 10.9 1.283 0.578 ± 0.031 4.17 ± 0.52
+15 91.9 ± 13.8 1.35 0.586 ± 0.028 4.25 ± 0.48
+20 115.7 ± 14.1 1.48 0.682 ± 0.016 4.79 ± 0.49
+25 146.1 ± 15.2 1.55 0.637 ± 0.015 5.56 ± 0.54
+30 177.8 ± 16.0 1.62 0.646 ± 0.012 6.36 ± 0.55
+35 199.7 ± 14.6 2.56 0.693 ± 0.008 15.58 ± 2.17
+40 196.2 ± 13.1 2.14 0.694 ± 0.008 11.25 ± 1.32
+45 209.5 ± 22.5 1.83 0.665 ± 0.014 6.64 ± 0.74
+
+
+## Page 14
+
+270 Fundamental Principles of Optical Lithography
+Table 7.2 Developer temperature- and normality-dependent modeling parameters for 
+Apex-E12
+Developer 
+Temperature 
+(°C)
+Developer 
+Normality rmax (nm/s) rmin (nm/s) mth n
+20 0.195 45.9 ± 7.9 0.272 0.527 ± 0.03 5.26 ± 1.00
+20 0.24425 90.9 ± 11.3 0.912 0.607 ± 0.018 5.41 ± 0.61
+20 0.26 115.7 ± 14.1 1.482 0.682 ± 0.016 4.79 ± 0.49
+35 0.195 78.1 ± 12.9 0.395 0.533 ± 0.01 17.33 ± 2.18
+35 0.24425 151.3 ± 13.1 1.191 0.667 ± 0.008 11.10 ± 1.14
+35 0.26 199.6 ± 14.6 2.562 0.693 ± 0.008 15.58 ± 2.17
+40 0.195 118.5 ± 94.6 0.395 0.511 ± 0.074 8.72 ± 1.93
+40 0.24425 182.9 ± 12.4 1.473 0.675 ± 0.005 16.44 ± 1.62
+40 0.26 196.2 ± 13.1 2.135 0.694 ± 0.008 11.25 ± 1.32
+One important reason for understanding developer normality effects is to better understand the impact of developer loading. One of the most popular styles of development is 
+puddle development, where a puddle of developer is formed on top of the wafer which 
+sits stationary through most of the development cycle. One potential issue with this 
+development method, especially for thicker resists, is the accumulation of dissolved resist 
+and the decrease in –OH concentration in the developer as development proceeds in what 
+is called developer loading. Additionally, if an integrated circuit has very different pattern 
+densities across the die, this developer loading effect can vary across the die. Since development will slow down as the developer loading increases, the result can be an additional 
+source of CD nonuniformity. A common solution to this problem is to break the puddle 
+step into a double puddle, where each puddle is allowed to sit for half of the development 
+time and fresh developer is used to form the second puddle.
+7.2 The Development Contrast
+The use of ‘contrast’ to describe the response of a photosensitive material dates back over 
+100 years. Hurter and Driffi eld measured the optical density of photographic negative 
+plates as a function of exposure.13 The ‘perfect negative’ was one that exhibited a linear 
+variation of optical density with the logarithm of exposure. A plot of optical density versus 
+log-exposure showed that a good negative exhibited a wide ‘period of correct representation’, as is shown in the Hurter–Driffi eld (H–D) curve in Figure 7.10. Hurter and Driffi eld 
+called the slope of this curve in the linear region g, the ‘development constant’. Negatives 
+with high values of g were said to be ‘high contrast’ negatives because the photosensitive 
+emulsion quickly changed from low to high optical density when exposed. Of course, 
+high contrast fi lm is not always desirable in photography since it easily saturates.
+7.2.1 Defi ning Photoresist Contrast
+Photolithography evolved from the photographic sciences and borrowed many of its 
+concepts and terminology. When exposing a photographic plate, the goal is to change the 
+
+
+## Page 15
+
+ Photoresist Development 271
+optical density of the material. In lithography, the goal is to remove resist. Thus, one 
+analogous H–D curve for lithography plots resist thickness after development versus logexposure. Experimentally, a wafer is exposed using a blank glass plate as the mask. As 
+each fi eld on the wafer is exposed, the dose is adjusted so that a large array of doses is 
+exposed on one wafer. After going through the normal PEB and development processes, 
+the thickness remaining in this open-frame area is measured for each dose (Figure 7.11). 
+The lithographic H–D curve (often called the characteristic curve) is a portion of a complete H–D curve as shown in Figure 7.10. Because the goal is to completely remove 
+unwanted photoresist, there is usually a range of energies for which all of the photoresist 
+is removed and thus the H–D curve would show no response. If, however, a very thick 
+photoresist were used so that it could never be completely removed, the result would be 
+the ‘S’-shape of a complete H–D curve. It is common practice to normalize the initial 
+0.0
+0.5
+1.0
+1.5
+2.0
+2.5
+3.0
+3.5
+4.0
+Log (Exposure Dose)
+Optical Density
+Figure 7.10 An example Hurter–Driffi eld (H–D) curve for a photographic negative
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+1 10 100 1000
+Exposure Dose (mJ/cm2)
+Relative Thickness Remaining
+Figure 7.11 Positive resist characteristic curve used to measure contrast
+
+
+## Page 16
+
+272 Fundamental Principles of Optical Lithography
+resist thickness to one, so that the lithographic H–D curve displays the relative thickness 
+remaining.
+Following the defi nition of g from Hurter and Driffi eld, the photoresist contrast has 
+traditionally been defi ned as the slope of the characteristic curve at the point where the 
+thickness goes to zero. Thus,
+γ m
+d
+d
+=± =
+1
+D 0
+z
+ln E EE
+ (7.21)
+where z is the resist thickness removed during development, D is the resist thickness 
+before development, E is the nominal exposure energy, and E0 is the energy at which z =
+D. E0 is called the clearing dose (or dose-to-clear) for positive photoresists and the gel 
+dose for negative systems. The positive sign in Equation (7.21) is used for positive resists 
+and the minus sign is used for negative systems in order to keep the value of gm positive. 
+For the remainder of this section, positive systems will be used as our example. The 
+results, however, can easily be applied to negative photoresists as well. [Note that sometimes a base-10 logarithm is used in Equation (7.21) rather than the natural logarithm. 
+This book will always employ the natural log.]
+Following the tradition of the photographic sciences, a high-contrast photoresist is one 
+that makes a quick transition from being an ‘underexposed’ resist (which does not dissolve) to an ‘overexposed’ resist (which dissolves completely). The traditional defi nition 
+in Equation (7.21) seems to fi t this concept. Further, it is reasonably analogous to the 
+photographic contrast as defi ned by Hurter and Driffi eld. The slope of optical density 
+(which is a logarithm of transmittance) versus log-exposure is similar in form to the slope 
+of relative thickness (which is like a log-thickness) versus log-exposure. Thus, it would 
+seem that a suitable defi nition has been used.
+However, there are numerous circumstances under which the defi nition in Equation 
+(7.21) does not meet our expectations of what contrast means. In particular, the use of 
+surfactant-laden developers dramatically increases measured contrast values, but without 
+lithographic improvement. What causes these apparent discrepancies between the behavior of the measured contrast and our concept of how contrast affects lithography? Is there 
+a problem with the defi nition, or with the measurement technique? These questions can 
+be answered by putting the concept of contrast on a fi rm theoretical basis and applying 
+rigorous analysis to the observed behavior.
+With the advantage of retrospect, let us look at the evolution of the traditional defi nition 
+of contrast and provide a different defi nition. In photography, the desired effect of exposure is a change in the optical density of the material. In photolithography, the desired 
+effect is a change in development rate. This change in development rate is manifest as a 
+change in resist thickness after development. Analogous to the photographic H–D curve, 
+let us plot log-development rate versus log-exposure energy. Figure 7.12 shows the results 
+for a typical photoresist. Note that this graph gives a complete H–D curve and does not 
+cut off at some energy E0. We can give a new defi nition of contrast, called the theoretical 
+contrast, as14
+γ th
+d
+d = lnln
+r
+E (7.22)
+
+
+## Page 17
+
+ Photoresist Development 273
+where r is the development rate. Note that the theoretical contrast will be a function of 
+dose, going to zero at very low and very high doses. A typical plot of gth(E) is shown in 
+Figure 7.13. Not only is the maximum of this curve important, but the width of the gth(E) 
+function also affects lithographic performance. The equivalent of the full-width halfmaximum (FWHM) on a logarithmic exposure scale would be the ratio of the high and 
+low energies that give contrast equal to half of the maximum value, called the FWHM 
+dose ratio.
+The goal of lithographic exposure is to turn a gradient in exposure energy (an aerial 
+image) into a gradient in development rate. From Equation 7.22, it is very easy to express 
+this effect as
+d
+d
+d
+d th
+ln ln r
+x
+I
+x = γ (7.23)
+0.01
+0.1
+1
+10
+100
+1000
+1 10 100 1000
+Exposure Dose (mJ/cm2)
+Development Rate (nm/s)
+Figure 7.12 A lithographic H–D curve used to defi ne the theoretical contrast
+0
+1
+2
+3
+4
+5
+6
+1 10 100 1000
+Exposure Dose (mJ/cm2)
+Theoretical Contrast
+Figure 7.13 A typical variation of theoretical contrast with exposure dose. For this data, the 
+FWHM dose ratio is about 5.5
+
+
+## Page 18
+
+274 Fundamental Principles of Optical Lithography
+where I is the aerial image intensity and x is the horizontal distance from the center of 
+the feature being printed. This equation is called the Lithographic Imaging Equation (and 
+will be explored in more detail in Chapter 9). The left-hand term is the spatial gradient 
+of development rate. To differentiate between exposed and unexposed areas, it is desirable 
+to have this gradient as large as possible. The right-hand side of Equation (7.23) contains 
+the log-slope of the aerial image. This term represents the quality of the aerial image, or 
+alternatively the amount of information contained in the image about the position of the 
+mask edge. In order to achieve a large development gradient between exposed and unexposed parts of the resist, one needs a large exposure gradient and a high photoresist contrast. Also, since contrast is a function of dose, it is important that the theoretical contrast 
+stays high over a wide enough range of doses (that is, the FWHM dose ratio must be 
+large). This is also equivalent to saying that rmax/rmin must be large (see section 7.2.4).
+7.2.2 Comparing Defi nitions of Contrast
+The theoretical defi nition of contrast can now be compared to the conventional measured 
+contrast, gm. The thickness remaining after development for the conventional H–D curve 
+measurement can be described by integrating the defi nition of development rate for our 
+open-frame exposures:
+r z
+t
+tt
+z
+rz
+t z
+= == ′
+′ ∫∫ d
+d ,d d dev
+dev
+00 () (7.24)
+where tdev is the fi nal development time. Knowing that development rate is a function of 
+dose as well as depth into the resist, r(E,z), and taking the derivative of both sides of the 
+right-hand equation with respect to log-exposure,
+0 1
+2
+0
+=− ′
+′ + ∫ d
+d
+dd
+d
+r
+E
+z
+r z rz
+z
+E
+z
+ln ( ) ( ) ln (7.25)
+Rearranging,
+1
+D 0
+z
+E
+rz
+D
+r
+E
+z
+rz
+z d
+d
+d
+d
+d
+ln
+( ) ln
+ln ( ) = ′
+′ ∫ (7.26)
+Evaluating this expression at E = E0 (i.e. z = D) and using the defi nitions of measured 
+and theoretical contrast,
+γγ m th
+d = = ∫ rz D
+D
+z
+rz
+D ()
+() 0
+ (7.27)
+If the development rate does not vary through the resist thickness, it is easy to show that 
+Equation (7.27) predicts that measured and theoretical contrast values are equal. But if 
+the development rate varies with depth into the resist, the measured contrast fails to 
+provide a good measurement of the theoretical contrast.
+Consider the case of surface inhibition (caused, for example, by surfactants in the 
+developer). The development rate at the top of the resist will be much lower than that at 
+the bottom. Thus, Equation (7.27) shows that the measured contrast will be equal to the 
+
+
+## Page 19
+
+ Photoresist Development 275
+theoretical contrast multiplied by some number bigger than 1. As the surface development 
+rate goes to zero, the measured contrast becomes infi nite, independent of the value of the 
+theoretical contrast. Likewise, absorption makes the measured contrast value artifi cially 
+low. Since every resist will exhibit some depth-dependent dissolution behavior, the conventional measured contrast is rarely an accurate measure of the true resist contrast. Both 
+of these cases can be explored in detail using Equation (7.27).
+For absorption, assume that the development rate follows the z-dependence given by 
+Equation (7.19). Let’s also assume that the theoretical contrast is constant (that is, through 
+the thickness of the resist, all of the doses lie in the range of the approximately linear 
+region of Figure 7.12). Thus,
+γγ γ
+α
+m th th α
+de d
+e = = = ∫∫ −
+−
+rz D
+D
+z
+rz
+r
+D
+z
+r
+D nD
+nz
+D ()
+()
+()
+() 00
+0
+0 (7.28)
+Solving the integral,
+γγ
+α
+α
+m th
+e =  −
+
+ 
+
+
+− 1 nD
+nD (7.29)
+The behavior of this result can be seen easily by considering the case of relatively small 
+absorption (anD << 1) and taking a Taylor expansion of the exponential out to second 
+order:
+γγ
+α
+γ
+α α
+m th th
+e =  −
+
+ 
+
+ ≈− 
+
+
+
+− 1 1
+2
+nD
+nD
+nD (7.30)
+Thus, absorption reduces the measured contrast by an amount approximately proportional 
+to anD. Also, as will be seen in Chapter 9, the dissolution selectivity parameter n is 
+directly proportional to the theoretical contrast. Thus, in the presence of absorption, any 
+increase in the theoretical contrast will result in only a fractional increase in the measured 
+contrast.
+Surface inhibition will increase the measured contrast over the theoretical contrast. 
+Consider again the case where theoretical contrast is constant, but let the depth dependence of the development rate be governed by the surface inhibition function of Equation 
+(7.17). Further, assume that D >> d so that the development rate at the bottom of the resist 
+is about equal to the bulk development rate. The measured contrast will become
+γγ m δ
+B
+th
+B /
+d
+e = −− ∫ −
+r
+D
+z
+rr z
+D
+[( ) ] 11 0 0
+ (7.31)
+Solving the integral,
+γγ
+δ m th =− 
+
+ 
+
+ 1 0 D ln( ) r (7.32)
+As the relative surface rate r0 goes to zero, the measured contrast goes to infi nity. For 
+example, if the surface inhibition depth is 20 % of the resist thickness and the relative 
+surface rate is 0.1, the measured contrast will be about 50 % higher than the theoretical 
+
+
+## Page 20
+
+276 Fundamental Principles of Optical Lithography
+contrast. If the relative surface rate is 0.01, the measured contrast will be about double 
+the true value.
+The problems with the characteristic curve as discussed above are often very severe. 
+While absorption can be easily characterized for a given resist and the measured contrast 
+corrected for absorption effects, surface inhibition is rarely characterized with suffi cient 
+accuracy to allow its impact to be removed from the measured contrast. As a result, few 
+lithographers use the characteristic curve for anything but a dose-to-clear measurement. 
+Instead, the theoretical contrast is most often measured directly using a development rate 
+monitor (see section 7.4), if it is measured at all.
+7.2.3 The Practical Contrast
+One possible improvement in the measurement of photoresist contrast uses a method that 
+Peter Gwozdz calls the ‘practical contrast’. Rather than measuring the resist thickness 
+remaining as a function of dose for open-frame exposures, as for the conventional measurement based on the characteristic curve, the practical contrast measures the development time required to clear each open frame. For reasonably slowly developing resists 
+(true for many g- and i-line resists), the clear time can be measured visually using a 
+stopwatch. Plotting time-to-clear versus dose on a log-log scale gives a curve whose slope 
+is equal to the negative of the theoretical contrast.
+To see how this is true, consider a resist where the infl uence of dose on development 
+rate is separable from the z-dependence.
+rEz f Egz ( ) ( )() , = (7.33)
+Such separable behavior has been assumed for the previously discussed absorption and 
+surface inhibition effects. The theoretical contrast can then be expressed as
+γ = ∂
+∂ = ∂∂
+ln
+ln
+ln
+ln
+r
+E
+f
+E (7.34)
+The time to clear will be given by Equation (7.24) when z = D:
+t
+z
+rz fE
+z
+gz
+DD
+clear
+dd == ∫∫ () ( ) () 001 (7.35)
+Since the integral on the right-hand side of Equation (7.35) is a constant (independent of 
+dose), the time-to-clear will be inversely proportional to f(E) and
+γ = ∂
+∂ =− ∂∂
+ln
+ln
+ln
+ln
+f
+E
+t
+E
+clear (7.36)
+Unfortunately, accurate measurement of time-to-clear is often diffi cult without automated equipment such as a development rate monitor (see section 7.4). For g- and i-line 
+resists, with maximum development rates of a few hundred nm/s and thicknesses greater 
+than 500 nm, the smallest time-to-clear will be a few seconds. For many 248-nm chemically amplifi ed resists, the maximum development rate is 1000–5000 nm/s and thicknesses 
+are as low as a few hundred nanometers, so that over a fair range of doses the time-toclear will be less than 1 second. Fortunately, though, the steep ‘high contrast’ portion of 
+
+
+## Page 21
+
+ Photoresist Development 277
+the time-to-clear versus dose curve must necessarily (for any reasonably good resist) have 
+time-to-clear values on the order of the development time (typically 45–90 seconds). 
+Thus, if the goal is to measure the maximum contrast rather than the full contrast versus 
+dose function, the practical contrast approach can work quite well.
+7.2.4 Relationship Between g and rmax/rmin
+As was mentioned briefl y at the end of section 7.1.1, a good development rate function 
+not only has a high dissolution selectivity parameter n, but also a large ratio rmax/rmin. In 
+the context of development contrast, these two requirements are equivalent to saying that 
+the resist must have a high maximum contrast and a large FWHM dose ratio (see Figure 
+7.13). To more explicitly see the relationships at work, let’s assume that our g (E) function 
+is Gaussian in shape (on a log-exposure scale):
+γγ σ () (ln ln ) E EE = −− max */ e 22 2 (7.37)
+where g max is the maximum contrast, and E* is the dose that gives the maximum contrast. 
+The FWHM dose ratio will be given by
+E
+E
+12
+12
+2 2 2 2 355 /
+− /
+=≈ exp( ln ) exp( . ) σσ (7.38)
+Integrating Equation (7.37) with respect to lnE gives an error function shape to the 
+contrast curve. Using the limits of zero and infi nite dose to defi ne rmax and rmin gives
+ln ln r ln( )
+rr
+r
+r erf EE
+max min
+max
+min
+ /*
+
+ 
+
+ = 
+
+ 
+
+ 
+
+
+2σ  (7.39)
+where
+σ
+πγ = 
+
+ 
+
+ 1
+2 max
+max
+min
+ln r
+r (7.40)
+Combining Equations (7.38) and (7.40),
+1
+42
+1 06 12
+12
+12
+γ 1
+π
+max
+max
+min
+/
+/
+/ ln
+ln
+ln . ln r
+r
+E
+E
+E
+E
+
+
+ 
+
+ = 
+
+ 
+
+ ≈ −− /2
+
+
+ 
+
+ (7.41)
+The required FWHM dose ratio is determined by the aerial image and is proportional 
+to the ratio of the maximum intensity in the space to the intensity at the line edge (which 
+has typical values of 2–4). Thus, the required maximum to minimum development rate 
+ratio goes as
+r
+r a r
+r
+E
+E
+max a
+min
+max
+min
+/
+/
+e , or max
+max
+∼∼ γ
+γ
+12 12
+12
+<< 
+
+ 
+
+ −
+ (7.42)
+Equation (7.42) provides the interesting result that resists with higher contrast require a 
+higher rmax/rmin in order to make effective use of that contrast. A doubling of the contrast 
+requires a squaring of the development rate ratio. For example, if the dose ratio is 2 and 
+the maximum contrast is 10, the maximum to minimum development rate ratio should be 
+
+
+## Page 22
+
+278 Fundamental Principles of Optical Lithography
+at least 1000. For the same dose ratio, however, a maximum contrast of 15 would require 
+that rmax/rmin be greater than 30 000 in order to take full advantage of the higher contrast.
+7.3 The Development Path
+Most of the discussion in this chapter so far has been concerned with how dose or resist 
+chemical composition is converted to development rate. A spatial distribution of energy 
+turns into a spatial distribution of chemicals which turns into a spatial distribution of 
+dissolution rates. But how does a spatial distribution in development rates turn into an 
+actual resist profi le? How does the resist–developer front propagate through time and 
+space during development?
+For the one-dimensional case of large open-frame exposures (such as the characteristic 
+curve experiment described in the previous section), propagation of the resist–developer 
+interface is strictly in the z-direction, with the rate of development at a given point equal 
+to the rate at which the interface moves down in z. For the more general case, we can 
+defi ne the path of development by tracing the position of the resist surface through the 
+development time (Figure 7.14). This path will have a direction such that it is always 
+perpendicular to the surface of the resist throughout the development cycle. Letting s be 
+the length along this path at any given time, the development rate will then be
+r s
+t = d
+d (7.43)
+The problem then is to follow this path at a rate given by the spatially varying dissolution 
+properties of the resist until the total development time is reached. Integrating this general 
+defi nition of development rate thus gives a path integral:
+t
+s
+r xyz dev
+path
+d
+,, = ∫ ()
+ (7.44)
+Resist
+Substrate
+Development
+ Path
+Figure 7.14 Typical development path
+
+
+## Page 23
+
+ Photoresist Development 279
+Before tackling the mathematical problem of solving this path integral, let’s consider 
+some of the general properties expected of this path. The path always begins vertically 
+(since the resist surface is horizontal). If the fi nal resist profi le is close to our goal of 
+nearly vertical sidewalls, the path must end going nearly horizontally. Thus, we should 
+expect a path that starts out vertically, travels down through the resist thickness, then turns 
+horizontally, stopping at the resist edge (see Figure 7.14).
+7.3.1 The Euler–Lagrange Equation
+The fi rst step in solving the development path integral will be to parameterize the path 
+in terms of its position. For simplicity, we will consider only the two-dimensional problem 
+s(x,z), though it can be easily extended to three dimensions. Consider a section of that 
+path (Figure 7.15) small enough that it can be approximated as linear. It is clear that
+∆ ∆∆ ∆ ∆
+∆
+s xz x
+z
+x
+= += + 
+
+ 
+
+ 22
+2
+1 (7.45)
+Letting the differentials go to zero,
+dd sx z =+1 ′
+2 (7.46)
+where z′ is the slope of the development path at any given point. The path integral then 
+becomes
+t
+xz
+rxz x
+x
+dev
+d
+, = + ′ ∫ 1 2
+0
+() (7.47)
+where the path starts at (x0,0) and ends at (x,z).
+Obviously, to solve Equation (7.47), one must know not only the development rate 
+as a function of position, but the slope of the path at every point along the path as well. 
+But how is one to determine the path of development? Physical insight and mathematical 
+methods must both be exploited. The physical constraint on what path is chosen is called 
+the principle of least action: the path taken will be that which goes from the starting 
+Path
+∆ s
+∆ x
+∆ z
+Figure 7.15 Section of a development path relating path length s to x and z
+
+
+## Page 24
+
+280 Fundamental Principles of Optical Lithography
+point to the fi nish point in the least amount of time. To see why this must be true, just 
+imagine a different path competing with the least-time path. By the time the competing 
+path made it to the point (x,z), the faster path would have already reached there, and thus 
+would have removed the photoresist from that point! Thus, only the least-time path 
+survives.
+The principle of least action means that a path must be found that minimizes the integral 
+in Equation (7.47). A fundamental result from the calculus of variations states that the 
+general integral
+f xzz x () ,, d′ ∫ (7.48)
+will have a minimum or maximum whenever the Euler–Lagrange equation
+∂
+∂ − ∂
+∂ ′
+
+
+ 
+
+ = f
+zx
+f
+z
+d
+d
+0 (7.49)
+is satisfi ed. Applying the Euler–Lagrange approach to the development path, the leasttime path will be that which satisfi es the second-order nonlinear differential equation:
+′′ ++ ( ′ ) ∂
+∂ − ′
+∂
+∂
+
+
+
+ zz = r
+z
+z r
+x
+10 2 ln ln (7.50)
+(As an interesting aside, there are many problems in physics where the principle of 
+least action is coupled with the Euler–Lagrange technique to solve problems. In optics, 
+techniques in geometrical optics are used to trace rays of light through materials of different refractive indices. Fermat’s principle says light will use the path that minimizes 
+the travel time – a principle of least action. The rays follow paths equivalent to the development path discussed here. The optical path length, or equivalently the optical phase, 
+represents the development time in this problem, and a wavefront – a surface of constant 
+phase – is equivalent to the resist profi le – a surface of constant development time. The 
+refractive index is equivalent to 1/r.)
+An equivalent formulation of the Euler–Lagrange equation is the Hamilton–Jacobi 
+equation. A surface of constant development time (i.e. the resist surface) is defi ned by the 
+Hamilton–Jacobi equation:
+∂
+∂
+
+
+ 
+
+ +
+∂
+∂
+
+
+ 
+
+ = t
+x
+t
+zr
+22
+2
+1 (7.51)
+(This equation is equivalent to the Eikonal equation of geometrical optics.) The Hamilton–Jacobi formulation is useful for ‘ray-trace’-like calculations, where at each point the 
+dissolution rate is broken down into x- and z-components and the trajectory of the ray is 
+traced out over time.
+7.3.2 The Case of No z-Dependence
+Solutions to Equation (7.50) for general development problems will almost always 
+require extensive numerical techniques. However, there are a few simplifying cases that 
+yield analytical solutions. Consider the idealized case where the development rate does 
+
+
+## Page 25
+
+ Photoresist Development 281
+not vary with z (no absorption, no standing waves, etc.). The Euler–Lagrange equation 
+simplifi es to
+′′ = ′ + ′ ∂
+∂ zz z rx
+() ln 1 2 (7.52)
+This equation can be solved by direct integration with the boundary condition that z′ =
+∞ and x = x0 at z = 0 (i.e. the path starts out vertically at x = x0), giving
+rx
+rx
+z
+z
+z
+rx
+rx rx
+()
+()
+()
+0 ( ) () 22 0 2 1 = ′
++ ′ ′ = − or (7.53)
+The actual path z(x) can be derived by integrating Equation (7.53),
+z
+rx
+rx rx
+x
+x
+x
+= − ∫ ()
+( ) () 2 0 2
+0
+d (7.54)
+and the development time becomes, by substituting Equation (7.53) into Equation 
+(7.47),
+t
+rx
+rx r x r x
+x
+x
+x
+dev = d − ∫ ()
+() ( ) ()
+0
+2 0 2
+0
+ (7.55)
+where the point (x,z) is the end of the path and thus a point on the fi nal resist profi le. For 
+a given spatial distribution of development rates r(x), the fi nal resist profi le is determined 
+by solving the integrals (7.54) and (7.55) for many different values of x0 (i.e. for different 
+starting points for the paths), as shown in Figure 7.16, and connecting the paths to form 
+a surface of constant development time.
+0
+50
+100
+150
+200
+250
+300
+350
+400
+−200 −100 0 100 200
+x (nm)
+z (nm)
+Resist
+Figure 7.16 Example of how the calculation of many development paths leads to the determination of the fi nal resist profi le
+
+
+## Page 26
+
+282 Fundamental Principles of Optical Lithography
+An interesting form of Equation (7.55) reveals some physical insight into the problem. 
+Combining Equations (7.55) and (7.53) in a different way,
+t
+rx
+z
+z
+x
+rx z
+x
+zx
+rx x
+x
+x
+x
+dev = dd + ′
+′ = ′ + ∫∫ 11 1 1
+0
+2
+00 00
+() ()
+()
+() (7.56)
+The right-hand side of this equation seems to segment the development into horizontal 
+and vertical components. The term z/r(x0) is the time required to develop vertically, starting at x0, to the value of z equal to the bottom of the path. The fi rst term on the right-hand 
+side (the integral) is then the effective amount of time spent developing horizontally from 
+x0 to x.
+7.3.3 The Case of a Separable Development Rate Function
+Another interesting case to examine is when the development rate function r(x,z) is 
+separable into a function of incident dose E only and a function of the spatial variables 
+independent of dose:
+rExz f Egxz ( ) ( )( ) ,, , = (7.57)
+In general, none of the kinetic development models discussed earlier meet this criterion. 
+However, such separability is approximately true for the reaction-controlled original 
+kinetic development model for conventional resists. For moderately low doses and no 
+bleaching, the latent image is approximately
+m x z CEI x z CEI x z ( ) exp ( ) ( ) , ,, =−[] rr ≈−1 (7.58)
+Ignoring the minimum development rate, this approximate latent image gives a development rate proportional to a power of dose:
+r x z r m x z r r CE I x z n nn () () () ,, , =− max min max r () 1 +≈ ( )( ) (7.59)
+Obviously, the restrictions and approximations placed on the exposure and development 
+functions to achieve separability are numerous and severe. Nonetheless, the separability 
+assumption can be very useful. Looking at it another way, separability can be achieved 
+by assuming a constant theoretical contrast. Integrating the defi nition of theoretical contrast, Equation (7.22), for the case of constant contrast, gives
+rxz E I xz ( ) ( ( )) ,, ∝ r γγ (7.60)
+Equations (7.59) and (7.60) are equivalent if n = g . Thus, separability can be assumed if 
+the range of dose experienced by the resist over the development path is suffi ciently small 
+to fall within the approximately linear region of the H–D curve.
+Separability leads to an interesting result. Using Equation (7.57),
+∂
+∂ = ∂
+∂
+∂
+∂ = ∂
+∂
+ln ln ln ln r
+z
+g
+z
+r
+x
+g
+x , (7.61)
+and the Euler–Lagrange Equation (7.50) is completely independent of incident dose. In 
+other words, as the dose is changed, the path of development does not change – the 
+
+
+## Page 27
+
+ Photoresist Development 283
+development just follows that path at a different rate. Applying this idea to the defi ning 
+development path Equation (7.47),
+f Et xz
+gxz
+c
+x
+x
+() () dev
+d
+, = , a constant
++ ′ = ∫ 1 2
+0
+ (7.62)
+For example, let f(E) = Eg. If the dose is increased, the same path is used to get from x0
+to x, but it arrives in a shorter time.
+7.3.4 Resist Sidewall Angle
+The development path can help to understand even more about the resist profi le. Since 
+the path is always perpendicular to the resist profi le, knowing the path gives us the sidewall angle of the profi le (the angle that the profi le makes with the horizontal substrate) – 
+the tangent of the sidewall angle will be one over the development path slope. For the 
+case of no z-variation in development rate, Equation (7.53) leads to
+cos
+()
+()
+θ = rx
+rx0
+ (7.63)
+The goal is to make the sidewall angle close to 90°, and thus make cosq ≈ 0. This is 
+accomplished by making the development rate at the end of the path very small compared 
+to the rate at the beginning of the path. In other words, good resist profi les are obtained 
+when very little time is spent developing vertically compared to the time spent developing 
+horizontally.
+As previously mentioned, numerical methods are required for a general solution for 
+the development path. However, an interesting limit can be observed that sheds further 
+light on the fi nal resist sidewall angle. For the case of no variation in development rate 
+with z, the sidewall angle is given by Equation (7.63) and can be made as close to 90° 
+as possible by making the development rate at the end of the path very small. However, 
+in the presence of a depth dependence to the development rate, there is a different limiting 
+sidewall angle. Consider the Euler–Lagrange Equation (7.50) near the end of the path 
+assuming a reasonably good resist profi le. For such a case, the path slope will be small 
+and z′
+2 << 1, so that
+′′ ≈ ′
+∂
+∂ − ∂
+∂ zz r
+x
+r
+z
+ln ln (7.64)
+The minimum possible value of z′ (and thus the best possible resist sidewall angle) will 
+occur when z″ = 0. Thus,
+′ = ∂∂
+∂∂ z
+rz
+rx min
+ln
+ln
+/
+/
+ (7.65)
+Consider again the case of absorption causing the only variation in development rate 
+with depth into the resist. Using our simple absorption model in Equation (7.19), the 
+
+
+## Page 28
+
+284 Fundamental Principles of Optical Lithography
+Lithographic Imaging Equation (7.23), and approximating the dissolution selectivity 
+parameter with the contrast,
+′ ≈ ∂∂ z
+Ix min ln
+α
+/ (7.66)
+The minimum path slope with absorption given in Equation (7.66) is obtained when 
+the development rate at the end of the path goes to zero. For the case of fi nite development rate, the path slope near the end of path is given approximately by
+′ ≈ ∂∂ z +
+Ix
+rx
+rx end /
+α
+ln
+()
+() 0
+ (7.67)
+This result will be derived in the next section for a specifi c case, but is approximately 
+true in general.
+7.3.5 The Case of Constant Development Gradients
+Another interesting case that can be explored analytically has constant spatial loggradients of the development rate. Let
+∂
+∂ =− ∂∂ =− ln ln rx
+a r
+z , b (7.68)
+where a and b are constants. Interpreting these constants as before, a is something like 
+the resist contrast times image log-slope. The term b is the contrast multiplied by the 
+absorption coeffi cient. Note that both a and b will be positive. The Euler–Lagrange equation can be solved by direct integration, with the boundary condition that z′ = ∞ and 
+x = x0 at z = 0. After some algebraic manipulation of the result,
+exp ( ) exp cot ( −− + 
+
+ 
+
+ 
+
+ 
+
+ = ′ −
++ ′
+
+
+ 
+
+ − ax x
+b
+a
+z ba
+z
+b
+a 0
+2
+2 2
+1 1
+1
+/ ′ 
+
+ 
+
+ z ) (7.69)
+For a typical process, b/a is in the range of 0.02–0.05 (development gradients in x must 
+be signifi cantly greater than the gradients in z if a good resist profi le is to result). Thus, 
+it is reasonable to neglect b2/a2 compared to 1. Also, the assumption of constant loggradient of development rates means that the development rate is separable into x- and 
+z-components and
+e−− = ax x rx
+rx
+() ()
+()
+0
+0
+ (7.70)
+Thus, Equation (7.69) becomes
+rx
+rx
+z ba
+z
+b
+a
+z
+()
+() exp cot ( ) 0 2
+1
+1 ≈ ′ −
++ ′
+
+
+ 
+
+ ′ 
+
+ 
+
+ − / (7.71)
+Finally, the inverse cotangent will be zero at the beginning of the path (when z′ = ∞), 
+going to p/4 for z′ = 1, and reaching its maximum of p/2 as z′ goes to zero. Given the 
+
+
+## Page 29
+
+ Photoresist Development 285
+small value of b/a, the exponential term can be approximated with a Taylor’s series 
+to give
+rx
+rx
+b
+a
+z
+z ba
+z
+()
+() cot ( ) 0
+1
+2 1
+1
+≈+ ′ 
+
+
+
+′ −
++ ′
+
+
+
+ − / (7.72)
+For a small enough value of b/a,
+rx
+rx
+z ba
+z
+()
+() 0 2 1 ≈ ′ −
++ ′
+
+
+
+
+/ (7.73)
+Note that at the end of the path, z′
+2 << 1, and the result given previously in Equation 
+(7.67) is obtained.
+Before continuing with the solution, let’s consider a simpler case where b = 0. Thus, 
+we are solving the no z-dependence case with the development rate function given in 
+Equation (7.70). Substituting this rate expression into Equation (7.54) and integrating 
+gives us the path z(x) for a given starting point x0:
+zxx
+aa
+ax x ax x ( ) tan cos ( ) () () ,e e 0
+1 12 1 1 1 00 =− () = − − − −− (7.74)
+Going on to fi nd the development time at each point on the path by carrying out the integration in Equation (7.55),
+t
+ar x
+ax x dev =− e
+1 − 1 0
+2 0
+()
+() (7.75)
+The resist profi le sidewall angle is simply az.
+A convenient way to express this result is to parameterize positions along the path (and 
+thus on the resist profi le) as a function of the path starting point and the development 
+time. Rearranging the results in Equations (7.74) and (7.75),
+zx t
+a
+ar x t x x t x
+a
+( ) tan ( ( ) ) ( ) ln [ ( ) ] ar x t 0 1 0 00 0
+11 2 , ,, = =+ + () 1 − (7.76)
+Note that for the very likely case that ar(x0)t >> 1,
+xx t x
+a
+( ) ln( ( ) ) ar x t 00 0
+1 , =+ (7.77)
+When absorption is added, the results are in general complicated, but simplify when 
+one doesn’t care to know the resist profi le at small development times. For normal conditions, the path and develop time can be expressed as the no-absorption solution plus an 
+added term:
+zxx
+a
+b
+a
+xx
+t
+ar x
+ax x
+ax x
+( ) tan ( )
+()
+()
+()
+,e
+dev e
+0 12 0
+0
+2
+1 1
+1
+0
+0
+=− () +−
+=
+−−
+− −+ − 1 0
+0
+b
+ar x
+xx
+() ()
+ (7.78)
+
+
+## Page 30
+
+286 Fundamental Principles of Optical Lithography
+Thus, absorption will slow down the development, making the time required to get 
+to a certain value of x longer. Also, since the path never levels off to be completely 
+horizontal, continued development pushes the profi le down (larger z) as well as to the 
+right.
+7.3.6 Segmented Development and the Lumped Parameter Model (LPM)
+Consider again the case of a constant theoretical contrast. Equation (7.60), for the simple 
+2D case, can be expressed as
+rxz r
+E
+E
+IxI z z ( ) ( ( ) ( )) , = 
+
+ 
+ 0 
+0
+γ
+γ (7.79)
+where the intensity variation is assumed separable into x- and z-components and E0 is any 
+arbitrary reference dose that produces the development rate r0 for an open-frame exposure 
+(so that I(x)Iz(0) = 1). It will be convenient to let this dose be the dose-to-clear. Applying 
+Equation (7.24) at this dose,
+t
+z
+rz r
+z
+Iz
+DD
+dev
+r
+dd == ∫∫ ( ) ( ( )) 0 0 01
+γ (7.80)
+An effective resist thickness can be defi ned as
+D rE z Dt ID
+Iz
+z z
+z
+D
+eff dev = == ,d 
+
+ 
+ ∫  () ()
+() 0
+0
+γ
+ (7.81)
+It is clear that for no variation in intensity with depth into the resist this effective resist 
+thickness will equal the actual resist thickness.
+As an example, the effective resist thickness can be calculated for the case when only 
+absorption causes a variation in intensity with depth into the resist. For such a case, I(z) 
+will decay exponentially with an absorption coeffi cient a, and Equation (7.81) can be 
+evaluated to give
+D D eff =− e
+1 − 1
+αγ
+αγ () (7.82)
+Equation (7.79) is an extremely simple-minded model relating development rate to 
+exposure energy based on the assumption of a constant resist contrast. In order to use 
+this expression, we still need to determine the path of dissolution. However, rather than 
+calculate the path for some given development variation r(x,z), it will be useful to assume 
+a reasonable development path and then use this path to calculate the fi nal resist CD 
+as a function of exposure dose. The assumed path will be the segmented development 
+path:
+15 the path goes vertically to a depth z, followed by a lateral development to position 
+x.
+A development ray, which traces out the path of development, starts at the point (x0,0) 
+and proceeds vertically until a depth z is reached, at which point the development will 
+begin horizontally. Since our interest is to determine the bottom linewidth, consider a path 
+
+
+## Page 31
+
+ Photoresist Development 287
+where the depth z is just equal to the resist thickness D. The vertical development time 
+becomes
+t
+rx D
+Iz
+ID
+z
+D
+rx D z
+D
+= 
+
+ 
+
+ =
+−
+∫ 1
+0 0 0 ()
+()
+, () ( )
+d ,
+eff
+γ
+ (7.83)
+Similarly, the horizontal development time becomes
+t
+rx D
+Ix
+Ix x x
+x
+x
+=  ′
+
+ 
+
+ ′
+−
+∫ 1
+00 0
+()
+()
+, ()
+d
+γ
+ (7.84)
+The total development time is still the sum of these two components.
+t
+D
+rx D D
+Ix
+Ix
+x
+x
+x
+dev
+eff
+eff , =+ d  ′
+
+ 
+
+ ′ 
+
+
+
+
+
+−
+∫ ()
+()
+() 00
+1 1
+0
+γ
+ (7.85)
+By applying Equations (7.79) and (7.81),
+rx Dt
+D
+Ex
+E
+( ) ()
+()
+0
+0
+, dev
+eff
+= 
+
+ 
+
+
+γ
+ (7.86)
+where E(x) is the dose required to create a CD = 2x, and E(0) is the dose required to make 
+the CD just equal to zero. Note that E(0) is not the dose-to-clear since in general I(x0) 
+will not be equal to 1.
+Substituting Equation (7.86) into (7.85) gives the Lumped Parameter Model.16
+Ex
+ED
+Ix
+Ix
+x
+x
+x ()
+()
+()
+0 ()
+1 1
+0 0
+
+
+ 
+
+ =+  ′
+
+ 
+
+ ′
+−
+∫
+γγ
+eff
+d (7.87)
+Given any aerial image I(x), a CD-versus-dose curve can be calculated by evaluating this 
+integral numerically. For a small space (or small dense lines and spaces), the start of the 
+path x0 will always be the center of the space. The only parameters that control the relationship between the shape of the aerial image and the shape of the exposure latitude 
+curve are the resist contrast and the effective resist thickness. As the effective resist thickness goes to zero and the resist contrast goes to infi nity, the dose required to produce a 
+CD of 2x becomes proportional to 1/I(x).
+7.3.7 LPM Example – Gaussian Image
+In the clear region of an image, near the edge of a line, the aerial image (and the image 
+in resist) can quite often be reasonably approximated as a Gaussian function:
+Ix I x () = − 0 2 22e / σ (7.88)
+Since only the space region develops away in a positive resist to form the resist profi le, 
+an accurate representation of the image is needed only in this region that develops 
+away. The reason why an aerial image of a space often looks Gaussian in shape can be 
+seen by looking at Taylor expansions of the Gaussian and of a typical cosine Fourier 
+
+
+## Page 32
+
+288 Fundamental Principles of Optical Lithography
+representation of an image. Consider for example an image with two Fourier components 
+(a three-beam imaging case) expanded in a Taylor series about x = 0 (the center of the 
+space) for a given pitch p:
+I x a a xp a xp
+aaa
+aa
+o
+o
+( ) cos( ) cos( )
+() (
+=+ +
+= ++ −  +
+
+
+
+12
+12
+12
+24
+4
+2
+2
+ππ //
+ππ xp
+aa // ) ( ) ... xp 2 12 16 4
+24
++ 2  +
+
+
+ − (7.89)
+Likewise for the Gaussian image:
+Ix I I Ix
+I
+x x ( ) ... = =− 
+
+
+ + 
+
+ − − 0 2 0
+0
+2
+2 0 4 22
+2 84
+e / σ
+σσ
+ (7.90)
+The zero- and second-order terms of these two series can be made to match exactly 
+when
+I aaa aaa
+aa
+p 0 012 2 012
+12
+2
+42
+= ++ =
+++
++
+
+
+ 
+
+
+
+
+
+ and σ
+π
+ (7.91)
+In addition, the fourth-order terms for each series are often quite close to each other in 
+magnitude. For example, if a0 = a1 and a2 = 0.2a0 (a reasonable set of values), then a 
+Gaussian image with parameters determined by Equation (7.91) will have fourth-order 
+terms in the Taylor series for the aerial image and the Gaussian representation that differ 
+in magnitude by only 5 %. Further, by adjusting s of the Gaussian slightly from the value 
+given by Equation (7.91), a better overall match to the image in the region of the space 
+can be obtained (see Figure 7.17).
+The log-slope of the Gaussian image is
+ILS I
+x
+x == d
+d
+ln
+σ2 (7.92)
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+0 0.1 0.2 0.3 0.4 0.5
+x/pitch
+Relative Intensity
+Aerial Image
+Gaussian
+0.0
+0.2
+0.4
+0.6
+0.8
+1.0
+1.2
+0 0.1 0.2 0.3 0.4 0.5
+x/pitch
+Relative Intensity
+Aerial Image
+Gaussian
+(a) (b)
+Figure 7.17 Matching a three-beam image (a0 = 0.45, a1 = 0.55, a2 = 0.1) with a Gaussian 
+using (a) a value of s given by Equation (7.91); and (b) the best-fi t s. Note the goodness of 
+the match in the region of the space (x/pitch < 0.25)
+
+
+## Page 33
+
+ Photoresist Development 289
+Thus, the log-slope varies linearly with x, a result that is approximately true for most 
+images in the region of the space (Figure 7.18). If the nominal CD is CD1, then the normalized image log-slope (NILS) at this point is
+NILS CD I
+x
+CD
+x CD
+11
+2
+1
+2
+2
+1 2 == =
+d
+d /
+ln
+σ
+ (7.93)
+Putting the Gaussian aerial image into these terms,
+Ix I NILS x CD () () = − 0 11 2e / (7.94)
+Using this Gaussian image in the LPM Equation (7.87) and letting the development 
+path start at x = 0,
+Ex
+ED
+x NILS x CD
+x ()
+()
+()
+0
+1 1 11 2
+0
+
+
+ 
+
+ =+ ′ ′
+∫
+γ
+γ
+eff
+/ ed (7.95)
+The integral is solvable in terms of the imaginary error function erfi . Letting g =
+gNILS1/CD1
+2
+,
+Ex
+E Dg
+erfi gx
+()
+() 0
+1 1
+2
+
+
+ 
+
+ =+ ( ) γ π
+eff
+ (7.96)
+Since erfi goes to infi nity as x goes to infi nity, a more convenient form can be obtained 
+by relating the imaginary error function to the Dawson’s integral Dw(z):
+erfi z Dz Dz x zx
+z
+() = −
+∫ 2 2 2
+0 π
+e where e e d w() () = z2
+w (7.97)
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+−0.15 −0.10 −0.05 0 0.05 0.10
+Distance from nominal edge (k1 units)
+Space Line
+−0.15 −0.10 −0.05 0 0.05 0.10
+Distance from nominal edge (k1 units)
+Space Line
+0
+2
+4
+6
+8
+10
+12
+14
+16
+18
+20
+(a) (b)
+Image Log-Slope (1/µm)
+Image Log-Slope (1/µm)
+Figure 7.18 Simulated aerial images over a range of conditions show that the image logslope varies about linearly with distance from the nominal resist edge in the region of the 
+space: (a) k1 = 0.46 and (b) k1 = 0.38 for isolated lines, isolated spaces, and equal lines and 
+spaces and for conventional, annular and quadrupole illumination
+
+
+## Page 34
+
+290 Fundamental Principles of Optical Lithography
+Dawson’s integral is a bit easier to handle since its maximum value is about 0.54 at z ≈
+0.92 and goes to zero at large z (see Figure 7.19). The LPM result becomes
+Ex
+E Dg D gx
+Dg
+Ix
+I
+gx ()
+()
+()
+()
+0
+1 1
+1 1
+0
+ 2
+
+ 
+
+ =+ ( )
+=+ 
+
+ 
+
+
+−
+γ
+eff
+w
+eff
+e
+γ
+D gx w( )
+ (7.98)
+For large arguments, the Dawson’s integral can be approximated reasonably well as
+Dz
+zz z w() = + +≈
+1
+2
+1
+4
+1
+2 3 ... (7.99)
+This fi nal approximation has about 20 % error when z = 2, 11 % error at z = 2.5, 7 % error 
+at z = 3, and 3.5 % error at z = 4. Small arguments occur for low g (low contrast resists 
+or low NILS values) and low x (underexposed spaces where the CD is much lower than 
+the nominal). This is also the regime where egx2
+ is small so that the impact of this error 
+is much reduced. For typical cases, and where the CD being predicted by Equation (7.98) 
+is within 50 % of the nominal CD, the error in calculating the dose required to achieve 
+that CD caused by using the approximation for the Dawson’s integral is usually less than 
+1–2 %.
+In this large argument case, the resulting exposure response expression becomes
+Ex
+E Dg x
+Ix
+I
+()
+() ( )
+()
+0 ()
+1 1
+20
+
+
+ 
+
+ ≈+ 
+
+ 
+
+
+γγ −
+eff
+ (7.100)
+Substituting the defi nition of g and letting CD = 2x,
+Ex
+ED
+CD
+CDNILS
+Ix
+I
+()
+()
+()
+0 ()
+1 11
+0
+1
+2
+1
+
+
+ 
+
+ ≈+ 
+
+ 
+
+
+
+
+ 
+
+
+
+
+γ
+γ eff
+ 
+
+
+−γ
+ (7.101)
+0
+0.1
+0.2
+0.3
+0.4
+0.5
+0.6
+0123456
+z
+Dw(z)
+Figure 7.19 A plot of Dawson’s integral, Dw(z)
+
+
+## Page 35
+
+ Photoresist Development 291
+For our Gaussian image [and from Equations (7.92) and (7.93)],
+ILS CD CDNILS
+CD == 2 2
+1
+1
+2 σ
+ (7.102)
+which gives the fi nal expression:
+Ex
+E D ILS x
+Ix
+I
+()
+() ()
+()
+0 ()
+1 1
+0
+1
+≈+ 
+
+ 
+
+
+
+
+ 
+
+ 
+
+ 
+
+
+−
+γ
+γ γ
+eff
+ (7.103)
+Remembering that log-slope of the aerial image is also a function of x, Equation (7.103) 
+predicts the dose required to achieve a certain CD (= 2x) as a function of the aerial image 
+I(x), the resist contrast g, and the effective thickness of the resist Deff.
+Equation (7.103) can be further simplifi ed by assuming that the vertical development 
+time of the LPM can be ignored compared to the horizontal development time (an assumption that is reasonable for a good lithography process, but may not be accurate when 
+trying to understand features that are just able to print, for example at the extremes of 
+focus). In this case, the 1 in the square brackets of Equation (7.103) can be ignored, 
+giving
+Ex EI
+I x D ILS
+E
+I x D ILS () ()()() () ≈ 
+
+ 
+
+ = 
+
+ 
+
+ 00 1 1 1
+0
+1
+γγ
+γγ
+eff eff
+ (7.104)
+This interesting result is in fact an example of a threshold resist model: the resist CD is 
+obtained when the local dose EI(x) reaches a certain threshold dose Eth.
+E E
+Ix
+EE
+D ILS == 
+
+ 
+
+ th
+th
+eff
+where
+() 0
+1
+1
+γ
+γ
+ (7.105)
+The particular variant of the threshold resist model derived here is called a variablethreshold resist model (sometimes called a VTR model). The threshold varies as a function 
+of the image log-slope of the image. This model also relates the threshold to physically 
+signifi cant resist parameters: E0, g and Deff.
+Figure 7.20 compares predictions of the CD of a space versus exposure dose for three 
+different models: the LPM Equation (7.98), the LPM using the approximation for the 
+Dawson’s integral of Equation (7.103), and the VTR of Equation (7.105). For the conditions here, the approximate form of Dawson’s integral is quite accurate and the approximate LPM expression is hard to distinguish from the full LPM results. As expected, the 
+VTR begins to deviate from the LPM at lower doses, where the vertical development 
+time is a signifi cant fraction of the total development time. At the nominal CD, the 
+approximate LPM predicts the dose wrong by 1 %, and the VTR is off by 2 %. For a CD 
+that is 10 and 20 % too small (underexposed), the approximate LPM is still off by only 
+1 % for both, whereas the VTR misses by about 3.5 and 6.5 %, respectively. Overexposed 
+(CD of the space getting larger), the VTR and approximate LPM both improve in 
+accuracy.
+
+
+## Page 36
+
+292 Fundamental Principles of Optical Lithography
+20
+40
+60
+80
+100
+120
+140
+160
+180
+0.9 1.4 1.9 2.4 2.9
+E/E(0)
+CD (nm)
+VTR
+LPM and Approximate LPM
+Figure 7.20 CD-versus-dose curves as predicted by the LPM Equation (7.98), the LPM using 
+the approximation for the Dawson’s integral, and the VTR. All models assumed a Gaussian 
+image with g = 0.0025 1/nm2
+ (NILS1 = 2.5 and CD1 = 100nm), g = 10, and Deff = 200nm
+An alternate (and usually more convenient) form of this VTR model can be obtained 
+by inserting the Gaussian image intensity [Equation (7.94)] that was used to derive the 
+VTR model directly into Equation (7.104). After some algebraic manipulations, and 
+letting E1 be the dose that produces the reference spacewidth CD1,
+CD
+CD NILS
+E
+E
+CD
+1 11 1 CD
+1 41=+ 
+
+ 
+
+ + 
+
+ 
+
+ 
+
+ 
+
+ ln ln
+γ
+ (7.106)
+Unfortunately, the equation is recursive with respect to CD. However, for dimensions 
+close to CD1, the following approximation can be made:
+ln
+ln
+ln
+ln
+CD
+CD
+E
+E
+CD
+CD
+E
+E
+CD
+CD
+E
+E
+1
+1
+1
+1
+1
+1
+1
+1
+
+
+
+
+
+
+
+
+=
++ 
+
+
+
++ 
+
+
+
+≈
+∆
+∆
+∆
+∆ ≈ 2
+NILS1
+ (7.107)
+Thus,
+CD
+CD NILS
+E
+1 11 1 E NILS
+1 4 1 2≈+ 
+
+ 
+
+ + 
+
+ 
+
+ ln
+γ
+ (7.108)
+7.4 Measuring Development Rates
+In general, development model parameters for a given resist/develop process are obtained 
+by making real-time in-situ measurements of resist thickness during development using 
+a development rate monitor (DRM). The resist thickness-versus-develop time curves are 
+measured at many different incident exposure doses. Taking the derivative of this data 
+gives development rate (r) as a function of incident dose (E) and depth into the resist (z). 
+
+
+## Page 37
+
+ Photoresist Development 293 Resist Thickness (nm)
+Exposure Dose (mJ/cm2) 
+0
+240
+480
+720
+960
+1200
+0 100 200 300 400 500
+Exposure Dose (mJ/cm2) 
+0 20 40 60 80 100
+Resist Thickness (nm)
+0
+240
+480
+720
+960
+1200
+Figure 7.21 Measured contrast curves17 for an i-line resist at development times ranging 
+from 9 to 201 seconds (shown here over two different exposure scales) Development Rate (nm/s)
+Relative Inhibitor Concentration m
+0
+24
+48
+72
+96
+120
+0.0 0.2 0.4 0.6 0.8 1.0
+RMS Error: 2.7 nm/s
+rmax = 100.3 nm/s
+rmin = 0.10 nm/s
+mth = 0.06
+n = 4.74
+Figure 7.22 Analysis of the contrast curves generates an r(m) data set, which was then fi t 
+to the original kinetic development model (best fi t is shown as the solid line)
+By modeling the exposure process, a given exposure dose turns into a distribution of 
+inhibitor concentration (m) after exposure as a function of depth. Combining the measured 
+r(E,z) with the calculated m(E,z) produces a resultant r(m,z) data set. These data are then 
+fi t with a development model (possibly including a surface inhibition function) and 
+parameters for the model are extracted.
+Although the best method for obtaining new parameters is the use of a DRM as 
+described above, there is another approximate approach called the Poor Man’s DRM.17
+The Poor Man’s DRM involves the measurement of multiple contrast curves – resist 
+thickness remaining as a function of exposure dose for open-frame exposures – at different 
+development times (Figure 7.21).
+Analyzing the information in Figure 7.21 to obtain development rate, and eventually 
+development parameters, is not trivial. The thickness as a function of dose and development time is fi rst converted to rate as a function of dose and depth into the resist, r(E,z). 
+From here, analysis is the same as for conventional DRM data. Figure 7.22 shows an 
+example set of results.
+
+
+## Page 38
+
+294 Fundamental Principles of Optical Lithography
+Problems
+7.1. For the original kinetic model of Equation (7.10), what is the value of the development rate at m = mth? For mth > 0, what is the limit of this value as n becomes 
+large?
+7.2. Derive Equation (7.9).
+7.3. Using the same approach that was used for the original kinetic development model, 
+add the effect of developer diffusion to the surface of the resist to the enhanced 
+kinetic model. In other words, let Equation (7.12) represent the surface reaction 
+rate and assume that rresin is proportional to DS.
+7.4. Consider a conventional positive resist that obeys the reaction-controlled version 
+of the original kinetic development model of Equation (7.11) Further assume no 
+bleaching, but absorption so that the inhibitor concentration m can be related to 
+incident dose E and depth into resist z by
+m Iz CEI z z r == −− e where e r () () α
+Using a spreadsheet or similar program, plot development rate versus dose for 
+rmax = 200 nm/s, rmin = 0.05 nm/s, n = 4, C = 0.02 cm2/mJ, a = 0.5 mm−1, and a depth 
+into the resist of 500 nm. Compare these results to the approximate Equation 
+(7.19):
+ r(z) ≈ r(z = 0)e−anz
+Repeat for a = 0.1 mm−1 and a = 1.5 mm−1. What can you conclude about the accuracy of the approximate expression?
+7.5. Consider a conventional positive resist that obeys the reaction-controlled version 
+of the original kinetic development model of Equation (7.11). Further, assume no 
+bleaching so that the inhibitor concentration m can be related to dose E by
+ m = e−CE
+Assuming that the minimum development rate rmin can be ignored over the dose 
+range of interest and ignoring any variation in development rate with depth into the 
+resist, derive an expression for the resist characteristic curve (such as that pictured 
+in Figure 7.11). Plot the resulting equation for rmax = 200 nm/s, n = 7, C = 0.02 cm2/
+mJ, an initial resist thickness of 800 nm, and a development time of 60 seconds. 
+What is the value of the dose-to-clear for this case?
+7.6. Given a conventionally measured resist characteristic curve, estimate how a small 
+change in resist thickness would change the dose-to-clear.
+7.7. Derive Equation (7.32).
+7.8. Derive Equation (7.63).
+7.9. For the Lumped Parameter Model, consider the case where only absorption causes 
+a variation of development rate with z. In the limit of very large contrast, what is 
+Deff for the two cases of a = 0 and a > 0?
+7.10. The assumption of a segmented development path can lead to a calculation of the 
+resulting CD of a space for a given development rate function r(x,z) and a given 
+development time. How will this CD compare to the CD calculated by rigorously 
+solving the Euler–Lagrange equation for the same conditions?
+
+
+## Page 39
+
+ Photoresist Development 295
+7.11. Use the Lumped Parameter Model to calculate CD as a function of dose for the 
+case of a space that has a constant log-slope aerial image:
+ I(x) = I0e−s|x|
+where s is positive. Also assume that x0 = 0 and that there is no z-dependence to 
+the development rate. Compare this result to Equation (7.76).
+7.12. For the Lumped Parameter Model, consider the case where only absorption causes 
+a variation of development rate with z. Derive an expression that compares the 
+value of resist contrast as measured with a standard photoresist Hurter–Driffi eld 
+(characteristic) curve to the theoretical (LPM) contrast.
+References
+ 1 Mack, C.A., 1987, Development of positive photoresist, Journal of the Electrochemical 
+Society, 134, 148–152.
+ 2 Mack, C.A., 1992, New kinetic model for resist dissolution, Journal of the Electrochemical 
+Society, 139, L35–L37.
+ 3 Meyerhofer, D., 1980, Photosolubility of diazoquinone resists, IEEE Transactions on Electron 
+Devices, ED–27, 921–926.
+ 4 Arthur, G., Mack, C.A. and Martin, B., 1997, Enhancing the development rate model for 
+optimum simulation capability in the sub-half-micron regime, Proceedings of SPIE: Advances 
+in Resist Technology and Processing XIV, 3049, 189–200.
+ 5 Tsiartas, P.C., Flanagin, L.W., Henderson, C.L., Hinsberg, W.D., Sanchez, I.C., Bonnecaze, 
+R.T. and Willson, C.G., 1997, The mechanism of phenolic polymer dissolution: a new perspective, Macromolecules, 30, 4656–4664.
+ 6 Hanabata, M., Oi, F. and Furuta, A., 1991, Novolak design for high-resolution positive 
+photoresists (IV): tandem-type novolak resin for high-performance positive photoresists,
+Proceedings of SPIE: Advances in Resist Technology and Processing VIII, 1466, 132–
+140.
+ 7 Dill, F.H. and Shaw, J.M., 1977, Thermal effects on the Photoresist AZ1350J, IBM Journal of 
+Research and Development, 21, 210–218.
+ 8 Kim, D.J., Oldham, W.G. and Neureuther, A.R., 1984, Development of positive photoresist, 
+IEEE Transactions on Electron Devices, ED-31, 1730–1735.
+ 9 Garza, C.M., Szmanda, C.R. and Fischer, R.L., Jr., 1988, Resist dissolution kinetics and submicron process control, Proceedings of SPIE: Advances in Resist Technology and Processing 
+V, 920, 321–338.
+10 Itoh, K., Yamanaka, K., Nozue, H. and Kasama, K., 1991, Dissolution kinetics of high resolution novolac resists, Proceedings of SPIE: Advances in Resist Technology and Processing VIII, 
+1466, 485–496.
+11 Mack, C.A., Maslow, M.J., Carpio, R. and Sekiguchi, A., 1998, New model for the effect of 
+developer temperature on photoresist dissolution, Proceedings of SPIE: Advances in Resist 
+Technology and Processing XV, 3333, 1218–1231.
+12 Maslow, M.J., Mack, C.A. and Byers, J., 1999, Effect of developer temperature and normality 
+on chemically amplifi ed photoresist dissolution, Proceedings of SPIE: Advances in Resist 
+Technology and Processing XVI, 3678, 1001–1011.
+13 Hurter, F. and Driffi eld, V.C., 1890, Photochemical investigations and a new method of determination of the sensitiveness of photographic plates, Journal of the Society of Chemical 
+Industry, 9, 455–469.
+14 Mack, C.A., Lithographic optimization using photoresist contrast, Proceedings of the KTI 
+Microlithography Seminar, Interface ’90, 1–12 (1990), and Microelectronics Manufacturing 
+Technology, 14, 36–42 (1991).
+
+
+## Page 40
+
+296 Fundamental Principles of Optical Lithography
+15 Watts, M.P.C., 1985, Positive development model for linewidth control, Semiconductor International, 8, 124–131.
+16 Hershel, R. and Mack, C.A., 1987, Chapter 2: lumped parameter model for optical lithography, 
+in R. K. Watts, N.G. Einspruch (eds), Lithography for VLSI, VLSI Electronics – Microstructure 
+Science Volume 16, Academic Press (New York, NY) pp. 19–55.
+17 Thornton, S.H. and Mack, C.A., 1996, Lithography model tuning: matching simulation to 
+experiment, Proceedings of SPIE: Optical Microlithography IX, 2726, 223–235.
