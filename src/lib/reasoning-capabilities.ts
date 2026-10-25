@@ -70,9 +70,6 @@ export function isOpenRouterEndpoint(endpoint: string): boolean {
  * request fields.
  */
 export function resolveReasoningCapabilities(config: LlmConfig): ReasoningCapabilities {
-  if (config.provider === "claude-code" || config.provider === "codex-cli") {
-    return capabilities(AUTO_ONLY)
-  }
   if (config.provider === "ollama") return capabilities(OLLAMA_LEVELS)
   if (config.provider === "google") {
     if (isGemini3(config.model)) return capabilities(THINKING_REQUIRED_LEVELS)

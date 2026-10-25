@@ -1,7 +1,6 @@
-import { useEffect, useMemo, useState } from "react"
-import { ChevronDown, ChevronRight, AlertCircle, CheckCircle2, Loader2, XCircle, Plus, Trash2 } from "lucide-react"
+import { useMemo, useState } from "react"
+import { ChevronDown, ChevronRight, AlertCircle, CheckCircle2, Plus, Trash2 } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { invoke, isDesktop } from "@/platform"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -55,12 +54,8 @@ export function LlmProviderSection() {
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [savedId, setSavedId] = useState<string | null>(null)
-  // The local Claude Code / Codex CLIs run on the user's machine; the
-  // self-hosted server disables them, so the web build does not offer them.
   const presets = useMemo(
-    () => availableLlmPresets(customLlmPresets).filter(
-      (preset) => isDesktop || (preset.provider !== "claude-code" && preset.provider !== "codex-cli"),
-    ),
+    () => availableLlmPresets(customLlmPresets),
     [customLlmPresets],
   )
 
@@ -389,22 +384,14 @@ function PresetRow({
   const reasoning = ov.reasoning ?? { mode: "auto" as const }
   // "off" by default: what ingest hardcoded before it was settable.
   const ingestReasoning = ov.ingestReasoning ?? { mode: "off" as const }
-  const localCliIsolation = ov.localCliIsolation === true
-  const codexCliTimeoutMinutes = Math.max(1, Math.min(240, ov.codexCliTimeoutMinutes ?? 10))
   const requestTimeoutMinutes = Math.max(1, Math.min(1440, ov.requestTimeoutMinutes ?? 30))
   const streamingEnabled = ov.streamingEnabled !== false
   const [headersText, setHeadersText] = useState(() => llmHeadersToText(ov.customHeaders))
-  const isLocalCliProvider = preset.provider === "claude-code" || preset.provider === "codex-cli"
   const [testState, setTestState] = useState<ProviderTestState>({ kind: "idle" })
   const hasConfig = !!apiKey || !!ov.baseUrl || !!ov.model || !!ov.azureApiVersion || !!ov.azureModelFamily
     || Object.keys(ov.customHeaders ?? {}).length > 0 || ov.streamingEnabled === false
-  // Local CLI providers authenticate via their own existing login state
-  // (inherited by the spawned subprocess), so no API key field is shown.
-  // Ollama ditto for its local-only model.
-  const needsApiKey =
-    preset.provider !== "ollama" &&
-    preset.provider !== "claude-code" &&
-    preset.provider !== "codex-cli"
+  // Ollama runs locally without auth, so no API key field is shown.
+  const needsApiKey = preset.provider !== "ollama"
 
   const resolvedConfig = useMemo(
     () => resolveConfig(preset, ov, useWikiStore.getState().globalLlmConfig),
@@ -588,79 +575,6 @@ function PresetRow({
             </div>
           )}
 
-          {preset.provider === "claude-code" && <ClaudeCliStatusPill />}
-          {preset.provider === "codex-cli" && <CodexCliStatusPill />}
-
-          {isLocalCliProvider && (
-            <div className="space-y-2 rounded-md border p-3">
-              <div className="flex items-start justify-between gap-3">
-                <div>
-                  <div className="text-sm font-medium">
-                    {t("settings.sections.llm.localCliIsolation")}
-                  </div>
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    {t("settings.sections.llm.localCliIsolationHint")}
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => onChange({ localCliIsolation: !localCliIsolation })}
-                  className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full border transition-colors ${
-                    localCliIsolation
-                      ? "border-primary bg-primary"
-                      : "border-muted-foreground/30 bg-muted-foreground/20 hover:bg-muted-foreground/30"
-                  }`}
-                  title={
-                    localCliIsolation
-                      ? t("settings.sections.llm.localCliIsolationOn")
-                      : t("settings.sections.llm.localCliIsolationOff")
-                  }
-                  aria-label={t("settings.sections.llm.localCliIsolation")}
-                >
-                  <span
-                    className={`inline-block h-3.5 w-3.5 rounded-full bg-white shadow-sm ring-1 ring-black/10 transition-transform ${
-                      localCliIsolation ? "translate-x-4" : "translate-x-0.5"
-                    }`}
-                  />
-                </button>
-              </div>
-              <div className="rounded-md bg-muted/50 px-2 py-1.5 text-xs text-muted-foreground">
-                {localCliIsolation
-                  ? t("settings.sections.llm.localCliIsolationOn")
-                  : t("settings.sections.llm.localCliIsolationOff")}
-              </div>
-            </div>
-          )}
-
-          {preset.provider === "codex-cli" && (
-            <div className="space-y-2 rounded-md border p-3">
-              <Label>{t("settings.sections.llm.codexCliTimeout")}</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  min={1}
-                  max={240}
-                  className="w-28"
-                  value={codexCliTimeoutMinutes}
-                  onChange={(e) => {
-                    const n = Number(e.target.value)
-                    onChange({
-                      codexCliTimeoutMinutes: Number.isFinite(n)
-                        ? Math.max(1, Math.min(240, Math.floor(n)))
-                        : undefined,
-                    })
-                  }}
-                />
-                <span className="text-xs text-muted-foreground">
-                  {t("settings.sections.llm.codexCliTimeoutUnit")}
-                </span>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {t("settings.sections.llm.codexCliTimeoutHint")}
-              </p>
-            </div>
-          )}
-
           {needsApiKey && (
             <div className="space-y-2">
               <Label>{t("settings.apiKey")}</Label>
@@ -738,8 +652,6 @@ function PresetRow({
             </div>
           </div>
 
-          {!isLocalCliProvider && (
-            <>
             <div className="space-y-2">
               <Label>{t("settings.sections.llm.customHeaders")}</Label>
               <textarea
@@ -770,8 +682,6 @@ function PresetRow({
                 {t("settings.sections.llm.requestTimeoutHint", "Increase this for slow local CPU models. The default is 30 minutes.")}
               </p>
             </div>
-            </>
-          )}
 
           <ReasoningControls
             value={reasoning}
@@ -1065,205 +975,6 @@ function ModelPicker({ value, suggestions, placeholder, onChange }: ModelPickerP
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
       />
-    </div>
-  )
-}
-
-interface DetectResult {
-  installed: boolean
-  version: string | null
-  path: string | null
-  error: string | null
-}
-
-/**
- * Health-check pill for the Claude Code CLI provider. Auto-runs
- * `claude --version` on mount, with a refresh button for when the user
- * just installed the binary and wants to re-check without reopening the
- * panel. The error message comes straight from the Rust side — it
- * already tailors the hint (macOS quarantine, missing binary, etc).
- */
-function ClaudeCliStatusPill() {
-  const { t } = useTranslation()
-  const [state, setState] = useState<"loading" | "ok" | "err">("loading")
-  const [result, setResult] = useState<DetectResult | null>(null)
-
-  async function detect() {
-    setState("loading")
-    try {
-      const r = await invoke<DetectResult>("claude_cli_detect")
-      setResult(r)
-      setState(r.installed ? "ok" : "err")
-    } catch (e) {
-      setResult({
-        installed: false,
-        version: null,
-        path: null,
-        error: e instanceof Error ? e.message : String(e),
-      })
-      setState("err")
-    }
-  }
-
-  useEffect(() => {
-    void detect()
-  }, [])
-
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-2">
-        <Label className="m-0">{t("settings.sections.llm.cliStatus")}</Label>
-        <button
-          type="button"
-          onClick={() => void detect()}
-          className="rounded border border-border px-2 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-          disabled={state === "loading"}
-        >
-          {state === "loading" ? t("settings.sections.llm.checkingCli") : t("settings.sections.llm.recheckCli")}
-        </button>
-      </div>
-      <div
-        className={`flex items-start gap-1.5 rounded-md border px-2 py-1.5 text-xs ${
-          state === "ok"
-            ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400"
-            : state === "err"
-              ? "border-rose-500/40 bg-rose-500/5 text-rose-700 dark:text-rose-400"
-              : "border-border bg-background/50 text-muted-foreground"
-        }`}
-      >
-        {state === "loading" && <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin" />}
-        {state === "ok" && <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-        {state === "err" && <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-        <div className="min-w-0 flex-1 space-y-0.5">
-          {state === "loading" && <div>{t("settings.sections.llm.detectingCli", { name: "Claude" })}</div>}
-          {state === "ok" && (
-            <>
-              <div>
-                {t("settings.sections.llm.cliDetected", { version: result?.version ? ` ${result.version}` : "", login: t("settings.sections.llm.claudeSubscription") })}
-              </div>
-              {result?.path && (
-                <div className="truncate font-mono text-[10px] text-muted-foreground">
-                  {result.path}
-                </div>
-              )}
-              {/* `claude --version` doesn't validate OAuth, so even a
-                  green pill can hide an expired login. Surface the
-                  remediation up front so users don't mis-diagnose
-                  the resulting "Unauthenticated" exit-1 as a LLM
-                  Wiki bug. */}
-              <div className="text-muted-foreground">
-                {t("settings.sections.llm.cliAuthBefore")}{" "}
-                <code className="rounded bg-background/60 px-1 py-0.5 font-mono text-[10px]">
-                  claude
-                </code>{" "}
-                {" "}{t("settings.sections.llm.cliAuthAfter")}
-              </div>
-            </>
-          )}
-          {state === "err" && (
-            <>
-              <div>{result?.error ?? t("settings.sections.llm.cliUnavailable", { name: "Claude" })}</div>
-              <div className="text-muted-foreground">
-                {t("settings.sections.llm.cliInstallBefore")}{" "}
-                <code className="rounded bg-background/60 px-1 py-0.5 font-mono text-[10px]">
-                  npm i -g @anthropic-ai/claude-code
-                </code>{" "}
-                {" "}{t("settings.sections.llm.cliInstallAfter")}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function CodexCliStatusPill() {
-  const { t } = useTranslation()
-  const [state, setState] = useState<"loading" | "ok" | "err">("loading")
-  const [result, setResult] = useState<DetectResult | null>(null)
-
-  async function detect() {
-    setState("loading")
-    try {
-      const r = await invoke<DetectResult>("codex_cli_detect")
-      setResult(r)
-      setState(r.installed ? "ok" : "err")
-    } catch (e) {
-      setResult({
-        installed: false,
-        version: null,
-        path: null,
-        error: e instanceof Error ? e.message : String(e),
-      })
-      setState("err")
-    }
-  }
-
-  useEffect(() => {
-    void detect()
-  }, [])
-
-  return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-2">
-        <Label className="m-0">{t("settings.sections.llm.cliStatus")}</Label>
-        <button
-          type="button"
-          onClick={() => void detect()}
-          className="rounded border border-border px-2 py-0.5 text-xs text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-          disabled={state === "loading"}
-        >
-          {state === "loading" ? t("settings.sections.llm.checkingCli") : t("settings.sections.llm.recheckCli")}
-        </button>
-      </div>
-      <div
-        className={`flex items-start gap-1.5 rounded-md border px-2 py-1.5 text-xs ${
-          state === "ok"
-            ? "border-emerald-500/40 bg-emerald-500/5 text-emerald-700 dark:text-emerald-400"
-            : state === "err"
-              ? "border-rose-500/40 bg-rose-500/5 text-rose-700 dark:text-rose-400"
-              : "border-border bg-background/50 text-muted-foreground"
-        }`}
-      >
-        {state === "loading" && <Loader2 className="mt-0.5 h-3.5 w-3.5 shrink-0 animate-spin" />}
-        {state === "ok" && <CheckCircle2 className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-        {state === "err" && <XCircle className="mt-0.5 h-3.5 w-3.5 shrink-0" />}
-        <div className="min-w-0 flex-1 space-y-0.5">
-          {state === "loading" && <div>{t("settings.sections.llm.detectingCli", { name: "Codex" })}</div>}
-          {state === "ok" && (
-            <>
-              <div>
-                {t("settings.sections.llm.cliDetected", { version: result?.version ? ` ${result.version}` : "", login: t("settings.sections.llm.codexLogin") })}
-              </div>
-              {result?.path && (
-                <div className="truncate font-mono text-[10px] text-muted-foreground">
-                  {result.path}
-                </div>
-              )}
-              <div className="text-muted-foreground">
-                {t("settings.sections.llm.cliAuthBefore")}{" "}
-                <code className="rounded bg-background/60 px-1 py-0.5 font-mono text-[10px]">
-                  codex
-                </code>{" "}
-                {" "}{t("settings.sections.llm.cliAuthAfter")}
-              </div>
-            </>
-          )}
-          {state === "err" && (
-            <>
-              <div>{result?.error ?? t("settings.sections.llm.cliUnavailable", { name: "Codex" })}</div>
-              <div className="text-muted-foreground">
-                {t("settings.sections.llm.cliInstallBefore")}{" "}
-                <code className="rounded bg-background/60 px-1 py-0.5 font-mono text-[10px]">
-                  npm install -g @openai/codex
-                </code>{" "}
-                {" "}{t("settings.sections.llm.cliInstallAfter")}
-              </div>
-            </>
-          )}
-        </div>
-      </div>
     </div>
   )
 }

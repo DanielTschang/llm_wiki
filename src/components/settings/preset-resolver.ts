@@ -38,11 +38,6 @@ export function resolveConfig(
   // Carried alongside `reasoning`: without it the ingest selector would save a
   // value the resolved config drops, and ingest would keep using the default.
   const ingestReasoning = ov.ingestReasoning ?? { mode: "off" as const }
-  const localCliIsolation = ov.localCliIsolation === true
-  const codexCliTimeoutMinutes =
-    typeof ov.codexCliTimeoutMinutes === "number" && Number.isFinite(ov.codexCliTimeoutMinutes)
-      ? Math.max(1, Math.min(240, Math.floor(ov.codexCliTimeoutMinutes)))
-      : undefined
   const requestTimeoutMinutes =
     typeof ov.requestTimeoutMinutes === "number" && Number.isFinite(ov.requestTimeoutMinutes)
       ? Math.max(1, Math.min(1440, Math.floor(ov.requestTimeoutMinutes)))
@@ -65,7 +60,6 @@ export function resolveConfig(
       apiMode: ov.apiMode ?? preset.apiMode ?? "chat_completions",
       reasoning,
       ingestReasoning,
-      localCliIsolation: false,
       requestTimeoutMinutes,
       customHeaders,
       ...streamingConfig,
@@ -82,7 +76,6 @@ export function resolveConfig(
       maxContextSize,
       reasoning,
       ingestReasoning,
-      localCliIsolation: false,
       requestTimeoutMinutes,
       customHeaders,
       ...streamingConfig,
@@ -101,28 +94,8 @@ export function resolveConfig(
       maxContextSize,
       reasoning,
       ingestReasoning,
-      localCliIsolation: false,
       requestTimeoutMinutes,
       customHeaders,
-      ...streamingConfig,
-    }
-  }
-
-  if (preset.provider === "claude-code" || preset.provider === "codex-cli") {
-    // Subprocess transport — no apiKey, no endpoint URL. Model id is
-    // passed straight to the local CLI's model flag.
-    return {
-      provider: preset.provider,
-      apiKey: "",
-      model,
-      ollamaUrl: fallback.ollamaUrl,
-      customEndpoint: fallback.customEndpoint,
-      maxContextSize,
-      reasoning,
-      ingestReasoning,
-      localCliIsolation,
-      codexCliTimeoutMinutes: preset.provider === "codex-cli" ? codexCliTimeoutMinutes : undefined,
-      requestTimeoutMinutes,
       ...streamingConfig,
     }
   }
@@ -139,7 +112,6 @@ export function resolveConfig(
     maxContextSize,
     reasoning,
     ingestReasoning,
-    localCliIsolation: false,
     requestTimeoutMinutes,
     customHeaders,
     ...streamingConfig,

@@ -25,7 +25,7 @@ export interface ReasoningConfig {
 }
 
 interface LlmConfig {
-  provider: "openai" | "anthropic" | "google" | "azure" | "ollama" | "custom" | "minimax" | "claude-code" | "codex-cli"
+  provider: "openai" | "anthropic" | "google" | "azure" | "ollama" | "custom" | "minimax"
   apiKey: string
   model: string
   ollamaUrl: string
@@ -44,14 +44,6 @@ interface LlmConfig {
    * Defaults to "off", which is what ingest hardcoded before this was settable.
    */
   ingestReasoning?: ReasoningConfig
-  /**
-   * Local CLI providers only. When true, LLM Wiki asks Claude/Codex CLI
-   * to ignore user-level rules/config/MCP/tool state where the CLI exposes
-   * such controls. Default false preserves existing advanced-user setups.
-   */
-  localCliIsolation?: boolean
-  /** Codex CLI provider only. Overall subprocess timeout in minutes. */
-  codexCliTimeoutMinutes?: number
   /** HTTP LLM request backstop. Defaults to 30 minutes for legacy configs. */
   requestTimeoutMinutes?: number
   /** Defaults to true. HTTP providers use a non-streaming wire when false. */
@@ -344,8 +336,6 @@ export interface ProviderOverride {
   reasoning?: ReasoningConfig
   /** Reasoning used by structured ingest calls; defaults to off. */
   ingestReasoning?: ReasoningConfig
-  localCliIsolation?: boolean
-  codexCliTimeoutMinutes?: number
   requestTimeoutMinutes?: number
   streamingEnabled?: boolean
   customHeaders?: Record<string, string>
@@ -508,7 +498,6 @@ export const useWikiStore = create<WikiState>((set) => ({
     customEndpoint: "",
     azureApiVersion: "2024-10-21",
     reasoning: { mode: "auto" },
-    localCliIsolation: false,
   },
   globalLlmConfig: {
     provider: "openai",
@@ -519,7 +508,6 @@ export const useWikiStore = create<WikiState>((set) => ({
     customEndpoint: "",
     azureApiVersion: "2024-10-21",
     reasoning: { mode: "auto" },
-    localCliIsolation: false,
   },
   providerConfigs: {},
   customLlmPresets: [],

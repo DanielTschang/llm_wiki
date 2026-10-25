@@ -323,13 +323,6 @@ describe("MiniMax Anthropic-compatible endpoint", () => {
     }))).toBe(false)
   })
 
-  it("reports Codex CLI as not image-capable because images are text-omitted", () => {
-    expect(supportsImageInput(mkConfig({
-      provider: "codex-cli",
-      model: "gpt-5-codex",
-    }))).toBe(false)
-  })
-
   it("reports official MiniMax M2.x Anthropic endpoints as not image-capable", () => {
     expect(supportsImageInput(mkConfig({
       provider: "custom",
@@ -421,13 +414,13 @@ describe("Zhipu BigModel / GLM vision content", () => {
     )
   })
 
-  it("keeps the default permissive image capability for OpenAI and Claude Code providers", () => {
+  it("keeps the default permissive image capability for OpenAI and Anthropic providers", () => {
     expect(supportsImageInput(mkConfig({
       provider: "openai",
       model: "gpt-4o-mini",
     }))).toBe(true)
     expect(supportsImageInput(mkConfig({
-      provider: "claude-code",
+      provider: "anthropic",
       model: "claude-sonnet-4-5-20250929",
     }))).toBe(true)
   })

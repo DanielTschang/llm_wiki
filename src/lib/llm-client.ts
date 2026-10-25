@@ -19,21 +19,6 @@ export interface StreamCompletion {
   truncated: boolean
 }
 
-function bufferedStreamCallbacks(callbacks: StreamCallbacks): StreamCallbacks {
-  let content = ""
-  let reasoning = ""
-  return {
-    onToken: (token) => { content += token },
-    onReasoningToken: (token) => { reasoning += token },
-    onDone: (completion) => {
-      if (reasoning) callbacks.onReasoningToken?.(reasoning)
-      if (content) callbacks.onToken(content)
-      callbacks.onDone(completion)
-    },
-    onError: callbacks.onError,
-  }
-}
-
 function streamFinishReason(record: string): string | undefined {
   const payload = record.startsWith("data:") ? record.slice(5).trim() : record.trim()
   if (!payload.startsWith("{")) return undefined
@@ -73,28 +58,6 @@ function isTokenLimitFinishReason(reason: string | undefined): boolean {
 
 // Lazy import keeps the Tauri event/invoke bindings out of bundles that
 // never touch the subprocess provider (e.g. vitest with a fetch mock).
-async function streamViaClaudeCodeCli(
-  config: LlmConfig,
-  messages: import("./llm-providers").ChatMessage[],
-  callbacks: StreamCallbacks,
-  signal?: AbortSignal,
-  requestOverrides?: RequestOverrides,
-) {
-  const mod = await import("./claude-cli-transport")
-  return mod.streamClaudeCodeCli(config, messages, callbacks, signal, requestOverrides)
-}
-
-async function streamViaCodexCli(
-  config: LlmConfig,
-  messages: import("./llm-providers").ChatMessage[],
-  callbacks: StreamCallbacks,
-  signal?: AbortSignal,
-  requestOverrides?: RequestOverrides,
-) {
-  const mod = await import("./codex-cli-transport")
-  return mod.streamCodexCli(config, messages, callbacks, signal, requestOverrides)
-}
-
 function parseLines(
   decoder: TextDecoder,
   chunk: Uint8Array,
@@ -219,29 +182,6 @@ export async function streamChat(
   requestOverrides?: RequestOverrides,
 ): Promise<void> {
   const { onToken, onDone, onError } = callbacks
-
-  // Claude Code CLI uses a subprocess transport (stdin/stdout), not
-  // HTTP. Dispatch before getProviderConfig — that function throws for
-  // this provider because it has no URL/headers.
-  if (config.provider === "claude-code") {
-    return streamViaClaudeCodeCli(
-      config,
-      messages,
-      config.streamingEnabled === false ? bufferedStreamCallbacks(callbacks) : callbacks,
-      signal,
-      requestOverrides,
-    )
-  }
-
-  if (config.provider === "codex-cli") {
-    return streamViaCodexCli(
-      config,
-      messages,
-      config.streamingEnabled === false ? bufferedStreamCallbacks(callbacks) : callbacks,
-      signal,
-      requestOverrides,
-    )
-  }
 
   const providerConfig = getProviderConfig(config)
 

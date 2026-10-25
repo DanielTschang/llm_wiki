@@ -758,7 +758,6 @@ function assertBigModelImageSupport(config: LlmConfig, messages: ChatMessage[]):
 }
 
 export function supportsImageInput(config: LlmConfig): boolean {
-  if (config.provider === "codex-cli") return false
   if (config.provider === "minimax") return isMiniMaxM3Model(config.model)
   if (isBigModelEndpoint(config)) return isGlmVisionModel(config.model)
   if ((config.provider === "custom") && (config.apiMode ?? "chat_completions") === "anthropic_messages") {
@@ -1049,15 +1048,6 @@ export function getProviderConfig(config: LlmConfig): ProviderConfig {
       }
     }
 
-    case "claude-code":
-    case "codex-cli":
-      // Local CLI providers use subprocess transports (stdin/stdout JSON
-      // streams), not HTTP. Dispatch happens one layer up in
-      // streamChat() before getProviderConfig is called. Reaching this
-      // branch means wiring is broken somewhere upstream.
-      throw new Error(
-        `${provider} provider uses subprocess transport; getProviderConfig should not be called for it`,
-      )
 
     case "custom": {
       // Custom endpoints can speak either OpenAI's /chat/completions
