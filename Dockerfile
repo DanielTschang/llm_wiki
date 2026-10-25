@@ -26,14 +26,12 @@ RUN apt-get update \
 WORKDIR /app
 # The whole workspace manifest is needed to resolve the lockfile, and core
 # embeds src/lib/source-watch-defaults.json at compile time.
-COPY src-tauri/Cargo.toml src-tauri/Cargo.lock src-tauri/build.rs ./src-tauri/
-COPY src-tauri/src ./src-tauri/src
+COPY src-tauri/Cargo.toml src-tauri/Cargo.lock ./src-tauri/
 COPY src-tauri/crates ./src-tauri/crates
 COPY src/lib/source-watch-defaults.json ./src/lib/source-watch-defaults.json
 WORKDIR /app/src-tauri
 # The workspace release profile (fat LTO, one codegen unit, size-optimized)
-# is tuned for the desktop installer; for the server it mostly costs build
-# time and memory.
+# favours binary size; for the server it mostly costs build time and memory.
 ENV CARGO_PROFILE_RELEASE_LTO=thin \
     CARGO_PROFILE_RELEASE_CODEGEN_UNITS=16 \
     CARGO_PROFILE_RELEASE_OPT_LEVEL=2

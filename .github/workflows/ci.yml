@@ -8,12 +8,7 @@ on:
 
 jobs:
   check:
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [macos-latest, ubuntu-22.04, windows-latest]
-
-    runs-on: ${{ matrix.platform }}
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -22,19 +17,10 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install protoc (macOS)
-        if: matrix.platform == 'macos-latest'
-        run: brew install protobuf
-
-      - name: Install dependencies (Ubuntu)
-        if: matrix.platform == 'ubuntu-22.04'
+      - name: Install protoc
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf protobuf-compiler
-
-      - name: Install protoc (Windows)
-        if: matrix.platform == 'windows-latest'
-        run: choco install protoc -y
+          sudo apt-get install -y protobuf-compiler libprotobuf-dev
 
       - name: Rust cache
         uses: Swatinem/rust-cache@v2
@@ -44,19 +30,16 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
 
       - name: Install frontend dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Check frontend build
-        run: npx vite build
-
-      - name: Prepare MCP server resources
+      - name: Typecheck and test frontend
         run: |
-          npm --prefix mcp-server ci
-          npm run mcp:build
+          npm run typecheck
+          npm run test:mocks
 
-      - name: Check Rust build
+      - name: Test Rust workspace
         working-directory: src-tauri
-        run: cargo build
+        run: cargo test --workspace

@@ -1,7 +1,6 @@
 # LLM Wiki — shortcuts for running each edition. See START.md.
 #
 #   make help            list targets
-#   make desktop         desktop app (Tauri) in dev mode
 #   make server          self-hosted web edition on http://127.0.0.1:19830
 #   make docker-up       web edition in Docker
 #   make fly-deploy      deploy the current commit to Fly.io
@@ -40,16 +39,6 @@ install: ## Install npm dependencies (app + bundled MCP server)
 	npm install
 	npm --prefix mcp-server ci
 	npm run mcp:build
-
-# ── Desktop (Tauri) ──────────────────────────────────────────────────────
-
-.PHONY: desktop
-desktop: ## Run the desktop app in dev mode (hot reload)
-	npm run tauri dev
-
-.PHONY: desktop-build
-desktop-build: ## Build the desktop installer (src-tauri/target/release/bundle)
-	npm run tauri build
 
 # ── Self-hosted web edition ──────────────────────────────────────────────
 
