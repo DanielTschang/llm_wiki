@@ -111,11 +111,11 @@ Python Extension Point（同事負責）
 
 ### 階段 0：盤點與準備
 
-- [ ] 盤點前端經 `/rpc` 呼叫 Rust 的地方（`invoke(`，約 10 個檔案、68 處），標出每個 command 的去向
-- [ ] 盤點前端發出的 LLM 請求（ingest、聊天、lint、Deep Research、review、vision caption、embedding）
-- [ ] 盤點 retrieval 有哪些邏輯在前端、哪些在 Rust
-- [ ] 盤點 `.llm-wiki/*.json` 的每種狀態檔，各自對應到哪張資料表
-- [ ] 找出所有寫在程式碼裡的 prompt，抽成 `prompts/` 模板檔
+- [x] 盤點前端經 `/rpc` 呼叫 Rust 的地方：75 個 command，標出各自的去向（`plans/inventory/rpc-commands.md`）
+- [x] 盤點前端發出的 LLM 請求：`streamChat` 22 處加其他外部請求（`plans/inventory/llm-requests.md`）
+- [x] 盤點 retrieval 有哪些邏輯在前端、哪些在 Rust（`plans/inventory/retrieval-split.md`）
+- [x] 盤點 `.llm-wiki/*.json` 的每種狀態檔，各自對應到哪張資料表（`plans/inventory/llm-wiki-state-files.md`，欄位設計留到階段 1）
+- [ ] 找出所有寫在程式碼裡的 prompt，抽成 `prompts/` 模板檔：**清單已完成**（`plans/inventory/prompts.md`），模板檔尚未抽出；`ingest.ts` 的部分等階段 3 一併處理
 - [x] 架好 k3d 開發叢集：CloudNativePG（含 pgvector）、NATS JetStream 三副本、MinIO、OTel Collector（`deploy/k3d/`）
 
 **完成條件：** 有完整的盤點清單和 prompt 模板檔，開發叢集可用。
