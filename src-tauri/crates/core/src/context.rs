@@ -10,8 +10,6 @@ use serde_json::Value;
 
 use crate::agent::cancel::AgentCancellationRegistry;
 use crate::agent::session::AgentSessionStore;
-use crate::commands::claude_cli::ClaudeCliState;
-use crate::commands::codex_cli::CodexCliState;
 use crate::commands::file_sync::FileSyncState;
 
 /// Delivers a named event to every connected UI (Tauri webview events on
@@ -51,8 +49,6 @@ pub struct CoreContext {
     app_version: String,
     events: EventEmitter,
     pub file_sync: FileSyncState,
-    pub claude_cli: ClaudeCliState,
-    pub codex_cli: CodexCliState,
     pub agent_sessions: AgentSessionStore,
     pub agent_cancellation: AgentCancellationRegistry,
 }
@@ -70,8 +66,6 @@ impl CoreContext {
             app_version: app_version.into(),
             events,
             file_sync: FileSyncState::default(),
-            claude_cli: ClaudeCliState::default(),
-            codex_cli: CodexCliState::default(),
             agent_sessions: AgentSessionStore::default(),
             agent_cancellation: AgentCancellationRegistry::default(),
         }

@@ -1,8 +1,6 @@
-//! RPC dispatch table: one arm per backend command, mirroring the desktop
-//! wrappers in `src-tauri/src/commands.rs` (argument names are the same
+//! RPC dispatch table: one arm per backend command (argument names are the
 //! camelCase keys the frontend passes to `invoke`). Sync commands run on the
-//! blocking pool, as Tauri would run them off the async executor.
-//! `tests::dispatches_every_desktop_command` fails when the two lists drift.
+//! blocking pool.
 
 use std::sync::Arc;
 
@@ -16,16 +14,6 @@ pub enum DispatchError {
     Unknown,
     Failed(String),
 }
-
-/// Desktop commands the server deliberately does not offer.
-pub const SERVER_DISABLED: &[&str] = &[
-    "claude_cli_detect",
-    "claude_cli_kill",
-    "claude_cli_spawn",
-    "codex_cli_detect",
-    "codex_cli_kill",
-    "codex_cli_spawn",
-];
 
 pub async fn dispatch(
     ctx: &Arc<CoreContext>,
@@ -1113,48 +1101,4 @@ async fn rpc_blocking<T: Send + 'static>(
     tokio::task::spawn_blocking(work)
         .await
         .map_err(|e| DispatchError::Failed(format!("Command task failed: {e}")))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    const DESKTOP_ONLY: &[&str] = &[
-        "open_project_folder",
-        "open_path_in_project",
-        "mcp_server_entry_path",
-        "set_close_behavior",
-    ];
-
-    fn desktop_commands() -> Vec<String> {
-        let lib = include_str!("../../../src/lib.rs");
-        let start =
-            lib.find("generate_handler![").expect("handler list") + "generate_handler![".len();
-        let end = start + lib[start..].find("])").expect("handler list end");
-        lib[start..end]
-            .split(',')
-            .map(|entry| entry.trim().rsplit("::").next().unwrap_or("").to_string())
-            .filter(|name| !name.is_empty())
-            .collect()
-    }
-
-    #[tokio::test]
-    async fn dispatches_every_desktop_command() {
-        let ctx = Arc::new(CoreContext::new(None, "test", core::EventEmitter::noop()));
-        let mut missing = Vec::new();
-        for name in desktop_commands() {
-            if DESKTOP_ONLY.contains(&name.as_str()) || SERVER_DISABLED.contains(&name.as_str()) {
-                continue;
-            }
-            // Deliberately malformed arguments: a known command fails
-            // argument parsing (or runs a harmless no-arg status call);
-            // only an unknown one reports Unknown.
-            if let Err(DispatchError::Unknown) =
-                dispatch(&ctx, &name, Value::String("x".into())).await
-            {
-                missing.push(name);
-            }
-        }
-        assert!(missing.is_empty(), "server does not dispatch: {missing:?}");
-    }
 }

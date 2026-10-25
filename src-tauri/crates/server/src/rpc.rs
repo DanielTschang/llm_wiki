@@ -59,11 +59,6 @@ async fn call(
         }
         return worker_call(state, command, args).map_err(DispatchError::Failed);
     }
-    if dispatch::SERVER_DISABLED.contains(&command) {
-        return Err(DispatchError::Failed(format!(
-            "`{command}` is not available in server mode"
-        )));
-    }
     state
         .roots
         .check_args(&args)

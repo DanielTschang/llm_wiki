@@ -1,8 +1,7 @@
 //! LLM Wiki backend, independent of any UI shell.
 //!
-//! The desktop app (`src-tauri`) wraps these functions as Tauri commands;
-//! the self-hosted server (plans/web-server-mode.md, Phase 3) exposes the
-//! same functions over HTTP. Nothing in this crate may depend on `tauri`.
+//! The server (`llm-wiki-server`) exposes these functions over HTTP;
+//! nothing in this crate may depend on a UI shell.
 
 pub mod agent;
 pub mod api_server;

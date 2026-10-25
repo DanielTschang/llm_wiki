@@ -1,50 +1,13 @@
-[package]
-name = "llm-wiki"
-version = "0.6.12"
-description = "LLM Wiki - A personal knowledge base for LLM concepts"
-authors = []
-edition = "2021"
-# AnyDoc and its archive/spreadsheet dependencies require Rust 1.88. Declaring
-# the floor here gives contributors an immediate toolchain error instead of a
-# late, platform-dependent dependency compilation failure.
-rust-version = "1.88"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[lib]
-name = "llm_wiki_lib"
-crate-type = ["staticlib", "cdylib", "rlib"]
-
-[[bin]]
-name = "llm-wiki"
-path = "src/main.rs"
-
 [workspace]
 members = ["crates/core", "crates/server"]
-# `cargo test` / `cargo build` in src-tauri (CI, contributors) cover the
-# core crate too, not just the desktop shell.
-default-members = [".", "crates/core", "crates/server"]
 resolver = "2"
-
-[build-dependencies]
-tauri-build = { version = "2", features = [] }
-
-[dependencies]
-tauri = { version = "2", features = ["protocol-asset", "tray-icon"] }
-tauri-plugin-opener = "2"
-tauri-plugin-autostart = "2.5.1"
-tauri-plugin-dialog = "2.7.1"
-tauri-plugin-store = "2.4.2"
-tauri-plugin-http = { version = "2", features = ["unsafe-headers"] }
-llm-wiki-core = { path = "crates/core" }
-serde_json = "1"
 
 [profile.release]
 codegen-units = 1
 lto = true
 opt-level = "s"
 # Unwind (not abort) so third-party parser panics can be caught at the
-# Tauri command boundary via panic_guard and turned into errors. Slightly
-# larger binary, but prevents single-file corruption from killing the app.
+# command boundary via panic_guard and turned into errors. Slightly
+# larger binary, but prevents single-file corruption from killing the server.
 panic = "unwind"
 strip = true
