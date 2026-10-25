@@ -1,0 +1,21 @@
+# Helm values for open-telemetry/opentelemetry-collector. Rust and Python
+# services send OTLP here; the debug exporter logs what arrives until a
+# trace backend is chosen.
+mode: deployment
+image:
+  repository: otel/opentelemetry-collector-contrib
+config:
+  exporters:
+    debug:
+      verbosity: basic
+  service:
+    pipelines:
+      traces:
+        receivers: [otlp]
+        exporters: [debug]
+      metrics:
+        receivers: [otlp]
+        exporters: [debug]
+      logs:
+        receivers: [otlp]
+        exporters: [debug]

@@ -1,0 +1,18 @@
+# k3d dev cluster for LLM Wiki (plans/PLAN.md, 階段 0). Created by up.sh.
+# Three nodes so NATS can spread its three replicas; they all share this
+# machine, so this only validates configuration, not availability.
+apiVersion: k3d.io/v1alpha5
+kind: Simple
+metadata:
+  name: llm-wiki
+servers: 1
+agents: 2
+ports:
+  # Traefik ingress, for the app later.
+  - port: 8080:80
+    nodeFilters:
+      - loadbalancer
+options:
+  kubeconfig:
+    updateDefaultKubeconfig: true
+    switchCurrentContext: false

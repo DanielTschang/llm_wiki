@@ -5,6 +5,7 @@
 #   make server          self-hosted web edition on http://127.0.0.1:19830
 #   make docker-up       web edition in Docker
 #   make fly-deploy      deploy the current commit to Fly.io
+#   make k3d-up          k3d dev cluster (Postgres, NATS, MinIO, OTel)
 
 SHELL := /bin/bash
 
@@ -132,6 +133,20 @@ fly-ssh: ## Open a shell on the Fly machine
 .PHONY: fly-token
 fly-token: ## Print the access token stored on the Fly volume
 	@fly ssh console -q -C "cat /data/server-token"; echo
+
+# ── k3d dev cluster (deploy/k3d, plans/PLAN.md 階段 0) ─────────────────
+
+.PHONY: k3d-up
+k3d-up: ## Create the k3d dev cluster with Postgres, NATS, MinIO, OTel
+	deploy/k3d/up.sh
+
+.PHONY: k3d-down
+k3d-down: ## Delete the k3d dev cluster and all its data
+	deploy/k3d/down.sh
+
+.PHONY: k3d-status
+k3d-status: ## Show pods in the k3d dev cluster
+	kubectl --context k3d-llm-wiki get pods -A
 
 # ── Checks ───────────────────────────────────────────────────────────────
 

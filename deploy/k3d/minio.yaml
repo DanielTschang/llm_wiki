@@ -1,0 +1,72 @@
+# Single-node MinIO for Sources and images. Accessed only by the API
+# (no presigned URLs), so there is no ingress.
+#
+# MinIO no longer publishes community images on Docker Hub or quay.io;
+# this is Chainguard's build of upstream MinIO, pinned by digest. In the
+# company cluster use the internally maintained MinIO image instead.
+apiVersion: v1
+kind: Secret
+metadata:
+  name: minio
+  namespace: llm-wiki
+stringData:
+  MINIO_ROOT_USER: llm-wiki
+  MINIO_ROOT_PASSWORD: llm-wiki-dev-only
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: llm-wiki
+spec:
+  selector:
+    app: minio
+  ports:
+    - name: api
+      port: 9000
+    - name: console
+      port: 9001
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minio
+  namespace: llm-wiki
+spec:
+  serviceName: minio
+  replicas: 1
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      securityContext:
+        fsGroup: 65532
+      containers:
+        - name: minio
+          image: cgr.dev/chainguard/minio@sha256:268d68a2a3b6fc65f905a61f84d7eab6345ce6bff14f551e2b028ec31e6a1341
+          args: ["server", "/data", "--console-address", ":9001"]
+          envFrom:
+            - secretRef:
+                name: minio
+          ports:
+            - containerPort: 9000
+            - containerPort: 9001
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+          volumeMounts:
+            - name: data
+              mountPath: /data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi

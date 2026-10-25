@@ -1,0 +1,17 @@
+# Postgres via CloudNativePG. The standard image ships pgvector.
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: pg
+  namespace: llm-wiki
+spec:
+  instances: 1
+  imageName: ghcr.io/cloudnative-pg/postgresql:17-standard-bookworm
+  storage:
+    size: 5Gi
+  bootstrap:
+    initdb:
+      database: llm_wiki
+      owner: llm_wiki
+      postInitApplicationSQL:
+        - CREATE EXTENSION IF NOT EXISTS vector

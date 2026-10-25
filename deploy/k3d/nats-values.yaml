@@ -1,0 +1,12 @@
+# Helm values for nats/nats: three-node cluster with JetStream on PVCs.
+config:
+  cluster:
+    enabled: true
+    replicas: 3
+  jetstream:
+    enabled: true
+    fileStore:
+      pvc:
+        size: 2Gi
+natsBox:
+  enabled: true
