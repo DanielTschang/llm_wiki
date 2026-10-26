@@ -59,6 +59,40 @@ fn vectorstore_v2_lock(project_path: &str) -> Arc<tokio::sync::RwLock<()>> {
         .clone()
 }
 
+/// The vector store of a platform server and the Project a command names, or
+/// `None` on a desktop where vectors live in the Project folder.
+fn on_platform(
+    project_path: &str,
+) -> Option<Result<(&'static dyn llm_wiki_storage::ChunkVectors, llm_wiki_storage::ProjectId), String>>
+{
+    let platform = crate::platform::get()?;
+    Some((|| {
+        let vectors = platform
+            .vectors
+            .as_deref()
+            .ok_or_else(|| "semantic search is not configured on this server".to_string())?;
+        let (project, root) = platform
+            .locator
+            .resolve(project_path)
+            .map_err(|error| error.to_string())?;
+        if !root.is_root() {
+            return Err(format!("not a project path: {project_path}"));
+        }
+        Ok((vectors, project))
+    })())
+}
+
+/// A page id is its wiki path without the folder and `.md`.
+fn page_rel(page_id: &str) -> Result<llm_wiki_storage::RelPath, String> {
+    validate_page_id_for_v2(page_id)?;
+    llm_wiki_storage::RelPath::parse(&format!("wiki/{page_id}.md")).map_err(|e| e.to_string())
+}
+
+fn page_id_of(path: &str) -> String {
+    let id = path.strip_prefix("wiki/").unwrap_or(path);
+    id.strip_suffix(".md").unwrap_or(id).to_string()
+}
+
 /// v1 (legacy) table name. One row per page.
 const TABLE_V1: &str = "wiki_vectors";
 /// v2 (current) table name. One row per CHUNK — a page is typically
@@ -458,6 +492,23 @@ pub async fn vector_upsert_chunks(
     page_id: String,
     chunks: Vec<ChunkUpsertInput>,
 ) -> Result<(), String> {
+    if let Some(target) = on_platform(&project_path) {
+        let (vectors, project) = target?;
+        let page = page_rel(&page_id)?;
+        let chunks = chunks
+            .into_iter()
+            .map(|c| llm_wiki_storage::ChunkInput {
+                chunk_index: c.chunk_index,
+                chunk_text: c.chunk_text,
+                heading_path: c.heading_path,
+                embedding: c.embedding,
+            })
+            .collect();
+        return vectors
+            .upsert_chunks(project, &page, chunks, None)
+            .await
+            .map_err(|e| e.to_string());
+    }
     run_guarded_async("vector_upsert_chunks", async move {
         vector_upsert_chunks_inner(&project_path, &page_id, chunks, None).await
     })
@@ -584,6 +635,27 @@ pub async fn vector_search_chunks(
     query_embedding: Vec<f32>,
     top_k: usize,
 ) -> Result<Vec<ChunkSearchResult>, String> {
+    if let Some(target) = on_platform(&project_path) {
+        let (vectors, project) = target?;
+        let hits = vectors
+            .search_chunks(project, &query_embedding, top_k)
+            .await
+            .map_err(|e| e.to_string())?;
+        return Ok(hits
+            .into_iter()
+            .map(|hit| {
+                let page_id = page_id_of(&hit.path);
+                ChunkSearchResult {
+                    chunk_id: format!("{page_id}#{}", hit.chunk_index),
+                    page_id,
+                    chunk_index: hit.chunk_index,
+                    chunk_text: hit.chunk_text,
+                    heading_path: hit.heading_path,
+                    score: 1.0 / (1.0 + hit.distance),
+                }
+            })
+            .collect());
+    }
     run_guarded_async("vector_search_chunks", async move {
         let lock = vectorstore_v2_lock(&project_path);
         let _guard = lock.read().await;
@@ -671,6 +743,13 @@ pub async fn vector_search_chunks(
 /// Delete every chunk belonging to a page. Used when a source document
 /// is removed, or before a full re-embed of a page whose content shrank.
 pub async fn vector_delete_page(project_path: String, page_id: String) -> Result<(), String> {
+    if let Some(target) = on_platform(&project_path) {
+        let (vectors, project) = target?;
+        return vectors
+            .delete_page(project, &page_rel(&page_id)?)
+            .await
+            .map_err(|e| e.to_string());
+    }
     run_guarded_async("vector_delete_page", async move {
         validate_page_id_for_v2(&page_id)?;
         let lock = vectorstore_v2_lock(&project_path);
@@ -710,6 +789,10 @@ pub async fn vector_delete_page(project_path: String, page_id: String) -> Result
 /// Total chunk count in the v2 table (not pages — chunks). Useful for
 /// "vector index has N chunks" status text.
 pub async fn vector_count_chunks(project_path: String) -> Result<usize, String> {
+    if let Some(target) = on_platform(&project_path) {
+        let (vectors, project) = target?;
+        return vectors.count_chunks(project).await.map_err(|e| e.to_string());
+    }
     run_guarded_async("vector_count_chunks", async move {
         let lock = vectorstore_v2_lock(&project_path);
         let _guard = lock.read().await;
@@ -749,6 +832,10 @@ pub async fn vector_count_chunks(project_path: String) -> Result<usize, String> 
 /// "Re-index all pages" so a rebuild reflects the current wiki tree
 /// exactly and removes chunks for deleted/renamed pages.
 pub async fn vector_clear_chunks(project_path: String) -> Result<(), String> {
+    if let Some(target) = on_platform(&project_path) {
+        let (vectors, project) = target?;
+        return vectors.clear(project).await.map_err(|e| e.to_string());
+    }
     run_guarded_async("vector_clear_chunks", async move {
         let lock = vectorstore_v2_lock(&project_path);
         let _guard = lock.write().await;
@@ -782,6 +869,10 @@ pub async fn vector_clear_chunks(project_path: String) -> Result<(), String> {
 /// an already-successful rebuild is not reported as failed if maintenance hits
 /// a platform-specific LanceDB error.
 pub async fn vector_optimize_chunks(project_path: String) -> Result<(), String> {
+    // pgvector keeps its own index; there is nothing to compact.
+    if let Some(target) = on_platform(&project_path) {
+        return target.map(|_| ());
+    }
     run_guarded_async("vector_optimize_chunks", async move {
         let lock = vectorstore_v2_lock(&project_path);
         let _guard = lock.write().await;
@@ -839,6 +930,10 @@ pub async fn vector_optimize_chunks(project_path: String) -> Result<(), String> 
 /// Settings → Embedding after upgrading. Returns 0 when v1 is absent or
 /// empty; otherwise returns the row count.
 pub async fn vector_legacy_row_count(project_path: String) -> Result<usize, String> {
+    // A platform Project never had the LanceDB table.
+    if let Some(target) = on_platform(&project_path) {
+        return target.map(|_| 0);
+    }
     run_guarded_async("vector_legacy_row_count", async move {
         let db = connect(&db_path(&project_path))
             .execute()
@@ -875,6 +970,9 @@ pub async fn vector_legacy_row_count(project_path: String) -> Result<usize, Stri
 /// after the user has re-indexed into v2 so the orphaned v1 table stops
 /// taking disk space. No-op if v1 isn't present.
 pub async fn vector_drop_legacy(project_path: String) -> Result<(), String> {
+    if let Some(target) = on_platform(&project_path) {
+        return target.map(|_| ());
+    }
     run_guarded_async("vector_drop_legacy", async move {
         let db = connect(&db_path(&project_path))
             .execute()

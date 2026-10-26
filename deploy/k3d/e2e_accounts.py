@@ -301,6 +301,25 @@ status, vector = alice2.rpc("embedding_fetch", {"text": "hi", "cfg": {"enabled":
 check("a named embedding model is called with the server's key and address",
       status == 200 and vector == [0.25, 0.5, 0.75] and Upstream.seen and Upstream.seen[-1]["headers"].get("authorization") == "Bearer sk-stub-secret", (status, vector))
 
+print("semantic search")
+for name in ("near", "far"):
+    alice2.rpc("write_file", {"path": f"{base}/wiki/vec/{name}.md", "contents": f"# {name.title()}\nunrelated words"})
+chunk = lambda i, v: {"chunk_index": i, "chunk_text": f"chunk {i}", "heading_path": "H", "embedding": v}
+check("an editor stores chunk vectors",
+      alice2.rpc("vector_upsert_chunks", {"projectPath": base, "pageId": "vec/near", "chunks": [chunk(0, [0.25, 0.5, 0.76])]})[0] == 200
+      and alice2.rpc("vector_upsert_chunks", {"projectPath": base, "pageId": "vec/far", "chunks": [chunk(0, [9, 9, 9])]})[0] == 200)
+check("a viewer cannot", dana.rpc("vector_upsert_chunks", {"projectPath": base, "pageId": "vec/far", "chunks": [chunk(0, [1, 1, 1])]})[0] == 403)
+check("an outsider cannot count them", carol.rpc("vector_count_chunks", {"projectPath": base})[0] == 403)
+check("the chunks are counted", alice2.rpc("vector_count_chunks", {"projectPath": base})[1] == 2)
+status, hits = alice2.rpc("vector_search_chunks", {"projectPath": base, "queryEmbedding": [0.25, 0.5, 0.75], "topK": 5})
+check("the nearest chunk comes first", status == 200 and [h["page_id"] for h in hits] == ["vec/near", "vec/far"], hits)
+status, found = alice2.rpc("search_project", {"projectPath": base, "query": "quasar", "embeddingConfig": {
+    "enabled": True, "endpoint": "", "apiKey": "", "model": "m", "serverModelId": "stub-embed"}})
+paths = [r["path"] for r in found["results"]] if status == 200 else found
+check("a search with no keyword match still finds the page by meaning", status == 200 and "wiki/vec/near.md" in paths, found)
+check("clearing removes them", alice2.rpc("vector_clear_chunks", {"projectPath": base})[0] == 200
+      and alice2.rpc("vector_count_chunks", {"projectPath": base})[1] == 0)
+
 print("ingest on the server")
 src = f"{base}/raw/sources/note.md"
 alice2.rpc("write_file", {"path": src, "contents": "# Note\nExtreme ultraviolet lithography uses 13.5 nm light."})

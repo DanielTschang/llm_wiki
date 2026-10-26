@@ -670,6 +670,7 @@ mod tests {
 
     fn fixture() -> Fixture {
         let platform = Platform {
+            vectors: None,
             files: Arc::new(MemoryStore::new()),
             streams: None,
             locator: ProjectLocator::default(),

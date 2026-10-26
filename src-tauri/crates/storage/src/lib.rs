@@ -10,8 +10,8 @@ mod accounts;
 mod blobs;
 mod connect;
 mod derive;
-mod index;
 mod error;
+mod index;
 mod listing;
 mod locator;
 mod memory;
@@ -25,6 +25,7 @@ mod settings;
 mod sql;
 mod state;
 mod store;
+mod vectors;
 
 #[cfg(test)]
 mod conformance;
@@ -33,11 +34,11 @@ pub use accounts::{check_password, normalize_username, Accounts, AuthError, NewU
 pub use blobs::PgBlobs;
 pub use connect::{open_services, open_store, Services};
 pub use error::StoreError;
+pub use index::{LinkTarget, PageLinks, PageRef};
 pub use locator::ProjectLocator;
 pub use memory::MemoryStore;
 pub use objects::S3Config;
 pub use path::RelPath;
-pub use index::{LinkTarget, PageLinks, PageRef};
 pub use pg::{migrate, PgFiles, DEFAULT_MAX_VERSIONS};
 pub use projects::{Member, ProjectInfo, Projects, Role};
 pub use route::{blob_kind, route, Backend};
@@ -47,3 +48,4 @@ pub use state::{PgState, MAX_STATE_BYTES};
 pub use store::{
     BlobStreams, Body, ByteStream, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx,
 };
+pub use vectors::{ActiveModel, ChunkHit, ChunkInput, ChunkVectors, MemoryVectors, PgVectors};

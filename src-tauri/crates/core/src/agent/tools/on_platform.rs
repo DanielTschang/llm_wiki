@@ -385,6 +385,7 @@ mod tests {
             path: locator.project_path(id),
             id,
             platform: Platform {
+                vectors: None,
                 files: Arc::new(MemoryStore::new()),
                 streams: None,
                 locator,

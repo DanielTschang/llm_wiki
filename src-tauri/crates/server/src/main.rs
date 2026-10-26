@@ -117,6 +117,7 @@ async fn run(args: config::Args) -> Result<(), String> {
                 services.files.clone(),
                 Some(services.files.clone()),
                 llm_wiki_storage::ProjectLocator::default(),
+                Some(services.vectors.clone()),
             )?;
             bootstrap_admin(&services, &args).await?;
             let operator = services

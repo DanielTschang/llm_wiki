@@ -61,7 +61,10 @@ fn arguments(command: &str) -> Option<&'static [(&'static str, Access)]> {
         "copy_file" | "copy_directory" => &[("source", Read), ("destination", Write)],
         "search_project" | "agent_list_skills" => &[("projectPath", Read)],
         "get_page_links" => &[("projectPath", Read), ("filePath", Read)],
-        "find_related_wiki_pages" => &[("projectPath", Read)],
+        "find_related_wiki_pages" | "vector_search_chunks" | "vector_count_chunks"
+        | "vector_legacy_row_count" => &[("projectPath", Read)],
+        "vector_upsert_chunks" | "vector_delete_page" | "vector_clear_chunks"
+        | "vector_optimize_chunks" | "vector_drop_legacy" => &[("projectPath", Write)],
         "agent_start_turn"
         | "agent_start_turn_stream"
         | "agent_cancel_turn"
@@ -209,6 +212,8 @@ mod tests {
             "write_file_atomic",
             "create_directory",
             "preprocess_file",
+            "vector_upsert_chunks",
+            "vector_clear_chunks",
         ] {
             let rules = arguments(command).unwrap();
             assert!(rules.iter().all(|(_, a)| *a == Access::Write), "{command}");
@@ -220,6 +225,7 @@ mod tests {
             "search_project",
             "get_page_links",
             "find_related_wiki_pages",
+            "vector_search_chunks",
             "agent_start_turn",
         ] {
             let rules = arguments(command).unwrap();

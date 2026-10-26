@@ -3,8 +3,8 @@ use std::sync::Arc;
 use sqlx::postgres::PgPoolOptions;
 
 use crate::{
-    migrate, Accounts, LlmUsage, PgBlobs, PgFiles, PgState, Projects, RoutedFiles, S3Config,
-    ServerSettings, StoreError,
+    migrate, Accounts, ActiveModel, LlmUsage, PgBlobs, PgFiles, PgState, PgVectors, Projects,
+    RoutedFiles, S3Config, ServerSettings, StoreError,
 };
 
 /// Everything a platform server needs from the database and the object store.
@@ -15,6 +15,8 @@ pub struct Services {
     /// The blob store on its own, for what the file tree does not do: removing
     /// a Project's objects when the Project is deleted.
     pub blobs: Arc<PgBlobs>,
+    /// Chunk embeddings, for the embedding model the catalogue designates.
+    pub vectors: Arc<PgVectors>,
     pub accounts: Accounts,
     pub projects: Projects,
     pub settings: ServerSettings,
@@ -44,6 +46,10 @@ pub async fn open_services(
     Ok(Services {
         files: Arc::new(files),
         blobs,
+        vectors: Arc::new(PgVectors::new(
+            pool.clone(),
+            ActiveModel::Catalogue(ServerSettings::new(pool.clone())),
+        )),
         accounts: Accounts::new(pool.clone()),
         projects: Projects::new(pool.clone()),
         settings: ServerSettings::new(pool.clone()),

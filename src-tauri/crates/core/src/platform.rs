@@ -8,7 +8,7 @@
 
 use std::sync::{Arc, OnceLock};
 
-use llm_wiki_storage::{BlobStreams, ProjectFiles, ProjectLocator};
+use llm_wiki_storage::{BlobStreams, ChunkVectors, ProjectFiles, ProjectLocator};
 
 pub struct Platform {
     pub files: Arc<dyn ProjectFiles>,
@@ -16,6 +16,8 @@ pub struct Platform {
     /// too large to hold in memory.
     pub streams: Option<Arc<dyn BlobStreams>>,
     pub locator: ProjectLocator,
+    /// Chunk embeddings for semantic search. `None` leaves search to keywords.
+    pub vectors: Option<Arc<dyn ChunkVectors>>,
 }
 
 static PLATFORM: OnceLock<Platform> = OnceLock::new();
@@ -25,12 +27,14 @@ pub fn install(
     files: Arc<dyn ProjectFiles>,
     streams: Option<Arc<dyn BlobStreams>>,
     locator: ProjectLocator,
+    vectors: Option<Arc<dyn ChunkVectors>>,
 ) -> Result<(), String> {
     PLATFORM
         .set(Platform {
             files,
             streams,
             locator,
+            vectors,
         })
         .map_err(|_| "the project file store is already installed".to_string())
 }

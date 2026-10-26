@@ -543,9 +543,6 @@ pub async fn search_project_inner(
     let mut vector_rank: BTreeMap<String, usize> = BTreeMap::new();
     let mut vector_score: BTreeMap<String, f32> = BTreeMap::new();
     let mut vector_hits = 0;
-    // The vector index is still LanceDB on local disk; until it moves to
-    // pgvector a platform server answers from keywords alone.
-    let query_embedding = query_embedding.filter(|_| crate::platform::get().is_none());
     if let Some(embedding) = query_embedding {
         if !embedding.is_empty() {
             match search_by_embedding(&project_path, embedding, limit.max(10)).await {
@@ -2623,6 +2620,7 @@ mod tests {
             Wiki {
                 root: locator.project_path(id),
                 platform: Platform {
+                    vectors: None,
                     files,
                     streams: None,
                     locator,
