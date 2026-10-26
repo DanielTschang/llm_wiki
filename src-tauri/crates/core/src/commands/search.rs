@@ -1,10 +1,8 @@
 use std::collections::{BTreeMap, BTreeSet};
-use std::fs;
 use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
-use walkdir::WalkDir;
 
 use llm_wiki_storage::RelPath;
 
@@ -154,12 +152,8 @@ pub async fn get_page_links(
     project_path: String,
     file_path: String,
 ) -> Result<PageLinksResponse, String> {
-    if let Some(platform) = crate::platform::get() {
-        return get_page_links_from_store(platform, &project_path, &file_path).await;
-    }
-    tokio::task::spawn_blocking(move || get_page_links_inner(&project_path, &file_path))
-        .await
-        .map_err(|err| format!("page links worker failed: {err}"))?
+    let platform = crate::platform::require()?;
+    get_page_links_from_store(platform, &project_path, &file_path).await
 }
 
 /// `get_page_links` for a Project held in the storage layer.
@@ -239,191 +233,21 @@ async fn get_page_links_from_store(
     })
 }
 
-/// Build link relationships from Markdown source rather than the UI's lazy
-/// file tree. Canonical paths enforce the project/wiki boundary, while the
-/// returned paths stay project-relative so all desktop platforms share one
-/// wire format and Windows separators never leak into frontend routing.
-fn get_page_links_inner(project_path: &str, file_path: &str) -> Result<PageLinksResponse, String> {
-    let project = fs::canonicalize(project_path)
-        .map_err(|err| format!("Failed to resolve project path: {err}"))?;
-    let file =
-        fs::canonicalize(file_path).map_err(|err| format!("Failed to resolve page path: {err}"))?;
-    let wiki_root = project.join("wiki");
-    if !file.starts_with(&wiki_root)
-        || !file.is_file()
-        || file.extension().and_then(|value| value.to_str()) != Some("md")
-    {
-        return Err("Page links target must be an existing Markdown file under wiki/".to_string());
-    }
 
-    let mut pages = BTreeMap::<String, GraphPage>::new();
-    let canonical_project = project.to_string_lossy();
-    for entry in WalkDir::new(&wiki_root).into_iter().filter_map(Result::ok) {
-        if pages.len() >= MAX_SEARCH_FILES
-            || !entry.file_type().is_file()
-            || entry.path().extension().and_then(|value| value.to_str()) != Some("md")
-        {
-            continue;
-        }
-        let Ok(content) = fs::read_to_string(entry.path()) else {
-            continue;
-        };
-        let path = relative_to_project(&canonical_project, entry.path());
-        let title = extract_title(
-            &content,
-            entry
-                .path()
-                .file_name()
-                .and_then(|value| value.to_str())
-                .unwrap_or_default(),
-        );
-        pages.insert(
-            normalize_path(&path),
-            GraphPage {
-                path,
-                title,
-                links: extract_graph_links(&content),
-                content,
-            },
-        );
-    }
 
-    let current_path = normalize_path(&relative_to_project(&canonical_project, &file));
-    page_links_from(&pages, &current_path)
-}
-
-/// Outgoing links, backlinks and missing targets of one page, given every
-/// page of the wiki keyed by its project-relative path.
-fn page_links_from(
-    pages: &BTreeMap<String, GraphPage>,
-    current_path: &str,
-) -> Result<PageLinksResponse, String> {
-    let current = pages
-        .get(current_path)
-        .ok_or_else(|| "Page is not available in the current wiki index".to_string())?;
-    let mut outgoing = Vec::new();
-    let mut missing = Vec::new();
-    for link in &current.links {
-        if let Some(target_path) = resolve_reader_wikilink(pages, link) {
-            if target_path.as_str() == current_path {
-                continue;
-            }
-            if let Some(target) = pages.get(target_path) {
-                outgoing.push(PageLinkEntry {
-                    title: target.title.clone(),
-                    path: Some(target.path.clone()),
-                    snippet: None,
-                });
-            }
-        } else {
-            missing.push(PageLinkEntry {
-                title: link.clone(),
-                path: None,
-                snippet: None,
-            });
-        }
-    }
-
-    let mut backlinks = Vec::new();
-    for (path, page) in pages {
-        if path == current_path {
-            continue;
-        }
-        let links_here = page.links.iter().any(|link| {
-            resolve_reader_wikilink(pages, link)
-                .is_some_and(|target| target.as_str() == current_path)
-        });
-        if links_here {
-            backlinks.push(PageLinkEntry {
-                title: page.title.clone(),
-                path: Some(page.path.clone()),
-                snippet: Some(build_snippet(&page.content, &current.title)),
-            });
-        }
-    }
-
-    outgoing.sort_by(|a, b| a.title.cmp(&b.title));
-    outgoing.dedup_by(|a, b| a.path == b.path);
-    backlinks.sort_by(|a, b| a.title.cmp(&b.title));
-    missing.sort_by(|a, b| a.title.cmp(&b.title));
-    missing.dedup_by(|a, b| a.title == b.title);
-    Ok(PageLinksResponse {
-        outgoing,
-        backlinks,
-        missing,
-    })
-}
-
-/// Mirror `resolveRelatedSlug` in the frontend reader. Path-shaped links must
-/// match their project-relative path exactly; bare links resolve by exact
-/// filename after adding `.md`. Deliberately avoid title and fuzzy aliases so
-/// the links panel never claims a target that the rendered page cannot open.
-fn resolve_reader_wikilink<'a>(
-    pages: &'a BTreeMap<String, GraphPage>,
-    link: &str,
-) -> Option<&'a String> {
-    let link = link.trim().replace('\\', "/");
-    if link.contains('/') {
-        return pages.get_key_value(&link).map(|(path, _)| path);
-    }
-    let filename = if link.ends_with(".md") {
-        link
-    } else {
-        format!("{link}.md")
-    };
-    pages.keys().find(|path| {
-        std::path::Path::new(path.as_str())
-            .file_name()
-            .is_some_and(|name| name == filename.as_str())
-    })
-}
 
 /// Every Markdown page of the wiki as (path, content), at most
 /// `MAX_SEARCH_FILES`. On a platform server the paths are Project paths under
 /// `/projects/<uuid>`; otherwise they are real files under `project_path`.
 async fn load_wiki_pages(project_path: &str) -> Result<Vec<(PathBuf, String)>, String> {
-    if let Some(platform) = crate::platform::get() {
-        let root = Path::new(project_path);
-        return Ok(platform
-            .wiki_markdown(project_path, MAX_SEARCH_FILES)
-            .await?
-            .into_iter()
-            .map(|(rel, content)| (root.join(rel), content))
-            .collect());
-    }
-    let project_path = project_path.to_string();
-    tokio::task::spawn_blocking(move || {
-        let wiki_root = Path::new(&project_path).join("wiki");
-        let mut pages = Vec::new();
-        if !wiki_root.exists() {
-            return pages;
-        }
-        let mut searched_files = 0usize;
-        for entry in WalkDir::new(&wiki_root).into_iter().filter_map(Result::ok) {
-            if !entry.file_type().is_file()
-                || !entry
-                    .path()
-                    .extension()
-                    .and_then(|s| s.to_str())
-                    .is_some_and(|ext| ext.eq_ignore_ascii_case("md"))
-            {
-                continue;
-            }
-            searched_files += 1;
-            if searched_files > MAX_SEARCH_FILES {
-                eprintln!(
-                    "[Search] stopped scanning wiki after {MAX_SEARCH_FILES} markdown files in {project_path}"
-                );
-                break;
-            }
-            if let Ok(content) = fs::read_to_string(entry.path()) {
-                pages.push((entry.path().to_path_buf(), content));
-            }
-        }
-        pages
-    })
-    .await
-    .map_err(|err| format!("wiki scan failed: {err}"))
+    let platform = crate::platform::require()?;
+    let root = Path::new(project_path);
+    Ok(platform
+        .wiki_markdown(project_path, MAX_SEARCH_FILES)
+        .await?
+        .into_iter()
+        .map(|(rel, content)| (root.join(rel), content))
+        .collect())
 }
 
 pub async fn resolve_query_embedding(
@@ -964,25 +788,6 @@ async fn search_by_embedding(
     Ok(ranked)
 }
 
-/// [`materialize_with`] reading each page from disk.
-#[cfg(test)]
-fn materialize_vector_only_results(
-    vector_results: &[PageVectorResult],
-    page_paths_by_vector_id: &BTreeMap<String, String>,
-    legacy_page_paths: &BTreeMap<String, String>,
-    project_path: &str,
-    results: &mut Vec<ProjectSearchResult>,
-    include_content: bool,
-) {
-    materialize_with(
-        vector_results,
-        page_paths_by_vector_id,
-        legacy_page_paths,
-        results,
-        include_content,
-        |rel| fs::read_to_string(Path::new(project_path).join(rel)).ok(),
-    );
-}
 
 /// Adds a result for each vector hit whose page the keyword scan did not
 /// already return. `read` gives a page's text from its project-relative path.
@@ -1407,9 +1212,6 @@ pub(crate) async fn fetch_embedding_batch(
     parse_embedding_batch_values(&data, texts.len())
 }
 
-pub(crate) fn supports_embedding_batch(cfg: &SearchEmbeddingConfig) -> bool {
-    !is_google_embedding_config(cfg) && !is_doubao_multimodal_embedding_config(cfg)
-}
 
 fn parse_embedding_batch_values(data: &Value, expected: usize) -> Result<Vec<Vec<f32>>, String> {
     let entries = data
@@ -1914,23 +1716,10 @@ fn vector_page_id(path: &str) -> Option<String> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::path::PathBuf;
-    use std::sync::atomic::{AtomicU64, Ordering};
+    
+    
 
-    fn tmp_project() -> PathBuf {
-        static COUNTER: AtomicU64 = AtomicU64::new(0);
-        let id = COUNTER.fetch_add(1, Ordering::SeqCst);
-        let path = std::env::temp_dir().join(format!("llm-wiki-search-test-{id}"));
-        let _ = fs::remove_dir_all(&path);
-        fs::create_dir_all(path.join("wiki/concepts")).unwrap();
-        path
-    }
 
-    fn write_page(root: &Path, rel: &str, content: &str) {
-        let path = root.join(rel);
-        fs::create_dir_all(path.parent().unwrap()).unwrap();
-        fs::write(path, content).unwrap();
-    }
 
     fn result(path: &str) -> ProjectSearchResult {
         ProjectSearchResult {
@@ -2256,86 +2045,7 @@ mod tests {
         assert_eq!(graph_result_quota(10, 100), 2);
     }
 
-    #[test]
-    fn vector_only_materialization_uses_chunk_snippet_and_any_wiki_subdir() {
-        let root = tmp_project();
-        write_page(
-            &root,
-            "wiki/custom/deep-page.md",
-            "---\ntitle: Deep Page\n---\n\n# Deep Page\n\nThe literal query is absent here.",
-        );
-        let vector_results = vec![PageVectorResult {
-            id: "custom/deep-page".to_string(),
-            score: 0.91,
-            chunk_text: "A semantic chunk explains the actual reason for retrieval.".to_string(),
-            heading_path: "Section > Detail".to_string(),
-        }];
-        let mut results = Vec::new();
-        let pages = BTreeMap::from([(
-            "custom/deep-page".to_string(),
-            "wiki/custom/deep-page.md".to_string(),
-        )]);
 
-        materialize_vector_only_results(
-            &vector_results,
-            &pages,
-            &BTreeMap::new(),
-            &root.to_string_lossy(),
-            &mut results,
-            false,
-        );
-
-        assert_eq!(results.len(), 1);
-        assert_eq!(results[0].path, "wiki/custom/deep-page.md");
-        assert_eq!(results[0].title, "Deep Page");
-        assert_eq!(results[0].vector_score, Some(0.91));
-        assert!(results[0].snippet.contains("Section > Detail"));
-        assert!(results[0].snippet.contains("semantic chunk"));
-        let _ = fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn vector_only_materialization_prefers_qualified_rows_over_legacy_rows() {
-        let root = tmp_project();
-        write_page(&root, "wiki/entities/topic.md", "# Topic\n\nCurrent content.");
-        let vector_results = vec![
-            PageVectorResult {
-                id: "topic".to_string(),
-                score: 0.99,
-                chunk_text: "Stale legacy chunk".to_string(),
-                heading_path: String::new(),
-            },
-            PageVectorResult {
-                id: "entities/topic".to_string(),
-                score: 0.82,
-                chunk_text: "Current qualified chunk".to_string(),
-                heading_path: String::new(),
-            },
-        ];
-        let qualified = BTreeMap::from([(
-            "entities/topic".to_string(),
-            "wiki/entities/topic.md".to_string(),
-        )]);
-        let legacy = BTreeMap::from([(
-            "topic".to_string(),
-            "wiki/entities/topic.md".to_string(),
-        )]);
-        let mut results = Vec::new();
-
-        materialize_vector_only_results(
-            &vector_results,
-            &qualified,
-            &legacy,
-            &root.to_string_lossy(),
-            &mut results,
-            false,
-        );
-
-        assert_eq!(results.len(), 1);
-        assert_eq!(results[0].vector_score, Some(0.82));
-        assert!(results[0].snippet.contains("Current qualified chunk"));
-        let _ = fs::remove_dir_all(root);
-    }
 
     #[test]
     fn vector_snippet_empty_chunk_does_not_echo_query() {
@@ -2349,217 +2059,11 @@ mod tests {
         assert_eq!(build_vector_snippet(&vector), "");
     }
 
-    #[tokio::test]
-    async fn keyword_search_prefers_filename_exact_match() {
-        let root = tmp_project();
-        write_page(
-            &root,
-            "wiki/concepts/attention.md",
-            "---\ntitle: Attention\n---\n\n# Attention\n\nbody about attention.",
-        );
-        write_page(
-            &root,
-            "wiki/concepts/random.md",
-            "---\ntitle: Random\n---\n\n# Random\n\nattention is mentioned briefly.",
-        );
 
-        let out = search_project_inner(
-            root.to_string_lossy().to_string(),
-            "attention".into(),
-            20,
-            false,
-            None,
-        )
-        .await
-        .unwrap();
 
-        assert_eq!(out.mode, "keyword");
-        assert_eq!(out.results[0].title, "Attention");
-        assert!(out.results[0].title_match);
-        assert!(out.results[0].score > 100.0);
-        let _ = fs::remove_dir_all(root);
-    }
 
-    #[tokio::test]
-    async fn keyword_search_always_blends_available_graph_neighbors() {
-        let root = tmp_project();
-        write_page(
-            &root,
-            "wiki/concepts/agent.md",
-            "---\ntitle: Agent Runtime\n---\n\n# Agent Runtime\n\nagent runtime details. [[Tool Registry]]",
-        );
-        write_page(
-            &root,
-            "wiki/concepts/tool-registry.md",
-            "---\ntitle: Tool Registry\n---\n\n# Tool Registry\n\nDefines callable tools.",
-        );
-        write_page(
-            &root,
-            "wiki/concepts/unrelated.md",
-            "---\ntitle: Unrelated\n---\n\n# Unrelated\n\nNo graph connection.",
-        );
 
-        let out = search_project_inner(
-            root.to_string_lossy().to_string(),
-            "agent runtime".into(),
-            10,
-            false,
-            None,
-        )
-        .await
-        .unwrap();
 
-        assert_eq!(out.mode, "hybrid");
-        assert_eq!(out.graph_hits, 1);
-        assert!(out
-            .results
-            .iter()
-            .any(|result| result.title == "Agent Runtime"));
-        assert!(out.results.iter().any(|result| {
-            result.title == "Tool Registry"
-                && result.snippet.contains("Graph neighbor")
-                && result.graph_related_to == vec!["Agent Runtime"]
-        }));
-        assert!(!out.results.iter().any(|result| result.title == "Unrelated"));
-        let _ = fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn page_links_resolve_outgoing_backlinks_and_missing_targets() {
-        let root = tmp_project();
-        write_page(
-            &root,
-            "wiki/concepts/Alpha.md",
-            "---\ntitle: Alpha\n---\n# Alpha\n\n[[Beta|label]], [[Alpha]], [[Title Only]], and [[Missing Page]].",
-        );
-        write_page(
-            &root,
-            "wiki/concepts/Beta.md",
-            "---\ntitle: Beta\n---\n# Beta\n\nBeta details.",
-        );
-        write_page(
-            &root,
-            "wiki/concepts/different-filename.md",
-            "---\ntitle: Title Only\n---\n# Title Only\n",
-        );
-        write_page(
-            &root,
-            "wiki/concepts/gamma.md",
-            "---\ntitle: Gamma\n---\n# Gamma\n\nGamma references [[Alpha]] here.",
-        );
-
-        let links = get_page_links_inner(
-            root.to_str().unwrap(),
-            root.join("wiki/concepts/Alpha.md").to_str().unwrap(),
-        )
-        .unwrap();
-        assert_eq!(links.outgoing.len(), 1);
-        assert_eq!(links.outgoing[0].title, "Beta");
-        assert_eq!(links.backlinks.len(), 1);
-        assert_eq!(links.backlinks[0].title, "Gamma");
-        assert!(links.backlinks[0]
-            .snippet
-            .as_deref()
-            .unwrap()
-            .contains("Alpha"));
-        assert_eq!(links.missing.len(), 2);
-        assert!(links
-            .missing
-            .iter()
-            .any(|entry| entry.title == "Missing Page"));
-        assert!(links
-            .missing
-            .iter()
-            .any(|entry| entry.title == "Title Only"));
-        let _ = fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn page_links_require_markdown_input_and_exact_reader_paths() {
-        let root = tmp_project();
-        write_page(
-            &root,
-            "wiki/concepts/current.md",
-            "[[wiki/concepts/target.md]] [[target#section]]",
-        );
-        write_page(&root, "wiki/concepts/target.md", "# Target");
-        write_page(&root, "wiki/concepts/not-markdown.txt", "text");
-
-        let links = get_page_links_inner(
-            root.to_str().unwrap(),
-            root.join("wiki/concepts/current.md").to_str().unwrap(),
-        )
-        .unwrap();
-        assert_eq!(links.outgoing.len(), 1);
-        assert_eq!(
-            links.outgoing[0].path.as_deref(),
-            Some("wiki/concepts/target.md")
-        );
-        assert_eq!(links.missing.len(), 1);
-        assert_eq!(links.missing[0].title, "target#section");
-
-        let error = get_page_links_inner(
-            root.to_str().unwrap(),
-            root.join("wiki/concepts/not-markdown.txt")
-                .to_str()
-                .unwrap(),
-        )
-        .unwrap_err();
-        assert!(error.contains("Markdown"));
-        let _ = fs::remove_dir_all(root);
-    }
-
-    #[tokio::test]
-    async fn keyword_search_handles_cjk_bigram_queries() {
-        let root = tmp_project();
-        write_page(
-            &root,
-            "wiki/concepts/tacit.md",
-            "---\ntitle: 默会知识\n---\n\n# 默会知识\n\n默会知识强调难以言明的实践经验。",
-        );
-
-        let out = search_project_inner(
-            root.to_string_lossy().to_string(),
-            "默会知识".into(),
-            20,
-            false,
-            None,
-        )
-        .await
-        .unwrap();
-
-        assert_eq!(out.results[0].title, "默会知识");
-        assert!(out.results[0].snippet.contains("默会知识"));
-        let _ = fs::remove_dir_all(root);
-    }
-
-    #[tokio::test]
-    async fn keyword_search_phrase_in_content_beats_scattered_tokens() {
-        let root = tmp_project();
-        write_page(
-            &root,
-            "wiki/concepts/phrase.md",
-            "---\ntitle: Phrase\n---\n\n# Phrase\n\nThe phrase vector database appears together.",
-        );
-        write_page(
-            &root,
-            "wiki/concepts/scattered.md",
-            "---\ntitle: Scattered\n---\n\n# Scattered\n\nvector appears here. database appears later.",
-        );
-
-        let out = search_project_inner(
-            root.to_string_lossy().to_string(),
-            "vector database".into(),
-            20,
-            false,
-            None,
-        )
-        .await
-        .unwrap();
-
-        assert_eq!(out.results[0].title, "Phrase");
-        let _ = fs::remove_dir_all(root);
-    }
     #[test]
     fn parses_openai_batch_vectors_in_input_order() {
         let response = json!({

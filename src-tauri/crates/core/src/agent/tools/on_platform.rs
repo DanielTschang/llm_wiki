@@ -94,6 +94,14 @@ async fn wiki_sources(platform: &Platform, project_path: &str) -> Res<Vec<WikiPa
         .collect())
 }
 
+/// The graph context of every wiki page, by path.
+pub(super) async fn context_index(
+    platform: &Platform,
+    project_path: &str,
+) -> Res<BTreeMap<String, AgentKnowledgeContext>> {
+    Ok(knowledge_snapshot_from(wiki_sources(platform, project_path).await?, None).1)
+}
+
 async fn read_page(platform: &Platform, input: &Value, project_path: &str) -> Res<Value> {
     let path = input
         .get("path")

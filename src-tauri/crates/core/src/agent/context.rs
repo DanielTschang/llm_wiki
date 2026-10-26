@@ -1,4 +1,3 @@
-use std::fs;
 use std::path::{Component, Path};
 
 use super::router::{QueryIntent, RouterDecision};
@@ -24,22 +23,12 @@ pub struct ProjectContext {
     pub agent_workspace: String,
 }
 
-pub fn load_project_context(project_path: &str) -> ProjectContext {
-    let root = Path::new(project_path);
-    ProjectContext {
-        overview: read_trimmed(root.join("overview.md"), MAX_OVERVIEW_CHARS)
-            .or_else(|| read_trimmed(root.join("wiki").join("overview.md"), MAX_OVERVIEW_CHARS)),
-        schema: read_trimmed(root.join("schema.md"), MAX_SCHEMA_CHARS)
-            .or_else(|| read_trimmed(root.join("wiki").join("schema.md"), MAX_SCHEMA_CHARS)),
-        agent_workspace: agent_workspace_display(root),
-    }
-}
 
 /// [`load_project_context`] for async callers: on a platform server the
 /// overview and schema come from the storage layer.
 pub async fn load_project_context_async(project_path: &str) -> ProjectContext {
     let Some(platform) = crate::platform::get() else {
-        return load_project_context(project_path);
+        return ProjectContext::default();
     };
     let read = |rel: &'static str, max_chars: usize| async move {
         let text = platform.read_text(project_path, rel).await?;
@@ -300,52 +289,10 @@ pub async fn load_explicit_context_files(
     project_path: &str,
     requested: &[String],
 ) -> Vec<(String, String)> {
-    if let Some(platform) = crate::platform::get() {
-        return load_explicit_from_store(platform, project_path, requested).await;
+    match crate::platform::get() {
+        Some(platform) => load_explicit_from_store(platform, project_path, requested).await,
+        None => Vec::new(),
     }
-    let root = Path::new(project_path);
-    let Ok(root_canon) = root.canonicalize() else {
-        return Vec::new();
-    };
-    let mut out = Vec::new();
-    let mut remaining = MAX_EXPLICIT_CONTEXT_CHARS;
-    for requested_path in requested.iter().take(MAX_EXPLICIT_CONTEXT_FILES) {
-        let Some(normalized) = explicit_relative(requested_path) else {
-            continue;
-        };
-        let relative = Path::new(&normalized);
-        let candidate = root.join(relative);
-        let Ok(candidate_canon) = candidate.canonicalize() else {
-            continue;
-        };
-        if !candidate_canon.starts_with(&root_canon) || !candidate_canon.is_file() {
-            continue;
-        }
-        // Reuse the application's canonical reader so @ attachments support
-        // the same PDF, Office, image, media, and text formats as previews.
-        // read_file moves blocking parsers onto Tauri's blocking pool.
-        let Ok(content) = crate::commands::fs::read_file(
-            candidate_canon.to_string_lossy().into_owned(),
-            Some(false),
-        )
-        .await
-        else {
-            continue;
-        };
-        let fitted = trim_chars(content.trim(), remaining.min(MAX_EXPLICIT_FILE_CHARS));
-        if fitted.is_empty() {
-            continue;
-        }
-        remaining = remaining.saturating_sub(fitted.chars().count());
-        // The request uses a project-relative path so callers cannot select an
-        // arbitrary host file. Only after canonical containment succeeds do we
-        // expose the absolute path to the model for unambiguous tool use.
-        out.push((candidate.to_string_lossy().replace('\\', "/"), fitted));
-        if remaining == 0 {
-            break;
-        }
-    }
-    out
 }
 
 /// A requested attachment as a clean project-relative path, or `None` if it
@@ -414,15 +361,6 @@ async fn load_explicit_from_store(
     out
 }
 
-fn read_trimmed(path: impl AsRef<Path>, max_chars: usize) -> Option<String> {
-    let raw = fs::read_to_string(path).ok()?;
-    let trimmed = raw.trim();
-    if trimmed.is_empty() {
-        None
-    } else {
-        Some(trim_chars(trimmed, max_chars))
-    }
-}
 
 pub fn trim_chars(value: &str, max_chars: usize) -> String {
     if value.chars().count() <= max_chars {
@@ -513,36 +451,6 @@ mod tests {
         assert!(rendered.contains("Latest version: agent via wiki.write_page at 123"));
     }
 
-    #[tokio::test]
-    async fn explicit_context_files_are_project_scoped() {
-        let root =
-            std::env::temp_dir().join(format!("llm-wiki-context-files-{}", std::process::id()));
-        let _ = fs::remove_dir_all(&root);
-        fs::create_dir_all(root.join("wiki")).unwrap();
-        fs::create_dir_all(root.join(".llm-wiki")).unwrap();
-        fs::write(root.join("wiki/page.md"), "selected evidence").unwrap();
-        fs::write(root.join("wiki/figure.png"), [0_u8, 1, 2, 3]).unwrap();
-        fs::write(root.join(".llm-wiki/secret.md"), "hidden secret").unwrap();
-
-        let files = load_explicit_context_files(
-            root.to_str().unwrap(),
-            &[
-                "wiki/page.md".to_string(),
-                "wiki/figure.png".to_string(),
-                "../outside.md".to_string(),
-                ".llm-wiki/secret.md".to_string(),
-            ],
-        )
-        .await;
-        assert_eq!(files.len(), 2);
-        assert_eq!(
-            Path::new(&files[0].0).canonicalize().unwrap(),
-            root.join("wiki/page.md").canonicalize().unwrap()
-        );
-        assert_eq!(files[0].1, "selected evidence");
-        assert!(files[1].1.starts_with("[Image: figure.png"));
-        let _ = fs::remove_dir_all(root);
-    }
 
     #[test]
     fn explicit_file_contents_cannot_close_context_markup() {

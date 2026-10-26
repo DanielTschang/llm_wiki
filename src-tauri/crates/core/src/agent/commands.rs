@@ -3,7 +3,6 @@
 use std::sync::Arc;
 
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use uuid::Uuid;
 
 use crate::context::CoreContext;
@@ -277,136 +276,22 @@ fn resolve_platform_project(
 }
 
 fn resolve_agent_project(ctx: &CoreContext, project_id: &str) -> Result<AgentProjectEntry, String> {
-    if let Some(platform) = crate::platform::get() {
-        return resolve_platform_project(platform, project_id);
-    }
-    let decoded = percent_decode(project_id);
-    load_agent_projects(ctx)
-        .into_iter()
-        .find(|project| project.id == decoded || project_path_matches(&project.path, &decoded))
-        .ok_or_else(|| format!("Unknown project: {decoded}"))
+    let _ = ctx;
+    resolve_platform_project(crate::platform::require()?, project_id)
 }
 
-fn load_agent_projects(ctx: &CoreContext) -> Vec<AgentProjectEntry> {
-    let mut projects = Vec::new();
-    if let Some(parsed) = load_agent_app_state(ctx) {
-        if let Some(registry) = parsed.get("projectRegistry").and_then(Value::as_object) {
-            for (id, value) in registry {
-                let path = value.get("path").and_then(Value::as_str).unwrap_or("");
-                if path.is_empty() {
-                    continue;
-                }
-                let path = normalize_path(path);
-                let name = value
-                    .get("name")
-                    .and_then(Value::as_str)
-                    .map(ToOwned::to_owned)
-                    .unwrap_or_else(|| project_name_from_path(&path));
-                projects.push(AgentProjectEntry {
-                    id: id.clone(),
-                    name,
-                    path,
-                });
-            }
-        }
-        if let Some(recents) = parsed.get("recentProjects").and_then(Value::as_array) {
-            for value in recents {
-                let path = value.get("path").and_then(Value::as_str).unwrap_or("");
-                if path.is_empty() {
-                    continue;
-                }
-                let path = normalize_path(path);
-                if projects.iter().any(|project| project.path == path) {
-                    continue;
-                }
-                let name = value
-                    .get("name")
-                    .and_then(Value::as_str)
-                    .map(ToOwned::to_owned)
-                    .unwrap_or_else(|| project_name_from_path(&path));
-                projects.push(AgentProjectEntry {
-                    id: read_project_id(&path).unwrap_or_else(|| path.clone()),
-                    name,
-                    path,
-                });
-            }
-        }
-    }
-    projects
-}
 
-fn load_agent_app_state(ctx: &CoreContext) -> Option<Value> {
-    let path = ctx.app_state_path()?;
-    let raw = std::fs::read_to_string(path).ok()?;
-    serde_json::from_str(&raw).ok()
-}
 
 fn load_agent_runtime_config(ctx: &CoreContext) -> AgentRuntimeConfig {
-    // On a platform server the models and their keys belong to the server and
-    // arrive with the request; nothing is read from the settings file.
-    if crate::platform::get().is_some() {
-        return AgentRuntimeConfig::default();
-    }
-    let Some(parsed) = load_agent_app_state(ctx) else {
-        return AgentRuntimeConfig::default();
-    };
-    AgentRuntimeConfig {
-        embedding: parsed
-            .get("embeddingConfig")
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-        llm: parsed
-            .get("llmConfig")
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-        web_search: parsed
-            .get("searchApiConfig")
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-        anytxt: parsed
-            .get("searchApiConfig")
-            .and_then(|value| value.get("anyTxt"))
-            .cloned()
-            .and_then(|value| serde_json::from_value(value).ok()),
-    }
+    // The models and their keys belong to the server and arrive with the
+    // request; nothing is read from a settings file.
+    let _ = ctx;
+    AgentRuntimeConfig::default()
 }
 
-fn read_project_id(path: &str) -> Option<String> {
-    let raw = std::fs::read_to_string(
-        std::path::Path::new(path)
-            .join(".llm-wiki")
-            .join("project.json"),
-    )
-    .ok()?;
-    serde_json::from_str::<Value>(&raw)
-        .ok()?
-        .get("id")
-        .and_then(Value::as_str)
-        .map(ToOwned::to_owned)
-}
 
-fn project_name_from_path(path: &str) -> String {
-    std::path::Path::new(path)
-        .file_name()
-        .and_then(|s| s.to_str())
-        .filter(|name| !name.is_empty())
-        .unwrap_or("Project")
-        .to_string()
-}
 
-fn project_path_matches(stored_path: &str, candidate: &str) -> bool {
-    let stored = normalize_path(stored_path);
-    let candidate = normalize_path(candidate);
-    if cfg!(windows) {
-        stored.eq_ignore_ascii_case(&candidate)
-    } else {
-        stored == candidate
-    }
-}
 
-fn normalize_path(path: &str) -> String {
-    path.replace('\\', "/").trim_end_matches('/').to_string()
-}
 
 fn percent_decode(input: &str) -> String {
     let bytes = input.as_bytes();

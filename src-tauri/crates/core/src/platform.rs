@@ -43,6 +43,14 @@ pub fn get() -> Option<&'static Platform> {
     PLATFORM.get()
 }
 
+/// The installed platform. Every file command needs one; there is no
+/// fallback to the host's disk.
+pub fn require() -> Result<&'static Platform, String> {
+    PLATFORM
+        .get()
+        .ok_or_else(|| "the project file store is not installed".to_string())
+}
+
 /// The error for a command that has not been moved onto the storage layer
 /// yet. In platform mode it must fail rather than fall back to the host disk.
 pub fn unsupported(command: &str) -> String {

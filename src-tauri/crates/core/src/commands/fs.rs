@@ -1,13 +1,10 @@
 use std::fs;
 use std::io::Read as IoRead;
 use std::path::Path;
-use std::thread;
-use std::time::Duration;
 
 use calamine::{open_workbook_auto, Data, ExcelDateTime, Reader};
 use office_oxide::Document;
 
-use crate::panic_guard::run_guarded;
 use crate::types::wiki::FileNode;
 
 /// Known binary formats that need special extraction
@@ -31,136 +28,17 @@ pub(crate) const EBOOK_EXTS: &[&str] = &["epub", "mobi"];
 pub(crate) const LEGACY_DOC_EXTS: &[&str] = &["pages", "numbers", "key"];
 pub(crate) const OFFICE_CACHE_FORMAT: &str = "anydoc-0.1.6-v1";
 
-fn require_absolute_path(operation: &str, path: &str) -> Result<(), String> {
-    if is_absolute_path_cross_platform(path) {
-        Ok(())
-    } else {
-        Err(format!(
-            "{operation} requires an absolute path; got relative path '{}'",
-            path
-        ))
-    }
-}
 
-fn is_absolute_path_cross_platform(path: &str) -> bool {
-    if path.is_empty() {
-        return false;
-    }
-    if Path::new(path).is_absolute() {
-        return true;
-    }
-
-    let bytes = path.as_bytes();
-    if bytes.len() >= 3
-        && bytes[1] == b':'
-        && bytes[0].is_ascii_alphabetic()
-        && matches!(bytes[2], b'/' | b'\\')
-    {
-        return true;
-    }
-
-    path.starts_with(r"\\") || path.starts_with("//")
-}
 
 pub async fn read_file(path: String, extract_images: Option<bool>) -> Result<String, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::read_file(p, &path, extract_images).await;
-    }
-    // `spawn_blocking` is REQUIRED, not a perf nicety. The body does
-    // synchronous PDF/Office text extraction (pdfium FFI, calamine,
-    // zip + image decode) that can take 10s+ on big files. Running
-    // that directly inside an `async fn` body would block the tokio
-    // worker thread it's scheduled on, starving every other async
-    // task on that worker (notably re-rendering the import progress
-    // UI, which is what motivated the async conversion in the first
-    // place). `spawn_blocking` moves the work to tokio's blocking
-    // pool where blocking-for-seconds is the contract.
-    tokio::task::spawn_blocking(move || {
-        run_guarded("read_file", || {
-            let p = Path::new(&path);
-            let ext = p
-                .extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("")
-                .to_lowercase();
-
-            if let Some(cached) = read_cache(p) {
-                return Ok(cached);
-            }
-
-            let include_images = extract_images.unwrap_or(true);
-
-            match ext.as_str() {
-                "pdf" => extract_pdf_text(&path, include_images),
-                "org" => extract_org_text(&path),
-                e if OFFICE_EXTS.contains(&e) => extract_office_text(&path, e),
-                e if EBOOK_EXTS.contains(&e) => crate::commands::ebook::extract_ebook_text(&path, e),
-                e if IMAGE_EXTS.contains(&e) => {
-                    let size = fs::metadata(&path).map(|m| m.len()).unwrap_or(0);
-                    Ok(format!("[Image: {} ({:.1} KB)]", p.file_name().unwrap_or_default().to_string_lossy(), size as f64 / 1024.0))
-                }
-                e if MEDIA_EXTS.contains(&e) => {
-                    let size = fs::metadata(&path).map(|m| m.len()).unwrap_or(0);
-                    Ok(format!("[Media: {} ({:.1} MB)]", p.file_name().unwrap_or_default().to_string_lossy(), size as f64 / 1048576.0))
-                }
-                e if LEGACY_DOC_EXTS.contains(&e) => {
-                    Ok(format!("[Document: {} — text extraction not supported for .{} format]",
-                        p.file_name().unwrap_or_default().to_string_lossy(), e))
-                }
-                _ => {
-                    match fs::read_to_string(&path) {
-                        Ok(content) => Ok(content),
-                        Err(e) => {
-                            let exists = p.exists();
-                            if !exists {
-                                Err(format!("File does not exist: '{}'", path))
-                            } else {
-                                Err(format!(
-                                    "Failed to read file '{}' as text: {} (likely binary, locked, or non-UTF-8)",
-                                    path, e,
-                                ))
-                            }
-                        }
-                    }
-                }
-            }
-        })
-    })
-    .await
-    .map_err(|e| format!("read_file blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::read_file(p, &path, extract_images).await
 }
 
 /// Pre-process a file and cache the extracted text.
 pub async fn preprocess_file(path: String) -> Result<String, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::preprocess_file(p, &path).await;
-    }
-    // See `read_file` above for why `spawn_blocking` is required.
-    tokio::task::spawn_blocking(move || {
-        run_guarded("preprocess_file", || {
-            let p = Path::new(&path);
-            let ext = p
-                .extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("")
-                .to_lowercase();
-
-            let text = match ext.as_str() {
-                "pdf" => extract_pdf_text(&path, false)?,
-                "org" => extract_org_text(&path)?,
-                e if OFFICE_EXTS.contains(&e) => extract_office_text(&path, e)?,
-                e if EBOOK_EXTS.contains(&e) => {
-                    crate::commands::ebook::extract_ebook_text(&path, e)?
-                }
-                _ => return Ok("no preprocessing needed".to_string()),
-            };
-
-            write_cache(p, &text)?;
-            Ok(text)
-        })
-    })
-    .await
-    .map_err(|e| format!("preprocess_file blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::preprocess_file(p, &path).await
 }
 
 pub(crate) fn cache_path_for(original: &Path) -> std::path::PathBuf {
@@ -186,63 +64,9 @@ pub(crate) fn uses_anydoc_cache(original: &Path) -> bool {
         .unwrap_or(false)
 }
 
-fn read_cache(original: &Path) -> Option<String> {
-    let cache_path = cache_path_for(original);
-    if uses_anydoc_cache(original)
-        && fs::read_to_string(cache_format_path_for(original))
-            .ok()?
-            .trim()
-            != OFFICE_CACHE_FORMAT
-    {
-        return None;
-    }
-    let original_modified = fs::metadata(original).ok()?.modified().ok()?;
-    let cache_modified = fs::metadata(&cache_path).ok()?.modified().ok()?;
-    if cache_modified >= original_modified {
-        fs::read_to_string(&cache_path).ok()
-    } else {
-        None
-    }
-}
 
-/// Return a fresh preprocessing cache for Agent source retrieval.
-///
-/// Binary imports remain the referenced source of record; this helper only
-/// exposes their text extraction and never causes parsing or cache writes from
-/// a search request. Keeping freshness checks here also prevents the Agent
-/// from quoting a cache after the original file changed externally.
-pub(crate) fn read_preprocessed_cache(original: &Path) -> Option<String> {
-    read_cache(original)
-}
 
-fn write_cache(original: &Path, text: &str) -> Result<(), String> {
-    let cache_path = cache_path_for(original);
-    if let Some(parent) = cache_path.parent() {
-        fs::create_dir_all(parent)
-            .map_err(|e| format!("Failed to create preprocessing cache directory: {e}"))?;
-    }
-    let format_path = cache_format_path_for(original);
-    if uses_anydoc_cache(original) {
-        // Remove the validity marker before replacing content. A crash or I/O
-        // error can then cause an extra rebuild, never acceptance of stale text.
-        let _ = fs::remove_file(&format_path);
-    }
-    fs::write(&cache_path, text).map_err(|e| format!("Failed to write cache: {e}"))?;
-    if uses_anydoc_cache(original) {
-        fs::write(&format_path, OFFICE_CACHE_FORMAT)
-            .map_err(|e| format!("Failed to write preprocessing cache format marker: {e}"))?;
-    }
-    Ok(())
-}
 
-/// Convert common Org syntax into Markdown-shaped text for ingestion and
-/// preview. The original `.org` file remains untouched in `raw/sources`.
-/// Source blocks are copied verbatim inside fences and are never executed.
-pub(crate) fn extract_org_text(path: &str) -> Result<String, String> {
-    let content = fs::read_to_string(path)
-        .map_err(|e| format!("Failed to read Org file '{}': {}", path, e))?;
-    Ok(org_to_markdown(&content))
-}
 
 pub(crate) fn org_to_markdown(content: &str) -> String {
     let normalized = content.replace("\r\n", "\n").replace('\r', "\n");
@@ -1241,315 +1065,48 @@ fn extract_odf_text(archive: &mut zip::ZipArchive<fs::File>) -> Result<String, S
 }
 
 pub async fn write_file(path: String, contents: String) -> Result<(), String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::write_file(p, &path, contents).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("write_file", || {
-            require_absolute_path("write_file", &path)?;
-            let p = Path::new(&path);
-            if let Some(parent) = p.parent() {
-                fs::create_dir_all(parent)
-                    .map_err(|e| format!("Failed to create parent dirs for '{}': {}", path, e))?;
-            }
-            crate::commands::file_history::record_file_version(
-                p,
-                "baseline",
-                "before.ui.write_file",
-            );
-            fs::write(&path, contents)
-                .map_err(|e| format!("Failed to write file '{}': {}", path, e))?;
-            crate::commands::file_history::record_file_version(p, "human", "ui.write_file");
-            Ok(())
-        })
-    })
-    .await
-    .map_err(|e| format!("write_file blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::write_file(p, &path, contents).await
 }
 
 pub async fn write_file_base64(path: String, base64: String) -> Result<(), String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::write_file_base64(p, &path, base64).await;
-    }
-    use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
-
-    tokio::task::spawn_blocking(move || {
-        run_guarded("write_file_base64", || {
-            require_absolute_path("write_file_base64", &path)?;
-            let bytes = B64
-                .decode(base64.as_bytes())
-                .map_err(|e| format!("Invalid base64 for '{}': {}", path, e))?;
-            let p = Path::new(&path);
-            if let Some(parent) = p.parent() {
-                fs::create_dir_all(parent)
-                    .map_err(|e| format!("Failed to create parent dirs for '{}': {}", path, e))?;
-            }
-            fs::write(&path, bytes)
-                .map_err(|e| format!("Failed to write binary file '{}': {}", path, e))?;
-            Ok(())
-        })
-    })
-    .await
-    .map_err(|e| format!("write_file_base64 blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::write_file_base64(p, &path, base64).await
 }
 
 pub async fn write_file_atomic(path: String, contents: String) -> Result<(), String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::write_file_atomic(p, &path, contents).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("write_file_atomic", || {
-            require_absolute_path("write_file_atomic", &path)?;
-            let p = Path::new(&path);
-            if let Some(parent) = p.parent() {
-                fs::create_dir_all(parent)
-                    .map_err(|e| format!("Failed to create parent dirs for '{}': {}", path, e))?;
-            }
-
-            let file_name = p
-                .file_name()
-                .map(|name| name.to_string_lossy().to_string())
-                .unwrap_or_else(|| "llm-wiki-file".to_string());
-            let tmp_path = p.with_file_name(format!(
-                ".{file_name}.{}.tmp",
-                chrono::Utc::now()
-                    .timestamp_nanos_opt()
-                    .unwrap_or_else(|| chrono::Utc::now().timestamp_millis())
-            ));
-
-            crate::commands::file_history::record_file_version(
-                p,
-                "baseline",
-                "before.ui.write_file_atomic",
-            );
-            fs::write(&tmp_path, contents).map_err(|e| {
-                format!("Failed to write temp file '{}': {}", tmp_path.display(), e)
-            })?;
-
-            fs::rename(&tmp_path, p).map_err(|e| {
-                let _ = fs::remove_file(&tmp_path);
-                format!(
-                    "Failed to move temp file '{}' to '{}': {}",
-                    tmp_path.display(),
-                    path,
-                    e
-                )
-            })?;
-            crate::commands::file_history::record_file_version(p, "human", "ui.write_file_atomic");
-            Ok(())
-        })
-    })
-    .await
-    .map_err(|e| format!("write_file_atomic blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::write_file_atomic(p, &path, contents).await
 }
 
-fn apply_text_selection_edit_inner(
-    project_path: &str,
-    file_path: &str,
-    prefix: &str,
-    selected_text: &str,
-    suffix: &str,
-    replacement: &str,
-) -> Result<String, String> {
-    let project = fs::canonicalize(project_path)
-        .map_err(|err| format!("Failed to resolve project path: {err}"))?;
-    let file = fs::canonicalize(file_path)
-        .map_err(|err| format!("Failed to resolve selected file: {err}"))?;
-    if !file.starts_with(&project) || !file.is_file() {
-        return Err(
-            "Selection edit target must be an existing file inside the project".to_string(),
-        );
-    }
-    let current = fs::read_to_string(&file)
-        .map_err(|err| format!("Failed to read selection edit target: {err}"))?;
-    let expected = format!("{prefix}{selected_text}{suffix}");
-    if current != expected {
-        return Err(
-            "The file changed after the selection was captured. Re-select the text before applying the Agent suggestion."
-                .to_string(),
-        );
-    }
-    let updated = format!("{prefix}{replacement}{suffix}");
-    crate::commands::file_history::record_file_version(
-        &file,
-        "baseline",
-        "before.agent.selection_edit",
-    );
-    fs::write(&file, &updated)
-        .map_err(|err| format!("Failed to apply Agent selection edit: {err}"))?;
-    crate::commands::file_history::record_file_version(&file, "agent", "agent.selection_edit");
-    Ok(updated)
-}
 
 /// Apply one Agent-proposed replacement without overwriting intervening user
 /// edits. The full prefix/selection/suffix snapshot is intentionally checked at
 /// the Rust write boundary; a frontend-only check would leave a TOCTOU window.
 pub async fn apply_text_selection_edit(
-    project_path: String,
-    file_path: String,
-    prefix: String,
-    selected_text: String,
-    suffix: String,
-    replacement: String,
+    _project_path: String,
+    _file_path: String,
+    _prefix: String,
+    _selected_text: String,
+    _suffix: String,
+    _replacement: String,
 ) -> Result<String, String> {
-    if crate::platform::get().is_some() {
-        return Err(crate::platform::unsupported("apply_text_selection_edit"));
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("apply_text_selection_edit", || {
-            apply_text_selection_edit_inner(
-                &project_path,
-                &file_path,
-                &prefix,
-                &selected_text,
-                &suffix,
-                &replacement,
-            )
-        })
-    })
-    .await
-    .map_err(|err| format!("apply_text_selection_edit blocking task join error: {err}"))?
+    // Not moved onto the storage layer yet.
+    Err(crate::platform::unsupported("apply_text_selection_edit"))
 }
 
-fn create_missing_wiki_page_inner(
-    project_path: &str,
-    title: &str,
-    content: Option<&str>,
-) -> Result<String, String> {
-    let project = fs::canonicalize(project_path)
-        .map_err(|err| format!("Failed to resolve project path: {err}"))?;
-    let title = title.trim();
-    if title.is_empty() || title.chars().count() > 200 {
-        return Err("Missing-link page title must contain 1 to 200 characters".to_string());
-    }
-    let normalized_title = title
-        .chars()
-        .map(|character| {
-            if character.is_control() {
-                ' '
-            } else {
-                character
-            }
-        })
-        .collect::<String>();
-    let title = normalized_title.trim();
-    if content.is_some_and(|value| value.len() > 2 * 1024 * 1024) {
-        return Err("Missing-link page content exceeds the 2 MB limit".to_string());
-    }
-    let wiki_root = project.join("wiki");
-    let canonical_wiki = fs::canonicalize(&wiki_root)
-        .map_err(|err| format!("Failed to resolve wiki directory: {err}"))?;
-    if !canonical_wiki.starts_with(&project) {
-        return Err("Wiki directory escapes the project boundary".to_string());
-    }
-    let directory = canonical_wiki.join("concepts");
-    fs::create_dir_all(&directory)
-        .map_err(|err| format!("Failed to create wiki concepts directory: {err}"))?;
-    let canonical_directory = fs::canonicalize(&directory)
-        .map_err(|err| format!("Failed to resolve wiki concepts directory: {err}"))?;
-    if !canonical_directory.starts_with(&project) {
-        return Err("Wiki concepts directory escapes the project boundary".to_string());
-    }
-    let base = safe_missing_page_stem(title);
-    let mut target = canonical_directory.join(format!("{base}.md"));
-    for suffix in 2..=9999 {
-        if !target.exists() {
-            break;
-        }
-        target = canonical_directory.join(format!("{base}-{suffix}.md"));
-    }
-    if target.exists() {
-        return Err("Could not allocate a unique wiki page filename".to_string());
-    }
-    let today = chrono::Utc::now().format("%Y-%m-%d");
-    let escaped_title = title.replace('"', "\\\"");
-    let default_content = format!(
-        "---\ntype: concept\ntitle: \"{escaped_title}\"\ncreated: {today}\nupdated: {today}\ntags: []\nrelated: []\n---\n\n# {title}\n"
-    );
-    let body = content
-        .filter(|value| !value.trim().is_empty())
-        .unwrap_or(&default_content);
-    use std::io::Write as _;
-    let mut output = fs::OpenOptions::new()
-        .write(true)
-        .create_new(true)
-        .open(&target)
-        .map_err(|err| format!("Failed to reserve missing-link page: {err}"))?;
-    if let Err(err) = output.write_all(body.as_bytes()) {
-        drop(output);
-        let _ = fs::remove_file(&target);
-        return Err(format!("Failed to create missing-link page: {err}"));
-    }
-    crate::commands::file_history::record_file_version(
-        &target,
-        "agent",
-        "wiki.missing_link.create",
-    );
-    target
-        .strip_prefix(&project)
-        .map(|path| path.to_string_lossy().replace('\\', "/"))
-        .map_err(|_| "Created page escaped the project boundary".to_string())
-}
 
-fn safe_missing_page_stem(title: &str) -> String {
-    let mut stem = title
-        .chars()
-        .map(|character| {
-            if character.is_control()
-                || matches!(
-                    character,
-                    '<' | '>' | ':' | '"' | '/' | '\\' | '|' | '?' | '*'
-                )
-            {
-                '-'
-            } else if character.is_whitespace() {
-                ' '
-            } else {
-                character
-            }
-        })
-        .collect::<String>();
-    while stem.contains("--") {
-        stem = stem.replace("--", "-");
-    }
-    stem = stem.trim_matches([' ', '.', '-']).to_string();
-    if stem.is_empty() {
-        stem = "untitled".to_string();
-    }
-    let device = stem
-        .split('.')
-        .next()
-        .unwrap_or_default()
-        .to_ascii_uppercase();
-    if matches!(device.as_str(), "CON" | "PRN" | "AUX" | "NUL")
-        || (device.len() == 4
-            && (device.starts_with("COM") || device.starts_with("LPT"))
-            && device.as_bytes()[3].is_ascii_digit()
-            && device.as_bytes()[3] != b'0')
-    {
-        stem = format!("page-{stem}");
-    }
-    stem.chars().take(120).collect()
-}
 
 /// Create a page for an unresolved wikilink. Filename allocation and the final
 /// write stay in Rust so UI callers cannot escape the project or overwrite an
 /// existing page, including through Windows device names or illegal characters.
 pub async fn create_missing_wiki_page(
-    project_path: String,
-    title: String,
-    content: Option<String>,
+    _project_path: String,
+    _title: String,
+    _content: Option<String>,
 ) -> Result<String, String> {
-    if crate::platform::get().is_some() {
-        return Err(crate::platform::unsupported("create_missing_wiki_page"));
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("create_missing_wiki_page", || {
-            create_missing_wiki_page_inner(&project_path, &title, content.as_deref())
-        })
-    })
-    .await
-    .map_err(|err| format!("create_missing_wiki_page blocking task join error: {err}"))?
+    // Not moved onto the storage layer yet.
+    Err(crate::platform::unsupported("create_missing_wiki_page"))
 }
 
 /// Whether a directory entry should appear in a listing.
@@ -1569,225 +1126,29 @@ pub async fn list_directory(
     include_hidden: Option<bool>,
     max_depth: Option<usize>,
 ) -> Result<Vec<FileNode>, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::list_directory(p, &path, include_hidden, max_depth).await;
-    }
-    let include_hidden = include_hidden.unwrap_or(false);
-    let max_depth = max_depth.unwrap_or(30).clamp(1, 30);
-    tokio::task::spawn_blocking(move || {
-        run_guarded("list_directory", || {
-            let p = Path::new(&path);
-            if !p.exists() {
-                return Err(format!("Path does not exist: '{}'", path));
-            }
-            if !p.is_dir() {
-                return Err(format!("Path is not a directory: '{}'", path));
-            }
-            let nodes = build_tree(p, 0, max_depth, include_hidden)?;
-            Ok(nodes)
-        })
-    })
-    .await
-    .map_err(|e| format!("list_directory blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::list_directory(p, &path, include_hidden, max_depth).await
 }
 
-fn build_tree(
-    dir: &Path,
-    depth: usize,
-    max_depth: usize,
-    include_hidden: bool,
-) -> Result<Vec<FileNode>, String> {
-    if depth >= max_depth {
-        return Ok(vec![]);
-    }
-
-    let mut entries: Vec<_> = fs::read_dir(dir)
-        .map_err(|e| format!("Failed to read directory '{}': {}", dir.display(), e))?
-        .filter_map(|entry| entry.ok())
-        .filter(|entry| {
-            entry
-                .file_name()
-                .to_str()
-                .map(|n| entry_is_visible(n, include_hidden))
-                .unwrap_or(false)
-        })
-        .collect();
-
-    // Sort: directories first, then alphabetical within each group
-    entries.sort_by(|a, b| {
-        let a_is_dir = a.path().is_dir();
-        let b_is_dir = b.path().is_dir();
-        match (a_is_dir, b_is_dir) {
-            (true, false) => std::cmp::Ordering::Less,
-            (false, true) => std::cmp::Ordering::Greater,
-            _ => a.file_name().cmp(&b.file_name()),
-        }
-    });
-
-    let mut nodes = Vec::new();
-    for entry in entries {
-        let entry_path = entry.path();
-        let name = entry.file_name().to_str().unwrap_or("").to_string();
-        // Always return forward-slash paths so the TS layer can compare
-        // and compose paths consistently across Windows and Unix. Windows
-        // APIs accept forward slashes, so normalizing here is safe and
-        // prevents a whole class of bugs where TS-constructed `/` paths
-        // fail to match Rust-returned `\` paths.
-        let path_str = entry_path.to_string_lossy().replace('\\', "/");
-        let is_dir = entry_path.is_dir();
-
-        let children = if is_dir {
-            let kids = build_tree(&entry_path, depth + 1, max_depth, include_hidden)?;
-            if kids.is_empty() {
-                None
-            } else {
-                Some(kids)
-            }
-        } else {
-            None
-        };
-
-        nodes.push(FileNode {
-            name,
-            path: path_str,
-            is_dir,
-            children,
-        });
-    }
-
-    Ok(nodes)
-}
 
 pub async fn copy_file(source: String, destination: String) -> Result<(), String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::copy_file(p, &source, &destination).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("copy_file", || {
-            let dest = Path::new(&destination);
-            if let Some(parent) = dest.parent() {
-                fs::create_dir_all(parent)
-                    .map_err(|e| format!("Failed to create parent dirs: {}", e))?;
-            }
-            fs::copy(&source, &destination)
-                .map_err(|e| format!("Failed to copy '{}' to '{}': {}", source, destination, e))?;
-            Ok(())
-        })
-    })
-    .await
-    .map_err(|e| format!("copy_file blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::copy_file(p, &source, &destination).await
 }
 
 /// Recursively copy a directory, preserving structure.
 /// Returns list of copied file paths (destination paths).
 pub async fn copy_directory(source: String, destination: String) -> Result<Vec<String>, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::copy_directory(p, &source, &destination).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("copy_directory", || {
-            let src = Path::new(&source);
-            let dest = Path::new(&destination);
-
-            if !src.is_dir() {
-                return Err(format!("'{}' is not a directory", source));
-            }
-
-            let mut copied_files = Vec::new();
-
-            fn copy_recursive(
-                src: &Path,
-                dest: &Path,
-                files: &mut Vec<String>,
-            ) -> Result<(), String> {
-                fs::create_dir_all(dest)
-                    .map_err(|e| format!("Failed to create dir '{}': {}", dest.display(), e))?;
-
-                let entries = fs::read_dir(src)
-                    .map_err(|e| format!("Failed to read dir '{}': {}", src.display(), e))?;
-
-                for entry in entries {
-                    let entry = entry.map_err(|e| format!("Dir entry error: {}", e))?;
-                    let path = entry.path();
-                    let name = entry.file_name();
-                    let dest_path = dest.join(&name);
-
-                    if name.to_string_lossy().starts_with('.') {
-                        continue;
-                    }
-
-                    if path.is_dir() {
-                        copy_recursive(&path, &dest_path, files)?;
-                    } else {
-                        fs::copy(&path, &dest_path)
-                            .map_err(|e| format!("Failed to copy '{}': {}", path.display(), e))?;
-                        files.push(dest_path.to_string_lossy().replace('\\', "/"));
-                    }
-                }
-                Ok(())
-            }
-
-            copy_recursive(src, dest, &mut copied_files)?;
-            Ok(copied_files)
-        })
-    })
-    .await
-    .map_err(|e| format!("copy_directory blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::copy_directory(p, &source, &destination).await
 }
 
 pub async fn delete_file(path: String) -> Result<(), String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::delete_file(p, &path).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("delete_file", || {
-            let p = Path::new(&path);
-            if p.is_dir() {
-                remove_path_with_retry(&path, true)
-                    .map_err(|e| format!("Failed to delete directory '{}': {}", path, e))?;
-            } else {
-                remove_path_with_retry(&path, false)
-                    .map_err(|e| format!("Failed to delete file '{}': {}", path, e))?;
-            }
-            Ok(())
-        })
-    })
-    .await
-    .map_err(|e| format!("delete_file blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::delete_file(p, &path).await
 }
 
-fn remove_path_with_retry(path: &str, is_dir: bool) -> Result<(), std::io::Error> {
-    let mut last_err: Option<std::io::Error> = None;
-    for attempt in 0..4 {
-        let result = if is_dir {
-            fs::remove_dir_all(path)
-        } else {
-            fs::remove_file(path)
-        };
-        match result {
-            Ok(()) => return Ok(()),
-            Err(err) if attempt < 3 && is_windows_transient_delete_error(&err) => {
-                last_err = Some(err);
-                thread::sleep(Duration::from_millis(250 * (1_u64 << attempt)));
-            }
-            Err(err) => return Err(err),
-        }
-    }
-    Err(last_err.unwrap_or_else(|| std::io::Error::other("delete failed")))
-}
 
-fn is_windows_transient_delete_error(err: &std::io::Error) -> bool {
-    #[cfg(windows)]
-    {
-        matches!(err.raw_os_error(), Some(32 | 33))
-            || err.kind() == std::io::ErrorKind::PermissionDenied
-    }
-    #[cfg(not(windows))]
-    {
-        let _ = err;
-        false
-    }
-}
 
 /// Find wiki pages that reference a given source file name.
 /// Scans all .md files under wiki/ for the source filename in frontmatter or content.
@@ -1795,163 +1156,14 @@ pub async fn find_related_wiki_pages(
     project_path: String,
     source_name: String,
 ) -> Result<Vec<String>, String> {
-    if let Some(platform) = crate::platform::get() {
-        return super::fs_platform::find_related_wiki_pages(platform, &project_path, &source_name)
-            .await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("find_related_wiki_pages", || {
-            let wiki_dir = Path::new(&project_path).join("wiki");
-            if !wiki_dir.is_dir() {
-                return Ok(vec![]);
-            }
-
-            let mut related = Vec::new();
-            collect_related_pages(&wiki_dir, &source_name, &mut related)?;
-            Ok(related)
-        })
-    })
-    .await
-    .map_err(|e| format!("find_related_wiki_pages blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::find_related_wiki_pages(p, &project_path, &source_name).await
 }
 
-fn collect_related_pages(
-    dir: &Path,
-    source_name: &str,
-    results: &mut Vec<String>,
-) -> Result<(), String> {
-    let entries = fs::read_dir(dir).map_err(|e| e.to_string())?;
-
-    // Get just the filename without path — use Path for cross-platform separator handling
-    let source_path = std::path::Path::new(source_name);
-    let file_name = source_path
-        .file_name()
-        .and_then(|n| n.to_str())
-        .unwrap_or(source_name);
-    let file_name_lower = file_name.to_lowercase();
-
-    // Derive stem (filename without extension) for source summary matching
-    let file_stem = file_name
-        .rsplit('.')
-        .skip(1)
-        .collect::<Vec<_>>()
-        .into_iter()
-        .rev()
-        .collect::<Vec<_>>()
-        .join(".");
-    let file_stem_lower = if file_stem.is_empty() {
-        file_name_lower.clone()
-    } else {
-        file_stem.to_lowercase()
-    };
-
-    for entry in entries.flatten() {
-        let path = entry.path();
-        if path.is_dir() {
-            collect_related_pages(&path, source_name, results)?;
-        } else if path.extension().map(|e| e == "md").unwrap_or(false) {
-            let fname = path.file_name().and_then(|n| n.to_str()).unwrap_or("");
-            // Skip index.md, log.md, overview.md — updated separately
-            if fname == "index.md" || fname == "log.md" || fname == "overview.md" {
-                continue;
-            }
-
-            if let Ok(content) = fs::read_to_string(&path) {
-                let content_lower = content.to_lowercase();
-
-                // Match 1: frontmatter sources field contains the exact filename
-                // e.g., sources: ["2603.25723v1.pdf"]
-                let sources_match = content_lower.contains(&format!("\"{}\"", file_name_lower))
-                    || content_lower.contains(&format!("'{}'", file_name_lower));
-
-                // Match 2: source summary page (wiki/sources/{stem}.md)
-                // Use Path component iteration to avoid hardcoded separator assumptions
-                let is_in_sources_dir = path.components().any(|c| c.as_os_str() == "sources");
-                let is_source_summary =
-                    is_in_sources_dir && fname.to_lowercase().starts_with(&file_stem_lower);
-
-                // Match 3: the page's *sources block* mentions the
-                // filename. Covers the multi-line YAML list form
-                //
-                //   sources:
-                //     - test.md         (unquoted, missed by Match 1)
-                //     - "other.md"
-                //
-                // Previous version substring-matched against the ENTIRE
-                // frontmatter, which false-positived whenever the
-                // filename happened to appear in title / description /
-                // any other field — those pages were then handed to
-                // the TS delete flow and, because their actual sources
-                // list didn't include the deleted file, silently
-                // wiped. Tightened: scope the substring check to the
-                // `sources:` block only (inline line + any indented
-                // continuation lines of a YAML list).
-                let frontmatter_match = if content.starts_with("---\n") {
-                    if let Some(fm_end_rel) = content[4..].find("\n---") {
-                        let frontmatter = &content[4..4 + fm_end_rel].to_lowercase();
-                        let mut found = false;
-                        let mut in_sources_block = false;
-                        for line in frontmatter.split('\n') {
-                            if line.starts_with("sources:") {
-                                // Inline-form `sources: [...]` lives
-                                // entirely on this one line; check it.
-                                if line.contains(&file_name_lower) {
-                                    found = true;
-                                    break;
-                                }
-                                in_sources_block = true;
-                                continue;
-                            }
-                            if in_sources_block {
-                                // Continuation lines of a YAML list are
-                                // indented; an un-indented line means
-                                // we've left the sources block for
-                                // another top-level field.
-                                if line.is_empty()
-                                    || line.starts_with(' ')
-                                    || line.starts_with('\t')
-                                {
-                                    if line.contains(&file_name_lower) {
-                                        found = true;
-                                        break;
-                                    }
-                                } else {
-                                    in_sources_block = false;
-                                }
-                            }
-                        }
-                        found
-                    } else {
-                        false
-                    }
-                } else {
-                    false
-                };
-
-                if sources_match || is_source_summary || frontmatter_match {
-                    // Normalize to forward slashes — matches build_tree /
-                    // copy_directory so TS-side comparisons work on Windows.
-                    results.push(path.to_string_lossy().replace('\\', "/"));
-                }
-            }
-        }
-    }
-    Ok(())
-}
 
 pub async fn create_directory(path: String) -> Result<(), String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::create_directory(p, &path).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("create_directory", || {
-            require_absolute_path("create_directory", &path)?;
-            fs::create_dir_all(&path)
-                .map_err(|e| format!("Failed to create directory '{}': {}", path, e))
-        })
-    })
-    .await
-    .map_err(|e| format!("create_directory blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::create_directory(p, &path).await
 }
 
 /// Read any file as base64 + a guessed mime type. Used by the
@@ -1989,118 +1201,34 @@ pub(crate) fn mime_for_extension(ext: &str) -> &'static str {
 }
 
 pub async fn read_file_as_base64(path: String) -> Result<FileBase64, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::read_file_as_base64(p, &path).await;
-    }
-    use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
-    tokio::task::spawn_blocking(move || {
-        run_guarded("read_file_as_base64", || {
-            let bytes = fs::read(&path).map_err(|e| format!("Failed to read '{}': {}", path, e))?;
-            let p = Path::new(&path);
-            let ext = p
-                .extension()
-                .and_then(|e| e.to_str())
-                .unwrap_or("")
-                .to_ascii_lowercase();
-            let mime_type = mime_for_extension(&ext).to_string();
-            Ok(FileBase64 {
-                base64: B64.encode(&bytes),
-                mime_type,
-            })
-        })
-    })
-    .await
-    .map_err(|e| format!("read_file_as_base64 blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::read_file_as_base64(p, &path).await
 }
 
 /// Cheap existence check without reading or classifying the file.
 /// Returns true iff `path` refers to something on disk right now.
 pub async fn file_exists(path: String) -> Result<bool, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::file_exists(p, &path).await;
-    }
-    // `Path::exists()` does a `stat(2)` syscall — fast on a hot
-    // cache, but a blocking syscall nonetheless. Wrapping it keeps
-    // the rule "no sync IO on tokio worker threads" uniform across
-    // every fs command rather than carving out an exception that's
-    // easy to violate later.
-    tokio::task::spawn_blocking(move || {
-        run_guarded("file_exists", || Ok(Path::new(&path).exists()))
-    })
-    .await
-    .map_err(|e| format!("file_exists blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::file_exists(p, &path).await
 }
 
 /// Get the last modified timestamp of a file in milliseconds since Unix epoch.
 /// Returns 0 if the file doesn't exist or metadata can't be read.
 pub async fn get_file_modified_time(path: String) -> Result<u64, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::get_file_modified_time(p, &path).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("get_file_modified_time", || {
-            let metadata = fs::metadata(&path)
-                .map_err(|e| format!("Failed to get metadata for '{}': {}", path, e))?;
-            let modified = metadata
-                .modified()
-                .map_err(|e| format!("Failed to get modified time for '{}': {}", path, e))?;
-            let duration = modified
-                .duration_since(std::time::UNIX_EPOCH)
-                .map_err(|e| format!("Time error for '{}': {}", path, e))?;
-            Ok(duration.as_millis() as u64)
-        })
-    })
-    .await
-    .map_err(|e| format!("get_file_modified_time blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::get_file_modified_time(p, &path).await
 }
 
 pub async fn get_file_size(path: String) -> Result<u64, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::get_file_size(p, &path).await;
-    }
-    tokio::task::spawn_blocking(move || {
-        run_guarded("get_file_size", || {
-            let metadata = fs::metadata(&path)
-                .map_err(|e| format!("Failed to get metadata for '{}': {}", path, e))?;
-            Ok(metadata.len())
-        })
-    })
-    .await
-    .map_err(|e| format!("get_file_size blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::get_file_size(p, &path).await
 }
 
 /// Compute MD5 hash of a file. Returns the hex-encoded hash string.
 pub async fn get_file_md5(path: String) -> Result<String, String> {
-    if let Some(p) = crate::platform::get() {
-        return super::fs_platform::get_file_md5(p, &path).await;
-    }
-    use md5::{Digest, Md5};
-    tokio::task::spawn_blocking(move || {
-        run_guarded("get_file_md5", || {
-            let mut file = fs::File::open(&path)
-                .map_err(|e| format!("Failed to open file '{}': {}", path, e))?;
-            let mut hasher = Md5::new();
-            let mut buffer = [0u8; 64 * 1024];
-            loop {
-                let read = file
-                    .read(&mut buffer)
-                    .map_err(|e| format!("Failed to read file '{}': {}", path, e))?;
-                if read == 0 {
-                    break;
-                }
-                hasher.update(&buffer[..read]);
-            }
-            let result = hasher.finalize();
-            Ok(format!("{:x}", result))
-        })
-    })
-    .await
-    .map_err(|e| format!("get_file_md5 blocking task join error: {e}"))?
+    let p = crate::platform::require()?;
+    super::fs_platform::get_file_md5(p, &path).await
 }
-
-#[cfg(test)]
-#[path = "fs_anydoc_benchmark.rs"]
-mod anydoc_benchmark;
 
 #[cfg(test)]
 mod tests {
@@ -2326,21 +1454,6 @@ mod tests {
         assert!(error.contains("no compatibility parser"));
     }
 
-    #[test]
-    fn office_cache_requires_the_current_anydoc_format_marker() {
-        let path = tmp_file_with_extension("docx", b"source placeholder");
-        let cache_path = cache_path_for(&path);
-        fs::create_dir_all(cache_path.parent().unwrap()).unwrap();
-        fs::write(&cache_path, "legacy parser output").unwrap();
-        assert_eq!(read_cache(&path), None);
-
-        fs::write(cache_format_path_for(&path), OFFICE_CACHE_FORMAT).unwrap();
-        assert_eq!(read_cache(&path).as_deref(), Some("legacy parser output"));
-
-        fs::remove_file(&path).unwrap();
-        fs::remove_file(cache_path).unwrap();
-        fs::remove_file(cache_format_path_for(&path)).unwrap();
-    }
 
     #[test]
     fn org_to_markdown_preserves_common_elements_without_executing_source_blocks() {
@@ -2440,44 +1553,7 @@ mod tests {
         assert!(result.unwrap_err().contains("Failed to parse DOC"));
     }
 
-    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    async fn write_file_base64_writes_decoded_binary_bytes() {
-        let dir = std::env::temp_dir();
-        let path = dir.join(format!(
-            "llm-wiki-base64-{}.bin",
-            std::time::SystemTime::now()
-                .duration_since(std::time::UNIX_EPOCH)
-                .unwrap()
-                .as_nanos()
-        ));
-        let path_str = path.to_string_lossy().to_string();
 
-        write_file_base64(path_str.clone(), "AAECA/8=".to_string())
-            .await
-            .unwrap();
-
-        let bytes = fs::read(&path).unwrap();
-        let _ = fs::remove_file(&path);
-        assert_eq!(bytes, vec![0, 1, 2, 3, 255]);
-    }
-
-    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    async fn write_file_base64_rejects_invalid_base64_and_relative_paths() {
-        let invalid = write_file_base64(
-            std::env::temp_dir()
-                .join("llm-wiki-invalid-base64.bin")
-                .to_string_lossy()
-                .to_string(),
-            "not!!base64".to_string(),
-        )
-        .await;
-        assert!(invalid.is_err());
-        assert!(invalid.unwrap_err().contains("Invalid base64"));
-
-        let relative = write_file_base64("relative.bin".to_string(), "AA==".to_string()).await;
-        assert!(relative.is_err());
-        assert!(relative.unwrap_err().contains("requires an absolute path"));
-    }
 
     /// Ad-hoc probe: run the production PDF extraction path against every
     /// .pdf under a user-provided directory and print a per-file report of
@@ -2601,185 +1677,16 @@ mod tests {
     // the tightening, a page whose title included the deleted filename
     // would be surfaced here and then wrongly deleted downstream.
 
-    fn make_wiki(files: &[(&str, &str)]) -> std::path::PathBuf {
-        let dir = std::env::temp_dir().join(format!("wiki-test-{}", uuid::Uuid::new_v4()));
-        fs::create_dir_all(&dir).unwrap();
-        for (rel, body) in files {
-            let p = dir.join(rel);
-            if let Some(parent) = p.parent() {
-                fs::create_dir_all(parent).unwrap();
-            }
-            fs::write(&p, body).unwrap();
-        }
-        dir
-    }
 
-    fn collect(wiki: &std::path::Path, source: &str) -> Vec<String> {
-        let mut out = Vec::new();
-        collect_related_pages(wiki, source, &mut out).unwrap();
-        // Normalize to the wiki-relative suffix so assertions are
-        // independent of the temp prefix.
-        let prefix = wiki.to_string_lossy().replace('\\', "/");
-        out.into_iter()
-            .map(|p| {
-                let p = p.replace('\\', "/");
-                p.strip_prefix(&format!("{}/", prefix))
-                    .map(str::to_string)
-                    .unwrap_or(p)
-            })
-            .collect()
-    }
 
-    #[test]
-    fn collect_related_strategy1_inline_quoted_sources() {
-        let wiki = make_wiki(&[
-            (
-                "concepts/rope.md",
-                "---\ntitle: RoPE\nsources: [\"test.md\"]\n---\nbody\n",
-            ),
-            (
-                "concepts/unrelated.md",
-                "---\ntitle: Unrelated\nsources: [\"other.md\"]\n---\nbody\n",
-            ),
-        ]);
-        let mut got = collect(&wiki, "test.md");
-        got.sort();
-        assert_eq!(got, vec!["concepts/rope.md"]);
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_strategy1_single_quoted_sources() {
-        let wiki = make_wiki(&[(
-            "concepts/rope.md",
-            "---\ntitle: RoPE\nsources: ['test.md']\n---\nbody\n",
-        )]);
-        let got = collect(&wiki, "test.md");
-        assert_eq!(got, vec!["concepts/rope.md"]);
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_strategy2_source_summary_page() {
-        // A page inside wiki/sources/ whose filename starts with the
-        // deleted source's stem counts as the source-summary page —
-        // kept linked even if its sources field happens to be missing.
-        let wiki = make_wiki(&[
-            ("sources/test.md", "---\ntitle: Test Summary\n---\nbody\n"),
-            (
-                "concepts/unrelated.md",
-                "---\ntitle: Unrelated\nsources: [\"other.md\"]\n---\nbody\n",
-            ),
-        ]);
-        let got = collect(&wiki, "test.md");
-        assert_eq!(got, vec!["sources/test.md"]);
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_strategy3_multi_line_yaml_list() {
-        // Multi-line YAML sources block with an unquoted entry — Strategy
-        // 1 can't see this (no quotes), Strategy 3 has to walk the
-        // sources block line by line.
-        let wiki = make_wiki(&[(
-            "concepts/rope.md",
-            "---\ntitle: RoPE\nsources:\n  - test.md\n  - \"other.md\"\ntags: []\n---\nbody\n",
-        )]);
-        let got = collect(&wiki, "test.md");
-        assert_eq!(got, vec!["concepts/rope.md"]);
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_strategy3_does_not_false_positive_on_title_substring() {
-        // Regression guard for the bug we just fixed: a page whose
-        // title / description contains the deleted filename MUST NOT
-        // be surfaced when its actual sources list is unrelated.
-        // Before the fix, the whole frontmatter was substring-scanned
-        // and this page would have been returned → downstream delete
-        // flow → silent data loss on an innocent page.
-        let wiki = make_wiki(&[
-            (
-                "concepts/rope.md",
-                "---\ntitle: Analysis of test.md\ndescription: Discusses test.md in depth\nsources: [\"other.md\"]\n---\nbody\n",
-            ),
-            (
-                "concepts/real-match.md",
-                "---\ntitle: Real\nsources: [\"test.md\"]\n---\nbody\n",
-            ),
-        ]);
-        let got = collect(&wiki, "test.md");
-        // Only the real-match page is surfaced. The title-substring
-        // page is correctly ignored now.
-        assert_eq!(got, vec!["concepts/real-match.md"]);
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_strategy3_stops_at_next_top_level_field() {
-        // Scan must stop at the next top-level YAML key so that a
-        // filename appearing in a later field (e.g. `notes:`) doesn't
-        // get pulled into the sources block.
-        let wiki = make_wiki(&[(
-            "concepts/rope.md",
-            "---\ntitle: RoPE\nsources:\n  - other.md\nnotes: See test.md for context\n---\nbody\n",
-        )]);
-        let got = collect(&wiki, "test.md");
-        // sources block has only other.md; test.md appears in `notes:`
-        // which is outside the block — must not match.
-        assert!(got.is_empty(), "expected empty, got {got:?}");
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_returns_empty_when_nothing_matches() {
-        let wiki = make_wiki(&[(
-            "concepts/unrelated.md",
-            "---\ntitle: X\nsources: [\"other.md\"]\n---\nbody\n",
-        )]);
-        let got = collect(&wiki, "nonexistent.md");
-        assert!(got.is_empty());
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_skips_index_log_overview() {
-        // Listing pages (index.md, log.md, overview.md) reference the
-        // filename heavily but should never be returned here — they're
-        // cleaned separately via the TS cleanup helpers.
-        let wiki = make_wiki(&[
-            (
-                "index.md",
-                "---\ntitle: Index\n---\n- [[Test]]\nsources: [\"test.md\"]\n",
-            ),
-            (
-                "log.md",
-                "---\ntitle: Log\n---\nIngested test.md on 2026-01-01\n",
-            ),
-            (
-                "overview.md",
-                "---\ntitle: Overview\n---\nCovers test.md and other.md\n",
-            ),
-            (
-                "concepts/real.md",
-                "---\ntitle: Real\nsources: [\"test.md\"]\n---\nbody\n",
-            ),
-        ]);
-        let got = collect(&wiki, "test.md");
-        assert_eq!(got, vec!["concepts/real.md"]);
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
-    #[test]
-    fn collect_related_case_insensitive_filename_match() {
-        let wiki = make_wiki(&[(
-            "concepts/rope.md",
-            "---\ntitle: RoPE\nsources: [\"Test.md\"]\n---\nbody\n",
-        )]);
-        let got = collect(&wiki, "test.md");
-        assert_eq!(got, vec!["concepts/rope.md"]);
-        let _ = fs::remove_dir_all(&wiki);
-    }
 
     // ── copy_directory: folder import recursion + filtering ──────────
     //
@@ -2807,86 +1714,9 @@ mod tests {
         dir
     }
 
-    #[test]
-    fn build_tree_hides_dot_entries_by_default_and_includes_them_when_asked() {
-        let root = make_temp_dir("build-tree-hidden");
-        fs::create_dir_all(root.join(".claude")).unwrap();
-        fs::write(root.join(".claude/CLAUDE.md"), "x").unwrap();
-        fs::create_dir_all(root.join("visible")).unwrap();
-        fs::write(root.join("visible/doc.md"), "y").unwrap();
-        fs::write(root.join(".env"), "secret").unwrap();
 
-        // Default: dot entries (incl. .env) hidden, normal entries shown.
-        let hidden = build_tree(&root, 0, 30, false).unwrap();
-        let hidden_names: Vec<&str> = hidden.iter().map(|n| n.name.as_str()).collect();
-        assert!(hidden_names.contains(&"visible"));
-        assert!(
-            !hidden_names.iter().any(|n| n.starts_with('.')),
-            "no dot entries should leak by default: {hidden_names:?}"
-        );
 
-        // include_hidden=true: dotfolders/dotfiles present.
-        let shown = build_tree(&root, 0, 30, true).unwrap();
-        let shown_names: Vec<&str> = shown.iter().map(|n| n.name.as_str()).collect();
-        assert!(shown_names.contains(&".claude"));
-        assert!(shown_names.contains(&".env"));
-        assert!(shown_names.contains(&"visible"));
 
-        // The dotfolder's children come through too.
-        let claude = shown.iter().find(|n| n.name == ".claude").unwrap();
-        let kids = claude
-            .children
-            .as_ref()
-            .expect(".claude should have children");
-        assert!(kids.iter().any(|n| n.name == "CLAUDE.md"));
-
-        let _ = fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn build_tree_respects_max_depth_for_shallow_listing() {
-        let root = make_temp_dir("build-tree-depth");
-        fs::create_dir_all(root.join("a/b")).unwrap();
-        fs::write(root.join("a/b/deep.md"), "x").unwrap();
-
-        let shallow = build_tree(&root, 0, 1, false).unwrap();
-        let a = shallow.iter().find(|n| n.name == "a").unwrap();
-        assert!(a.is_dir);
-        assert!(
-            a.children.is_none(),
-            "max_depth=1 must not load grandchildren"
-        );
-
-        let deeper = build_tree(&root, 0, 3, false).unwrap();
-        let a = deeper.iter().find(|n| n.name == "a").unwrap();
-        let b = a
-            .children
-            .as_ref()
-            .and_then(|children| children.iter().find(|n| n.name == "b"))
-            .expect("max_depth=3 should include nested directory");
-        let files = b.children.as_ref().expect("b should include deep file");
-        assert!(files.iter().any(|n| n.name == "deep.md"));
-
-        let _ = fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn reject_relative_write_paths_before_touching_cwd() {
-        assert!(require_absolute_path("write_file", "wiki/sources/stray.md").is_err());
-        assert!(require_absolute_path("write_file", "./wiki/sources/stray.md").is_err());
-    }
-
-    #[test]
-    fn allow_absolute_write_paths() {
-        assert!(require_absolute_path("write_file", "/tmp/project/wiki/sources/page.md").is_ok());
-        assert!(require_absolute_path("write_file", "C:/project/wiki/sources/page.md").is_ok());
-        assert!(require_absolute_path("write_file", r"C:\project\wiki\sources\page.md").is_ok());
-        assert!(
-            require_absolute_path("write_file", r"\\server\share\wiki\sources\page.md").is_ok()
-        );
-        assert!(require_absolute_path("write_file", "//server/share/wiki/sources/page.md").is_ok());
-        assert!(require_absolute_path("write_file", "C:wiki/sources/page.md").is_err());
-    }
 
     /// Pull the inner sync `copy_recursive` body out from
     /// `copy_directory` so the test doesn't need to spin up a
@@ -3025,118 +1855,8 @@ mod tests {
         let _ = std::fs::remove_dir_all(&dest);
     }
 
-    #[test]
-    fn selection_edit_rejects_stale_content_and_preserves_user_changes() {
-        let root = make_temp_dir("selection-edit");
-        let file = root.join("wiki/page.md");
-        std::fs::create_dir_all(file.parent().unwrap()).unwrap();
-        std::fs::write(&file, "before selected after").unwrap();
 
-        let updated = apply_text_selection_edit_inner(
-            root.to_str().unwrap(),
-            file.to_str().unwrap(),
-            "before ",
-            "selected",
-            " after",
-            "replacement",
-        )
-        .unwrap();
-        assert_eq!(updated, "before replacement after");
 
-        std::fs::write(&file, "user changed the file").unwrap();
-        let error = apply_text_selection_edit_inner(
-            root.to_str().unwrap(),
-            file.to_str().unwrap(),
-            "before ",
-            "selected",
-            " after",
-            "second replacement",
-        )
-        .unwrap_err();
-        assert!(error.contains("changed after the selection"));
-        assert_eq!(
-            std::fs::read_to_string(&file).unwrap(),
-            "user changed the file"
-        );
-        let _ = std::fs::remove_dir_all(root);
-    }
 
-    #[test]
-    fn missing_link_page_uses_safe_unique_cross_platform_names() {
-        let root = make_temp_dir("missing-link-page");
-        std::fs::create_dir_all(root.join("wiki")).unwrap();
-        let first =
-            create_missing_wiki_page_inner(root.to_str().unwrap(), "AUX: Safety / Notes?", None)
-                .unwrap();
-        let second = create_missing_wiki_page_inner(
-            root.to_str().unwrap(),
-            "AUX: Safety / Notes?",
-            Some("# Draft"),
-        )
-        .unwrap();
-        assert_eq!(first, "wiki/concepts/AUX- Safety - Notes.md");
-        assert_eq!(second, "wiki/concepts/AUX- Safety - Notes-2.md");
-        assert_eq!(
-            std::fs::read_to_string(root.join(second)).unwrap(),
-            "# Draft"
-        );
-        let _ = std::fs::remove_dir_all(root);
-    }
 
-    #[test]
-    fn missing_link_page_handles_reserved_cjk_and_traversal_titles_without_overwrite() {
-        let root = make_temp_dir("missing-link-adversarial");
-        std::fs::create_dir_all(root.join("wiki/concepts")).unwrap();
-        std::fs::write(root.join("wiki/concepts/Existing Page.md"), "user content").unwrap();
-
-        let reserved = create_missing_wiki_page_inner(root.to_str().unwrap(), "AUX", None).unwrap();
-        let cjk =
-            create_missing_wiki_page_inner(root.to_str().unwrap(), "知识 图谱", None).unwrap();
-        let traversal =
-            create_missing_wiki_page_inner(root.to_str().unwrap(), "../../escape", None).unwrap();
-        let allocated =
-            create_missing_wiki_page_inner(root.to_str().unwrap(), "Existing Page", None).unwrap();
-
-        assert_eq!(reserved, "wiki/concepts/page-AUX.md");
-        assert_eq!(cjk, "wiki/concepts/知识 图谱.md");
-        assert_eq!(traversal, "wiki/concepts/escape.md");
-        assert_eq!(allocated, "wiki/concepts/Existing Page-2.md");
-        assert_eq!(
-            std::fs::read_to_string(root.join("wiki/concepts/Existing Page.md")).unwrap(),
-            "user content"
-        );
-        assert!(!root.parent().unwrap().join("escape.md").exists());
-        let _ = std::fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn missing_link_page_rejects_content_over_two_megabytes() {
-        let root = make_temp_dir("missing-link-size");
-        std::fs::create_dir_all(root.join("wiki")).unwrap();
-        let content = "x".repeat(2 * 1024 * 1024 + 1);
-        let error = create_missing_wiki_page_inner(root.to_str().unwrap(), "large", Some(&content))
-            .unwrap_err();
-        assert!(error.contains("2 MB"));
-        let _ = std::fs::remove_dir_all(root);
-    }
-
-    #[test]
-    fn selection_edit_rejects_files_outside_project() {
-        let root = make_temp_dir("selection-boundary");
-        let outside = make_temp_dir("selection-outside").join("outside.md");
-        std::fs::write(&outside, "selected").unwrap();
-        let error = apply_text_selection_edit_inner(
-            root.to_str().unwrap(),
-            outside.to_str().unwrap(),
-            "",
-            "selected",
-            "",
-            "replacement",
-        )
-        .unwrap_err();
-        assert!(error.contains("inside the project"));
-        assert_eq!(std::fs::read_to_string(&outside).unwrap(), "selected");
-        let _ = std::fs::remove_dir_all(root);
-        let _ = std::fs::remove_dir_all(outside.parent().unwrap());
-    }
 }

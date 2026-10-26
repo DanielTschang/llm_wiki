@@ -1,6 +1,4 @@
 use std::collections::BTreeMap;
-use std::fs;
-use std::path::{Path, PathBuf};
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 
@@ -51,7 +49,7 @@ impl AgentSessionStore {
         let cache_key = session_cache_key(project_path, session_id);
         let session = guard
             .entry(cache_key)
-            .or_insert_with(|| load_session(project_path, session_id).unwrap_or_default());
+            .or_default();
         session.session_id = session_id.to_string();
         session.project_id = project_id.to_string();
         session.messages.push(AgentSessionMessage {
@@ -69,7 +67,6 @@ impl AgentSessionStore {
             session.messages.drain(0..drop_count);
         }
         session.updated_at = now;
-        let _ = save_session(project_path, session);
         trim_session_cache(&mut guard);
     }
 
@@ -83,17 +80,11 @@ impl AgentSessionStore {
             .inner
             .lock()
             .ok()
-            .and_then(|mut guard| {
-                let cache_key = session_cache_key(project_path, session_id);
-                if !guard.contains_key(&cache_key) {
-                    if let Some(loaded) = load_session(project_path, session_id) {
-                        guard.insert(cache_key.clone(), loaded);
-                        trim_session_cache(&mut guard);
-                    }
-                }
-                guard.get(&cache_key).cloned()
-            })
-            .or_else(|| load_session(project_path, session_id));
+            .and_then(|guard| {
+                guard
+                    .get(&session_cache_key(project_path, session_id))
+                    .cloned()
+            });
         let Some(session) = session else {
             return Vec::new();
         };
@@ -102,32 +93,9 @@ impl AgentSessionStore {
     }
 
     pub fn list_sessions(&self, project_path: &str) -> Vec<AgentSession> {
-        if crate::platform::get().is_some() {
-            // Sessions are kept in memory only until they move to a table.
-            return Vec::new();
-        }
-        let dir = Path::new(project_path)
-            .join(".llm-wiki")
-            .join("agent-sessions");
-        let Ok(entries) = fs::read_dir(dir) else {
-            return Vec::new();
-        };
-        let mut sessions = entries
-            .filter_map(Result::ok)
-            .filter_map(|entry| {
-                if entry.path().extension().and_then(|s| s.to_str()) != Some("json") {
-                    return None;
-                }
-                let raw = fs::read_to_string(entry.path()).ok()?;
-                serde_json::from_str::<AgentSession>(&raw).ok()
-            })
-            .collect::<Vec<_>>();
-        sessions.sort_by(|a, b| {
-            b.updated_at
-                .cmp(&a.updated_at)
-                .then_with(|| b.session_id.cmp(&a.session_id))
-        });
-        sessions
+        // Sessions live in memory only, until `agent_sessions` has a table.
+        let _ = project_path;
+        Vec::new()
     }
 }
 
@@ -161,189 +129,21 @@ fn now_ms() -> u64 {
         .unwrap_or(0)
 }
 
-fn load_session(project_path: &str, session_id: &str) -> Option<AgentSession> {
-    if crate::platform::get().is_some() {
-        return None;
-    }
-    let path = session_file(project_path, session_id)?;
-    let raw = fs::read_to_string(path).ok()?;
-    serde_json::from_str(&raw).ok()
-}
 
-fn save_session(project_path: &str, session: &AgentSession) -> Result<(), String> {
-    // On a platform server a Project has no folder to write to. Sessions live
-    // in the in-memory cache until `agent_sessions` has a store behind it.
-    if crate::platform::get().is_some() {
-        return Ok(());
-    }
-    let path = session_file(project_path, &session.session_id)
-        .ok_or_else(|| "Invalid Agent session id".to_string())?;
-    if let Some(parent) = path.parent() {
-        fs::create_dir_all(parent).map_err(|err| format!("Failed to create session dir: {err}"))?;
-    }
-    let raw = serde_json::to_string_pretty(session)
-        .map_err(|err| format!("Failed to serialize session: {err}"))?;
-    fs::write(path, raw).map_err(|err| format!("Failed to write session: {err}"))
-}
 
-fn session_file(project_path: &str, session_id: &str) -> Option<PathBuf> {
-    let id = sanitize_session_id(session_id)?;
-    Some(
-        Path::new(project_path)
-            .join(".llm-wiki")
-            .join("agent-sessions")
-            .join(format!("{id}.json")),
-    )
-}
 
-fn sanitize_session_id(session_id: &str) -> Option<String> {
-    let trimmed = session_id.trim();
-    if trimmed.is_empty()
-        || trimmed.contains('/')
-        || trimmed.contains('\\')
-        || trimmed.contains("..")
-        || trimmed.len() > 128
-    {
-        return None;
-    }
-    Some(
-        trimmed
-            .chars()
-            .map(|ch| {
-                if ch.is_ascii_alphanumeric() || matches!(ch, '-' | '_' | '.') {
-                    ch
-                } else {
-                    '_'
-                }
-            })
-            .collect(),
-    )
-}
 
 #[cfg(test)]
 mod tests {
-    use uuid::Uuid;
+    
 
-    use super::*;
+    
 
-    fn temp_project(name: &str) -> PathBuf {
-        let root =
-            std::env::temp_dir().join(format!("llm-wiki-agent-session-{name}-{}", Uuid::new_v4()));
-        fs::create_dir_all(&root).unwrap();
-        root
-    }
 
-    #[test]
-    fn append_turn_tracks_recent_messages() {
-        let project = temp_project("recent");
-        let store = AgentSessionStore::default();
-        store.append_turn(project.to_str().unwrap(), "p1", "s1", "hello", "hi");
-        store.append_turn(project.to_str().unwrap(), "p1", "s1", "question", "answer");
 
-        let messages = store.recent_messages(project.to_str().unwrap(), "s1", 3);
-        assert_eq!(messages.len(), 3);
-        assert_eq!(messages[0].content, "hi");
-        assert_eq!(messages[1].role, "user");
-        assert_eq!(messages[2].content, "answer");
-        let _ = fs::remove_dir_all(project);
-    }
 
-    #[test]
-    fn recent_messages_returns_empty_for_missing_session() {
-        let project = temp_project("missing");
-        let store = AgentSessionStore::default();
-        assert!(store
-            .recent_messages(project.to_str().unwrap(), "missing", 10)
-            .is_empty());
-        let _ = fs::remove_dir_all(project);
-    }
 
-    #[test]
-    fn append_turn_persists_session_to_project_state_dir() {
-        let project = temp_project("persist");
-        let store = AgentSessionStore::default();
-        store.append_turn(project.to_str().unwrap(), "p1", "s.persist", "hello", "hi");
 
-        let fresh = AgentSessionStore::default();
-        let messages = fresh.recent_messages(project.to_str().unwrap(), "s.persist", 10);
-        assert_eq!(messages.len(), 2);
-        assert_eq!(messages[0].content, "hello");
-        assert!(project
-            .join(".llm-wiki")
-            .join("agent-sessions")
-            .join("s.persist.json")
-            .exists());
-        let _ = fs::remove_dir_all(project);
-    }
 
-    #[test]
-    fn session_cache_is_bounded() {
-        let project = temp_project("bounded");
-        let store = AgentSessionStore::default();
-        for idx in 0..(MAX_CACHED_SESSIONS + 5) {
-            store.append_turn(
-                project.to_str().unwrap(),
-                "p1",
-                &format!("s{idx:03}"),
-                "hello",
-                "hi",
-            );
-        }
-        let guard = store.inner.lock().unwrap();
-        assert!(guard.len() <= MAX_CACHED_SESSIONS);
-        let _ = fs::remove_dir_all(project);
-    }
 
-    #[test]
-    fn same_session_id_is_isolated_by_project() {
-        let project_a = temp_project("isolate-a");
-        let project_b = temp_project("isolate-b");
-        let store = AgentSessionStore::default();
-        store.append_turn(
-            project_a.to_str().unwrap(),
-            "p1",
-            "same",
-            "hello a",
-            "answer a",
-        );
-        store.append_turn(
-            project_b.to_str().unwrap(),
-            "p2",
-            "same",
-            "hello b",
-            "answer b",
-        );
-
-        let a_messages = store.recent_messages(project_a.to_str().unwrap(), "same", 10);
-        let b_messages = store.recent_messages(project_b.to_str().unwrap(), "same", 10);
-
-        assert_eq!(a_messages.len(), 2);
-        assert_eq!(a_messages[0].content, "hello a");
-        assert_eq!(a_messages[1].content, "answer a");
-        assert_eq!(b_messages.len(), 2);
-        assert_eq!(b_messages[0].content, "hello b");
-        assert_eq!(b_messages[1].content, "answer b");
-        let _ = fs::remove_dir_all(project_a);
-        let _ = fs::remove_dir_all(project_b);
-    }
-
-    #[test]
-    fn session_ids_reject_path_traversal() {
-        assert!(session_file("/tmp/project", "../secret").is_none());
-        assert!(session_file("/tmp/project", "safe-id").is_some());
-    }
-
-    #[test]
-    fn list_sessions_returns_persisted_sessions_newest_first() {
-        let project = temp_project("list");
-        let store = AgentSessionStore::default();
-        store.append_turn(project.to_str().unwrap(), "p1", "s1", "one", "a");
-        store.append_turn(project.to_str().unwrap(), "p1", "s2", "two", "b");
-
-        let sessions = store.list_sessions(project.to_str().unwrap());
-        assert_eq!(sessions.len(), 2);
-        assert_eq!(sessions[0].session_id, "s2");
-        assert_eq!(sessions[1].session_id, "s1");
-        let _ = fs::remove_dir_all(project);
-    }
 }
