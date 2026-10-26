@@ -7,6 +7,7 @@
 //! by callers.
 
 mod blobs;
+mod connect;
 mod error;
 mod listing;
 mod locator;
@@ -23,6 +24,7 @@ mod store;
 mod conformance;
 
 pub use blobs::PgBlobs;
+pub use connect::open_store;
 pub use error::StoreError;
 pub use locator::ProjectLocator;
 pub use memory::MemoryStore;

@@ -65,6 +65,30 @@ pub struct Args {
     #[arg(long, env = "LLM_WIKI_NO_WORKER")]
     pub no_worker: bool,
 
+    /// Postgres connection string. Setting it switches the server to
+    /// platform mode: Project files live in Postgres and the S3 bucket below,
+    /// every path a request names must be `/projects/<uuid>/…`, and the host
+    /// disk is out of reach. Still under construction: commands not yet moved
+    /// onto the storage layer answer that they are unavailable.
+    #[arg(long, env = "LLM_WIKI_DATABASE_URL", hide_env_values = true)]
+    pub database_url: Option<String>,
+
+    /// S3 API address of the object store, e.g. `http://minio:9000`.
+    #[arg(long, env = "LLM_WIKI_S3_ENDPOINT")]
+    pub s3_endpoint: Option<String>,
+
+    #[arg(long, env = "LLM_WIKI_S3_BUCKET")]
+    pub s3_bucket: Option<String>,
+
+    #[arg(long, env = "LLM_WIKI_S3_ACCESS_KEY")]
+    pub s3_access_key: Option<String>,
+
+    #[arg(long, env = "LLM_WIKI_S3_SECRET_KEY", hide_env_values = true)]
+    pub s3_secret_key: Option<String>,
+
+    #[arg(long, env = "LLM_WIKI_S3_REGION", default_value = "us-east-1")]
+    pub s3_region: String,
+
     /// Do not copy model settings from the desktop app on this machine when
     /// the server has none configured yet.
     #[arg(long, env = "LLM_WIKI_NO_DESKTOP_SETTINGS")]
@@ -72,6 +96,23 @@ pub struct Args {
 }
 
 impl Args {
+    /// The object store settings; all of endpoint, bucket and both keys are
+    /// required together with `--database-url`.
+    pub fn s3_config(&self) -> Result<llm_wiki_storage::S3Config, String> {
+        let need = |value: &Option<String>, flag: &str| {
+            value
+                .clone()
+                .ok_or_else(|| format!("--database-url needs {flag} as well"))
+        };
+        Ok(llm_wiki_storage::S3Config {
+            endpoint: need(&self.s3_endpoint, "--s3-endpoint")?,
+            bucket: need(&self.s3_bucket, "--s3-bucket")?,
+            access_key: need(&self.s3_access_key, "--s3-access-key")?,
+            secret_key: need(&self.s3_secret_key, "--s3-secret-key")?,
+            region: self.s3_region.clone(),
+        })
+    }
+
     pub fn resolved_data_dir(&self) -> PathBuf {
         if let Some(dir) = &self.data_dir {
             return dir.clone();

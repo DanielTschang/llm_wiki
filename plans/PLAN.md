@@ -143,7 +143,8 @@ Python Extension Point（同事負責）
   - [x] `PgBlobs`（blobs 部分）：後端是 `object_store::ObjectStore`（測試用 `InMemory`），物件不可變、每次寫入用新鍵（公司 MinIO 每鍵最多 10 版）；舊列軟刪除，`purge_deleted`／`purge_project` 事後清掉舊物件。跑同一組一致性測試，另有 7 個 blob 專屬測試
   - [x] `RoutedFiles`：依 `route()` 把 `PgFiles`、`PgBlobs` 和 State 轉接層組成同一棵檔案樹。目錄的 list／stat／delete 合併各後端；rename 在後端內由後端自己完成，跨後端（例如 `wiki/x.md` 搬到 `raw/`）則複製再刪除，失敗時還原已搬的檔案；頁面與 blob 不能互相遮蔽（檔案不能放在另一個後端的檔案底下）。跨後端操作不是原子的。同一組一致性測試跑過 memory、Postgres＋記憶體物件、Postgres＋真 MinIO，另有 20 MiB multipart 上傳驗證
   - [x] `S3Config`：從環境變數讀 MinIO 連線（path-style，只在 endpoint 是 `http://` 時允許明文），Debug 輸出遮掉 secret。`make test-pg` 會轉發 k3d 的 MinIO 並建 `llm-wiki-test` bucket（需要 `aws` CLI）
-  - [ ] `fs.rs` 接上 `RoutedFiles`（A 類呼叫點），並接上 API 的上傳／下載端點
+  - [x] `fs.rs` 接上 `RoutedFiles`（A 類）：核心新增「平台模式」（`platform.rs`），伺服器設了 `LLM_WIKI_DATABASE_URL` 與 `LLM_WIKI_S3_*` 就啟用。此時檔案命令只認 `/projects/<uuid>/…` 形式的路徑，其他路徑一律拒絕，不會碰伺服器主機的磁碟；沒啟用時行為不變。已轉換：`read_file`（含 PDF／Office／電子書抽取，在暫存目錄跑解析器，抽出的圖片傳進 `wiki/media/<名稱>`）、`preprocess_file`（文字快取存成 `raw/sources/.cache/*`）、`write_file*`、`list_directory`、`copy_*`、`delete_file`、`create_directory`、`file_exists`、大小／時間／MD5、`read_file_as_base64`。`/rpc` 的路徑檢查、`GET /files`（blob 以串流回傳）、`POST /upload`（串流進 MinIO，暫存在 `.uploads/<batch>/`，需帶 `project`）都已接上。`make e2e-k3d` 用真伺服器打 k3d 的 PG 與 MinIO 驗證
+  - [ ] 平台模式還不能對外開放，在下列完成前只限開發使用：(1) `apply_text_selection_edit`、`create_missing_wiki_page`、`find_related_wiki_pages` 還沒轉換，平台模式下會回「尚未提供」；(2) 其他接受主機路徑的 RPC（`project.rs`、`search.rs`、`page_embedding.rs`、`vectorstore.rs`、`file_history.rs`、agent 工具）還沒轉換，路徑檢查擋得住主機路徑，但這些功能在平台模式下暫時不可用；(3) `.uploads/` 暫存檔沒有清理工作；(4) `GET /files` 還不支援 Range
   - [ ] 頁面寫入時一併重建 `page_links`、`page_sources`，並解析 frontmatter 填 `title`／`page_type`
   - [ ] `.llm-wiki/*` 狀態檔的轉接層（`route()` 回傳 State 的路徑，讀寫轉成對應資料表）
   - [x] 大檔案串流：`BlobStreams`（`put_stream`／`get_stream`，8 MiB 分段上傳，邊傳邊算 SHA-256）。API 的上傳／下載端點還沒接

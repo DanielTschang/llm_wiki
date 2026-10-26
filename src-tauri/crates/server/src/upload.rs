@@ -20,6 +20,8 @@ use serde::Deserialize;
 use serde_json::json;
 use tokio::io::AsyncWriteExt;
 
+use llm_wiki_core::platform::Platform;
+
 use crate::AppState;
 
 pub const UPLOAD_DIR: &str = ".uploads";
@@ -32,6 +34,10 @@ pub struct UploadQuery {
     batch: String,
     /// File name, optionally with sub-folders (folder uploads).
     name: String,
+    /// The Project the file is staged in. Required in platform mode, where
+    /// there is no shared staging folder on disk.
+    #[serde(default)]
+    project: Option<String>,
 }
 
 pub async fn receive(
@@ -39,6 +45,9 @@ pub async fn receive(
     Query(query): Query<UploadQuery>,
     body: Body,
 ) -> Response {
+    if let Some(platform) = llm_wiki_core::platform::get() {
+        return receive_into_store(platform, &query, body).await;
+    }
     let target = match staged_path(&state.upload_root, &query.batch, &query.name) {
         Ok(target) => target,
         Err(message) => return error(StatusCode::BAD_REQUEST, message),
@@ -52,9 +61,70 @@ pub async fn receive(
     }
 }
 
+/// Platform mode: the upload streams straight into the Project's object
+/// store under `.uploads/<batch>/<name>`, and the response is that Project
+/// path. The import step then copies it into `raw/sources`.
+async fn receive_into_store(platform: &Platform, query: &UploadQuery, body: Body) -> Response {
+    use llm_wiki_storage::{ByteStream, Precondition, ProjectId, RelPath, StoreError, WriteCtx};
+
+    let Some(streams) = platform.streams.as_deref() else {
+        return error(
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "uploads are not configured".into(),
+        );
+    };
+    let Some(project) = query.project.as_deref() else {
+        return error(StatusCode::BAD_REQUEST, "`project` is required".into());
+    };
+    let staged = match clean_name(&query.batch, &query.name) {
+        Ok(relative) => relative.to_string_lossy().replace('\\', "/"),
+        Err(message) => return error(StatusCode::BAD_REQUEST, message),
+    };
+    let Ok(project_id) = uuid::Uuid::parse_str(project).map(ProjectId) else {
+        return error(
+            StatusCode::BAD_REQUEST,
+            "`project` is not a Project id".into(),
+        );
+    };
+    let rel = match RelPath::parse(&format!("{UPLOAD_DIR}/{staged}")) {
+        Ok(rel) => rel,
+        Err(message) => return error(StatusCode::BAD_REQUEST, message.to_string()),
+    };
+    let mut written: u64 = 0;
+    let stream: ByteStream = Box::pin(body.into_data_stream().map(move |chunk| {
+        let chunk = chunk.map_err(|e| StoreError::Backend(format!("Upload interrupted: {e}")))?;
+        written += chunk.len() as u64;
+        if written > MAX_UPLOAD_BYTES {
+            return Err(StoreError::Backend("Upload exceeds the 4 GB limit".into()));
+        }
+        Ok(chunk)
+    }));
+    match streams
+        .put_stream(
+            project_id,
+            &rel,
+            stream,
+            Precondition::Any,
+            &WriteCtx::new("upload"),
+        )
+        .await
+    {
+        Ok(_) => {
+            Json(json!({ "path": platform.locator.project_path(project_id) + "/" + rel.as_str() }))
+                .into_response()
+        }
+        Err(message) => error(StatusCode::BAD_REQUEST, message.to_string()),
+    }
+}
+
 /// Validates the client-chosen batch id and relative name and maps them
 /// into the staging area. Never lets either escape it.
 fn staged_path(upload_root: &Path, batch: &str, name: &str) -> Result<PathBuf, String> {
+    clean_name(batch, name).map(|relative| upload_root.join(relative))
+}
+
+/// `<batch>/<name>` after checking neither can climb out of the staging area.
+fn clean_name(batch: &str, name: &str) -> Result<PathBuf, String> {
     let batch_ok = !batch.is_empty()
         && batch.len() <= 64
         && batch.chars().all(|c| c.is_ascii_alphanumeric() || c == '-');
@@ -72,7 +142,7 @@ fn staged_path(upload_root: &Path, batch: &str, name: &str) -> Result<PathBuf, S
     if clean.as_os_str().is_empty() {
         return Err("Upload file name is empty".into());
     }
-    Ok(upload_root.join(batch).join(clean))
+    Ok(PathBuf::from(batch).join(clean))
 }
 
 async fn write_stream(target: &Path, body: Body) -> Result<(), String> {

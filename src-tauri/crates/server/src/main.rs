@@ -100,6 +100,19 @@ async fn run(args: config::Args) -> Result<(), String> {
     }
     llm_wiki_core::runtime::install(tokio::runtime::Handle::current());
 
+    if let Some(database_url) = &args.database_url {
+        let store = llm_wiki_storage::open_store(database_url, &args.s3_config()?, 10)
+            .await
+            .map_err(|e| format!("Cannot open the project file store: {e}"))?;
+        let store = Arc::new(store);
+        llm_wiki_core::platform::install(
+            store.clone(),
+            Some(store),
+            llm_wiki_storage::ProjectLocator::default(),
+        )?;
+        eprintln!("[platform] Project files are in Postgres and the S3 bucket");
+    }
+
     let events = EventHub::new();
     let worker_token = uuid::Uuid::new_v4().simple().to_string();
     let state = AppState {

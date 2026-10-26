@@ -9,6 +9,7 @@ pub mod commands;
 pub mod context;
 pub mod cors;
 pub mod panic_guard;
+pub mod platform;
 pub mod proxy;
 pub mod runtime;
 pub mod server_bind;

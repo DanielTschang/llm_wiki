@@ -4,6 +4,7 @@ pub mod external_search;
 pub mod extract_images;
 pub mod file_history;
 pub mod fs;
+pub mod fs_platform;
 pub mod page_embedding;
 pub mod project;
 pub mod project_maintenance;

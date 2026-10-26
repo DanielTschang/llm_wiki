@@ -4,9 +4,12 @@ use std::path::Path;
 
 use axum::body::Body;
 use axum::extract::{Query, Request, State};
-use axum::http::{header, HeaderValue, StatusCode};
+use axum::http::{header, HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
+use futures::StreamExt;
+use llm_wiki_core::platform::Platform;
+use llm_wiki_storage::{route, Backend, EntryKind, StoreError};
 use serde::Deserialize;
 use serde_json::json;
 use tower::ServiceExt;
@@ -33,6 +36,9 @@ pub async fn serve(
     Query(query): Query<FileQuery>,
     request: Request,
 ) -> Response {
+    if let Some(platform) = llm_wiki_core::platform::get() {
+        return serve_from_store(platform, &query).await;
+    }
     let path = match state.roots.check(Path::new(&query.path)) {
         Ok(path) => path,
         Err(message) => {
@@ -48,7 +54,21 @@ pub async fn serve(
         Err(never) => match never {},
     };
     let mut response = response.into_response();
-    let headers = response.headers_mut();
+    let name = path
+        .file_name()
+        .map(|name| name.to_string_lossy().into_owned())
+        .unwrap_or_else(|| "download".into());
+    harden(
+        response.headers_mut(),
+        active,
+        query.download.then_some(name.as_str()),
+    );
+    response
+}
+
+/// Headers every served file gets: no content sniffing, a sandbox for
+/// content a browser could run, and a download name when one is asked for.
+fn harden(headers: &mut HeaderMap, active: bool, download_as: Option<&str>) {
     headers.insert(
         header::X_CONTENT_TYPE_OPTIONS,
         HeaderValue::from_static("nosniff"),
@@ -59,15 +79,84 @@ pub async fn serve(
             HeaderValue::from_static("sandbox"),
         );
     }
-    if query.download {
-        let name = path
-            .file_name()
-            .map(|name| name.to_string_lossy().into_owned())
-            .unwrap_or_else(|| "download".into());
-        if let Ok(value) = HeaderValue::from_str(&content_disposition(&name)) {
+    if let Some(name) = download_as {
+        if let Ok(value) = HeaderValue::from_str(&content_disposition(name)) {
             headers.insert(header::CONTENT_DISPOSITION, value);
         }
     }
+}
+
+/// The content type for the common file kinds a Project holds.
+fn content_type(extension: &str) -> &'static str {
+    match extension {
+        "html" | "htm" | "xhtml" => "text/html; charset=utf-8",
+        "svg" => "image/svg+xml",
+        "xml" | "xsl" => "application/xml",
+        "png" => "image/png",
+        "jpg" | "jpeg" => "image/jpeg",
+        "gif" => "image/gif",
+        "webp" => "image/webp",
+        "bmp" => "image/bmp",
+        "pdf" => "application/pdf",
+        "md" | "markdown" | "txt" | "org" | "csv" => "text/plain; charset=utf-8",
+        "json" => "application/json",
+        "css" => "text/css; charset=utf-8",
+        "js" | "mjs" => "text/javascript; charset=utf-8",
+        "mp4" => "video/mp4",
+        "webm" => "video/webm",
+        "mp3" => "audio/mpeg",
+        "wav" => "audio/wav",
+        "zip" => "application/zip",
+        _ => "application/octet-stream",
+    }
+}
+
+/// `GET /files` in platform mode: the file comes out of the store, blobs as a
+/// stream so a large PDF never sits in memory whole.
+async fn serve_from_store(platform: &Platform, query: &FileQuery) -> Response {
+    let failure = |status: StatusCode, message: String| {
+        (status, Json(json!({ "error": message }))).into_response()
+    };
+    let (project, rel) = match platform.locator.resolve(&query.path) {
+        Ok(target) => target,
+        Err(error) => return failure(StatusCode::FORBIDDEN, error.to_string()),
+    };
+    let from_store = |error: StoreError| match error {
+        StoreError::NotFound(_) => failure(StatusCode::NOT_FOUND, error.to_string()),
+        other => failure(StatusCode::INTERNAL_SERVER_ERROR, other.to_string()),
+    };
+    let meta = match platform.files.stat(project, &rel).await {
+        Ok(Some(meta)) if meta.kind == EntryKind::File => meta,
+        Ok(_) => return failure(StatusCode::NOT_FOUND, format!("not found: {rel}")),
+        Err(error) => return from_store(error),
+    };
+    let body = match (route(&rel), &platform.streams) {
+        (Backend::Blobs, Some(streams)) => match streams.get_stream(project, &rel).await {
+            Ok((stream, _)) => Body::from_stream(
+                stream.map(|part| part.map_err(|error| std::io::Error::other(error.to_string()))),
+            ),
+            Err(error) => return from_store(error),
+        },
+        _ => match platform.files.read(project, &rel).await {
+            Ok((content, _)) => Body::from(content.into_bytes()),
+            Err(error) => return from_store(error),
+        },
+    };
+    let extension = rel.extension().unwrap_or("").to_ascii_lowercase();
+    let mut response = Response::new(body);
+    let headers = response.headers_mut();
+    headers.insert(
+        header::CONTENT_TYPE,
+        HeaderValue::from_static(content_type(&extension)),
+    );
+    headers.insert(header::CONTENT_LENGTH, HeaderValue::from(meta.size));
+    harden(
+        headers,
+        ACTIVE_CONTENT_EXTENSIONS.contains(&extension.as_str()),
+        query
+            .download
+            .then(|| rel.file_name().unwrap_or("download")),
+    );
     response
 }
 

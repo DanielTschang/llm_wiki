@@ -3820,6 +3820,7 @@ dependencies = [
  "html2text",
  "image",
  "lancedb",
+ "llm-wiki-storage",
  "md-5",
  "mobi",
  "office_oxide",
@@ -3840,10 +3841,12 @@ name = "llm-wiki-server"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "bytes",
  "clap",
  "futures",
  "http-body-util",
  "llm-wiki-core",
+ "llm-wiki-storage",
  "reqwest",
  "serde",
  "serde_json",

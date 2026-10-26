@@ -59,10 +59,11 @@ async fn call(
         }
         return worker_call(state, command, args).map_err(DispatchError::Failed);
     }
-    state
-        .roots
-        .check_args(&args)
-        .map_err(DispatchError::Failed)?;
+    match llm_wiki_core::platform::get() {
+        Some(platform) => crate::paths::check_platform_args(&platform.locator, &args),
+        None => state.roots.check_args(&args),
+    }
+    .map_err(DispatchError::Failed)?;
     if AGENT_TURN_COMMANDS.contains(&command) && !state.allow_shell {
         strip_shell_approvals(&mut args);
     }
@@ -72,6 +73,10 @@ async fn call(
         }
         "ingest_command" => ingest_command(state, args).await,
         // Where the web file picker may browse and stage uploads.
+        "server_locations" if llm_wiki_core::platform::get().is_some() => {
+            // Nothing on the host is browsable in platform mode.
+            Ok(json!({ "roots": [], "uploads": "" }))
+        }
         "server_locations" => Ok(json!({
             "roots": state.roots.roots(),
             "uploads": state.upload_root.as_ref(),

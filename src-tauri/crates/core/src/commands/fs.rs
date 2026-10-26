@@ -16,20 +16,20 @@ use crate::types::wiki::FileNode;
 /// arbitrary binary files never reach a parser merely because detection is
 /// permissive. PDF and EPUB intentionally remain on the existing pipelines:
 /// PDFium also extracts images, while the ebook path retains MOBI parity.
-const OFFICE_EXTS: &[&str] = &[
+pub(crate) const OFFICE_EXTS: &[&str] = &[
     "doc", "docx", "docm", "ppt", "pps", "pot", "pptx", "pptm", "ppsx", "ppsm", "xls", "xlsx",
     "xlsm", "xlsb", "odt", "ods", "odp", "rtf",
 ];
-const IMAGE_EXTS: &[&str] = &[
+pub(crate) const IMAGE_EXTS: &[&str] = &[
     "png", "jpg", "jpeg", "gif", "webp", "bmp", "ico", "tiff", "tif", "avif", "heic", "heif", "svg",
 ];
-const MEDIA_EXTS: &[&str] = &[
+pub(crate) const MEDIA_EXTS: &[&str] = &[
     "mp4", "webm", "mov", "avi", "mkv", "flv", "wmv", "m4v", "mp3", "wav", "ogg", "flac", "aac",
     "m4a", "wma",
 ];
-const EBOOK_EXTS: &[&str] = &["epub", "mobi"];
-const LEGACY_DOC_EXTS: &[&str] = &["pages", "numbers", "key"];
-const OFFICE_CACHE_FORMAT: &str = "anydoc-0.1.6-v1";
+pub(crate) const EBOOK_EXTS: &[&str] = &["epub", "mobi"];
+pub(crate) const LEGACY_DOC_EXTS: &[&str] = &["pages", "numbers", "key"];
+pub(crate) const OFFICE_CACHE_FORMAT: &str = "anydoc-0.1.6-v1";
 
 fn require_absolute_path(operation: &str, path: &str) -> Result<(), String> {
     if is_absolute_path_cross_platform(path) {
@@ -63,6 +63,9 @@ fn is_absolute_path_cross_platform(path: &str) -> bool {
 }
 
 pub async fn read_file(path: String, extract_images: Option<bool>) -> Result<String, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::read_file(p, &path, extract_images).await;
+    }
     // `spawn_blocking` is REQUIRED, not a perf nicety. The body does
     // synchronous PDF/Office text extraction (pdfium FFI, calamine,
     // zip + image decode) that can take 10s+ on big files. Running
@@ -129,6 +132,9 @@ pub async fn read_file(path: String, extract_images: Option<bool>) -> Result<Str
 
 /// Pre-process a file and cache the extracted text.
 pub async fn preprocess_file(path: String) -> Result<String, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::preprocess_file(p, &path).await;
+    }
     // See `read_file` above for why `spawn_blocking` is required.
     tokio::task::spawn_blocking(move || {
         run_guarded("preprocess_file", || {
@@ -157,19 +163,19 @@ pub async fn preprocess_file(path: String) -> Result<String, String> {
     .map_err(|e| format!("preprocess_file blocking task join error: {e}"))?
 }
 
-fn cache_path_for(original: &Path) -> std::path::PathBuf {
+pub(crate) fn cache_path_for(original: &Path) -> std::path::PathBuf {
     let parent = original.parent().unwrap_or(Path::new("."));
     let cache_dir = parent.join(".cache");
     let file_name = original.file_name().unwrap_or_default().to_string_lossy();
     cache_dir.join(format!("{}.txt", file_name))
 }
 
-fn cache_format_path_for(original: &Path) -> std::path::PathBuf {
+pub(crate) fn cache_format_path_for(original: &Path) -> std::path::PathBuf {
     let cache_path = cache_path_for(original);
     cache_path.with_extension("txt.parser")
 }
 
-fn uses_anydoc_cache(original: &Path) -> bool {
+pub(crate) fn uses_anydoc_cache(original: &Path) -> bool {
     original
         .extension()
         .and_then(|extension| extension.to_str())
@@ -232,13 +238,13 @@ fn write_cache(original: &Path, text: &str) -> Result<(), String> {
 /// Convert common Org syntax into Markdown-shaped text for ingestion and
 /// preview. The original `.org` file remains untouched in `raw/sources`.
 /// Source blocks are copied verbatim inside fences and are never executed.
-fn extract_org_text(path: &str) -> Result<String, String> {
+pub(crate) fn extract_org_text(path: &str) -> Result<String, String> {
     let content = fs::read_to_string(path)
         .map_err(|e| format!("Failed to read Org file '{}': {}", path, e))?;
     Ok(org_to_markdown(&content))
 }
 
-fn org_to_markdown(content: &str) -> String {
+pub(crate) fn org_to_markdown(content: &str) -> String {
     let normalized = content.replace("\r\n", "\n").replace('\r', "\n");
     let mut output = Vec::new();
     let mut block_end: Option<&'static str> = None;
@@ -547,7 +553,7 @@ pub(crate) fn pdfium() -> Result<&'static pdfium_render::prelude::Pdfium, String
 /// Lock: delegates to `extract_pdf_markdown`, which acquires the
 /// pdfium lock internally. We must NOT take it here too —
 /// `std::sync::Mutex` is non-reentrant.
-fn extract_pdf_text(path: &str, include_images: bool) -> Result<String, String> {
+pub(crate) fn extract_pdf_text(path: &str, include_images: bool) -> Result<String, String> {
     use crate::commands::extract_images::{extract_pdf_markdown, ExtractOptions};
 
     if include_images {
@@ -586,7 +592,7 @@ fn extract_pdf_text(path: &str, include_images: bool) -> Result<String, String> 
 }
 
 /// Extract text from Office Open XML formats, converting to Markdown.
-fn extract_office_text(path: &str, ext: &str) -> Result<String, String> {
+pub(crate) fn extract_office_text(path: &str, ext: &str) -> Result<String, String> {
     let mut anydoc_failure = None;
     match anydoc::to_markdown(path) {
         Ok(markdown) if !markdown.trim().is_empty() => return Ok(markdown),
@@ -1235,6 +1241,9 @@ fn extract_odf_text(archive: &mut zip::ZipArchive<fs::File>) -> Result<String, S
 }
 
 pub async fn write_file(path: String, contents: String) -> Result<(), String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::write_file(p, &path, contents).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("write_file", || {
             require_absolute_path("write_file", &path)?;
@@ -1259,6 +1268,9 @@ pub async fn write_file(path: String, contents: String) -> Result<(), String> {
 }
 
 pub async fn write_file_base64(path: String, base64: String) -> Result<(), String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::write_file_base64(p, &path, base64).await;
+    }
     use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
 
     tokio::task::spawn_blocking(move || {
@@ -1282,6 +1294,9 @@ pub async fn write_file_base64(path: String, base64: String) -> Result<(), Strin
 }
 
 pub async fn write_file_atomic(path: String, contents: String) -> Result<(), String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::write_file_atomic(p, &path, contents).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("write_file_atomic", || {
             require_absolute_path("write_file_atomic", &path)?;
@@ -1377,6 +1392,9 @@ pub async fn apply_text_selection_edit(
     suffix: String,
     replacement: String,
 ) -> Result<String, String> {
+    if crate::platform::get().is_some() {
+        return Err(crate::platform::unsupported("apply_text_selection_edit"));
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("apply_text_selection_edit", || {
             apply_text_selection_edit_inner(
@@ -1522,6 +1540,9 @@ pub async fn create_missing_wiki_page(
     title: String,
     content: Option<String>,
 ) -> Result<String, String> {
+    if crate::platform::get().is_some() {
+        return Err(crate::platform::unsupported("create_missing_wiki_page"));
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("create_missing_wiki_page", || {
             create_missing_wiki_page_inner(&project_path, &title, content.as_deref())
@@ -1539,7 +1560,7 @@ pub async fn create_missing_wiki_page(
 /// the user deliberately added. Every other caller keeps hiding dot
 /// entries so internal state (`.llm-wiki`, `.git`), caches, and secrets
 /// (`.env`) never leak into trees or the ingest candidate set.
-fn entry_is_visible(name: &str, include_hidden: bool) -> bool {
+pub(crate) fn entry_is_visible(name: &str, include_hidden: bool) -> bool {
     include_hidden || !name.starts_with('.')
 }
 
@@ -1548,6 +1569,9 @@ pub async fn list_directory(
     include_hidden: Option<bool>,
     max_depth: Option<usize>,
 ) -> Result<Vec<FileNode>, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::list_directory(p, &path, include_hidden, max_depth).await;
+    }
     let include_hidden = include_hidden.unwrap_or(false);
     let max_depth = max_depth.unwrap_or(30).clamp(1, 30);
     tokio::task::spawn_blocking(move || {
@@ -1635,6 +1659,9 @@ fn build_tree(
 }
 
 pub async fn copy_file(source: String, destination: String) -> Result<(), String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::copy_file(p, &source, &destination).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("copy_file", || {
             let dest = Path::new(&destination);
@@ -1654,6 +1681,9 @@ pub async fn copy_file(source: String, destination: String) -> Result<(), String
 /// Recursively copy a directory, preserving structure.
 /// Returns list of copied file paths (destination paths).
 pub async fn copy_directory(source: String, destination: String) -> Result<Vec<String>, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::copy_directory(p, &source, &destination).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("copy_directory", || {
             let src = Path::new(&source);
@@ -1706,6 +1736,9 @@ pub async fn copy_directory(source: String, destination: String) -> Result<Vec<S
 }
 
 pub async fn delete_file(path: String) -> Result<(), String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::delete_file(p, &path).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("delete_file", || {
             let p = Path::new(&path);
@@ -1762,6 +1795,9 @@ pub async fn find_related_wiki_pages(
     project_path: String,
     source_name: String,
 ) -> Result<Vec<String>, String> {
+    if crate::platform::get().is_some() {
+        return Err(crate::platform::unsupported("find_related_wiki_pages"));
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("find_related_wiki_pages", || {
             let wiki_dir = Path::new(&project_path).join("wiki");
@@ -1903,6 +1939,9 @@ fn collect_related_pages(
 }
 
 pub async fn create_directory(path: String) -> Result<(), String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::create_directory(p, &path).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("create_directory", || {
             require_absolute_path("create_directory", &path)?;
@@ -1933,7 +1972,25 @@ pub struct FileBase64 {
     pub mime_type: String,
 }
 
+/// The mime type for a lower-case file extension.
+pub(crate) fn mime_for_extension(ext: &str) -> &'static str {
+    match ext {
+        "png" => "image/png",
+        "jpg" | "jpeg" => "image/jpeg",
+        "gif" => "image/gif",
+        "webp" => "image/webp",
+        "bmp" => "image/bmp",
+        "tiff" | "tif" => "image/tiff",
+        "svg" => "image/svg+xml",
+        "pdf" => "application/pdf",
+        _ => "application/octet-stream",
+    }
+}
+
 pub async fn read_file_as_base64(path: String) -> Result<FileBase64, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::read_file_as_base64(p, &path).await;
+    }
     use base64::{engine::general_purpose::STANDARD as B64, Engine as _};
     tokio::task::spawn_blocking(move || {
         run_guarded("read_file_as_base64", || {
@@ -1944,18 +2001,7 @@ pub async fn read_file_as_base64(path: String) -> Result<FileBase64, String> {
                 .and_then(|e| e.to_str())
                 .unwrap_or("")
                 .to_ascii_lowercase();
-            let mime_type = match ext.as_str() {
-                "png" => "image/png",
-                "jpg" | "jpeg" => "image/jpeg",
-                "gif" => "image/gif",
-                "webp" => "image/webp",
-                "bmp" => "image/bmp",
-                "tiff" | "tif" => "image/tiff",
-                "svg" => "image/svg+xml",
-                "pdf" => "application/pdf",
-                _ => "application/octet-stream",
-            }
-            .to_string();
+            let mime_type = mime_for_extension(&ext).to_string();
             Ok(FileBase64 {
                 base64: B64.encode(&bytes),
                 mime_type,
@@ -1969,6 +2015,9 @@ pub async fn read_file_as_base64(path: String) -> Result<FileBase64, String> {
 /// Cheap existence check without reading or classifying the file.
 /// Returns true iff `path` refers to something on disk right now.
 pub async fn file_exists(path: String) -> Result<bool, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::file_exists(p, &path).await;
+    }
     // `Path::exists()` does a `stat(2)` syscall — fast on a hot
     // cache, but a blocking syscall nonetheless. Wrapping it keeps
     // the rule "no sync IO on tokio worker threads" uniform across
@@ -1984,6 +2033,9 @@ pub async fn file_exists(path: String) -> Result<bool, String> {
 /// Get the last modified timestamp of a file in milliseconds since Unix epoch.
 /// Returns 0 if the file doesn't exist or metadata can't be read.
 pub async fn get_file_modified_time(path: String) -> Result<u64, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::get_file_modified_time(p, &path).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("get_file_modified_time", || {
             let metadata = fs::metadata(&path)
@@ -2002,6 +2054,9 @@ pub async fn get_file_modified_time(path: String) -> Result<u64, String> {
 }
 
 pub async fn get_file_size(path: String) -> Result<u64, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::get_file_size(p, &path).await;
+    }
     tokio::task::spawn_blocking(move || {
         run_guarded("get_file_size", || {
             let metadata = fs::metadata(&path)
@@ -2015,6 +2070,9 @@ pub async fn get_file_size(path: String) -> Result<u64, String> {
 
 /// Compute MD5 hash of a file. Returns the hex-encoded hash string.
 pub async fn get_file_md5(path: String) -> Result<String, String> {
+    if let Some(p) = crate::platform::get() {
+        return super::fs_platform::get_file_md5(p, &path).await;
+    }
     use md5::{Digest, Md5};
     tokio::task::spawn_blocking(move || {
         run_guarded("get_file_md5", || {
