@@ -133,6 +133,10 @@ k3d-up: ## Create the k3d dev cluster with Postgres, NATS, MinIO, OTel
 k3d-down: ## Delete the k3d dev cluster and all its data
 	deploy/k3d/down.sh
 
+.PHONY: test-pg
+test-pg: ## Run the Postgres-backed tests against the k3d cluster
+	deploy/k3d/test-pg.sh
+
 .PHONY: k3d-status
 k3d-status: ## Show pods in the k3d dev cluster
 	kubectl --context k3d-llm-wiki get pods -A

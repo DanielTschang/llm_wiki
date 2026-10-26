@@ -91,6 +91,20 @@ impl RelPath {
                 .is_some_and(|rest| rest.starts_with('/'))
     }
 
+    /// Every directory above this path, nearest first, without the root.
+    pub fn ancestors(&self) -> Vec<RelPath> {
+        let mut out = Vec::new();
+        let mut cursor = self.parent();
+        while let Some(dir) = cursor {
+            if dir.is_root() {
+                break;
+            }
+            cursor = dir.parent();
+            out.push(dir);
+        }
+        out
+    }
+
     /// The first segment, e.g. `wiki` for `wiki/entities/a.md`.
     pub fn top_level(&self) -> &str {
         self.0.split('/').next().unwrap_or("")
@@ -165,6 +179,14 @@ mod tests {
         assert_eq!(RelPath::parse("a/b.md").unwrap().extension(), Some("md"));
         assert_eq!(RelPath::parse("a/.hidden").unwrap().extension(), None);
         assert_eq!(RelPath::parse("a/noext").unwrap().extension(), None);
+    }
+
+    #[test]
+    fn ancestors_exclude_the_root_and_the_path_itself() {
+        let path = RelPath::parse("wiki/entities/a.md").unwrap();
+        let names: Vec<_> = path.ancestors().iter().map(|p| p.to_string()).collect();
+        assert_eq!(names, ["wiki/entities", "wiki"]);
+        assert!(RelPath::parse("a").unwrap().ancestors().is_empty());
     }
 
     #[test]

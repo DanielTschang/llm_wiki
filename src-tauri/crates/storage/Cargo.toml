@@ -9,8 +9,10 @@ publish = false
 [dependencies]
 async-trait = "0.1"
 chrono = { version = "0.4", features = ["clock"] }
+sha2 = "0.10"
+sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "uuid", "chrono", "json", "migrate", "macros"] }
 thiserror = "2"
 uuid = { version = "1", features = ["v4"] }
 
 [dev-dependencies]
-tokio = { version = "1", features = ["macros", "rt"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

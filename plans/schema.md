@@ -20,6 +20,7 @@ Migration 在 `src-tauri/crates/storage/migrations/`，純 SQL，依序套用：
 - `pages` 放目前狀態（含 `content`），讀取不用 join；`page_versions` 是 append-only 的寫入紀錄，每次寫入（含建立、刪除）都一列。同一份最新內容因此存兩次，換來歷史和還原都只查一張表；以 50–200 人的規模這個成本可以接受。
 - 取代 `page-history/` 與 `history/` 兩套機制（盤點裡的「待確認」）：兩者都是「寫入前的備份」，統一成版本列；`tool` 欄位標出寫入來源。
 - 刪除是軟刪除（`deleted_at`），活的路徑才有唯一性（partial unique index），所以刪掉後同一路徑可以重建，Changeset 也能還原。
+- rename 與 delete 也各寫一筆版本紀錄（`op` 為 `rename`、`delete`），且都讓 `version` 加一；因此改名後，手上拿著舊版本號的寫入者會得到版本衝突，這是刻意的。
 - 版本衝突靠 `version`：寫入者帶著讀到的版本，`UPDATE … WHERE version = $n` 沒命中就是衝突。階段 3 的提交鎖（advisory lock）疊在這上面。
 - 路徑語意與資料夾時代相同（相對 Project 根、正斜線），CHECK 擋掉 `../`、開頭 `/` 和 `//`。目錄不是資料列，列目錄時由路徑前綴推出，副作用是空目錄不存在。
 - 路徑宇宙：`wiki/**` 的文字檔加上根目錄的 `purpose.md`、`schema.md` 進 `pages`；二進位（`raw/**`、`wiki/media/**`）進 `blobs`。分流規則寫在 storage 介面，不在 schema。

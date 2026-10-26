@@ -7,15 +7,21 @@
 //! by callers.
 
 mod error;
+mod listing;
 mod locator;
 mod memory;
 mod path;
+mod pg;
 mod route;
 mod store;
+
+#[cfg(test)]
+mod conformance;
 
 pub use error::StoreError;
 pub use locator::ProjectLocator;
 pub use memory::MemoryStore;
 pub use path::RelPath;
+pub use pg::{migrate, PgFiles};
 pub use route::{route, Backend};
 pub use store::{Body, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx};

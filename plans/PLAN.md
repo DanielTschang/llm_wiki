@@ -138,7 +138,9 @@ Python Extension Point（同事負責）
 - [ ] storage 頁面儲存介面：fs RPC 依路徑分流，`wiki/` 存 PG、`raw/` 存 MinIO，`.llm-wiki/*.json` 逐一換成資料表；TS worker 和前端看到的路徑語意不變
   - [x] `llm-wiki-storage` crate：`ProjectFiles` trait（read／write 帶 `Precondition`／delete／rename／stat／list）、`RelPath`（拒絕 `..`、絕對路徑等）、`ProjectLocator`（虛擬根 `/projects/<uuid>` ↔ `(ProjectId, RelPath)`，既有的 `project_path: &str` 簽名可沿用）、`route()`（Pages／Blobs／State 分流）、`MemoryStore`（語意基準實作）
   - [ ] B 類呼叫點改走 `ProjectFiles`（見 `plans/inventory/fs-callsites.md`）
-  - [ ] Postgres + MinIO 實作；`fs.rs` 接上介面
+  - [x] `PgFiles`（頁面部分）：`pages`＋`page_versions` 的 Postgres 實作；`MemoryStore` 與 `PgFiles` 跑同一組 13 個一致性測試（`conformance.rs`），`make test-pg` 在 k3d 上實跑。rename 與 delete 也各寫一筆版本紀錄，rename 會讓版本加一
+  - [ ] MinIO 實作（blobs）；`fs.rs` 接上介面
+  - [ ] 頁面寫入時一併重建 `page_links`、`page_sources`，並解析 frontmatter 填 `title`／`page_type`
   - [ ] `.llm-wiki/*` 狀態檔的轉接層（`route()` 回傳 State 的路徑，讀寫轉成對應資料表）
   - [ ] 大檔案串流（目前 `Body` 整份放記憶體，上傳／下載需要另一組串流方法）
 - [ ] 所有索引、快取、檢索介面都以 Project 為鍵；檢索介面接受 Project 清單（先只傳一個），為跨 Project 檢索預留

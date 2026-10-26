@@ -25,6 +25,8 @@ CREATE TABLE pages (
 );
 CREATE UNIQUE INDEX pages_live_path_key ON pages (project_id, path) WHERE deleted_at IS NULL;
 CREATE INDEX pages_project_type_idx ON pages (project_id, page_type) WHERE deleted_at IS NULL;
+-- Serves `path LIKE 'dir/%'` (directory listings, subtree delete and rename).
+CREATE INDEX pages_live_prefix_idx ON pages (project_id, path text_pattern_ops) WHERE deleted_at IS NULL;
 
 -- Append-only; one row per write, including the first and including deletes.
 -- Replaces both `.llm-wiki/page-history/` (backup before ingest/dedup
@@ -33,7 +35,7 @@ CREATE TABLE page_versions (
     id             bigserial PRIMARY KEY,
     page_id        uuid NOT NULL REFERENCES pages (id) ON DELETE CASCADE,
     version        integer NOT NULL,
-    op             text NOT NULL CHECK (op IN ('create', 'update', 'delete', 'restore')),
+    op             text NOT NULL CHECK (op IN ('create', 'update', 'delete', 'rename', 'restore')),
     -- NULL content on 'delete'.
     content        text,
     content_sha256 bytea,
