@@ -1,0 +1,16 @@
+[package]
+name = "llm-wiki-storage"
+version = "0.1.0"
+description = "Project file storage behind the fs seam: pages in Postgres, blobs in MinIO"
+edition = "2021"
+rust-version = "1.88"
+publish = false
+
+[dependencies]
+async-trait = "0.1"
+chrono = { version = "0.4", features = ["clock"] }
+thiserror = "2"
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt"] }

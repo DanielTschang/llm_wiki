@@ -136,6 +136,11 @@ Python Extension Point（同事負責）
 - [x] 設計 Postgres schema：Project、頁面、頁面歷史、wikilink 邊、操作紀錄、對話、Review Item、ingest 快取與狀態、outbox，另含 embedding 分表與 lint／dedup／圖片說明快取。SQL 在 `src-tauri/crates/storage/migrations/`，設計說明在 `plans/schema.md`；已在 k3d 套用並跑過冒煙測試
 - [x] 盤點直接碰檔案系統的呼叫點（`plans/inventory/fs-callsites.md`）：約 300 處、26 個檔案；發現 schema 漏掉 `agent-sessions` 與 `agent-workspace/`，已補；發現 agent skills 會讀伺服器主機的 `~/.claude`／`~/.codex`／`~/.agents`，須立刻刪
 - [ ] storage 頁面儲存介面：fs RPC 依路徑分流，`wiki/` 存 PG、`raw/` 存 MinIO，`.llm-wiki/*.json` 逐一換成資料表；TS worker 和前端看到的路徑語意不變
+  - [x] `llm-wiki-storage` crate：`ProjectFiles` trait（read／write 帶 `Precondition`／delete／rename／stat／list）、`RelPath`（拒絕 `..`、絕對路徑等）、`ProjectLocator`（虛擬根 `/projects/<uuid>` ↔ `(ProjectId, RelPath)`，既有的 `project_path: &str` 簽名可沿用）、`route()`（Pages／Blobs／State 分流）、`MemoryStore`（語意基準實作）
+  - [ ] B 類呼叫點改走 `ProjectFiles`（見 `plans/inventory/fs-callsites.md`）
+  - [ ] Postgres + MinIO 實作；`fs.rs` 接上介面
+  - [ ] `.llm-wiki/*` 狀態檔的轉接層（`route()` 回傳 State 的路徑，讀寫轉成對應資料表）
+  - [ ] 大檔案串流（目前 `Body` 整份放記憶體，上傳／下載需要另一組串流方法）
 - [ ] 所有索引、快取、檢索介面都以 Project 為鍵；檢索介面接受 Project 清單（先只傳一個），為跨 Project 檢索預留
 - [ ] 向量庫從 LanceDB 換成 pgvector，embedding 依模型分表
 - [ ] NATS JetStream：定義 stream 與 subject（ingest 工作、頁面提交事件），outbox relay；Rust ingest-worker 角色取得工作後交給 Node 子程序，再由 Rust 回 ack
