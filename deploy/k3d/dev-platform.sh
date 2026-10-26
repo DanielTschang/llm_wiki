@@ -41,12 +41,28 @@ PG_PASSWORD=$("${K[@]}" get secret pg-app -o jsonpath='{.data.password}' | base6
 S3_USER=$("${K[@]}" get secret minio -o jsonpath='{.data.MINIO_ROOT_USER}' | base64 -d)
 S3_PASSWORD=$("${K[@]}" get secret minio -o jsonpath='{.data.MINIO_ROOT_PASSWORD}' | base64 -d)
 
-"${K[@]}" port-forward svc/pg-rw "$PG_PORT":5432 >/dev/null 2>&1 &
+# `kubectl port-forward` exits when one connection is reset, and the server
+# then hangs on its next query (logins time out). Restart each forward when it
+# dies; the server's pool reconnects through the same local port.
+forward() {
+  while true; do
+    "${K[@]}" port-forward "$@" >/dev/null 2>&1
+    sleep 1
+  done
+}
+forward svc/pg-rw "$PG_PORT":5432 &
 PG_FORWARD=$!
-"${K[@]}" port-forward svc/minio "$S3_PORT":9000 >/dev/null 2>&1 &
+forward svc/minio "$S3_PORT":9000 &
 S3_FORWARD=$!
 DATA=$(mktemp -d)
-trap 'kill $PG_FORWARD $S3_FORWARD 2>/dev/null || true; rm -rf "$DATA"' EXIT
+# Stopping the loop leaves its kubectl child behind, so stop the children too.
+stop_forwards() {
+  for loop in "$PG_FORWARD" "$S3_FORWARD"; do
+    kill "$loop" 2>/dev/null || true
+    pkill -P "$loop" 2>/dev/null || true
+  done
+}
+trap 'stop_forwards; rm -rf "$DATA"' EXIT
 for p in "$PG_PORT" "$S3_PORT"; do
   for _ in $(seq 1 50); do (exec 3<>"/dev/tcp/127.0.0.1/$p") 2>/dev/null && break; sleep 0.2; done
 done
