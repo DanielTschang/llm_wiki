@@ -547,20 +547,6 @@ pub async fn dispatch(
                     .await,
             )
         }
-        "api_server_status" => {
-            #[allow(unused_imports)]
-            use llm_wiki_core::commands::app::*;
-            #[allow(unused_imports)]
-            use llm_wiki_core::proxy;
-            rpc_value(rpc_blocking(core::commands::app::api_server_status).await?)
-        }
-        "api_server_reload_config" => {
-            #[allow(unused_imports)]
-            use llm_wiki_core::commands::app::*;
-            #[allow(unused_imports)]
-            use llm_wiki_core::proxy;
-            rpc_value(rpc_blocking(core::commands::app::api_server_reload_config).await?)
-        }
         "set_proxy_env" => {
             #[allow(unused_imports)]
             use llm_wiki_core::commands::app::*;

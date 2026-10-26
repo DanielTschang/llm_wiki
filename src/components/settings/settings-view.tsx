@@ -10,7 +10,6 @@ import {
   Network,
   History,
   Wrench,
-  Server,
   Settings,
   FileText,
   UserRound,
@@ -41,7 +40,6 @@ import { OutputSection } from "./sections/output-section"
 import { InterfaceSection } from "./sections/interface-section"
 import { NetworkSection } from "./sections/network-section"
 import { MineruSection } from "./sections/mineru-section"
-import { ApiServerSection } from "./sections/api-server-section"
 import { GeneralSection } from "./sections/general-section"
 import { ChangelogSection } from "./sections/changelog-section"
 import { MaintenanceSection } from "./sections/maintenance-section"
@@ -63,7 +61,6 @@ type CategoryId =
   | "web-search"
   | "network"
   | "mineru"
-  | "api-server"
   | "output"
   | "interface"
   | "maintenance"
@@ -90,7 +87,6 @@ const CATEGORIES: Category[] = [
   { id: "web-search", labelKey: "settings.categories.webSearch", icon: Globe },
   { id: "network", labelKey: "settings.categories.network", icon: Network },
   { id: "mineru", labelKey: "settings.categories.mineru", icon: FileText },
-  { id: "api-server", labelKey: "settings.categories.apiServer", icon: Server },
   { id: "output", labelKey: "settings.categories.output", icon: Languages },
   { id: "interface", labelKey: "settings.categories.interface", icon: Palette },
   { id: "maintenance", labelKey: "settings.categories.maintenance", icon: Wrench },
@@ -99,8 +95,8 @@ const CATEGORIES: Category[] = [
 ]
 
 /** Desktop shell features (window/startup behavior, the local HTTP API on
- *  127.0.0.1:19828) that the server edition does not have. */
-const DESKTOP_ONLY_CATEGORIES = new Set<CategoryId>(["general", "api-server"])
+ *  ) that the server edition does not have. */
+const DESKTOP_ONLY_CATEGORIES = new Set<CategoryId>(["general"])
 /** Pages that exist only where the server has accounts. */
 const PLATFORM_CATEGORIES = new Set<CategoryId>(["account", "members", "users"])
 
@@ -562,8 +558,6 @@ export function SettingsView() {
         return <NetworkSection draft={draft} setDraft={setDraft} />
       case "mineru":
         return <MineruSection draft={draft} setDraft={setDraft} />
-      case "api-server":
-        return <ApiServerSection draft={draft} setDraft={setDraft} />
       case "output":
         return <OutputSection draft={draft} setDraft={setDraft} />
       case "interface":

@@ -98,11 +98,6 @@ pub struct Args {
 
     #[arg(long, env = "LLM_WIKI_S3_REGION", default_value = "us-east-1")]
     pub s3_region: String,
-
-    /// Do not copy model settings from the desktop app on this machine when
-    /// the server has none configured yet.
-    #[arg(long, env = "LLM_WIKI_NO_DESKTOP_SETTINGS")]
-    pub no_desktop_settings: bool,
 }
 
 impl Args {

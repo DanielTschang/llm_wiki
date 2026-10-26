@@ -1,22 +1,6 @@
 //! App-level status and settings commands.
 
-use crate::panic_guard::run_guarded;
-use crate::{api_server, proxy};
-
-pub fn api_server_status() -> String {
-    run_guarded("api_server_status", || {
-        Ok(api_server::get_api_status().to_string())
-    })
-    .unwrap_or_else(|e| format!("error: {e}"))
-}
-
-pub fn api_server_reload_config() -> String {
-    run_guarded("api_server_reload_config", || {
-        api_server::invalidate_config_cache();
-        Ok("ok".to_string())
-    })
-    .unwrap_or_else(|e| format!("error: {e}"))
-}
+use crate::proxy;
 
 /// Apply a proxy configuration to the process env immediately, so the
 /// next outbound HTTP request picks it up without needing the user to

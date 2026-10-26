@@ -272,14 +272,6 @@ export async function openPathInProject(projectPath: string, targetPath: string)
   return openPath(absolute)
 }
 
-export async function apiServerStatus(): Promise<string> {
-  return invoke<string>("api_server_status")
-}
-
-export async function apiServerReloadConfig(): Promise<string> {
-  return invoke<string>("api_server_reload_config")
-}
-
 export async function mcpServerEntryPath(): Promise<string> {
   return invoke<string>("mcp_server_entry_path")
 }

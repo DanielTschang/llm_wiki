@@ -67,8 +67,6 @@ const PLATFORM_COMMANDS: &[&str] = &[
     "embedding_fetch_batch",
     "web_search",
     "set_proxy_env",
-    "api_server_status",
-    "api_server_reload_config",
 ];
 
 fn available_on_platform(command: &str) -> bool {

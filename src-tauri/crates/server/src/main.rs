@@ -4,7 +4,6 @@ mod accounts_rpc;
 mod auth;
 mod authz;
 mod config;
-mod desktop_settings;
 mod dispatch;
 mod events;
 mod files;
@@ -87,20 +86,7 @@ async fn run(args: config::Args) -> Result<(), String> {
         std::iter::once(data_dir.join("projects")).chain(args.allow_roots.iter().cloned()),
     )?;
 
-    // On a machine that also runs the desktop app, start from its models.
-    let mut desktop_import = None;
-    if !args.no_desktop_settings {
-        if let Some(desktop) = desktop_settings::desktop_app_state_path() {
-            match desktop_settings::seed_from_desktop(&data_dir.join("app-state.json"), &desktop) {
-                Ok(Some(_)) => desktop_import = Some(desktop),
-                Ok(None) => {}
-                Err(e) => eprintln!("[settings] could not import desktop settings: {e}"),
-            }
-        }
-    }
-
-    // Same startup step as the desktop app: honor the saved proxy settings
-    // before any outbound request.
+    // Honor the saved proxy settings before any outbound request.
     if let Some(proxy) =
         llm_wiki_core::proxy::read_proxy_config_from_store(&data_dir.join("app-state.json"))
     {
@@ -175,12 +161,6 @@ async fn run(args: config::Args) -> Result<(), String> {
         eprintln!(
             "  token:     from {}",
             data_dir.join("server-token").display()
-        );
-    }
-    if let Some(desktop) = &desktop_import {
-        eprintln!(
-            "  settings:  imported model settings from the desktop app ({})",
-            desktop.display()
         );
     }
     if args.allow_shell {

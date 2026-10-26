@@ -76,7 +76,7 @@ fn arguments(command: &str) -> Option<&'static [(&'static str, Access)]> {
 
 /// Commands with a global effect, which only a Platform Admin may run.
 fn admin_only(command: &str) -> bool {
-    matches!(command, "set_proxy_env" | "api_server_reload_config")
+    matches!(command, "set_proxy_env")
 }
 
 /// A Project named by a `/projects/<id>/…` path or by a bare id.

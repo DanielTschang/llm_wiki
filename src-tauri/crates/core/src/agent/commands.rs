@@ -1,5 +1,4 @@
 //! Agent chat commands invoked by the UI (desktop IPC or server RPC).
-//! The external HTTP API has its own entry points in `api_server.rs`.
 
 use std::sync::Arc;
 
