@@ -141,7 +141,9 @@ Python Extension Point（同事負責）
   - [x] `PgFiles`（頁面部分）：`pages`＋`page_versions` 的 Postgres 實作；`MemoryStore` 與 `PgFiles` 跑同一組 13 個一致性測試（`conformance.rs`），`make test-pg` 在 k3d 上實跑。rename 與 delete 也各寫一筆版本紀錄，rename 會讓版本加一
   - [x] 頁面歷史每頁只留 8 版（常駐開啟，取代 `file_history` 的選擇性開關）
   - [x] `PgBlobs`（blobs 部分）：後端是 `object_store::ObjectStore`（測試用 `InMemory`），物件不可變、每次寫入用新鍵（公司 MinIO 每鍵最多 10 版）；舊列軟刪除，`purge_deleted`／`purge_project` 事後清掉舊物件。跑同一組一致性測試，另有 7 個 blob 專屬測試
-  - [ ] `RoutedFiles`：依 `route()` 合併 `PgFiles`、`PgBlobs` 與 State 轉接層（list 合併、跨後端的子樹刪除與 rename）；連到 k3d 的真 MinIO（`AmazonS3Builder`、path-style、allow_http）；`fs.rs` 接上介面
+  - [x] `RoutedFiles`：依 `route()` 把 `PgFiles`、`PgBlobs` 和 State 轉接層組成同一棵檔案樹。目錄的 list／stat／delete 合併各後端；rename 在後端內由後端自己完成，跨後端（例如 `wiki/x.md` 搬到 `raw/`）則複製再刪除，失敗時還原已搬的檔案；頁面與 blob 不能互相遮蔽（檔案不能放在另一個後端的檔案底下）。跨後端操作不是原子的。同一組一致性測試跑過 memory、Postgres＋記憶體物件、Postgres＋真 MinIO，另有 20 MiB multipart 上傳驗證
+  - [x] `S3Config`：從環境變數讀 MinIO 連線（path-style，只在 endpoint 是 `http://` 時允許明文），Debug 輸出遮掉 secret。`make test-pg` 會轉發 k3d 的 MinIO 並建 `llm-wiki-test` bucket（需要 `aws` CLI）
+  - [ ] `fs.rs` 接上 `RoutedFiles`（A 類呼叫點），並接上 API 的上傳／下載端點
   - [ ] 頁面寫入時一併重建 `page_links`、`page_sources`，並解析 frontmatter 填 `title`／`page_type`
   - [ ] `.llm-wiki/*` 狀態檔的轉接層（`route()` 回傳 State 的路徑，讀寫轉成對應資料表）
   - [x] 大檔案串流：`BlobStreams`（`put_stream`／`get_stream`，8 MiB 分段上傳，邊傳邊算 SHA-256）。API 的上傳／下載端點還沒接

@@ -11,9 +11,11 @@ mod error;
 mod listing;
 mod locator;
 mod memory;
+mod objects;
 mod path;
 mod pg;
 mod route;
+mod routed;
 mod sql;
 mod store;
 
@@ -24,9 +26,11 @@ pub use blobs::PgBlobs;
 pub use error::StoreError;
 pub use locator::ProjectLocator;
 pub use memory::MemoryStore;
+pub use objects::S3Config;
 pub use path::RelPath;
 pub use pg::{migrate, PgFiles, DEFAULT_MAX_VERSIONS};
 pub use route::{blob_kind, route, Backend};
+pub use routed::RoutedFiles;
 pub use store::{
     BlobStreams, Body, ByteStream, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx,
 };
