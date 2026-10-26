@@ -13,8 +13,10 @@ use serde_json::{json, Value};
 use crate::auth::Credential;
 use crate::dispatch::{self, DispatchError};
 use crate::paths::PROJECT_SETTING_KEYS;
+use crate::principal::Principal;
 use crate::worker::PUBLISH_PREFIX;
 use crate::AppState;
+use crate::{accounts_rpc, authz};
 use llm_wiki_core::EventSink;
 
 const AGENT_TURN_COMMANDS: &[&str] = &["agent_start_turn", "agent_start_turn_stream"];
@@ -66,6 +68,7 @@ fn available_on_platform(command: &str) -> bool {
 pub async fn handle(
     State(state): State<AppState>,
     Extension(credential): Extension<Credential>,
+    principal: Option<Extension<Principal>>,
     Path(command): Path<String>,
     body: Bytes,
 ) -> Response {
@@ -80,18 +83,21 @@ pub async fn handle(
             Err(e) => return error(StatusCode::BAD_REQUEST, format!("Invalid JSON body: {e}")),
         }
     };
-    match call(&state, credential, &command, args).await {
+    let principal = principal.map(|Extension(principal)| principal);
+    match call(&state, credential, principal, &command, args).await {
         Ok(value) => Json(value).into_response(),
         Err(DispatchError::Unknown) => {
             error(StatusCode::NOT_FOUND, format!("Unknown command: {command}"))
         }
         Err(DispatchError::Failed(message)) => error(StatusCode::BAD_REQUEST, message),
+        Err(DispatchError::Status(status, message)) => error(status, message),
     }
 }
 
 async fn call(
     state: &AppState,
     credential: Credential,
+    principal: Option<Principal>,
     command: &str,
     mut args: Value,
 ) -> Result<Value, DispatchError> {
@@ -108,6 +114,17 @@ async fn call(
         None => state.roots.check_args(&args),
     }
     .map_err(DispatchError::Failed)?;
+    // On a platform server the caller is a known principal, and what they ask
+    // for is checked against their roles before anything runs.
+    if let (Some(platform), Some(principal)) = (&state.platform, &principal) {
+        if let Some(reply) = accounts_rpc::handle(platform, principal, command, args.clone()).await
+        {
+            return reply.map_err(|denied| DispatchError::Status(denied.status, denied.message));
+        }
+        authz::authorize_rpc(platform, principal, command, &mut args)
+            .await
+            .map_err(|denied| DispatchError::Status(denied.status, denied.message))?;
+    }
     if AGENT_TURN_COMMANDS.contains(&command) && !state.allow_shell {
         strip_shell_approvals(&mut args);
     }
@@ -317,7 +334,12 @@ mod platform_tests {
 
     #[test]
     fn a_platform_server_serves_only_the_commands_moved_onto_storage() {
-        for command in ["read_file", "write_file", "search_project", "agent_start_turn"] {
+        for command in [
+            "read_file",
+            "write_file",
+            "search_project",
+            "agent_start_turn",
+        ] {
             assert!(available_on_platform(command), "{command}");
         }
         // Still working on host folders.

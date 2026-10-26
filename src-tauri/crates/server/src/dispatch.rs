@@ -13,6 +13,8 @@ use serde_json::Value;
 pub enum DispatchError {
     Unknown,
     Failed(String),
+    /// Refused with a specific status, e.g. 403 when the role is too low.
+    Status(axum::http::StatusCode, String),
 }
 
 pub async fn dispatch(

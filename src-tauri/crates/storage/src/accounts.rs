@@ -434,6 +434,26 @@ impl Accounts {
         .map(Some)
     }
 
+    /// The account the operator's token acts as: a Service Account with no
+    /// password, so it appears in the activity log without being a person
+    /// anyone can sign in as.
+    pub async fn operator_user(&self) -> Result<User, StoreError> {
+        const SUBJECT: &str = "system:operator";
+        let id: Uuid = sqlx::query_scalar(
+            "INSERT INTO users (kind, external_subject, display_name)
+             VALUES ('service', $1, 'Operator')
+             ON CONFLICT (external_subject) DO UPDATE SET external_subject = EXCLUDED.external_subject
+             RETURNING id",
+        )
+        .bind(SUBJECT)
+        .fetch_one(&self.pool)
+        .await
+        .map_err(backend)?;
+        self.user(id)
+            .await?
+            .ok_or_else(|| StoreError::Backend("the operator account vanished".into()))
+    }
+
     /// A new browser session for `user_id`; the returned string is the cookie
     /// value and is not recoverable later.
     pub async fn create_session(&self, user_id: Uuid) -> Result<String, StoreError> {
@@ -786,6 +806,22 @@ mod tests {
             .await
             .unwrap();
         assert!(made.is_none());
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn the_operator_account_is_one_passwordless_service_account() {
+        let Some(accounts) = accounts().await else {
+            return;
+        };
+        let first = accounts.operator_user().await.unwrap();
+        let again = accounts.operator_user().await.unwrap();
+        assert_eq!(first.id, again.id);
+        assert!(first.is_service && first.username.is_none() && !first.is_platform_admin);
+        assert!(accounts.create_session(first.id).await.is_ok());
+        assert_eq!(
+            accounts.authenticate("operator", "anything at all").await,
+            Err(AuthError::InvalidCredentials)
+        );
     }
 
     #[tokio::test(flavor = "multi_thread")]

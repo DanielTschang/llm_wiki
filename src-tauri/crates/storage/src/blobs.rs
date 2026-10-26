@@ -74,6 +74,27 @@ impl PgBlobs {
         self.purge(None, grace).await
     }
 
+    /// Removes every object of a Project from the object store, live or not.
+    /// Run before the Project's rows are deleted: afterwards nothing records
+    /// which objects were its, and they would be orphaned.
+    pub async fn delete_project_objects(&self, project: ProjectId) -> Result<usize, StoreError> {
+        sqlx::query(
+            "UPDATE blobs SET deleted_at = now() WHERE project_id = $1 AND deleted_at IS NULL",
+        )
+        .bind(project.0)
+        .execute(&self.pool)
+        .await
+        .map_err(backend)?;
+        let mut removed = 0;
+        loop {
+            let batch = self.purge_project(project, Duration::ZERO).await?;
+            if batch == 0 {
+                return Ok(removed);
+            }
+            removed += batch;
+        }
+    }
+
     /// [`purge_deleted`](Self::purge_deleted) limited to one project.
     pub async fn purge_project(
         &self,
@@ -584,6 +605,53 @@ mod tests {
             h.blobs.read(p, &path).await.unwrap().0,
             Body::Bytes(vec![3; 4])
         );
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn deleting_a_projects_objects_empties_the_store_of_them_and_only_them() {
+        let Some(h) = harness().await else { return };
+        let (mine, other) = (h.new_project().await, h.new_project().await);
+        let ctx = WriteCtx::new("test");
+        for n in 0..3u8 {
+            for project in [mine, other] {
+                h.blobs
+                    .write(
+                        project,
+                        &rel(&format!("raw/sources/f{n}.bin")),
+                        Body::Bytes(vec![n]),
+                        Precondition::Any,
+                        &ctx,
+                    )
+                    .await
+                    .unwrap();
+            }
+        }
+        // One replaced file leaves a soft-deleted object behind as well.
+        h.blobs
+            .write(
+                mine,
+                &rel("raw/sources/f0.bin"),
+                Body::Bytes(vec![9]),
+                Precondition::Any,
+                &ctx,
+            )
+            .await
+            .unwrap();
+        assert_eq!(object_count(&h).await, 7);
+
+        assert_eq!(h.blobs.delete_project_objects(mine).await.unwrap(), 4);
+        assert_eq!(object_count(&h).await, 3);
+        assert!(h
+            .blobs
+            .read(other, &rel("raw/sources/f1.bin"))
+            .await
+            .is_ok());
+        assert!(h
+            .blobs
+            .read(mine, &rel("raw/sources/f1.bin"))
+            .await
+            .is_err());
+        assert_eq!(h.blobs.delete_project_objects(mine).await.unwrap(), 0);
     }
 
     #[tokio::test(flavor = "multi_thread")]

@@ -3,19 +3,20 @@
 use std::path::Path;
 
 use axum::body::Body;
-use axum::extract::{Query, Request, State};
+use axum::extract::{Extension, Query, Request, State};
 use axum::http::{header, HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
 use futures::StreamExt;
 use llm_wiki_core::platform::Platform;
-use llm_wiki_storage::{route, Backend, EntryKind, StoreError};
+use llm_wiki_storage::{route, Backend, EntryKind, Role, StoreError};
 use serde::Deserialize;
 use serde_json::json;
 use tower::ServiceExt;
 use tower_http::services::ServeFile;
 
-use crate::AppState;
+use crate::principal::Principal;
+use crate::{authz, AppState};
 
 /// Extensions a browser may execute script from. Served under a CSP
 /// sandbox (opaque origin) so an agent-generated or imported HTML file
@@ -33,10 +34,23 @@ pub struct FileQuery {
 
 pub async fn serve(
     State(state): State<AppState>,
+    principal: Option<Extension<Principal>>,
     Query(query): Query<FileQuery>,
     request: Request,
 ) -> Response {
     if let Some(platform) = llm_wiki_core::platform::get() {
+        // A platform server checks the caller's role in the file's Project
+        // before reading anything.
+        if let (Some(accounts), Some(Extension(principal))) = (&state.platform, principal) {
+            if let Ok((project, _)) = platform.locator.resolve(&query.path) {
+                if let Err(denied) =
+                    authz::require_role(accounts, &principal, project, Role::Viewer).await
+                {
+                    return (denied.status, Json(json!({ "error": denied.message })))
+                        .into_response();
+                }
+            }
+        }
         return serve_from_store(platform, &query).await;
     }
     let path = match state.roots.check(Path::new(&query.path)) {

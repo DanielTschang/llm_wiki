@@ -1,6 +1,8 @@
 //! Self-hosted LLM Wiki server. See plans/web-server-mode.md (Phase 3).
 
+mod accounts_rpc;
 mod auth;
+mod authz;
 mod config;
 mod desktop_settings;
 mod dispatch;
@@ -26,9 +28,9 @@ use axum::routing::{any, get, post};
 use axum::{Form, Json, Router};
 use clap::Parser;
 use llm_wiki_core::{CoreContext, EventEmitter};
-use llm_wiki_storage::{AuthError, Services};
+use llm_wiki_storage::AuthError;
 
-use crate::principal::Principal;
+use crate::principal::{PlatformState, Principal};
 use serde_json::json;
 use tower::ServiceExt;
 use tower_http::services::{ServeDir, ServeFile};
@@ -55,7 +57,7 @@ pub struct AppState {
     /// Staging area for files uploaded from the browser's device.
     upload_root: Arc<PathBuf>,
     /// Present on a platform server: accounts, projects, and the stores.
-    platform: Option<Services>,
+    platform: Option<PlatformState>,
 }
 
 #[tokio::main]
@@ -116,8 +118,13 @@ async fn run(args: config::Args) -> Result<(), String> {
                 llm_wiki_storage::ProjectLocator::default(),
             )?;
             bootstrap_admin(&services, &args).await?;
+            let operator = services
+                .accounts
+                .operator_user()
+                .await
+                .map_err(|e| format!("Cannot create the operator account: {e}"))?;
             eprintln!("[platform] Project files are in Postgres and the S3 bucket");
-            Some(services)
+            Some(PlatformState::new(services, operator))
         }
         None => None,
     };
@@ -209,7 +216,10 @@ async fn run(args: config::Args) -> Result<(), String> {
 
 /// Creates the first Platform Admin when the platform has none, so there is
 /// someone who can sign in and create everyone else.
-async fn bootstrap_admin(services: &Services, args: &config::Args) -> Result<(), String> {
+async fn bootstrap_admin(
+    services: &llm_wiki_storage::Services,
+    args: &config::Args,
+) -> Result<(), String> {
     let generated = args.admin_password.is_none();
     let password = args.admin_password.clone().unwrap_or_else(|| {
         let raw = uuid::Uuid::new_v4().simple().to_string();
@@ -315,13 +325,15 @@ async fn require_auth(State(state): State<AppState>, mut request: Request, next:
             "/events" | "/files" | "/proxy" | "/upload" | "/logout"
         );
     let credential = match &state.platform {
-        Some(platform) => match platform_principal(platform, &state.auth, request.headers()).await {
-            Some((credential, principal)) => {
-                request.extensions_mut().insert(principal);
-                credential
+        Some(platform) => {
+            match platform_principal(platform, &state.auth, request.headers()).await {
+                Some((credential, principal)) => {
+                    request.extensions_mut().insert(principal);
+                    credential
+                }
+                None => Credential::None,
             }
-            None => Credential::None,
-        },
+        }
         None => state.auth.credential(request.headers()),
     };
     request.extensions_mut().insert(credential);
@@ -352,12 +364,17 @@ async fn require_auth(State(state): State<AppState>, mut request: Request, next:
 /// Who a platform request is from: the server token, the worker's token, or a
 /// signed-in user's session cookie.
 async fn platform_principal(
-    platform: &Services,
+    platform: &PlatformState,
     auth: &Auth,
     headers: &axum::http::HeaderMap,
 ) -> Option<(Credential, Principal)> {
     match auth.bearer_credential(headers) {
-        Credential::Bearer => return Some((Credential::Bearer, Principal::Operator)),
+        Credential::Bearer => {
+            return Some((
+                Credential::Bearer,
+                Principal::Operator(platform.operator.clone()),
+            ))
+        }
         Credential::Worker => return Some((Credential::Worker, Principal::Worker)),
         _ => {}
     }
@@ -391,7 +408,11 @@ async fn login(
         }
         Some(platform) => {
             let password = form.get("password").map(String::as_str).unwrap_or_default();
-            let user = match platform.accounts.authenticate(field("username"), password).await {
+            let user = match platform
+                .accounts
+                .authenticate(field("username"), password)
+                .await
+            {
                 Ok(user) => user,
                 Err(AuthError::InvalidCredentials) => {
                     return fail(StatusCode::UNAUTHORIZED, "Wrong username or password.")

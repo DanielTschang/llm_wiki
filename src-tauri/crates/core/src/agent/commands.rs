@@ -171,10 +171,12 @@ pub async fn agent_start_turn_stream(
         let events = ctx_for_task.events().clone();
         let emit_session = session_for_task.clone();
         let emit_run = run_for_task.clone();
+        let emit_project = project_for_task.id.clone();
         let sink: crate::agent::runtime::AgentEventSink = std::sync::Arc::new(move |event| {
             let _ = events.emit(
                 "agent-event",
                 serde_json::json!({
+                    "projectId": emit_project.clone(),
                     "sessionId": emit_session.clone(),
                     "runId": emit_run.clone(),
                     "event": event,
@@ -205,6 +207,7 @@ pub async fn agent_start_turn_stream(
                 let _ = ctx_for_task.events().emit(
                     "agent-event",
                     serde_json::json!({
+                        "projectId": project_for_task.id,
                         "sessionId": session_for_task,
                         "runId": run_for_task,
                         "event": { "type": "error", "message": err },
@@ -238,13 +241,44 @@ pub fn agent_list_sessions(
     Ok(ctx.agent_sessions.list_sessions(&project.path))
 }
 
+/// On a platform server a Project is its id, or its `/projects/<id>` path;
+/// there is no registry of folders to look it up in.
+fn resolve_platform_project(
+    platform: &crate::platform::Platform,
+    project_id: &str,
+) -> Result<AgentProjectEntry, String> {
+    let decoded = percent_decode(project_id);
+    let path = if decoded.starts_with('/') {
+        decoded.clone()
+    } else {
+        let id =
+            uuid::Uuid::parse_str(&decoded).map_err(|_| format!("Unknown project: {decoded}"))?;
+        platform
+            .locator
+            .project_path(llm_wiki_storage::ProjectId(id))
+    };
+    let (id, root) = platform
+        .locator
+        .resolve(&path)
+        .map_err(|_| format!("Unknown project: {decoded}"))?;
+    if !root.is_root() {
+        return Err(format!("Unknown project: {decoded}"));
+    }
+    Ok(AgentProjectEntry {
+        id: id.0.to_string(),
+        name: "Project".to_string(),
+        path,
+    })
+}
+
 fn resolve_agent_project(ctx: &CoreContext, project_id: &str) -> Result<AgentProjectEntry, String> {
+    if let Some(platform) = crate::platform::get() {
+        return resolve_platform_project(platform, project_id);
+    }
     let decoded = percent_decode(project_id);
     load_agent_projects(ctx)
         .into_iter()
-        .find(|project| {
-            project.id == decoded || project_path_matches(&project.path, &decoded)
-        })
+        .find(|project| project.id == decoded || project_path_matches(&project.path, &decoded))
         .ok_or_else(|| format!("Unknown project: {decoded}"))
 }
 

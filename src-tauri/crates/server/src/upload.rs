@@ -11,7 +11,7 @@ use std::path::{Component, Path, PathBuf};
 use std::time::{Duration, SystemTime};
 
 use axum::body::Body;
-use axum::extract::{Query, State};
+use axum::extract::{Extension, Query, State};
 use axum::http::StatusCode;
 use axum::response::{IntoResponse, Response};
 use axum::Json;
@@ -22,7 +22,8 @@ use tokio::io::AsyncWriteExt;
 
 use llm_wiki_core::platform::Platform;
 
-use crate::AppState;
+use crate::principal::Principal;
+use crate::{authz, AppState};
 
 pub const UPLOAD_DIR: &str = ".uploads";
 const MAX_UPLOAD_BYTES: u64 = 4 * 1024 * 1024 * 1024;
@@ -42,10 +43,25 @@ pub struct UploadQuery {
 
 pub async fn receive(
     State(state): State<AppState>,
+    principal: Option<Extension<Principal>>,
     Query(query): Query<UploadQuery>,
     body: Body,
 ) -> Response {
     if let Some(platform) = llm_wiki_core::platform::get() {
+        // Uploading adds Sources, which takes an editor.
+        if let (Some(accounts), Some(Extension(principal)), Some(project)) =
+            (&state.platform, principal, query.project.as_deref())
+        {
+            if let Ok(id) = uuid::Uuid::parse_str(project) {
+                let id = llm_wiki_storage::ProjectId(id);
+                if let Err(denied) =
+                    authz::require_role(accounts, &principal, id, llm_wiki_storage::Role::Editor)
+                        .await
+                {
+                    return error(denied.status, denied.message);
+                }
+            }
+        }
         return receive_into_store(platform, &query, body).await;
     }
     let target = match staged_path(&state.upload_root, &query.batch, &query.name) {

@@ -133,6 +133,10 @@ k3d-up: ## Create the k3d dev cluster with Postgres, NATS, MinIO, OTel
 k3d-down: ## Delete the k3d dev cluster and all its data
 	deploy/k3d/down.sh
 
+.PHONY: e2e-accounts
+e2e-accounts: ## Check accounts, roles and permissions against the k3d Postgres and MinIO
+	deploy/k3d/e2e-accounts.sh
+
 .PHONY: e2e-k3d
 e2e-k3d: ## Drive the built server over HTTP against the k3d Postgres and MinIO
 	deploy/k3d/e2e-platform.sh
