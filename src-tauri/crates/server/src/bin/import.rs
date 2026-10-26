@@ -192,7 +192,15 @@ async fn run(args: Args) -> Result<(), String> {
         report.already_there,
         report.skipped.len()
     );
-    for (path, why) in &report.skipped {
+    // The old vector index is hundreds of files; say so once.
+    let (index, other): (Vec<_>, Vec<_>) = report
+        .skipped
+        .iter()
+        .partition(|(path, _)| path.starts_with(".llm-wiki/lancedb/"));
+    if !index.is_empty() {
+        println!("  skipped {} files of the old vector index (re-index instead)", index.len());
+    }
+    for (path, why) in other {
         println!("  skipped {path}: {why}");
     }
     println!("project id: {}", project.0);
