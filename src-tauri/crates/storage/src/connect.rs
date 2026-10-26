@@ -35,7 +35,10 @@ pub async fn open_services(
         .map_err(|error| StoreError::Backend(format!("connect to postgres: {error}")))?;
     migrate(&pool).await?;
     let blobs = Arc::new(PgBlobs::new(pool.clone(), s3.build()?));
-    let files = RoutedFiles::new(Arc::new(PgFiles::new(pool.clone())), blobs.clone())
+    let pages = Arc::new(PgFiles::new(pool.clone()));
+    // Pages stored before the link tables existed get their links and frontmatter now.
+    pages.reindex_stale().await?;
+    let files = RoutedFiles::new(pages, blobs.clone())
         .with_state(Arc::new(PgState::new(pool.clone())))
         .with_blob_streams(blobs.clone());
     Ok(Services {

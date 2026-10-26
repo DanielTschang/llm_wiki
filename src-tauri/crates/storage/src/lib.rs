@@ -9,6 +9,8 @@
 mod accounts;
 mod blobs;
 mod connect;
+mod derive;
+mod index;
 mod error;
 mod listing;
 mod locator;
@@ -35,6 +37,7 @@ pub use locator::ProjectLocator;
 pub use memory::MemoryStore;
 pub use objects::S3Config;
 pub use path::RelPath;
+pub use index::{LinkTarget, PageLinks};
 pub use pg::{migrate, PgFiles, DEFAULT_MAX_VERSIONS};
 pub use projects::{Member, ProjectInfo, Projects, Role};
 pub use route::{blob_kind, route, Backend};

@@ -4,6 +4,8 @@ use sha2::{Digest, Sha256};
 use sqlx::postgres::PgRow;
 use sqlx::{PgPool, Postgres, Row, Transaction};
 
+use crate::derive::{derive, DERIVE_REV};
+use crate::index::{self, PageLinks};
 use crate::listing::{dir_meta, list_entries, FileInfo};
 use crate::sql::{any_live, backend, below, collides, is_unique_violation, WriteFailure};
 use crate::store::{Body, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx};
@@ -64,6 +66,30 @@ impl PgFiles {
         self
     }
 
+    /// Re-derives pages stored before the link tables existed, or under older
+    /// derivation rules. Cheap when there is nothing to do; call on start.
+    pub async fn reindex_stale(&self) -> Result<usize, StoreError> {
+        index::reindex_stale(&self.pool).await
+    }
+
+    /// The links out of a page and the pages linking to it.
+    pub async fn page_links(
+        &self,
+        project: ProjectId,
+        path: &RelPath,
+    ) -> Result<PageLinks, StoreError> {
+        index::page_links(&self.pool, project, path).await
+    }
+
+    /// The pages whose `sources:` cite the Source stored at `source`.
+    pub async fn pages_citing(
+        &self,
+        project: ProjectId,
+        source: &RelPath,
+    ) -> Result<Vec<String>, StoreError> {
+        index::pages_citing(&self.pool, project, source).await
+    }
+
     async fn log_version(
         &self,
         tx: &mut Transaction<'_, Postgres>,
@@ -71,18 +97,20 @@ impl PgFiles {
         version: i32,
         op: &str,
         content: Option<&str>,
+        frontmatter: Option<&serde_json::Map<String, serde_json::Value>>,
         ctx: &WriteCtx,
     ) -> Result<(), StoreError> {
         sqlx::query(
             "INSERT INTO page_versions
-                 (page_id, version, op, content, content_sha256, tool, author_id, ingest_job_id)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8)",
+                 (page_id, version, op, content, content_sha256, frontmatter, tool, author_id, ingest_job_id)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)",
         )
         .bind(page_id)
         .bind(version)
         .bind(op)
         .bind(content)
         .bind(content.map(content_hash))
+        .bind(frontmatter.map(sqlx::types::Json))
         .bind(&ctx.tool)
         .bind(ctx.actor)
         .bind(ctx.ingest_job_id)
@@ -169,7 +197,7 @@ impl ProjectFiles for PgFiles {
             "UPDATE pages SET deleted_at = now(), updated_at = now(), version = version + 1
              WHERE project_id = $1 AND deleted_at IS NULL
                AND (path = $2 OR path LIKE $3 ESCAPE '\\')
-             RETURNING id, version",
+             RETURNING id, version, path",
         )
         .bind(project.0)
         .bind(path.as_str())
@@ -180,12 +208,19 @@ impl ProjectFiles for PgFiles {
         if rows.is_empty() {
             return Err(StoreError::not_found(path));
         }
+        let mut ids = Vec::new();
+        let mut paths = Vec::new();
         for row in &rows {
-            let id = row.try_get("id").map_err(backend)?;
+            let id: uuid::Uuid = row.try_get("id").map_err(backend)?;
             let version = row.try_get("version").map_err(backend)?;
-            self.log_version(&mut tx, id, version, "delete", None, ctx)
+            self.log_version(&mut tx, id, version, "delete", None, None, ctx)
                 .await?;
+            ids.push(id);
+            paths.push(row.try_get::<String, _>("path").map_err(backend)?);
         }
+        index::forget_pages(&mut tx, project, &ids, &paths)
+            .await
+            .map_err(backend)?;
         tx.commit().await.map_err(backend)?;
         Ok(rows.len())
     }
@@ -205,7 +240,7 @@ impl ProjectFiles for PgFiles {
         }
         let mut tx = self.pool.begin().await.map_err(backend)?;
         let moving = sqlx::query(
-            "SELECT id FROM pages
+            "SELECT id, path FROM pages
              WHERE project_id = $1 AND deleted_at IS NULL
                AND (path = $2 OR path LIKE $3 ESCAPE '\\')
              FOR UPDATE",
@@ -228,11 +263,15 @@ impl ProjectFiles for PgFiles {
             .iter()
             .map(|row| row.try_get("id").map_err(backend))
             .collect::<Result<_, _>>()?;
+        let mut paths: Vec<String> = moving
+            .iter()
+            .map(|row| row.try_get("path").map_err(backend))
+            .collect::<Result<_, _>>()?;
         let moved = sqlx::query(
             "UPDATE pages
              SET path = $2 || substr(path, $3), version = version + 1, updated_at = now()
              WHERE id = ANY($1)
-             RETURNING id, version, content",
+             RETURNING id, version, content, path",
         )
         .bind(&ids)
         .bind(to.as_str())
@@ -244,9 +283,27 @@ impl ProjectFiles for PgFiles {
             let id = row.try_get("id").map_err(backend)?;
             let version = row.try_get("version").map_err(backend)?;
             let content: String = row.try_get("content").map_err(backend)?;
-            self.log_version(&mut tx, id, version, "rename", Some(&content), ctx)
-                .await?;
+            let new_path: String = row.try_get("path").map_err(backend)?;
+            let facts = derive(&new_path, &content);
+            self.log_version(
+                &mut tx,
+                id,
+                version,
+                "rename",
+                Some(&content),
+                Some(&facts.frontmatter),
+                ctx,
+            )
+            .await?;
+            // Whether a page belongs to the link graph depends on its path.
+            index::index_page(&mut tx, project, id, &new_path, &facts)
+                .await
+                .map_err(backend)?;
+            paths.push(new_path);
         }
+        index::relink(&mut tx, project, &ids, &paths)
+            .await
+            .map_err(backend)?;
         tx.commit().await.map_err(backend)?;
         Ok(())
     }
@@ -373,16 +430,23 @@ impl PgFiles {
             _ => {}
         }
         let hash = content_hash(content);
+        let facts = derive(path.as_str(), content);
+        let frontmatter = sqlx::types::Json(&facts.frontmatter);
         let (id, version, updated_at, op) = match current {
             Some((id, _)) => {
                 let row = sqlx::query(
                     "UPDATE pages SET content = $2, content_sha256 = $3,
+                         frontmatter = $4, title = $5, page_type = $6, derived_rev = $7,
                          version = version + 1, updated_at = now()
                      WHERE id = $1 RETURNING version, updated_at",
                 )
                 .bind(id)
                 .bind(content)
                 .bind(&hash)
+                .bind(&frontmatter)
+                .bind(&facts.title)
+                .bind(&facts.page_type)
+                .bind(DERIVE_REV)
                 .fetch_one(&mut *tx)
                 .await?;
                 (
@@ -394,13 +458,19 @@ impl PgFiles {
             }
             None => {
                 let row = sqlx::query(
-                    "INSERT INTO pages (project_id, path, content, content_sha256)
-                     VALUES ($1, $2, $3, $4) RETURNING id, version, updated_at",
+                    "INSERT INTO pages
+                         (project_id, path, content, content_sha256,
+                          frontmatter, title, page_type, derived_rev)
+                     VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id, version, updated_at",
                 )
                 .bind(project.0)
                 .bind(path.as_str())
                 .bind(content)
                 .bind(&hash)
+                .bind(&frontmatter)
+                .bind(&facts.title)
+                .bind(&facts.page_type)
+                .bind(DERIVE_REV)
                 .fetch_one(&mut *tx)
                 .await?;
                 (
@@ -411,8 +481,18 @@ impl PgFiles {
                 )
             }
         };
-        self.log_version(&mut tx, id, version, op, Some(content), ctx)
-            .await?;
+        self.log_version(
+            &mut tx,
+            id,
+            version,
+            op,
+            Some(content),
+            Some(&facts.frontmatter),
+            ctx,
+        )
+        .await?;
+        index::index_page(&mut tx, project, id, path.as_str(), &facts).await?;
+        index::relink(&mut tx, project, &[id], &[path.to_string()]).await?;
         tx.commit().await?;
         Ok(Meta {
             path: path.clone(),
@@ -430,6 +510,7 @@ mod tests {
     use sqlx::postgres::PgPoolOptions;
 
     use super::*;
+    use crate::LinkTarget;
     use crate::conformance::{self, Harness};
 
     struct PgHarness {
@@ -480,6 +561,198 @@ mod tests {
     }
 
     conformance::conformance_tests!(harness().await);
+
+    async fn put(h: &PgHarness, p: ProjectId, path: &str, text: &str) {
+        h.files
+            .write(
+                p,
+                &RelPath::parse(path).unwrap(),
+                Body::Text(text.into()),
+                Precondition::Any,
+                &WriteCtx::new("test"),
+            )
+            .await
+            .unwrap();
+    }
+
+    fn rel(path: &str) -> RelPath {
+        RelPath::parse(path).unwrap()
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn writing_a_page_stores_its_frontmatter_title_and_type() {
+        let Some(h) = harness().await else {
+            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
+            return;
+        };
+        let p = h.new_project().await;
+        put(&h, p, "wiki/a.md", "---\ntype: concept\ntitle: Alpha\ntags: [x, y]\n---\nbody").await;
+        let row = sqlx::query(
+            "SELECT frontmatter, title, page_type, derived_rev FROM pages
+             WHERE project_id = $1 AND path = 'wiki/a.md'",
+        )
+        .bind(p.0)
+        .fetch_one(&h.files.pool)
+        .await
+        .unwrap();
+        let fm: serde_json::Value = row.get("frontmatter");
+        assert_eq!(fm["tags"], serde_json::json!(["x", "y"]));
+        assert_eq!(row.get::<String, _>("title"), "Alpha");
+        assert_eq!(row.get::<String, _>("page_type"), "concept");
+        assert_eq!(row.get::<i16, _>("derived_rev"), DERIVE_REV);
+        // The version log carries the frontmatter too.
+        let logged: serde_json::Value = sqlx::query_scalar(
+            "SELECT v.frontmatter FROM page_versions v JOIN pages g ON g.id = v.page_id
+             WHERE g.project_id = $1 AND g.path = 'wiki/a.md'",
+        )
+        .bind(p.0)
+        .fetch_one(&h.files.pool)
+        .await
+        .unwrap();
+        assert_eq!(logged["title"], "Alpha");
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn links_resolve_when_the_target_appears_and_break_when_it_goes() {
+        let Some(h) = harness().await else {
+            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
+            return;
+        };
+        let p = h.new_project().await;
+        put(&h, p, "wiki/a.md", "see [[b]] and [[wiki/deep/c.md]] and [[a]]").await;
+        let broken = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
+        // A page linking to itself is not an outgoing link.
+        assert_eq!(
+            broken.outgoing,
+            [("b", None), ("wiki/deep/c.md", None)]
+                .map(|(r, path): (&str, Option<&str>)| LinkTarget {
+                    target_ref: r.into(),
+                    path: path.map(Into::into)
+                })
+        );
+
+        put(&h, p, "wiki/entities/b.md", "# B").await;
+        put(&h, p, "wiki/deep/c.md", "# C [[b]]").await;
+        let links = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
+        assert_eq!(links.outgoing[0].path.as_deref(), Some("wiki/entities/b.md"));
+        assert_eq!(links.outgoing[1].path.as_deref(), Some("wiki/deep/c.md"));
+        let b = h.files.page_links(p, &rel("wiki/entities/b.md")).await.unwrap();
+        assert_eq!(b.backlinks, ["wiki/a.md", "wiki/deep/c.md"]);
+
+        // Rewriting a page replaces its links.
+        put(&h, p, "wiki/a.md", "only [[c]]").await;
+        let b = h.files.page_links(p, &rel("wiki/entities/b.md")).await.unwrap();
+        assert_eq!(b.backlinks, ["wiki/deep/c.md"]);
+
+        // Deleting the target breaks the link instead of dropping it.
+        h.files
+            .delete(p, &rel("wiki/deep/c.md"), &WriteCtx::new("test"))
+            .await
+            .unwrap();
+        let a = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
+        assert_eq!(
+            a.outgoing,
+            [LinkTarget { target_ref: "c".into(), path: None }]
+        );
+        // The deleted page no longer counts as a source of links.
+        let b = h.files.page_links(p, &rel("wiki/entities/b.md")).await.unwrap();
+        assert!(b.backlinks.is_empty());
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn renaming_a_page_moves_the_links_with_it() {
+        let Some(h) = harness().await else {
+            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
+            return;
+        };
+        let p = h.new_project().await;
+        put(&h, p, "wiki/a.md", "[[b]] [[wiki/b.md]]").await;
+        put(&h, p, "wiki/b.md", "# B [[a]]").await;
+        h.files
+            .rename(p, &rel("wiki/b.md"), &rel("wiki/old/b2.md"), &WriteCtx::new("test"))
+            .await
+            .unwrap();
+        let a = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
+        assert!(a.outgoing.iter().all(|l| l.path.is_none()), "{a:?}");
+        let b2 = h.files.page_links(p, &rel("wiki/old/b2.md")).await.unwrap();
+        assert_eq!(b2.outgoing[0].path.as_deref(), Some("wiki/a.md"));
+        assert_eq!(h.files.page_links(p, &rel("wiki/a.md")).await.unwrap().backlinks, ["wiki/old/b2.md"]);
+        // Moving a page out of wiki/ takes it out of the graph.
+        h.files
+            .rename(p, &rel("wiki/old/b2.md"), &rel("elsewhere.md"), &WriteCtx::new("test"))
+            .await
+            .unwrap();
+        assert!(h.files.page_links(p, &rel("wiki/a.md")).await.unwrap().backlinks.is_empty());
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn pages_citing_a_source_are_found_by_path_or_file_name() {
+        let Some(h) = harness().await else {
+            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
+            return;
+        };
+        let p = h.new_project().await;
+        put(&h, p, "wiki/a.md", "---\nsources: [paper.pdf]\n---\n").await;
+        put(&h, p, "wiki/b.md", "---\nsources:\n  - raw/sources/dir/notes.md\n  - paper.pdf\n---\n").await;
+        put(&h, p, "wiki/c.md", "---\ntitle: paper.pdf\n---\nmentions paper.pdf").await;
+        let cite = |s: &str| {
+            let files = h.files.clone();
+            let s = rel(s);
+            async move { files.pages_citing(p, &s).await.unwrap() }
+        };
+        assert_eq!(cite("raw/sources/paper.pdf").await, ["wiki/a.md", "wiki/b.md"]);
+        assert_eq!(cite("raw/sources/dir/notes.md").await, ["wiki/b.md"]);
+        assert!(cite("raw/sources/other.pdf").await.is_empty());
+        h.files
+            .delete(p, &rel("wiki/a.md"), &WriteCtx::new("test"))
+            .await
+            .unwrap();
+        assert_eq!(cite("raw/sources/paper.pdf").await, ["wiki/b.md"]);
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn pages_outside_the_wiki_have_no_links_and_stale_pages_are_reindexed() {
+        let Some(h) = harness().await else {
+            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
+            return;
+        };
+        let p = h.new_project().await;
+        put(&h, p, "purpose.md", "[[a]]").await;
+        put(&h, p, "wiki/a.md", "---\ntitle: A\n---\n[[b]]").await;
+        put(&h, p, "wiki/b.md", "# B").await;
+        let count = |table: &'static str| {
+            let pool = h.files.pool.clone();
+            async move {
+                sqlx::query_scalar::<_, i64>(&format!(
+                    "SELECT count(*) FROM {table} WHERE project_id = $1"
+                ))
+                .bind(p.0)
+                .fetch_one(&pool)
+                .await
+                .unwrap()
+            }
+        };
+        assert_eq!(count("page_links").await, 1);
+
+        // A page that predates the derived columns.
+        sqlx::query("DELETE FROM page_links WHERE project_id = $1").bind(p.0).execute(&h.files.pool).await.unwrap();
+        sqlx::query("UPDATE pages SET derived_rev = 0, frontmatter = '{}', title = NULL WHERE project_id = $1")
+            .bind(p.0)
+            .execute(&h.files.pool)
+            .await
+            .unwrap();
+        assert!(h.files.reindex_stale().await.unwrap() >= 3);
+        assert_eq!(count("page_links").await, 1);
+        let a = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
+        assert_eq!(a.outgoing[0].path.as_deref(), Some("wiki/b.md"));
+        let title: String = sqlx::query_scalar("SELECT title FROM pages WHERE project_id = $1 AND path = 'wiki/a.md'")
+            .bind(p.0)
+            .fetch_one(&h.files.pool)
+            .await
+            .unwrap();
+        assert_eq!(title, "A");
+        assert_eq!(h.files.reindex_stale().await.unwrap(), 0);
+    }
 
     #[tokio::test(flavor = "multi_thread")]
     async fn only_the_newest_eight_versions_of_a_page_are_kept() {
