@@ -54,6 +54,7 @@ pub struct AgentRuntime {
     llm_config: Option<LlmConfig>,
     web_search_config: Option<WebSearchConfig>,
     anytxt_config: Option<AnyTxtConfig>,
+    read_only: bool,
 }
 
 #[derive(Debug, Clone, Default, Deserialize)]
@@ -143,7 +144,14 @@ impl AgentRuntime {
             llm_config,
             web_search_config,
             anytxt_config,
+            read_only: false,
         }
+    }
+
+    /// An agent that can read and search the Project but not change it.
+    pub fn with_read_only(mut self, read_only: bool) -> Self {
+        self.read_only = read_only;
+        self
     }
 
     #[allow(dead_code)]
@@ -195,7 +203,11 @@ impl AgentRuntime {
             },
         );
         let mut references = Vec::new();
-        let permission_policy = PermissionPolicy::api_default();
+        let permission_policy = if self.read_only {
+            PermissionPolicy::read_only()
+        } else {
+            PermissionPolicy::api_default()
+        };
         let router = route_query(message, request.mode, &request.tools);
         let skills = load_project_skills(&self.project_path, &request.skills);
         check_cancel(cancellation.as_ref())?;
@@ -2422,6 +2434,7 @@ impl AgentRuntime {
     fn tool_context(&self) -> tools::ToolContext<'_> {
         tools::ToolContext {
             project_path: &self.project_path,
+            read_only: self.read_only,
             embedding_config: self.embedding_config.clone(),
             web_search_config: self.web_search_config.clone(),
             anytxt_config: self.anytxt_config.clone(),

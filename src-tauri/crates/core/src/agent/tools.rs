@@ -30,6 +30,13 @@ use super::workspace::{agent_workspace_path, AGENT_WORKSPACE_DIR};
 // Tool I/O limits are backend security boundaries. Do not relax them only in
 // the UI: API and MCP callers can invoke the same tools without going through
 // React components.
+/// Tools that change the Project or run commands.
+const WRITE_TOOLS: &[&str] = &[
+    "wiki.write_page",
+    "workspace.write_file",
+    "workspace.append_file",
+    "shell.exec",
+];
 const MAX_READ_PAGE_BYTES: usize = 2 * 1024 * 1024;
 const MAX_WRITE_PAGE_BYTES: usize = 2 * 1024 * 1024;
 const MAX_WORKSPACE_WRITE_BYTES: usize = 2 * 1024 * 1024;
@@ -106,6 +113,8 @@ pub struct BuiltinToolRegistry;
 #[derive(Clone)]
 pub struct ToolContext<'a> {
     pub project_path: &'a str,
+    /// The session may read and search but not change the Project.
+    pub read_only: bool,
     pub embedding_config: Option<SearchEmbeddingConfig>,
     pub web_search_config: Option<WebSearchConfig>,
     pub anytxt_config: Option<AnyTxtConfig>,
@@ -123,6 +132,9 @@ impl ToolRegistry for BuiltinToolRegistry {
         context: ToolContext<'a>,
     ) -> Pin<Box<dyn Future<Output = Result<Value, String>> + Send + 'a>> {
         Box::pin(async move {
+            if context.read_only && WRITE_TOOLS.contains(&name) {
+                return Err(format!("{name} is not available: this session can only read"));
+            }
             if let Some(platform) = crate::platform::get() {
                 if let Some(result) =
                     on_platform::execute(platform, name, &input, context.project_path).await
@@ -3050,6 +3062,7 @@ mod tests {
 
         let registry = BuiltinToolRegistry;
         let context = ToolContext {
+            read_only: false,
             project_path: root.to_str().unwrap(),
             embedding_config: None,
             web_search_config: None,
@@ -3075,11 +3088,46 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn a_read_only_session_can_read_but_not_write() {
+        let root = std::env::temp_dir().join(format!("llm-wiki-readonly-{}", Uuid::new_v4()));
+        fs::create_dir_all(root.join("wiki")).unwrap();
+        fs::write(root.join("wiki/a.md"), "# A\n\nBody").unwrap();
+        let registry = BuiltinToolRegistry;
+        let context = ToolContext {
+            read_only: true,
+            project_path: root.to_str().unwrap(),
+            embedding_config: None,
+            web_search_config: None,
+            anytxt_config: None,
+        };
+        let read = registry
+            .execute("wiki.read_page", json!({ "path": "wiki/a.md" }), context.clone())
+            .await
+            .unwrap();
+        assert!(read["content"].as_str().unwrap().contains("Body"));
+        for (tool, input) in [
+            ("wiki.write_page", json!({ "path": "wiki/b.md", "content": "x" })),
+            ("workspace.write_file", json!({ "path": "o.txt", "content": "x" })),
+            ("workspace.append_file", json!({ "path": "o.txt", "content": "x" })),
+            ("shell.exec", json!({ "command": "echo hi" })),
+        ] {
+            let err = registry
+                .execute(tool, input, context.clone())
+                .await
+                .unwrap_err();
+            assert!(err.contains("can only read"), "{tool}: {err}");
+        }
+        assert!(!root.join("wiki/b.md").exists());
+        let _ = fs::remove_dir_all(root);
+    }
+
+    #[tokio::test]
     async fn registry_executes_project_scoped_shell_command() {
         let root = std::env::temp_dir().join(format!("llm-wiki-shell-tool-{}", Uuid::new_v4()));
         fs::create_dir_all(&root).unwrap();
         let registry = BuiltinToolRegistry;
         let context = ToolContext {
+            read_only: false,
             project_path: root.to_str().unwrap(),
             embedding_config: None,
             web_search_config: None,

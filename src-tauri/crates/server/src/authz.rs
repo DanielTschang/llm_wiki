@@ -94,8 +94,15 @@ fn needs(access: Access, rel: &RelPath) -> Role {
     }
 }
 
+/// Marks an agent turn as read-only, overriding whatever the browser sent.
+fn force_read_only(args: &mut Value) {
+    if let Some(request) = args.get_mut("request").and_then(Value::as_object_mut) {
+        request.insert("readOnly".into(), Value::Bool(true));
+    }
+}
+
 /// Checks an RPC call against the caller's roles. For an agent turn by
-/// someone who may not edit, sets `readOnly` so the agent cannot write.
+/// someone who may not edit, sets `request.readOnly` so the agent cannot write.
 pub async fn authorize_rpc(
     platform: &PlatformState,
     principal: &Principal,
@@ -140,9 +147,7 @@ pub async fn authorize_rpc(
         }
     }
     if AGENT_TURNS.contains(&command) && weakest.is_some_and(|role| role < Role::Editor) {
-        if let Some(object) = args.as_object_mut() {
-            object.insert("readOnly".into(), Value::Bool(true));
-        }
+        force_read_only(args);
     }
     Ok(())
 }
@@ -166,6 +171,8 @@ pub async fn require_role(
 
 #[cfg(test)]
 mod tests {
+    use serde_json::json;
+
     use super::*;
 
     fn rel(path: &str) -> RelPath {
@@ -229,6 +236,19 @@ mod tests {
         );
         assert_eq!(needs(Access::Read, &rel("wiki/a.md")), Role::Viewer);
         assert_eq!(needs(Access::Write, &rel("wiki/a.md")), Role::Editor);
+    }
+
+    #[test]
+    fn a_readers_agent_turn_is_forced_read_only_whatever_the_browser_sent() {
+        for sent in [json!({}), json!({ "readOnly": false }), json!({ "readOnly": true })] {
+            let mut args = json!({ "projectId": "p", "request": sent });
+            force_read_only(&mut args);
+            assert_eq!(args["request"]["readOnly"], true);
+        }
+        // Nothing to mark when there is no request object.
+        let mut odd = json!({ "projectId": "p" });
+        force_read_only(&mut odd);
+        assert_eq!(odd, json!({ "projectId": "p" }));
     }
 
     #[test]

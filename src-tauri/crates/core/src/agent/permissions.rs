@@ -38,6 +38,16 @@ impl PermissionPolicy {
         }
     }
 
+    /// What an agent may do for a member who can only read: everything
+    /// except changing the Project.
+    pub fn read_only() -> Self {
+        let mut policy = Self::api_default();
+        policy
+            .allowed
+            .retain(|capability| !matches!(capability, AgentCapability::WriteWiki | AgentCapability::Process));
+        policy
+    }
+
     pub fn allows(&self, capability: AgentCapability) -> bool {
         self.allowed.contains(&capability)
     }
@@ -62,5 +72,8 @@ mod tests {
         assert!(policy.allows(AgentCapability::Network));
         assert!(policy.allows(AgentCapability::WriteWiki));
         assert!(policy.allows(AgentCapability::Process));
+        let reader = PermissionPolicy::read_only();
+        assert!(reader.allows(AgentCapability::ReadProject) && reader.allows(AgentCapability::SearchWiki));
+        assert!(!reader.allows(AgentCapability::WriteWiki) && !reader.allows(AgentCapability::Process));
     }
 }

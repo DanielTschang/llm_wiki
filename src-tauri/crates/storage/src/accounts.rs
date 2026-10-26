@@ -434,6 +434,54 @@ impl Accounts {
         .map(Some)
     }
 
+    /// One of a user's own settings (zoom level, the last project they had
+    /// open, ...). These belong to the person, not to the organisation.
+    pub async fn preference(
+        &self,
+        user_id: Uuid,
+        key: &str,
+    ) -> Result<Option<serde_json::Value>, StoreError> {
+        sqlx::query_scalar("SELECT value FROM user_preferences WHERE user_id = $1 AND key = $2")
+            .bind(user_id)
+            .bind(key)
+            .fetch_optional(&self.pool)
+            .await
+            .map_err(backend)
+    }
+
+    pub async fn set_preference(
+        &self,
+        user_id: Uuid,
+        key: &str,
+        value: &serde_json::Value,
+    ) -> Result<(), StoreError> {
+        sqlx::query(
+            "INSERT INTO user_preferences (user_id, key, value) VALUES ($1, $2, $3)
+             ON CONFLICT (user_id, key) DO UPDATE SET value = EXCLUDED.value, updated_at = now()",
+        )
+        .bind(user_id)
+        .bind(key)
+        .bind(value)
+        .execute(&self.pool)
+        .await
+        .map_err(backend)?;
+        Ok(())
+    }
+
+    /// Whether there was anything to delete.
+    pub async fn delete_preference(&self, user_id: Uuid, key: &str) -> Result<bool, StoreError> {
+        Ok(
+            sqlx::query("DELETE FROM user_preferences WHERE user_id = $1 AND key = $2")
+                .bind(user_id)
+                .bind(key)
+                .execute(&self.pool)
+                .await
+                .map_err(backend)?
+                .rows_affected()
+                > 0,
+        )
+    }
+
     /// The account the operator's token acts as: a Service Account with no
     /// password, so it appears in the activity log without being a person
     /// anyone can sign in as.
@@ -806,6 +854,44 @@ mod tests {
             .await
             .unwrap();
         assert!(made.is_none());
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn preferences_are_kept_per_user_and_replaced_in_place() {
+        let Some(accounts) = accounts().await else {
+            return;
+        };
+        let (a, _, _) = user(&accounts, false).await;
+        let (b, _, _) = user(&accounts, false).await;
+        assert_eq!(accounts.preference(a.id, "zoomLevel").await.unwrap(), None);
+        accounts
+            .set_preference(a.id, "zoomLevel", &serde_json::json!(1.25))
+            .await
+            .unwrap();
+        accounts
+            .set_preference(a.id, "zoomLevel", &serde_json::json!(1.5))
+            .await
+            .unwrap();
+        accounts
+            .set_preference(b.id, "zoomLevel", &serde_json::json!({ "level": 2 }))
+            .await
+            .unwrap();
+        assert_eq!(
+            accounts.preference(a.id, "zoomLevel").await.unwrap(),
+            Some(serde_json::json!(1.5))
+        );
+        assert_eq!(
+            accounts.preference(b.id, "zoomLevel").await.unwrap(),
+            Some(serde_json::json!({ "level": 2 }))
+        );
+        assert!(accounts.delete_preference(a.id, "zoomLevel").await.unwrap());
+        assert!(!accounts.delete_preference(a.id, "zoomLevel").await.unwrap());
+        assert_eq!(accounts.preference(a.id, "zoomLevel").await.unwrap(), None);
+        assert!(accounts
+            .preference(b.id, "zoomLevel")
+            .await
+            .unwrap()
+            .is_some());
     }
 
     #[tokio::test(flavor = "multi_thread")]

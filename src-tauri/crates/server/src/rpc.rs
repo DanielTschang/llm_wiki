@@ -130,7 +130,7 @@ async fn call(
     }
     match command {
         "app_store_get" | "app_store_set" | "app_store_delete" => {
-            app_store(state, command, args).await
+            app_store(state, principal.as_ref(), command, args).await
         }
         "ingest_command" => ingest_command(state, args).await,
         // Where the web file picker may browse and stage uploads.
@@ -291,10 +291,80 @@ struct StoreArgs {
     value: Value,
 }
 
-async fn app_store(state: &AppState, command: &str, args: Value) -> Result<Value, DispatchError> {
+/// Settings that belong to the person, not the organisation: where they left
+/// off, how they like the screen. Everything else in the store is configuration
+/// the whole platform shares, such as models and endpoints.
+const PER_USER_KEYS: &[&str] = &[
+    "lastProject",
+    "recentProjects",
+    "projectRegistry",
+    "zoomLevel",
+    "updateCheckState",
+    "outputLanguage",
+    "generalConfig",
+];
+
+/// A signed-in user's own copy of a personal setting, in their preferences.
+async fn user_setting(
+    platform: &crate::principal::PlatformState,
+    user: &llm_wiki_storage::User,
+    command: &str,
+    args: StoreArgs,
+) -> Result<Value, DispatchError> {
+    let failed = |error: llm_wiki_storage::StoreError| DispatchError::Failed(error.to_string());
+    let key = format!("{}:{}", args.store, args.key);
+    match command {
+        "app_store_get" => Ok(platform
+            .accounts
+            .preference(user.id, &key)
+            .await
+            .map_err(failed)?
+            .unwrap_or(Value::Null)),
+        "app_store_set" => {
+            platform
+                .accounts
+                .set_preference(user.id, &key, &args.value)
+                .await
+                .map_err(failed)?;
+            Ok(Value::Null)
+        }
+        _ => platform
+            .accounts
+            .delete_preference(user.id, &key)
+            .await
+            .map(Value::Bool)
+            .map_err(failed),
+    }
+}
+
+async fn app_store(
+    state: &AppState,
+    principal: Option<&Principal>,
+    command: &str,
+    args: Value,
+) -> Result<Value, DispatchError> {
     let args: StoreArgs = serde_json::from_value(args)
         .map_err(|e| DispatchError::Failed(format!("Invalid arguments: {e}")))?;
-    if command == "app_store_set" && PROJECT_SETTING_KEYS.contains(&args.key.as_str()) {
+    // A person's own settings live in their preferences. The organisation's
+    // are read by everyone and changed only by a Platform Admin.
+    if let (Some(platform), Some(principal)) = (&state.platform, principal) {
+        if let Principal::User(user) = principal {
+            if PER_USER_KEYS.contains(&args.key.as_str()) {
+                return user_setting(platform, user, command, args).await;
+            }
+        }
+        if command != "app_store_get" && !principal.is_platform_admin() {
+            return Err(DispatchError::Status(
+                StatusCode::FORBIDDEN,
+                "only a Platform Admin can change these settings".into(),
+            ));
+        }
+    }
+    let on_platform = state.platform.is_some();
+    if command == "app_store_set"
+        && !on_platform
+        && PROJECT_SETTING_KEYS.contains(&args.key.as_str())
+    {
         state
             .roots
             .check_project_setting(&args.value)

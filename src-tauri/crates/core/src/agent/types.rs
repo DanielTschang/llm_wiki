@@ -133,6 +133,11 @@ pub struct AgentChatRequest {
     pub shell_command: Option<String>,
     #[serde(default)]
     pub images: Vec<AgentImage>,
+    // Set by the server, never trusted from a browser: a member who may only
+    // read gets an agent that can read, search and answer but cannot write
+    // pages or workspace files.
+    #[serde(default)]
+    pub read_only: bool,
     #[serde(default)]
     pub stream: Option<bool>,
     // Internal retrieval preflight used by CLI-backed chat. It collects tool
@@ -166,6 +171,7 @@ impl Default for AgentChatRequest {
             stream: None,
             allow_empty_retrieval: false,
             persist_session: true,
+            read_only: false,
         }
     }
 }

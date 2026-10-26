@@ -165,6 +165,18 @@ check("admin disables bob", admin.rpc("set_user_disabled", {"userId": users["bob
 check("his session ends", bob.rpc("whoami")[0] == 401)
 check("and he cannot sign in", Client().login(f"bob-{tag}", "a long enough password") == 403)
 
+alice2 = Client()
+check("alice signs in again with the new password", alice2.login(f"alice-{tag}", "another long password") == 303)
+
+print("settings")
+check("a user keeps their own last project", alice2.rpc("app_store_set", {"store": "app-state.json", "key": "lastProject", "value": {"path": base}})[0] == 200)
+check("another user does not see it", carol.rpc("app_store_get", {"store": "app-state.json", "key": "lastProject"})[1] is None)
+check("and gets it back themselves", alice2.rpc("app_store_get", {"store": "app-state.json", "key": "lastProject"})[1]["path"] == base)
+check("a user cannot change organisation settings", alice2.rpc("app_store_set", {"store": "app-state.json", "key": "llmConfig", "value": {"model": "x"}})[0] == 403)
+check("an administrator can", admin.rpc("app_store_set", {"store": "app-state.json", "key": "llmConfig", "value": {"model": "m1"}})[0] == 200)
+check("and everyone reads them", carol.rpc("app_store_get", {"store": "app-state.json", "key": "llmConfig"})[1]["model"] == "m1")
+check("a user cannot change the proxy", alice2.rpc("set_proxy_env", {})[0] == 403)
+
 print("operator token")
 operator = Client(bearer=OPERATOR_TOKEN)
 check("the operator needs an owner to create a project", operator.rpc("create_project", {"name": "Ops"})[0] == 400)
@@ -174,7 +186,6 @@ check("the operator reads any project", operator.rpc("read_file", {"path": f"{ba
 
 print("deleting a project")
 check("an editor cannot delete it", alice.rpc("delete_project", {"projectId": pid})[0] in (401, 403))
-alice2 = Client(); alice2.login(f"alice-{tag}", "another long password")
 check("an editor cannot delete it (signed in again)", alice2.rpc("delete_project", {"projectId": pid})[0] == 403)
 check("the owner deletes it", admin.rpc("delete_project", {"projectId": pid})[0] == 200)
 check("it is gone for everyone", alice2.rpc("read_file", {"path": f"{base}/wiki/a.md"})[0] == 403 and operator.rpc("open_project", {"path": base})[0] == 404)

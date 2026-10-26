@@ -74,7 +74,8 @@ pub async fn agent_start_turn(
         runtime_config.llm,
         runtime_config.web_search,
         runtime_config.anytxt,
-    );
+    )
+    .with_read_only(request.read_only);
     let user_message = request.message.clone();
     let persist_session = request.persist_session;
     let cancellation =
@@ -157,7 +158,8 @@ pub async fn agent_start_turn_stream(
         runtime_config.llm,
         runtime_config.web_search,
         runtime_config.anytxt,
-    );
+    )
+    .with_read_only(request.read_only);
     let ctx_for_task = Arc::clone(&ctx);
     let project_for_task = project.clone();
     let session_for_task = active_session_id.clone();
