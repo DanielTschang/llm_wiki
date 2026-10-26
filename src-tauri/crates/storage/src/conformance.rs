@@ -399,6 +399,72 @@ pub(crate) async fn read_tree_returns_every_file_beneath_a_directory_in_order(h:
         .is_empty());
 }
 
+fn backlink_paths(links: &crate::PageLinks) -> Vec<&str> {
+    links.backlinks.iter().map(|b| b.path.as_str()).collect()
+}
+
+/// Only the page store keeps the link tables.
+pub(crate) async fn links_follow_their_targets(h: &dyn Harness) {
+    if h.root() != "wiki" {
+        return;
+    }
+    let p = h.new_project().await;
+    let ctx = ctx();
+    put(h, p, "a.md", "---\ntitle: Alpha\n---\nsee [[b]], [[wiki/deep/c.md#x]], [[a]]").await;
+    let a = h.store().page_links(p, &at(h, "a.md")).await.unwrap();
+    let refs: Vec<_> = a.outgoing.iter().map(|l| (l.target_ref.as_str(), l.path.as_deref())).collect();
+    assert_eq!(refs, [("b", None), ("wiki/deep/c.md", None)], "the self link is not outgoing");
+
+    put(h, p, "entities/b.md", "# B").await;
+    put(h, p, "deep/c.md", "# C [[b]]").await;
+    let a = h.store().page_links(p, &at(h, "a.md")).await.unwrap();
+    assert_eq!(a.outgoing[0].path.as_deref(), Some("wiki/entities/b.md"));
+    assert_eq!(a.outgoing[0].title.as_deref(), Some("B"));
+    assert_eq!(a.outgoing[1].path.as_deref(), Some("wiki/deep/c.md"));
+    let b = h.store().page_links(p, &at(h, "entities/b.md")).await.unwrap();
+    assert_eq!(backlink_paths(&b), ["wiki/a.md", "wiki/deep/c.md"]);
+    assert_eq!(b.backlinks[0].title.as_deref(), Some("Alpha"));
+
+    put(h, p, "a.md", "only [[c]]").await;
+    let b = h.store().page_links(p, &at(h, "entities/b.md")).await.unwrap();
+    assert_eq!(backlink_paths(&b), ["wiki/deep/c.md"]);
+
+    h.store().delete(p, &at(h, "deep/c.md"), &ctx).await.unwrap();
+    let a = h.store().page_links(p, &at(h, "a.md")).await.unwrap();
+    assert_eq!(a.outgoing.len(), 1);
+    assert_eq!(a.outgoing[0].path, None);
+    let b = h.store().page_links(p, &at(h, "entities/b.md")).await.unwrap();
+    assert!(b.backlinks.is_empty());
+
+    h.store()
+        .rename(p, &at(h, "entities/b.md"), &at(h, "moved/b.md"), &ctx)
+        .await
+        .unwrap();
+    put(h, p, "a.md", "[[b]] [[wiki/entities/b.md]]").await;
+    let a = h.store().page_links(p, &at(h, "a.md")).await.unwrap();
+    assert_eq!(a.outgoing[0].path.as_deref(), Some("wiki/moved/b.md"));
+    assert_eq!(a.outgoing[1].path, None, "the old path is gone");
+}
+
+pub(crate) async fn pages_citing_a_source_by_path_or_name(h: &dyn Harness) {
+    if h.root() != "wiki" {
+        return;
+    }
+    let p = h.new_project().await;
+    put(h, p, "a.md", "---\nsources: [paper.pdf]\n---\n").await;
+    put(h, p, "b.md", "---\nsources:\n  - raw/sources/dir/notes.md\n  - paper.pdf\n---\n").await;
+    put(h, p, "c.md", "---\ntitle: paper.pdf\n---\nmentions paper.pdf").await;
+    let cite = |path: &str| {
+        let path = RelPath::parse(path).unwrap();
+        async move { h.store().pages_citing(p, &path).await.unwrap() }
+    };
+    assert_eq!(cite("raw/sources/paper.pdf").await, ["wiki/a.md", "wiki/b.md"]);
+    assert_eq!(cite("raw/sources/dir/notes.md").await, ["wiki/b.md"]);
+    assert!(cite("raw/sources/other.pdf").await.is_empty());
+    h.store().delete(p, &at(h, "a.md"), &ctx()).await.unwrap();
+    assert_eq!(cite("raw/sources/paper.pdf").await, ["wiki/b.md"]);
+}
+
 /// Expands to one `#[tokio::test]` per case. `$setup` is an expression of
 /// type `Option<impl Harness>`; `None` skips (no database configured).
 macro_rules! conformance_tests {
@@ -418,6 +484,8 @@ macro_rules! conformance_tests {
             a_file_cannot_shadow_a_directory_or_sit_beneath_a_file,
             like_wildcards_in_names_are_literal,
             read_tree_returns_every_file_beneath_a_directory_in_order,
+            links_follow_their_targets,
+            pages_citing_a_source_by_path_or_name,
         );
     };
     (@cases $setup:expr; $($case:ident),+ $(,)?) => {

@@ -17,13 +17,22 @@ pub struct LinkTarget {
     pub target_ref: String,
     /// `None` when no page matches: a broken link.
     pub path: Option<String>,
+    /// Title of the page it resolves to.
+    pub title: Option<String>,
+}
+
+/// A page, by path and title.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct PageRef {
+    pub path: String,
+    pub title: Option<String>,
 }
 
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct PageLinks {
     pub outgoing: Vec<LinkTarget>,
-    /// Paths of the pages that link here, sorted.
-    pub backlinks: Vec<String>,
+    /// The pages that link here, by path.
+    pub backlinks: Vec<PageRef>,
 }
 
 /// Replaces the link and source rows of one page with those in `facts`.
@@ -211,7 +220,7 @@ pub(crate) async fn page_links(
     path: &RelPath,
 ) -> Result<PageLinks, StoreError> {
     let outgoing = sqlx::query(
-        "SELECT l.target_ref, t.path AS target_path
+        "SELECT l.target_ref, t.path AS target_path, t.title AS target_title
          FROM page_links l
          JOIN pages s ON s.id = l.source_page_id
          LEFT JOIN pages t ON t.id = l.target_page_id
@@ -229,22 +238,31 @@ pub(crate) async fn page_links(
         Ok(LinkTarget {
             target_ref: row.try_get("target_ref").map_err(backend)?,
             path: row.try_get("target_path").map_err(backend)?,
+            title: row.try_get("target_title").map_err(backend)?,
         })
     })
     .collect::<Result<_, StoreError>>()?;
-    let backlinks = sqlx::query_scalar(
-        "SELECT s.path FROM page_links l
+    let backlinks = sqlx::query(
+        "SELECT s.path, s.title FROM page_links l
          JOIN pages t ON t.id = l.target_page_id
          JOIN pages s ON s.id = l.source_page_id
          WHERE t.project_id = $1 AND t.path = $2 AND t.deleted_at IS NULL
            AND s.deleted_at IS NULL AND s.id <> t.id
-         GROUP BY s.path ORDER BY s.path COLLATE \"C\"",
+         GROUP BY s.path, s.title ORDER BY s.path COLLATE \"C\"",
     )
     .bind(project.0)
     .bind(path.as_str())
     .fetch_all(pool)
     .await
-    .map_err(backend)?;
+    .map_err(backend)?
+    .iter()
+    .map(|row| {
+        Ok(PageRef {
+            path: row.try_get("path").map_err(backend)?,
+            title: row.try_get("title").map_err(backend)?,
+        })
+    })
+    .collect::<Result<_, StoreError>>()?;
     Ok(PageLinks { outgoing, backlinks })
 }
 

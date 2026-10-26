@@ -1795,8 +1795,9 @@ pub async fn find_related_wiki_pages(
     project_path: String,
     source_name: String,
 ) -> Result<Vec<String>, String> {
-    if crate::platform::get().is_some() {
-        return Err(crate::platform::unsupported("find_related_wiki_pages"));
+    if let Some(platform) = crate::platform::get() {
+        return super::fs_platform::find_related_wiki_pages(platform, &project_path, &source_name)
+            .await;
     }
     tokio::task::spawn_blocking(move || {
         run_guarded("find_related_wiki_pages", || {

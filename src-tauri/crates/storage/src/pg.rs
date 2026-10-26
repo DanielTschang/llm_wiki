@@ -72,24 +72,6 @@ impl PgFiles {
         index::reindex_stale(&self.pool).await
     }
 
-    /// The links out of a page and the pages linking to it.
-    pub async fn page_links(
-        &self,
-        project: ProjectId,
-        path: &RelPath,
-    ) -> Result<PageLinks, StoreError> {
-        index::page_links(&self.pool, project, path).await
-    }
-
-    /// The pages whose `sources:` cite the Source stored at `source`.
-    pub async fn pages_citing(
-        &self,
-        project: ProjectId,
-        source: &RelPath,
-    ) -> Result<Vec<String>, StoreError> {
-        index::pages_citing(&self.pool, project, source).await
-    }
-
     async fn log_version(
         &self,
         tx: &mut Transaction<'_, Postgres>,
@@ -359,6 +341,22 @@ impl ProjectFiles for PgFiles {
             .collect()
     }
 
+    async fn page_links(
+        &self,
+        project: ProjectId,
+        path: &RelPath,
+    ) -> Result<PageLinks, StoreError> {
+        index::page_links(&self.pool, project, path).await
+    }
+
+    async fn pages_citing(
+        &self,
+        project: ProjectId,
+        source: &RelPath,
+    ) -> Result<Vec<String>, StoreError> {
+        index::pages_citing(&self.pool, project, source).await
+    }
+
     async fn list(
         &self,
         project: ProjectId,
@@ -510,7 +508,6 @@ mod tests {
     use sqlx::postgres::PgPoolOptions;
 
     use super::*;
-    use crate::LinkTarget;
     use crate::conformance::{self, Harness};
 
     struct PgHarness {
@@ -575,6 +572,10 @@ mod tests {
             .unwrap();
     }
 
+    fn paths(links: &PageLinks) -> Vec<&str> {
+        links.backlinks.iter().map(|b| b.path.as_str()).collect()
+    }
+
     fn rel(path: &str) -> RelPath {
         RelPath::parse(path).unwrap()
     }
@@ -613,53 +614,6 @@ mod tests {
     }
 
     #[tokio::test(flavor = "multi_thread")]
-    async fn links_resolve_when_the_target_appears_and_break_when_it_goes() {
-        let Some(h) = harness().await else {
-            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
-            return;
-        };
-        let p = h.new_project().await;
-        put(&h, p, "wiki/a.md", "see [[b]] and [[wiki/deep/c.md]] and [[a]]").await;
-        let broken = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
-        // A page linking to itself is not an outgoing link.
-        assert_eq!(
-            broken.outgoing,
-            [("b", None), ("wiki/deep/c.md", None)]
-                .map(|(r, path): (&str, Option<&str>)| LinkTarget {
-                    target_ref: r.into(),
-                    path: path.map(Into::into)
-                })
-        );
-
-        put(&h, p, "wiki/entities/b.md", "# B").await;
-        put(&h, p, "wiki/deep/c.md", "# C [[b]]").await;
-        let links = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
-        assert_eq!(links.outgoing[0].path.as_deref(), Some("wiki/entities/b.md"));
-        assert_eq!(links.outgoing[1].path.as_deref(), Some("wiki/deep/c.md"));
-        let b = h.files.page_links(p, &rel("wiki/entities/b.md")).await.unwrap();
-        assert_eq!(b.backlinks, ["wiki/a.md", "wiki/deep/c.md"]);
-
-        // Rewriting a page replaces its links.
-        put(&h, p, "wiki/a.md", "only [[c]]").await;
-        let b = h.files.page_links(p, &rel("wiki/entities/b.md")).await.unwrap();
-        assert_eq!(b.backlinks, ["wiki/deep/c.md"]);
-
-        // Deleting the target breaks the link instead of dropping it.
-        h.files
-            .delete(p, &rel("wiki/deep/c.md"), &WriteCtx::new("test"))
-            .await
-            .unwrap();
-        let a = h.files.page_links(p, &rel("wiki/a.md")).await.unwrap();
-        assert_eq!(
-            a.outgoing,
-            [LinkTarget { target_ref: "c".into(), path: None }]
-        );
-        // The deleted page no longer counts as a source of links.
-        let b = h.files.page_links(p, &rel("wiki/entities/b.md")).await.unwrap();
-        assert!(b.backlinks.is_empty());
-    }
-
-    #[tokio::test(flavor = "multi_thread")]
     async fn renaming_a_page_moves_the_links_with_it() {
         let Some(h) = harness().await else {
             eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
@@ -676,38 +630,13 @@ mod tests {
         assert!(a.outgoing.iter().all(|l| l.path.is_none()), "{a:?}");
         let b2 = h.files.page_links(p, &rel("wiki/old/b2.md")).await.unwrap();
         assert_eq!(b2.outgoing[0].path.as_deref(), Some("wiki/a.md"));
-        assert_eq!(h.files.page_links(p, &rel("wiki/a.md")).await.unwrap().backlinks, ["wiki/old/b2.md"]);
+        assert_eq!(paths(&h.files.page_links(p, &rel("wiki/a.md")).await.unwrap()), ["wiki/old/b2.md"]);
         // Moving a page out of wiki/ takes it out of the graph.
         h.files
             .rename(p, &rel("wiki/old/b2.md"), &rel("elsewhere.md"), &WriteCtx::new("test"))
             .await
             .unwrap();
         assert!(h.files.page_links(p, &rel("wiki/a.md")).await.unwrap().backlinks.is_empty());
-    }
-
-    #[tokio::test(flavor = "multi_thread")]
-    async fn pages_citing_a_source_are_found_by_path_or_file_name() {
-        let Some(h) = harness().await else {
-            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
-            return;
-        };
-        let p = h.new_project().await;
-        put(&h, p, "wiki/a.md", "---\nsources: [paper.pdf]\n---\n").await;
-        put(&h, p, "wiki/b.md", "---\nsources:\n  - raw/sources/dir/notes.md\n  - paper.pdf\n---\n").await;
-        put(&h, p, "wiki/c.md", "---\ntitle: paper.pdf\n---\nmentions paper.pdf").await;
-        let cite = |s: &str| {
-            let files = h.files.clone();
-            let s = rel(s);
-            async move { files.pages_citing(p, &s).await.unwrap() }
-        };
-        assert_eq!(cite("raw/sources/paper.pdf").await, ["wiki/a.md", "wiki/b.md"]);
-        assert_eq!(cite("raw/sources/dir/notes.md").await, ["wiki/b.md"]);
-        assert!(cite("raw/sources/other.pdf").await.is_empty());
-        h.files
-            .delete(p, &rel("wiki/a.md"), &WriteCtx::new("test"))
-            .await
-            .unwrap();
-        assert_eq!(cite("raw/sources/paper.pdf").await, ["wiki/b.md"]);
     }
 
     #[tokio::test(flavor = "multi_thread")]

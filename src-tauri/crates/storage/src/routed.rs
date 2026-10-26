@@ -7,6 +7,7 @@ use crate::route::{route, Backend};
 use crate::store::{
     BlobStreams, Body, ByteStream, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx,
 };
+use crate::index::PageLinks;
 use crate::{RelPath, StoreError};
 
 const STATE_DIR: &str = ".llm-wiki";
@@ -353,6 +354,22 @@ impl ProjectFiles for RoutedFiles {
             done.push(step);
         }
         Ok(())
+    }
+
+    async fn page_links(
+        &self,
+        project: ProjectId,
+        path: &RelPath,
+    ) -> Result<PageLinks, StoreError> {
+        self.pages.page_links(project, path).await
+    }
+
+    async fn pages_citing(
+        &self,
+        project: ProjectId,
+        source: &RelPath,
+    ) -> Result<Vec<String>, StoreError> {
+        self.pages.pages_citing(project, source).await
     }
 
     async fn stat(&self, project: ProjectId, path: &RelPath) -> Result<Option<Meta>, StoreError> {

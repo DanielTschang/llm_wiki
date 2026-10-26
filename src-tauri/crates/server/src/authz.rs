@@ -61,6 +61,7 @@ fn arguments(command: &str) -> Option<&'static [(&'static str, Access)]> {
         "copy_file" | "copy_directory" => &[("source", Read), ("destination", Write)],
         "search_project" | "agent_list_skills" => &[("projectPath", Read)],
         "get_page_links" => &[("projectPath", Read), ("filePath", Read)],
+        "find_related_wiki_pages" => &[("projectPath", Read)],
         "agent_start_turn"
         | "agent_start_turn_stream"
         | "agent_cancel_turn"
@@ -218,6 +219,7 @@ mod tests {
             "file_exists",
             "search_project",
             "get_page_links",
+            "find_related_wiki_pages",
             "agent_start_turn",
         ] {
             let rules = arguments(command).unwrap();

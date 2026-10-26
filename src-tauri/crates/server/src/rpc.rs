@@ -46,6 +46,7 @@ const PLATFORM_COMMANDS: &[&str] = &[
     // Retrieval and the agent, over the stored pages.
     "search_project",
     "get_page_links",
+    "find_related_wiki_pages",
     "agent_start_turn",
     "agent_start_turn_stream",
     "agent_cancel_turn",

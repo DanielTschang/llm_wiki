@@ -4,6 +4,8 @@ use std::sync::Mutex;
 use async_trait::async_trait;
 use chrono::{DateTime, Utc};
 
+use crate::derive::{cites, derive, is_wiki_page, resolve_link, PageFacts};
+use crate::index::{LinkTarget, PageLinks, PageRef};
 use crate::listing::{dir_meta, list_entries, FileInfo};
 use crate::store::{Body, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx};
 use crate::{RelPath, StoreError};
@@ -27,6 +29,19 @@ pub struct MemoryStore {
 impl MemoryStore {
     pub fn new() -> Self {
         Self::default()
+    }
+
+    /// The live pages of the link graph with what they say about themselves,
+    /// in path order.
+    fn wiki_pages(&self, project: ProjectId) -> Vec<(String, PageFacts)> {
+        self.lock()
+            .iter()
+            .filter(|((p, path), _)| *p == project.0 && is_wiki_page(path.as_str()))
+            .filter_map(|((_, path), stored)| {
+                let text = stored.body.as_text()?;
+                Some((path.to_string(), derive(path.as_str(), text)))
+            })
+            .collect()
     }
 
     fn lock(&self) -> std::sync::MutexGuard<'_, BTreeMap<(uuid::Uuid, RelPath), Stored>> {
@@ -171,6 +186,70 @@ impl ProjectFiles for MemoryStore {
             files.insert((project.0, target), stored);
         }
         Ok(())
+    }
+
+    async fn page_links(
+        &self,
+        project: ProjectId,
+        path: &RelPath,
+    ) -> Result<PageLinks, StoreError> {
+        let pages = self.wiki_pages(project);
+        let paths: Vec<&str> = pages.iter().map(|(p, _)| p.as_str()).collect();
+        let resolved = |source: &(String, PageFacts)| -> Vec<(String, Option<&str>)> {
+            source
+                .1
+                .links
+                .iter()
+                .map(|r| (r.clone(), resolve_link(&paths, r)))
+                .collect()
+        };
+        let title_of = |p: &str| {
+            pages
+                .iter()
+                .find(|(path, _)| path == p)
+                .and_then(|(_, facts)| facts.title.clone())
+        };
+        let mut outgoing = Vec::new();
+        if let Some(page) = pages.iter().find(|(p, _)| p == path.as_str()) {
+            for (target_ref, target) in resolved(page) {
+                if target == Some(path.as_str()) {
+                    continue;
+                }
+                outgoing.push(LinkTarget {
+                    title: target.and_then(title_of),
+                    path: target.map(str::to_string),
+                    target_ref,
+                });
+            }
+            outgoing.sort_by(|a, b| a.target_ref.cmp(&b.target_ref));
+        }
+        let backlinks = pages
+            .iter()
+            .filter(|(p, _)| p != path.as_str())
+            .filter(|page| {
+                resolved(page)
+                    .iter()
+                    .any(|(_, target)| *target == Some(path.as_str()))
+            })
+            .map(|(p, facts)| PageRef {
+                path: p.clone(),
+                title: facts.title.clone(),
+            })
+            .collect();
+        Ok(PageLinks { outgoing, backlinks })
+    }
+
+    async fn pages_citing(
+        &self,
+        project: ProjectId,
+        source: &RelPath,
+    ) -> Result<Vec<String>, StoreError> {
+        Ok(self
+            .wiki_pages(project)
+            .into_iter()
+            .filter(|(_, facts)| facts.sources.iter().any(|r| cites(r, source.as_str())))
+            .map(|(path, _)| path)
+            .collect())
     }
 
     async fn stat(&self, project: ProjectId, path: &RelPath) -> Result<Option<Meta>, StoreError> {

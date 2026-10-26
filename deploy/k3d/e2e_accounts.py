@@ -170,6 +170,18 @@ check("carol (no role) cannot read", carol.rpc("read_file", {"path": page})[0] =
 check("carol cannot list", carol.rpc("list_directory", {"path": base})[0] == 403)
 check("carol cannot search the project", carol.rpc("search_project", {"projectPath": base, "query": "ultraviolet"})[0] == 403)
 check("bob (viewer) can search", len(bob.rpc("search_project", {"projectPath": base, "query": "ultraviolet"})[1]["results"]) == 1)
+alice.rpc("write_file", {"path": f"{base}/raw/sources/graph.pdf", "contents": "g"})
+alice.rpc("write_file", {"path": f"{base}/wiki/graph/one.md", "contents": "---\ntitle: One\nsources: [graph.pdf]\n---\nsee [[two]] and [[ghost]]"})
+alice.rpc("write_file", {"path": f"{base}/wiki/graph/two.md", "contents": "# Two\nback to [[one]]"})
+status, links = bob.rpc("get_page_links", {"projectPath": base, "filePath": f"{base}/wiki/graph/one.md"})
+check("links come from the link tables", status == 200 and [l["title"] for l in links["outgoing"]] == ["Two"]
+      and [l["title"] for l in links["backlinks"]] == ["Two"] and [l["title"] for l in links["missing"]] == ["ghost"], links)
+check("carol cannot read links", carol.rpc("get_page_links", {"projectPath": base, "filePath": f"{base}/wiki/graph/one.md"})[0] == 403)
+status, related = bob.rpc("find_related_wiki_pages", {"projectPath": base, "sourceName": "graph.pdf"})
+check("deleting a source finds the pages that cite it", status == 200 and related == [f"{base}/wiki/graph/one.md"], related)
+check("carol cannot ask", carol.rpc("find_related_wiki_pages", {"projectPath": base, "sourceName": "graph.pdf"})[0] == 403)
+alice.rpc("write_file", {"path": f"{base}/wiki/graph/one.md", "contents": "# One\nno citations"})
+check("rewriting a page drops its citations", bob.rpc("find_related_wiki_pages", {"projectPath": base, "sourceName": "graph.pdf"})[1] == [])
 check("the same denial whether or not the project exists",
       carol.rpc("read_file", {"path": f"/projects/{uuid.uuid4()}/wiki/a.md"}) [0] == 403)
 check("a page cannot be copied into a project the user cannot write",

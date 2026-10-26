@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 use futures::stream::BoxStream;
 use uuid::Uuid;
 
+use crate::index::PageLinks;
 use crate::{RelPath, StoreError};
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -165,6 +166,30 @@ pub trait ProjectFiles: Send + Sync {
             }
         }
         Ok(out)
+    }
+
+    /// The links out of a page and the pages that link to it. Only stores
+    /// that keep the link tables answer; the others say so.
+    async fn page_links(
+        &self,
+        _project: ProjectId,
+        _path: &RelPath,
+    ) -> Result<PageLinks, StoreError> {
+        Err(StoreError::Backend(
+            "this store does not index page links".into(),
+        ))
+    }
+
+    /// Paths of the live pages whose `sources:` cite the Source stored at
+    /// `source` (`raw/sources/...`).
+    async fn pages_citing(
+        &self,
+        _project: ProjectId,
+        _source: &RelPath,
+    ) -> Result<Vec<String>, StoreError> {
+        Err(StoreError::Backend(
+            "this store does not index page sources".into(),
+        ))
     }
 }
 

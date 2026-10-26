@@ -6,6 +6,8 @@ use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use walkdir::WalkDir;
 
+use llm_wiki_storage::RelPath;
+
 use crate::commands::vectorstore;
 use crate::panic_guard::run_guarded_async;
 
@@ -180,23 +182,61 @@ async fn get_page_links_from_store(
     if file_project != project || file.top_level() != "wiki" || !is_markdown {
         return Err("Page links target must be an existing Markdown file under wiki/".to_string());
     }
-    let mut pages = BTreeMap::<String, GraphPage>::new();
-    for (path, content) in platform
-        .wiki_markdown(project_path, MAX_SEARCH_FILES)
-        .await?
-    {
-        let file_name = path.rsplit('/').next().unwrap_or_default().to_string();
-        pages.insert(
-            normalize_path(&path),
-            GraphPage {
-                title: extract_title(&content, &file_name),
-                links: extract_graph_links(&content),
-                path,
-                content,
-            },
-        );
+    let (body, _) = platform
+        .files
+        .read(project, &file)
+        .await
+        .map_err(|_| "Page is not available in the current wiki index".to_string())?;
+    let file_name = file.as_str().rsplit('/').next().unwrap_or_default();
+    let current_title = extract_title(body.as_text().unwrap_or_default(), file_name);
+    // The link tables are kept up to date by every page write, so this is
+    // two queries instead of a scan of the wiki.
+    let links = platform
+        .files
+        .page_links(project, &file)
+        .await
+        .map_err(|err| err.to_string())?;
+
+    let mut outgoing = Vec::new();
+    let mut missing = Vec::new();
+    for link in links.outgoing {
+        match link.path {
+            Some(path) => outgoing.push(PageLinkEntry {
+                title: link.title.unwrap_or_else(|| link.target_ref.clone()),
+                path: Some(path),
+                snippet: None,
+            }),
+            None => missing.push(PageLinkEntry {
+                title: link.target_ref,
+                path: None,
+                snippet: None,
+            }),
+        }
     }
-    page_links_from(&pages, &normalize_path(file.as_str()))
+    let mut backlinks = Vec::new();
+    for page in links.backlinks {
+        let snippet = match RelPath::parse(&page.path) {
+            Ok(rel) => platform.files.read(project, &rel).await.ok().and_then(|(body, _)| {
+                body.as_text().map(|text| build_snippet(text, &current_title))
+            }),
+            Err(_) => None,
+        };
+        backlinks.push(PageLinkEntry {
+            title: page.title.unwrap_or_else(|| page.path.clone()),
+            path: Some(page.path),
+            snippet,
+        });
+    }
+    outgoing.sort_by(|a, b| a.title.cmp(&b.title));
+    outgoing.dedup_by(|a, b| a.path == b.path);
+    backlinks.sort_by(|a, b| a.title.cmp(&b.title));
+    missing.sort_by(|a, b| a.title.cmp(&b.title));
+    missing.dedup_by(|a, b| a.title == b.title);
+    Ok(PageLinksResponse {
+        outgoing,
+        backlinks,
+        missing,
+    })
 }
 
 /// Build link relationships from Markdown source rather than the UI's lazy

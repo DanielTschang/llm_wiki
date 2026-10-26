@@ -172,6 +172,33 @@ pub(crate) fn link_ref(raw: &str) -> Option<String> {
     (!target.is_empty()).then_some(target)
 }
 
+/// The page a link resolves to among `paths` (live pages, any order): a
+/// target with a `/` must be a page path; a bare one matches a file name
+/// anywhere in `wiki/`, the first path in byte order winning. The same rule
+/// as the SQL that keeps `page_links` up to date.
+pub(crate) fn resolve_link<'a>(paths: &[&'a str], target_ref: &str) -> Option<&'a str> {
+    let mut graph = paths.iter().copied().filter(|p| is_wiki_page(p));
+    if target_ref.contains('/') {
+        return graph.find(|p| *p == target_ref);
+    }
+    let name = if target_ref.ends_with(".md") {
+        target_ref.to_string()
+    } else {
+        format!("{target_ref}.md")
+    };
+    let nested = format!("/{name}");
+    graph.filter(|p| *p == name || p.ends_with(&nested)).min()
+}
+
+/// Whether the `sources:` entry `source_ref` cites the Source stored at
+/// `source_path`: the same path, the path without `raw/sources/`, or the file
+/// name at the end of it.
+pub(crate) fn cites(source_ref: &str, source_path: &str) -> bool {
+    source_ref == source_path
+        || format!("raw/sources/{source_ref}") == source_path
+        || source_path.ends_with(&format!("/{source_ref}"))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

@@ -287,6 +287,65 @@ pub async fn copy_directory(
     Ok(copied)
 }
 
+/// `find_related_wiki_pages` for a Project in the storage layer: the pages
+/// whose `sources:` cite the Source, plus its summary page(s) under
+/// `wiki/sources/`. Citations come from the index kept on every page write, so
+/// this does not read the wiki. Unlike the desktop scan it does not count a
+/// page that merely mentions the file name in its text.
+pub async fn find_related_wiki_pages(
+    platform: &Platform,
+    project_path: &str,
+    source_name: &str,
+) -> Res<Vec<String>> {
+    let (project, root) = resolve(platform, project_path)?;
+    if !root.is_root() {
+        return Err(format!("not a project path: {project_path}"));
+    }
+    // A full project path, or a name relative to `raw/sources/`.
+    let source = match resolve(platform, source_name) {
+        Ok((other, rel)) if other == project => rel,
+        _ => RelPath::parse(&format!("raw/sources/{}", source_name.trim_start_matches('/')))
+            .map_err(store_error)?,
+    };
+    let mut related: BTreeSet<String> = platform
+        .files
+        .pages_citing(project, &source)
+        .await
+        .map_err(store_error)?
+        .into_iter()
+        .collect();
+
+    let file_name = source.as_str().rsplit('/').next().unwrap_or_default();
+    let stem = match file_name.rsplit_once('.') {
+        Some((stem, _)) if !stem.is_empty() => stem,
+        _ => file_name,
+    }
+    .to_lowercase();
+    let summaries = RelPath::parse("wiki/sources").map_err(store_error)?;
+    for meta in platform
+        .files
+        .list(project, &summaries, true)
+        .await
+        .map_err(store_error)?
+    {
+        let name = meta.path.as_str().rsplit('/').next().unwrap_or_default();
+        if meta.kind == EntryKind::File
+            && extension_of(&meta.path) == "md"
+            && name.to_lowercase().starts_with(&stem)
+        {
+            related.insert(meta.path.to_string());
+        }
+    }
+    related
+        .into_iter()
+        .map(|path| {
+            RelPath::parse(&path)
+                .map(|rel| virtual_path(platform, project, &rel))
+                .map_err(store_error)
+        })
+        .collect()
+}
+
 pub async fn file_exists(platform: &Platform, path: &str) -> Res<bool> {
     let (project, rel) = resolve(platform, path)?;
     let held = platform
@@ -631,6 +690,35 @@ mod tests {
                 .await
                 .unwrap();
         }
+    }
+
+    #[tokio::test]
+    async fn pages_that_cite_a_source_are_found_with_its_summary_page() {
+        let f = fixture();
+        f.put("raw/sources/paper.pdf", "x").await;
+        f.put("wiki/concepts/a.md", "---\nsources: [paper.pdf]\n---\n# A").await;
+        f.put("wiki/concepts/b.md", "---\nsources: [other.pdf, paper.pdf]\n---\n# B").await;
+        f.put("wiki/concepts/c.md", "---\nsources: [other.pdf]\n---\nmentions paper.pdf").await;
+        f.put("wiki/sources/paper-summary.md", "# Summary").await;
+        f.put("wiki/sources/unrelated.md", "# U").await;
+        let expected: Vec<String> = ["wiki/concepts/a.md", "wiki/concepts/b.md", "wiki/sources/paper-summary.md"]
+            .iter()
+            .map(|p| f.at(p))
+            .collect();
+        for name in ["paper.pdf".to_string(), f.at("raw/sources/paper.pdf")] {
+            assert_eq!(
+                find_related_wiki_pages(&f.platform, &f.root, &name).await.unwrap(),
+                expected,
+                "{name}"
+            );
+        }
+        assert!(find_related_wiki_pages(&f.platform, &f.root, "nothing.pdf")
+            .await
+            .unwrap()
+            .is_empty());
+        assert!(find_related_wiki_pages(&f.platform, &f.at("wiki"), "paper.pdf")
+            .await
+            .is_err());
     }
 
     #[tokio::test]
