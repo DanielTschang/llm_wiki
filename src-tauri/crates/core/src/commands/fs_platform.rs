@@ -358,7 +358,7 @@ fn cache_rel(rel: &RelPath) -> Res<RelPath> {
 
 /// The extracted text saved by `preprocess_file`, if it is at least as new
 /// as the file it came from.
-async fn read_cache(platform: &Platform, project: ProjectId, rel: &RelPath) -> Option<String> {
+pub(crate) async fn read_cache(platform: &Platform, project: ProjectId, rel: &RelPath) -> Option<String> {
     let cache = cache_rel(rel).ok()?;
     if uses_anydoc_cache(Path::new(rel.as_str())) {
         let marker = RelPath::parse(

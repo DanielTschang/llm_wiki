@@ -19,6 +19,50 @@ use llm_wiki_core::EventSink;
 
 const AGENT_TURN_COMMANDS: &[&str] = &["agent_start_turn", "agent_start_turn_stream"];
 
+/// The commands of the shared backend a platform server serves. Everything
+/// else still works on host folders, so on a platform server it answers that
+/// it is unavailable rather than touching the host disk. A command joins this
+/// list when it has been moved onto the storage layer (or never needed files),
+/// which keeps a newly added command off by default.
+const PLATFORM_COMMANDS: &[&str] = &[
+    // Files, served from Postgres and the object store.
+    "read_file",
+    "write_file",
+    "write_file_base64",
+    "write_file_atomic",
+    "list_directory",
+    "copy_file",
+    "copy_directory",
+    "preprocess_file",
+    "delete_file",
+    "create_directory",
+    "file_exists",
+    "get_file_modified_time",
+    "get_file_size",
+    "get_file_md5",
+    "read_file_as_base64",
+    // Retrieval and the agent, over the stored pages.
+    "search_project",
+    "get_page_links",
+    "agent_start_turn",
+    "agent_start_turn_stream",
+    "agent_cancel_turn",
+    "agent_get_session",
+    "agent_list_sessions",
+    "agent_list_skills",
+    // No Project files involved.
+    "embedding_fetch",
+    "embedding_fetch_batch",
+    "web_search",
+    "set_proxy_env",
+    "api_server_status",
+    "api_server_reload_config",
+];
+
+fn available_on_platform(command: &str) -> bool {
+    PLATFORM_COMMANDS.contains(&command)
+}
+
 pub async fn handle(
     State(state): State<AppState>,
     Extension(credential): Extension<Credential>,
@@ -82,6 +126,9 @@ async fn call(
             "uploads": state.upload_root.as_ref(),
         })),
         "review_inbox_append" | "review_inbox_take" => review_inbox(state, command, args).await,
+        _ if llm_wiki_core::platform::get().is_some() && !available_on_platform(command) => Err(
+            DispatchError::Failed(llm_wiki_core::platform::unsupported(command)),
+        ),
         _ => dispatch::dispatch(&state.core, command, args).await,
     }
 }
@@ -262,6 +309,33 @@ async fn app_store(state: &AppState, command: &str, args: Value) -> Result<Value
 
 fn error(status: StatusCode, message: String) -> Response {
     (status, Json(json!({ "error": message }))).into_response()
+}
+
+#[cfg(test)]
+mod platform_tests {
+    use super::*;
+
+    #[test]
+    fn a_platform_server_serves_only_the_commands_moved_onto_storage() {
+        for command in ["read_file", "write_file", "search_project", "agent_start_turn"] {
+            assert!(available_on_platform(command), "{command}");
+        }
+        // Still working on host folders.
+        for command in [
+            "create_project",
+            "open_project",
+            "export_project_archive",
+            "list_file_history",
+            "vector_upsert",
+            "vector_search",
+            "extract_and_save_pdf_images_cmd",
+            "apply_text_selection_edit",
+            "anytxt_search",
+            "an_unknown_command",
+        ] {
+            assert!(!available_on_platform(command), "{command}");
+        }
+    }
 }
 
 #[cfg(test)]

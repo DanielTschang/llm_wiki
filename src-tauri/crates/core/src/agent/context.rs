@@ -35,6 +35,32 @@ pub fn load_project_context(project_path: &str) -> ProjectContext {
     }
 }
 
+/// [`load_project_context`] for async callers: on a platform server the
+/// overview and schema come from the storage layer.
+pub async fn load_project_context_async(project_path: &str) -> ProjectContext {
+    let Some(platform) = crate::platform::get() else {
+        return load_project_context(project_path);
+    };
+    let read = |rel: &'static str, max_chars: usize| async move {
+        let text = platform.read_text(project_path, rel).await?;
+        let trimmed = text.trim();
+        (!trimmed.is_empty()).then(|| trim_chars(trimmed, max_chars))
+    };
+    let overview = match read("overview.md", MAX_OVERVIEW_CHARS).await {
+        Some(text) => Some(text),
+        None => read("wiki/overview.md", MAX_OVERVIEW_CHARS).await,
+    };
+    let schema = match read("schema.md", MAX_SCHEMA_CHARS).await {
+        Some(text) => Some(text),
+        None => read("wiki/schema.md", MAX_SCHEMA_CHARS).await,
+    };
+    ProjectContext {
+        overview,
+        schema,
+        agent_workspace: agent_workspace_display(Path::new(project_path)),
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct AgentContextInput<'a> {
     pub query: &'a str,
@@ -274,6 +300,9 @@ pub async fn load_explicit_context_files(
     project_path: &str,
     requested: &[String],
 ) -> Vec<(String, String)> {
+    if let Some(platform) = crate::platform::get() {
+        return load_explicit_from_store(platform, project_path, requested).await;
+    }
     let root = Path::new(project_path);
     let Ok(root_canon) = root.canonicalize() else {
         return Vec::new();
@@ -281,17 +310,10 @@ pub async fn load_explicit_context_files(
     let mut out = Vec::new();
     let mut remaining = MAX_EXPLICIT_CONTEXT_CHARS;
     for requested_path in requested.iter().take(MAX_EXPLICIT_CONTEXT_FILES) {
-        let normalized = requested_path.trim().replace('\\', "/");
-        let relative = Path::new(&normalized);
-        if normalized.is_empty()
-            || relative.is_absolute()
-            || relative
-                .components()
-                .any(|part| !matches!(part, Component::Normal(_)))
-            || normalized.split('/').any(|part| part.starts_with('.'))
-        {
+        let Some(normalized) = explicit_relative(requested_path) else {
             continue;
-        }
+        };
+        let relative = Path::new(&normalized);
         let candidate = root.join(relative);
         let Ok(candidate_canon) = candidate.canonicalize() else {
             continue;
@@ -319,6 +341,72 @@ pub async fn load_explicit_context_files(
         // arbitrary host file. Only after canonical containment succeeds do we
         // expose the absolute path to the model for unambiguous tool use.
         out.push((candidate.to_string_lossy().replace('\\', "/"), fitted));
+        if remaining == 0 {
+            break;
+        }
+    }
+    out
+}
+
+/// A requested attachment as a clean project-relative path, or `None` if it
+/// is empty, absolute, climbs out of the project or names a hidden entry.
+fn explicit_relative(requested: &str) -> Option<String> {
+    let normalized = requested.trim().replace('\\', "/");
+    let relative = Path::new(&normalized);
+    if normalized.is_empty()
+        || relative.is_absolute()
+        || relative
+            .components()
+            .any(|part| !matches!(part, Component::Normal(_)))
+        || normalized.split('/').any(|part| part.starts_with('.'))
+    {
+        return None;
+    }
+    Some(normalized)
+}
+
+/// [`load_explicit_context_files`] for a Project held in the storage layer.
+async fn load_explicit_from_store(
+    platform: &crate::platform::Platform,
+    project_path: &str,
+    requested: &[String],
+) -> Vec<(String, String)> {
+    use llm_wiki_storage::{EntryKind, RelPath};
+
+    let Ok((project, root)) = platform.locator.resolve(project_path) else {
+        return Vec::new();
+    };
+    if !root.is_root() {
+        return Vec::new();
+    }
+    let mut out = Vec::new();
+    let mut remaining = MAX_EXPLICIT_CONTEXT_CHARS;
+    for requested_path in requested.iter().take(MAX_EXPLICIT_CONTEXT_FILES) {
+        let Some(normalized) = explicit_relative(requested_path) else {
+            continue;
+        };
+        let Ok(rel) = RelPath::parse(&normalized) else {
+            continue;
+        };
+        let is_file = matches!(
+            platform.files.stat(project, &rel).await,
+            Ok(Some(meta)) if meta.kind == EntryKind::File
+        );
+        if !is_file {
+            continue;
+        }
+        let candidate = format!("{}/{normalized}", project_path.trim_end_matches('/'));
+        let Ok(content) =
+            crate::commands::fs_platform::read_file(platform, &candidate, Some(false)).await
+        else {
+            continue;
+        };
+        let fitted = trim_chars(content.trim(), remaining.min(MAX_EXPLICIT_FILE_CHARS));
+        if fitted.is_empty() {
+            continue;
+        }
+        remaining = remaining.saturating_sub(fitted.chars().count());
+        out.push((candidate, fitted));
         if remaining == 0 {
             break;
         }

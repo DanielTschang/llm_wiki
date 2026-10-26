@@ -1,6 +1,6 @@
 use std::collections::{BTreeMap, BTreeSet};
 use std::fs;
-use std::path::Path;
+use std::path::{Path, PathBuf};
 
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
@@ -152,9 +152,51 @@ pub async fn get_page_links(
     project_path: String,
     file_path: String,
 ) -> Result<PageLinksResponse, String> {
+    if let Some(platform) = crate::platform::get() {
+        return get_page_links_from_store(platform, &project_path, &file_path).await;
+    }
     tokio::task::spawn_blocking(move || get_page_links_inner(&project_path, &file_path))
         .await
         .map_err(|err| format!("page links worker failed: {err}"))?
+}
+
+/// `get_page_links` for a Project held in the storage layer.
+async fn get_page_links_from_store(
+    platform: &crate::platform::Platform,
+    project_path: &str,
+    file_path: &str,
+) -> Result<PageLinksResponse, String> {
+    let (project, _) = platform
+        .locator
+        .resolve(project_path)
+        .map_err(|err| err.to_string())?;
+    let (file_project, file) = platform
+        .locator
+        .resolve(file_path)
+        .map_err(|err| err.to_string())?;
+    let is_markdown = file
+        .extension()
+        .is_some_and(|ext| ext == "md");
+    if file_project != project || file.top_level() != "wiki" || !is_markdown {
+        return Err("Page links target must be an existing Markdown file under wiki/".to_string());
+    }
+    let mut pages = BTreeMap::<String, GraphPage>::new();
+    for (path, content) in platform
+        .wiki_markdown(project_path, MAX_SEARCH_FILES)
+        .await?
+    {
+        let file_name = path.rsplit('/').next().unwrap_or_default().to_string();
+        pages.insert(
+            normalize_path(&path),
+            GraphPage {
+                title: extract_title(&content, &file_name),
+                links: extract_graph_links(&content),
+                path,
+                content,
+            },
+        );
+    }
+    page_links_from(&pages, &normalize_path(file.as_str()))
 }
 
 /// Build link relationships from Markdown source rather than the UI's lazy
@@ -207,13 +249,22 @@ fn get_page_links_inner(project_path: &str, file_path: &str) -> Result<PageLinks
     }
 
     let current_path = normalize_path(&relative_to_project(&canonical_project, &file));
+    page_links_from(&pages, &current_path)
+}
+
+/// Outgoing links, backlinks and missing targets of one page, given every
+/// page of the wiki keyed by its project-relative path.
+fn page_links_from(
+    pages: &BTreeMap<String, GraphPage>,
+    current_path: &str,
+) -> Result<PageLinksResponse, String> {
     let current = pages
-        .get(&current_path)
+        .get(current_path)
         .ok_or_else(|| "Page is not available in the current wiki index".to_string())?;
     let mut outgoing = Vec::new();
     let mut missing = Vec::new();
     for link in &current.links {
-        if let Some(target_path) = resolve_reader_wikilink(&pages, link) {
+        if let Some(target_path) = resolve_reader_wikilink(pages, link) {
             if target_path.as_str() == current_path {
                 continue;
             }
@@ -234,12 +285,12 @@ fn get_page_links_inner(project_path: &str, file_path: &str) -> Result<PageLinks
     }
 
     let mut backlinks = Vec::new();
-    for (path, page) in &pages {
-        if path == &current_path {
+    for (path, page) in pages {
+        if path == current_path {
             continue;
         }
         let links_here = page.links.iter().any(|link| {
-            resolve_reader_wikilink(&pages, link)
+            resolve_reader_wikilink(pages, link)
                 .is_some_and(|target| target.as_str() == current_path)
         });
         if links_here {
@@ -285,6 +336,54 @@ fn resolve_reader_wikilink<'a>(
             .file_name()
             .is_some_and(|name| name == filename.as_str())
     })
+}
+
+/// Every Markdown page of the wiki as (path, content), at most
+/// `MAX_SEARCH_FILES`. On a platform server the paths are Project paths under
+/// `/projects/<uuid>`; otherwise they are real files under `project_path`.
+async fn load_wiki_pages(project_path: &str) -> Result<Vec<(PathBuf, String)>, String> {
+    if let Some(platform) = crate::platform::get() {
+        let root = Path::new(project_path);
+        return Ok(platform
+            .wiki_markdown(project_path, MAX_SEARCH_FILES)
+            .await?
+            .into_iter()
+            .map(|(rel, content)| (root.join(rel), content))
+            .collect());
+    }
+    let project_path = project_path.to_string();
+    tokio::task::spawn_blocking(move || {
+        let wiki_root = Path::new(&project_path).join("wiki");
+        let mut pages = Vec::new();
+        if !wiki_root.exists() {
+            return pages;
+        }
+        let mut searched_files = 0usize;
+        for entry in WalkDir::new(&wiki_root).into_iter().filter_map(Result::ok) {
+            if !entry.file_type().is_file()
+                || !entry
+                    .path()
+                    .extension()
+                    .and_then(|s| s.to_str())
+                    .is_some_and(|ext| ext.eq_ignore_ascii_case("md"))
+            {
+                continue;
+            }
+            searched_files += 1;
+            if searched_files > MAX_SEARCH_FILES {
+                eprintln!(
+                    "[Search] stopped scanning wiki after {MAX_SEARCH_FILES} markdown files in {project_path}"
+                );
+                break;
+            }
+            if let Ok(content) = fs::read_to_string(entry.path()) {
+                pages.push((entry.path().to_path_buf(), content));
+            }
+        }
+        pages
+    })
+    .await
+    .map_err(|err| format!("wiki scan failed: {err}"))
 }
 
 pub async fn resolve_query_embedding(
@@ -343,69 +442,43 @@ pub async fn search_project_inner(
     let mut legacy_stem_candidates = BTreeMap::<String, Vec<String>>::new();
     let mut graph_pages = BTreeMap::new();
 
-    let wiki_root = Path::new(&project_path).join("wiki");
-    if wiki_root.exists() {
-        let mut searched_files = 0usize;
-        for entry in WalkDir::new(&wiki_root).into_iter().filter_map(Result::ok) {
-            if !entry.file_type().is_file()
-                || !entry
-                    .path()
-                    .extension()
-                    .and_then(|s| s.to_str())
-                    .is_some_and(|ext| ext.eq_ignore_ascii_case("md"))
-            {
-                continue;
-            }
-            searched_files += 1;
-            if searched_files > MAX_SEARCH_FILES {
-                eprintln!(
-                    "[Search] stopped scanning wiki after {MAX_SEARCH_FILES} markdown files in {project_path}"
-                );
-                break;
-            }
-            let content = match fs::read_to_string(entry.path()) {
-                Ok(content) => content,
-                Err(_) => continue,
-            };
-            let relative_path = relative_to_project(&project_path, entry.path());
-            if let Some(vector_id) = vector_page_id(&relative_path) {
-                page_paths_by_vector_id.insert(vector_id, relative_path.clone());
-            }
-            if let Some(stem) = entry.path().file_stem().and_then(|s| s.to_str()) {
-                legacy_stem_candidates
-                    .entry(stem.to_string())
-                    .or_default()
-                    .push(relative_path.clone());
-            }
-            let title = extract_title(
-                &content,
-                entry
-                    .path()
-                    .file_name()
-                    .and_then(|value| value.to_str())
-                    .unwrap_or_default(),
-            );
-            let hit = score_file(
-                &project_path,
-                entry.path(),
-                &content,
-                &effective_tokens,
-                &query_phrase,
-                &query,
-                include_content,
-            );
-            graph_pages.insert(
-                normalize_path(&relative_path),
-                GraphPage {
-                    path: relative_path,
-                    title,
-                    links: extract_graph_links(&content),
-                    content,
-                },
-            );
-            if let Some(hit) = hit {
-                results.push(hit);
-            }
+    for (path, content) in load_wiki_pages(&project_path).await? {
+        let relative_path = relative_to_project(&project_path, &path);
+        if let Some(vector_id) = vector_page_id(&relative_path) {
+            page_paths_by_vector_id.insert(vector_id, relative_path.clone());
+        }
+        if let Some(stem) = path.file_stem().and_then(|s| s.to_str()) {
+            legacy_stem_candidates
+                .entry(stem.to_string())
+                .or_default()
+                .push(relative_path.clone());
+        }
+        let title = extract_title(
+            &content,
+            path.file_name()
+                .and_then(|value| value.to_str())
+                .unwrap_or_default(),
+        );
+        let hit = score_file(
+            &project_path,
+            &path,
+            &content,
+            &effective_tokens,
+            &query_phrase,
+            &query,
+            include_content,
+        );
+        graph_pages.insert(
+            normalize_path(&relative_path),
+            GraphPage {
+                path: relative_path,
+                title,
+                links: extract_graph_links(&content),
+                content,
+            },
+        );
+        if let Some(hit) = hit {
+            results.push(hit);
         }
     }
     let legacy_page_paths = legacy_stem_candidates
@@ -430,6 +503,9 @@ pub async fn search_project_inner(
     let mut vector_rank: BTreeMap<String, usize> = BTreeMap::new();
     let mut vector_score: BTreeMap<String, f32> = BTreeMap::new();
     let mut vector_hits = 0;
+    // The vector index is still LanceDB on local disk; until it moves to
+    // pgvector a platform server answers from keywords alone.
+    let query_embedding = query_embedding.filter(|_| crate::platform::get().is_none());
     if let Some(embedding) = query_embedding {
         if !embedding.is_empty() {
             match search_by_embedding(&project_path, embedding, limit.max(10)).await {
@@ -439,13 +515,17 @@ pub async fn search_project_inner(
                         vector_rank.insert(vr.id.clone(), idx + 1);
                         vector_score.insert(vr.id.clone(), vr.score);
                     }
-                    materialize_vector_only_results(
+                    materialize_with(
                         &vector_results,
                         &page_paths_by_vector_id,
                         &legacy_page_paths,
-                        &project_path,
                         &mut results,
                         include_content,
+                        |rel| {
+                            graph_pages
+                                .get(&normalize_path(rel))
+                                .map(|page: &GraphPage| page.content.clone())
+                        },
                     );
                 }
                 Err(err) => {
@@ -847,6 +927,8 @@ async fn search_by_embedding(
     Ok(ranked)
 }
 
+/// [`materialize_with`] reading each page from disk.
+#[cfg(test)]
 fn materialize_vector_only_results(
     vector_results: &[PageVectorResult],
     page_paths_by_vector_id: &BTreeMap<String, String>,
@@ -854,6 +936,26 @@ fn materialize_vector_only_results(
     project_path: &str,
     results: &mut Vec<ProjectSearchResult>,
     include_content: bool,
+) {
+    materialize_with(
+        vector_results,
+        page_paths_by_vector_id,
+        legacy_page_paths,
+        results,
+        include_content,
+        |rel| fs::read_to_string(Path::new(project_path).join(rel)).ok(),
+    );
+}
+
+/// Adds a result for each vector hit whose page the keyword scan did not
+/// already return. `read` gives a page's text from its project-relative path.
+fn materialize_with(
+    vector_results: &[PageVectorResult],
+    page_paths_by_vector_id: &BTreeMap<String, String>,
+    legacy_page_paths: &BTreeMap<String, String>,
+    results: &mut Vec<ProjectSearchResult>,
+    include_content: bool,
+    read: impl Fn(&str) -> Option<String>,
 ) {
     let mut known_paths: BTreeSet<String> = results
         .iter()
@@ -878,8 +980,7 @@ fn materialize_vector_only_results(
             if known_paths.contains(&normalized_rel) {
                 continue;
             }
-            let path = Path::new(project_path).join(rel);
-            let Ok(content) = fs::read_to_string(&path) else {
+            let Some(content) = read(rel) else {
                 continue;
             };
             let file_name = Path::new(&rel)
@@ -2445,5 +2546,118 @@ mod tests {
         assert!(parse_embedding_batch_values(&response, 2)
             .unwrap_err()
             .contains("duplicate"));
+    }
+
+    mod on_a_platform_server {
+        use std::sync::Arc;
+
+        use llm_wiki_storage::{
+            Body, MemoryStore, Precondition, ProjectFiles, ProjectId, ProjectLocator, RelPath,
+            WriteCtx,
+        };
+
+        use super::*;
+        use crate::platform::Platform;
+
+        struct Wiki {
+            platform: Platform,
+            root: String,
+        }
+
+        async fn wiki(pages: &[(&str, &str)]) -> Wiki {
+            let files = Arc::new(MemoryStore::new());
+            let locator = ProjectLocator::default();
+            let id = ProjectId(uuid::Uuid::new_v4());
+            for (path, content) in pages {
+                files
+                    .write(
+                        id,
+                        &RelPath::parse(path).unwrap(),
+                        Body::Text((*content).to_string()),
+                        Precondition::Any,
+                        &WriteCtx::new("test"),
+                    )
+                    .await
+                    .unwrap();
+            }
+            Wiki {
+                root: locator.project_path(id),
+                platform: Platform {
+                    files,
+                    streams: None,
+                    locator,
+                },
+            }
+        }
+
+        #[tokio::test]
+        async fn the_wiki_scan_returns_only_markdown_pages_under_wiki() {
+            let w = wiki(&[
+                ("wiki/b.md", "# B"),
+                ("wiki/a.md", "# A"),
+                ("wiki/sub/c.MD", "# C"),
+                ("wiki/notes.txt", "text"),
+                ("raw/sources/s.md", "source"),
+                ("purpose.md", "why"),
+            ])
+            .await;
+            let pages = w.platform.wiki_markdown(&w.root, 100).await.unwrap();
+            let paths: Vec<_> = pages.iter().map(|(path, _)| path.as_str()).collect();
+            assert_eq!(paths, ["wiki/a.md", "wiki/b.md", "wiki/sub/c.MD"]);
+            assert_eq!(pages[0].1, "# A");
+            assert!(w
+                .platform
+                .wiki_markdown(&format!("{}/wiki", w.root), 100)
+                .await
+                .is_err());
+        }
+
+        #[tokio::test]
+        async fn page_links_are_built_from_the_stored_pages() {
+            let w = wiki(&[
+                ("wiki/a.md", "# A\nsee [[b]]"),
+                ("wiki/b.md", "# B\nback to [[a]]"),
+                ("wiki/c.md", "# C\n[[a]] and [[missing]]"),
+                ("raw/sources/x.md", "[[a]]"),
+            ])
+            .await;
+            let page = |name: &str| format!("{}/wiki/{name}", w.root);
+
+            let a = get_page_links_from_store(&w.platform, &w.root, &page("a.md"))
+                .await
+                .unwrap();
+            assert_eq!(a.outgoing.iter().map(|l| l.title.as_str()).collect::<Vec<_>>(), ["B"]);
+            assert_eq!(a.backlinks.iter().map(|l| l.title.as_str()).collect::<Vec<_>>(), ["B", "C"]);
+            assert!(a.missing.is_empty());
+            assert_eq!(a.outgoing[0].path.as_deref(), Some("wiki/b.md"));
+
+            let c = get_page_links_from_store(&w.platform, &w.root, &page("c.md"))
+                .await
+                .unwrap();
+            assert_eq!(c.missing.iter().map(|l| l.title.as_str()).collect::<Vec<_>>(), ["missing"]);
+        }
+
+        #[tokio::test]
+        async fn page_links_refuse_targets_outside_the_wiki_or_the_project() {
+            let w = wiki(&[("wiki/a.md", "# A"), ("raw/sources/x.md", "x")]).await;
+            let other = ProjectLocator::default().project_path(ProjectId(uuid::Uuid::new_v4()));
+            for target in [
+                format!("{}/raw/sources/x.md", w.root),
+                format!("{}/wiki/a.txt", w.root),
+                format!("{other}/wiki/a.md"),
+                "/etc/passwd".to_string(),
+            ] {
+                assert!(
+                    get_page_links_from_store(&w.platform, &w.root, &target)
+                        .await
+                        .is_err(),
+                    "{target}"
+                );
+            }
+            let missing = format!("{}/wiki/none.md", w.root);
+            assert!(get_page_links_from_store(&w.platform, &w.root, &missing)
+                .await
+                .is_err());
+        }
     }
 }

@@ -138,6 +138,34 @@ pub trait ProjectFiles: Send + Sync {
         dir: &RelPath,
         recursive: bool,
     ) -> Result<Vec<Meta>, StoreError>;
+
+    /// Reads every file beneath `dir`, in path order, up to `limit` files.
+    /// For callers that scan a whole tree (search, the graph, embedding): a
+    /// store that can fetch them in one go should override this instead of
+    /// answering one `read` per file.
+    async fn read_tree(
+        &self,
+        project: ProjectId,
+        dir: &RelPath,
+        limit: usize,
+    ) -> Result<Vec<(Body, Meta)>, StoreError> {
+        let mut out = Vec::new();
+        for meta in self.list(project, dir, true).await? {
+            if out.len() >= limit {
+                break;
+            }
+            if meta.kind != EntryKind::File {
+                continue;
+            }
+            match self.read(project, &meta.path).await {
+                Ok(item) => out.push(item),
+                // Deleted since the listing: not part of the tree any more.
+                Err(StoreError::NotFound(_)) => {}
+                Err(error) => return Err(error),
+            }
+        }
+        Ok(out)
+    }
 }
 
 /// A body delivered in pieces, so large files never have to fit in memory.

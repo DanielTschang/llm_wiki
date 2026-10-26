@@ -102,6 +102,10 @@ impl AgentSessionStore {
     }
 
     pub fn list_sessions(&self, project_path: &str) -> Vec<AgentSession> {
+        if crate::platform::get().is_some() {
+            // Sessions are kept in memory only until they move to a table.
+            return Vec::new();
+        }
         let dir = Path::new(project_path)
             .join(".llm-wiki")
             .join("agent-sessions");
@@ -158,12 +162,20 @@ fn now_ms() -> u64 {
 }
 
 fn load_session(project_path: &str, session_id: &str) -> Option<AgentSession> {
+    if crate::platform::get().is_some() {
+        return None;
+    }
     let path = session_file(project_path, session_id)?;
     let raw = fs::read_to_string(path).ok()?;
     serde_json::from_str(&raw).ok()
 }
 
 fn save_session(project_path: &str, session: &AgentSession) -> Result<(), String> {
+    // On a platform server a Project has no folder to write to. Sessions live
+    // in the in-memory cache until `agent_sessions` has a store behind it.
+    if crate::platform::get().is_some() {
+        return Ok(());
+    }
     let path = session_file(project_path, &session.session_id)
         .ok_or_else(|| "Invalid Agent session id".to_string())?;
     if let Some(parent) = path.parent() {

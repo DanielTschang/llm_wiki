@@ -276,6 +276,32 @@ impl ProjectFiles for PgFiles {
         Ok(newest.map(|modified| dir_meta(path.clone(), modified)))
     }
 
+    async fn read_tree(
+        &self,
+        project: ProjectId,
+        dir: &RelPath,
+        limit: usize,
+    ) -> Result<Vec<(Body, Meta)>, StoreError> {
+        let rows = sqlx::query(
+            "SELECT path, content, version, octet_length(content)::bigint AS size, updated_at
+             FROM pages
+             WHERE project_id = $1 AND deleted_at IS NULL AND path LIKE $2 ESCAPE '\\'
+             ORDER BY path COLLATE \"C\" LIMIT $3",
+        )
+        .bind(project.0)
+        .bind(below(dir))
+        .bind(limit.min(i64::MAX as usize) as i64)
+        .fetch_all(&self.pool)
+        .await
+        .map_err(backend)?;
+        rows.iter()
+            .map(|row| {
+                let content: String = row.try_get("content").map_err(backend)?;
+                Ok((Body::Text(content), file_meta(rel_from_row(row)?, row)?))
+            })
+            .collect()
+    }
+
     async fn list(
         &self,
         project: ProjectId,

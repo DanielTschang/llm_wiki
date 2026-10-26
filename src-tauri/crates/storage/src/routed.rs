@@ -372,6 +372,21 @@ impl ProjectFiles for RoutedFiles {
         Ok(found)
     }
 
+    async fn read_tree(
+        &self,
+        project: ProjectId,
+        dir: &RelPath,
+        limit: usize,
+    ) -> Result<Vec<(Body, Meta)>, StoreError> {
+        let mut all = Vec::new();
+        for backend in self.scope(dir) {
+            all.extend(self.store(backend)?.read_tree(project, dir, limit).await?);
+        }
+        all.sort_by(|(_, a), (_, b)| a.path.cmp(&b.path));
+        all.truncate(limit);
+        Ok(all)
+    }
+
     async fn list(
         &self,
         project: ProjectId,

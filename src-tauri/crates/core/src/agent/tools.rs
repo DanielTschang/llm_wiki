@@ -19,6 +19,8 @@ use tokio::task::JoinHandle;
 use tokio::time::{timeout, Duration};
 use walkdir::WalkDir;
 
+mod on_platform;
+
 use crate::commands::external_search::file_url_for_path;
 use crate::commands::search::{self, SearchEmbeddingConfig};
 
@@ -37,6 +39,15 @@ const MAX_WORKSPACE_WRITE_BYTES: usize = 2 * 1024 * 1024;
 const MAX_WORKSPACE_ROLLBACK_BYTES: u64 = 512 * 1024;
 const MAX_SOURCE_SEARCH_FILES: usize = 10_000;
 const MAX_SOURCE_SNIPPET_CHARS: usize = 500;
+/// Source files `source.search` reads as they are.
+const TEXT_SOURCE_EXTENSIONS: &[&str] = &[
+    "md", "markdown", "org", "txt", "json", "csv", "tsv", "yaml", "yml", "xml", "html",
+];
+/// Source files `source.search` reads through their preprocessed text cache.
+const PARSED_SOURCE_EXTENSIONS: &[&str] = &[
+    "pdf", "doc", "docx", "docm", "ppt", "pps", "pot", "pptx", "pptm", "ppsx", "ppsm", "xls",
+    "xlsx", "xlsm", "xlsb", "odt", "ods", "odp", "rtf", "epub", "mobi",
+];
 const MAX_GRAPH_SEARCH_FILES: usize = 10_000;
 const MAX_KNOWLEDGE_CONTEXT_ITEMS: usize = 20;
 const WEB_SEARCH_TIMEOUT_SECS: u64 = 30;
@@ -112,6 +123,13 @@ impl ToolRegistry for BuiltinToolRegistry {
         context: ToolContext<'a>,
     ) -> Pin<Box<dyn Future<Output = Result<Value, String>> + Send + 'a>> {
         Box::pin(async move {
+            if let Some(platform) = crate::platform::get() {
+                if let Some(result) =
+                    on_platform::execute(platform, name, &input, context.project_path).await
+                {
+                    return result;
+                }
+            }
             match name {
                 "wiki.write_page" => {
                     let path = input
@@ -2186,14 +2204,14 @@ fn friendly_firecrawl_error(error: &str) -> String {
 }
 
 #[derive(Debug)]
-struct KnowledgePage {
-    path: String,
-    title: String,
+pub(super) struct KnowledgePage {
+    pub(super) path: String,
+    pub(super) title: String,
     stem: String,
     tags: Vec<String>,
     links: Vec<String>,
-    matches_query: bool,
-    neighbors: Vec<String>,
+    pub(super) matches_query: bool,
+    pub(super) neighbors: Vec<String>,
 }
 
 /// Build one bounded graph/provenance index for a complete retrieval tool
@@ -2201,6 +2219,13 @@ struct KnowledgePage {
 /// turn top-k retrieval into top-k full filesystem scans.
 fn build_knowledge_context_index(project_path: &str) -> BTreeMap<String, AgentKnowledgeContext> {
     build_knowledge_graph_snapshot(project_path, None).1
+}
+
+/// One wiki page as the graph builder sees it.
+pub(super) struct WikiPageSource {
+    pub(super) path: String,
+    pub(super) file_name: String,
+    pub(super) content: String,
 }
 
 fn build_knowledge_graph_snapshot(
@@ -2211,10 +2236,9 @@ fn build_knowledge_graph_snapshot(
     if !wiki_root.is_dir() {
         return (Vec::new(), BTreeMap::new());
     }
-
-    let mut pages = Vec::new();
+    let mut sources = Vec::new();
     for entry in WalkDir::new(&wiki_root).into_iter().filter_map(Result::ok) {
-        if pages.len() >= MAX_GRAPH_SEARCH_FILES
+        if sources.len() >= MAX_GRAPH_SEARCH_FILES
             || !entry.file_type().is_file()
             || entry.path().extension().and_then(|value| value.to_str()) != Some("md")
         {
@@ -2227,7 +2251,31 @@ fn build_knowledge_graph_snapshot(
         if is_hidden_rel(&path) {
             continue;
         }
-        let title = search::extract_title(&content, entry.file_name().to_string_lossy().as_ref());
+        sources.push(WikiPageSource {
+            path,
+            file_name: entry.file_name().to_string_lossy().into_owned(),
+            content,
+        });
+    }
+    knowledge_snapshot_from(sources, query)
+}
+
+/// The graph index of a wiki given its pages, wherever they were read from.
+pub(super) fn knowledge_snapshot_from(
+    sources: Vec<WikiPageSource>,
+    query: Option<&str>,
+) -> (Vec<KnowledgePage>, BTreeMap<String, AgentKnowledgeContext>) {
+    let mut pages = Vec::new();
+    for source in sources {
+        if pages.len() >= MAX_GRAPH_SEARCH_FILES || is_hidden_rel(&source.path) {
+            continue;
+        }
+        let WikiPageSource {
+            path,
+            file_name,
+            content,
+        } = source;
+        let title = search::extract_title(&content, &file_name);
         let matches_query = query.is_some_and(|query| {
             let haystack = format!("{title} {path} {content}").to_lowercase();
             haystack.contains(query)
@@ -2238,8 +2286,7 @@ fn build_knowledge_graph_snapshot(
         pages.push(KnowledgePage {
             path,
             title,
-            stem: entry
-                .path()
+            stem: Path::new(&file_name)
                 .file_stem()
                 .and_then(|value| value.to_str())
                 .unwrap_or_default()
@@ -2425,6 +2472,15 @@ fn extract_frontmatter_list(content: &str, key: &str) -> Vec<String> {
     Vec::new()
 }
 
+/// [`read_wiki_page`] for callers in async code, served from the storage
+/// layer on a platform server.
+pub async fn read_wiki_page_async(project_path: &str, rel_path: &str) -> Result<String, String> {
+    match crate::platform::get() {
+        Some(platform) => on_platform::read_page_text(platform, project_path, rel_path).await,
+        None => read_wiki_page(project_path, rel_path),
+    }
+}
+
 pub fn read_wiki_page(project_path: &str, rel_path: &str) -> Result<String, String> {
     let rel = normalize_rel_path(rel_path);
     if !is_public_read_rel(&rel) || !rel.to_ascii_lowercase().starts_with("wiki/") {
@@ -2450,14 +2506,28 @@ pub fn search_graph(
     if query.is_empty() {
         return Ok(Vec::new());
     }
-    let (pages, mut context_index) = build_knowledge_graph_snapshot(project_path, Some(&query));
+    let (pages, context_index) = build_knowledge_graph_snapshot(project_path, Some(&query));
+    Ok(rank_graph_pages(pages, context_index, top_k, |rel, context| {
+        attach_latest_version(project_path, rel, context)
+    }))
+}
+
+/// Orders the pages a graph query matched, plus their direct neighbours.
+/// `with_version` fills in a page's latest-version summary when the caller
+/// has one.
+pub(super) fn rank_graph_pages(
+    pages: Vec<KnowledgePage>,
+    mut context_index: BTreeMap<String, AgentKnowledgeContext>,
+    top_k: usize,
+    with_version: impl Fn(&str, &mut Option<AgentKnowledgeContext>),
+) -> Vec<AgentReference> {
     let seed_paths: BTreeSet<String> = pages
         .iter()
         .filter(|page| page.matches_query)
         .map(|page| page.path.clone())
         .collect();
     if seed_paths.is_empty() {
-        return Ok(Vec::new());
+        return Vec::new();
     }
     let mut refs = Vec::new();
     for page in pages {
@@ -2492,7 +2562,7 @@ pub fn search_graph(
             ),
             knowledge_context: {
                 let mut context = context_index.remove(&rel);
-                attach_latest_version(project_path, &rel, &mut context);
+                with_version(&rel, &mut context);
                 context
             },
         });
@@ -2504,7 +2574,7 @@ pub fn search_graph(
             .then_with(|| a.path.cmp(&b.path))
     });
     refs.truncate(top_k.clamp(1, 10));
-    Ok(refs)
+    refs
 }
 
 pub fn search_sources(
@@ -2547,47 +2617,12 @@ pub fn search_sources(
         else {
             continue;
         };
-        let content = if matches!(
-            ext.as_str(),
-            "md" | "markdown"
-                | "org"
-                | "txt"
-                | "json"
-                | "csv"
-                | "tsv"
-                | "yaml"
-                | "yml"
-                | "xml"
-                | "html"
-        ) {
+        let content = if TEXT_SOURCE_EXTENSIONS.contains(&ext.as_str()) {
             let Ok(content) = fs::read_to_string(entry.path()) else {
                 continue;
             };
             content
-        } else if matches!(
-            ext.as_str(),
-            "pdf"
-                | "doc"
-                | "docx"
-                | "docm"
-                | "ppt"
-                | "pps"
-                | "pot"
-                | "pptx"
-                | "pptm"
-                | "ppsx"
-                | "ppsm"
-                | "xls"
-                | "xlsx"
-                | "xlsm"
-                | "xlsb"
-                | "odt"
-                | "ods"
-                | "odp"
-                | "rtf"
-                | "epub"
-                | "mobi"
-        ) {
+        } else if PARSED_SOURCE_EXTENSIONS.contains(&ext.as_str()) {
             let Some(content) = crate::commands::fs::read_preprocessed_cache(entry.path()) else {
                 continue;
             };
@@ -2595,30 +2630,18 @@ pub fn search_sources(
         } else {
             continue;
         };
-        let lower = content.to_lowercase();
-        let matched = std::iter::once(lower_query.as_str())
-            .chain(query_terms.iter().map(String::as_str))
-            .find_map(|term| lower.find(term).map(|idx| (idx, term.len())));
-        let Some((byte_idx, _matched_len)) = matched else {
+        let file_name = entry
+            .path()
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or(&rel)
+            .to_string();
+        let Some(reference) =
+            match_source(rel, &file_name, &content, &lower_query, &query_terms)
+        else {
             continue;
         };
-        refs.push(AgentReference {
-            title: entry
-                .path()
-                .file_name()
-                .and_then(|s| s.to_str())
-                .unwrap_or(&rel)
-                .to_string(),
-            path: rel,
-            kind: "source".to_string(),
-            snippet: Some(snippet_around_byte(
-                &content,
-                byte_idx,
-                MAX_SOURCE_SNIPPET_CHARS,
-            )),
-            score: None,
-            knowledge_context: None,
-        });
+        refs.push(reference);
         if refs.len() >= top_k.clamp(1, 10) {
             break;
         }
@@ -2626,7 +2649,34 @@ pub fn search_sources(
     Ok(refs)
 }
 
-fn source_query_terms(query: &str) -> Vec<String> {
+/// The reference for a source whose text contains the query or one of its
+/// terms, with a snippet around the first hit.
+pub(super) fn match_source(
+    rel: String,
+    file_name: &str,
+    content: &str,
+    lower_query: &str,
+    query_terms: &[String],
+) -> Option<AgentReference> {
+    let lower = content.to_lowercase();
+    let (byte_idx, _matched_len) = std::iter::once(lower_query)
+        .chain(query_terms.iter().map(String::as_str))
+        .find_map(|term| lower.find(term).map(|idx| (idx, term.len())))?;
+    Some(AgentReference {
+        title: file_name.to_string(),
+        path: rel,
+        kind: "source".to_string(),
+        snippet: Some(snippet_around_byte(
+            content,
+            byte_idx,
+            MAX_SOURCE_SNIPPET_CHARS,
+        )),
+        score: None,
+        knowledge_context: None,
+    })
+}
+
+pub(super) fn source_query_terms(query: &str) -> Vec<String> {
     query
         .split(|c: char| c.is_whitespace() || matches!(c, ',' | '，' | ';' | '；' | ':' | '：'))
         .map(str::trim)

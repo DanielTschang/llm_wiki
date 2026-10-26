@@ -361,6 +361,44 @@ pub(crate) async fn like_wildcards_in_names_are_literal(h: &dyn Harness) {
     assert_eq!(names, [at(h, "100z").to_string(), at(h, "axb").to_string()]);
 }
 
+pub(crate) async fn read_tree_returns_every_file_beneath_a_directory_in_order(h: &dyn Harness) {
+    let p = h.new_project().await;
+    put(h, p, "b/deep/two.md", "two").await;
+    put(h, p, "a.md", "one").await;
+    put(h, p, "b/three.md", "three").await;
+    // A sibling whose name merely starts with the directory's must not appear.
+    let sibling = RelPath::parse(&format!("{}2/x.md", h.root())).unwrap();
+    h.store()
+        .write(p, &sibling, text("no"), Precondition::Any, &ctx())
+        .await
+        .unwrap();
+
+    let all = h.store().read_tree(p, &root(h), 100).await.unwrap();
+    let got: Vec<_> = all
+        .iter()
+        .map(|(body, meta)| (meta.path.to_string(), body.as_text().unwrap().to_string()))
+        .collect();
+    assert_eq!(
+        got,
+        [
+            (at(h, "a.md").to_string(), "one".to_string()),
+            (at(h, "b/deep/two.md").to_string(), "two".to_string()),
+            (at(h, "b/three.md").to_string(), "three".to_string()),
+        ]
+    );
+    assert_eq!(all[0].1.size, 3);
+
+    let first_two = h.store().read_tree(p, &root(h), 2).await.unwrap();
+    assert_eq!(first_two.len(), 2);
+    assert_eq!(first_two[1].1.path, at(h, "b/deep/two.md"));
+    assert!(h
+        .store()
+        .read_tree(p, &at(h, "missing"), 10)
+        .await
+        .unwrap()
+        .is_empty());
+}
+
 /// Expands to one `#[tokio::test]` per case. `$setup` is an expression of
 /// type `Option<impl Harness>`; `None` skips (no database configured).
 macro_rules! conformance_tests {
@@ -379,6 +417,7 @@ macro_rules! conformance_tests {
             rename_moves_a_directory_and_refuses_an_occupied_destination,
             a_file_cannot_shadow_a_directory_or_sit_beneath_a_file,
             like_wildcards_in_names_are_literal,
+            read_tree_returns_every_file_beneath_a_directory_in_order,
         );
     };
     (@cases $setup:expr; $($case:ident),+ $(,)?) => {

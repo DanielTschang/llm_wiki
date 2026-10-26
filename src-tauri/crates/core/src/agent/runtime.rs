@@ -13,7 +13,7 @@ use crate::commands::search::SearchEmbeddingConfig;
 use super::cancel::AgentCancellationToken;
 use super::context::{
     build_agent_context, collapse_whitespace, intent_label, load_explicit_context_files,
-    load_project_context, trim_chars, AgentContextInput, BuiltAgentContext,
+    load_project_context_async, trim_chars, AgentContextInput, BuiltAgentContext,
 };
 use super::events::AgentEvent;
 use super::permissions::{AgentCapability, PermissionPolicy};
@@ -714,25 +714,25 @@ impl AgentRuntime {
             }
             if matches!(request.mode, AgentMode::Deep) && !references.is_empty() {
                 permission_policy.require(AgentCapability::ReadProject)?;
-                let excerpts = references
+                let mut excerpts = Vec::new();
+                for reference in references
                     .iter()
                     .filter(|reference| reference.kind == "wiki")
                     .take(2)
-                    .filter_map(|reference| {
-                        tools::read_wiki_page(&self.project_path, &reference.path)
-                            .ok()
-                            .map(|content| {
-                                format!(
-                                    "Excerpt from {}:\n{}",
-                                    reference.path,
-                                    collapse_whitespace(&content)
-                                        .chars()
-                                        .take(2_000)
-                                        .collect::<String>()
-                                )
-                            })
-                    })
-                    .collect::<Vec<_>>();
+                {
+                    if let Ok(content) =
+                        tools::read_wiki_page_async(&self.project_path, &reference.path).await
+                    {
+                        excerpts.push(format!(
+                            "Excerpt from {}:\n{}",
+                            reference.path,
+                            collapse_whitespace(&content)
+                                .chars()
+                                .take(2_000)
+                                .collect::<String>()
+                        ));
+                    }
+                }
                 if !excerpts.is_empty() {
                     tool_emit_event(
                         &mut tool_events,
@@ -1153,7 +1153,7 @@ impl AgentRuntime {
         }
         let retrieval_summary = retrieval_parts.join("\n\n");
         let project_context = project_context_for_retrieval_mode(
-            load_project_context(&self.project_path),
+            load_project_context_async(&self.project_path).await,
             request.retrieval_mode,
         );
         let explicit_files =
@@ -1314,7 +1314,7 @@ impl AgentRuntime {
         let client = LlmClient::new(config.clone())?
             .structured_task_config(agent_structured_max_tokens(!skills.is_empty()));
         let project_context = project_context_for_retrieval_mode(
-            load_project_context(&self.project_path),
+            load_project_context_async(&self.project_path).await,
             request.retrieval_mode,
         );
         let explicit_files =
