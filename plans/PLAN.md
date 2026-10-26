@@ -1,8 +1,38 @@
 # LLM Wiki 平台化改寫計畫
 
-Oct 26, 2026 · @Daniel Tschang
+Oct 27, 2026 · @Daniel Tschang
 
 > 給 Claude Code：這是 LLM Wiki 平台化改寫的主計畫。架構以「已確定的架構決策」和「決策紀錄」為準，術語以 `CONTEXT.md` 為準，重大取捨見 `docs/adr/`。完成任務時把對應的 `- [ ]` 改成 `- [x]`，有新決策時更新決策紀錄。
+
+## 目前進度與接下來（2026-10-27）
+
+### 現況
+
+後端已經是一個**只有平台版**的多人伺服器，桌面版與單人資料夾模式都已移除：
+
+- **儲存**：頁面、版本、連結、來源引用在 Postgres；Source 與圖片在 MinIO（經 API 串流，沒有 presigned URL）；向量在 pgvector；`.llm-wiki/*` 暫存在 `state_files` 表。頁面寫入時同一個交易內重建連結表並解析 frontmatter。
+- **帳號與權限**：帳密登入、Platform Admin／Owner／Editor／Viewer、每條 `/rpc`、`/files`、`/upload`、`/events` 都檢查角色。
+- **LLM**：瀏覽器不再持有 API key；模型目錄在伺服器，呼叫走 `/llm/relay` 閘道；伺服器自己發出的呼叫（agent、搜尋、embedding）也記進 `llm_usage`（次數、耗時，無 token 數）。
+- **檢索**：關鍵字加語意（pgvector）搜尋、`get_page_links` 與「刪來源會影響哪些頁面」都改查連結表。
+- **Ingest**：仍是 TS worker（過渡版），在伺服器端跑，一次服務一個專案。
+- **Crate**：`storage`、`llm`、`core`（檢索、agent、解析）、`server`。`core` 測試 186、`llm` 53、`storage` 272、`server` 29；`make e2e-accounts` 約 150 項檢查全過。
+- **資料**：`projects/Lithography-wiki` 已用 `llm-wiki-import` 匯入開發環境（`llm_wiki_dev`）。
+- **開發入口**：`make k3d-up`＋`make platform-dev`；文件為 `README.md`、`START.md`。
+
+### 還不能對外開放的原因
+
+agent 會話只放記憶體；review 項目、對話、ingest 快取等狀態還在 `state_files`；review inbox 與檔案歷史／匯出入／`rebuild_wiki_index`／圖片抽取命令在平台上不可用；沒有速率限制與依專案的模型限制；ingest 一次只服務一個專案、沒有 NATS；CI 沒跑需要資料庫的測試。
+
+### 接下來（建議順序）
+
+預計**第二位會寫 Rust 的人加入**，所以先把他能獨立工作的邊界和環境備好，再進階段 3：
+
+1. **補 CI**：在 CI 啟動 Postgres（pgvector）與 MinIO，跑 `storage` 的測試；加依賴方向檢查（例如 `llm` 不可依賴 `core`）。這是新人加入前最重要的一項。
+2. **拆 `parsing`**：把文件抽取、圖片抽取、ebook 搬出 `core`（先整個搬、維持以檔案路徑為輸入，改成 bytes 輸入留給階段 3 的 ingest）。
+3. **建 `ingest` 空骨架**：只依賴 `storage`、`llm`、`parsing`。新人從這裡開始做階段 3 的 Rust ingest，不會碰到 agent 與 server。
+4. **寫 crate 範圍與依賴規則**（README 或 `CONTRIBUTING`），並在乾淨環境驗證 `START.md` 的步驟。
+5. 之後平行進行：你做 `retrieval`／agent／`api`（圖譜改用連結表、狀態檔搬進型別化資料表、review 項目、agent 會話、速率限制與依專案限制模型）；新人做階段 3（NATS＋outbox、六階段 ingest、Changeset、新舊對照）。
+6. `server` 改名 `api` 最後做，純改名。
 
 ## 目標與範圍
 
@@ -26,7 +56,7 @@ Oct 26, 2026 · @Daniel Tschang
 - 不做即時協作編輯
 - 不保留 Web Clipper
 - 不做頁面層級權限
-- 不做既有資料夾 project 的匯入工具
+- 不做常態的匯入功能（只提供一次性的 `llm-wiki-import`，把舊的資料夾專案搬進來）
 - 不做 LLM 配額（只統計）
 - 長期分叉，不和上游 nashsu 版本同步
 
@@ -73,8 +103,8 @@ Rust 核心（同一映像，依角色部署）
   └─ Ingest worker 角色：解析 → 分析 → 產生 Changeset → 提交（每個 Project 單一提交）→ 後續處理
         （階段 1–2：Rust 取得工作後交給 Node 子程序跑 TS ingest）
 
-Rust crate（由現有的 core / server 拆出）
-  storage（頁面儲存介面，後端是 PG + MinIO）· retrieval · agent · parsing · llm · api
+Rust crate（由現有的 core / server 拆出；已拆：storage、llm；其餘依序拆出）
+  storage（頁面儲存介面，後端是 PG + MinIO + pgvector）· llm · parsing · ingest（新）· retrieval · agent · api
 
 資料層
   ├─ Postgres：頁面、版本、wikilink、對話、Review Item、ingest 狀態、outbox、pgvector
@@ -96,12 +126,12 @@ Python Extension Point（同事負責）
 | --- | --- |
 | `crates/server`（axum、SSE、串流上傳下載、靜態服務、worker bridge） | 改成 `api` 角色；`auth.rs` 換成多人登入，`/proxy` 換成 LLM 服務 |
 | `core/commands/fs.rs` | 被 `storage` 的頁面儲存介面取代；fs RPC 依路徑分流 |
-| `core/commands/search.rs`、`page_embedding.rs` | 移到 `retrieval` |
-| `core/commands/vectorstore.rs`（LanceDB） | 改寫成 pgvector，embedding 依模型分表 |
-| `core/agent/`（`provider.rs` 除外） | 移到 `agent`，拿掉 shell 和本機工具 |
-| `core/agent/provider.rs` | 抽成 `llm`，加上統計、模型限制、重試 |
+| `core/commands/search.rs` | 移到 `retrieval`（`page_embedding.rs` 已刪，嵌入流程在前端加 `vector_*` 指令） |
+| `core/commands/vectorstore.rs`（LanceDB） | 已改寫成 pgvector，embedding 依模型分表 |
+| `core/agent/`（`provider.rs` 除外） | 移到 `agent`；shell 與磁碟版工具已拿掉 |
+| `core/agent/provider.rs` | 已抽成 `llm`（含用量回報）；模型限制、重試尚未做 |
 | `core/commands/extract_images.rs`、`ebook.rs`，以及 office/docx 解析 | 移到 `parsing` |
-| `core/api_server.rs` | 階段 3 改成遠端 MCP 時拆掉 |
+| `core/api_server.rs` | 已刪（本機 HTTP API）；階段 3 另做遠端 MCP，`mcp-server/` 程式碼保留等那時改寫 |
 | `src-tauri` 桌面殼、`clip_server.rs`、`file_sync.rs`、`claude_cli.rs`、`codex_cli.rs`、`cli_resolver.rs` | 刪除 |
 | 前端 `src/platform/` 的 desktop 分支 | 刪除 |
 
@@ -124,15 +154,15 @@ Python Extension Point（同事負責）
 
 - [x] core 去除 Tauri 依賴（`llm-wiki-core`）
 - [x] ingest 能在伺服器端執行，不需要開著瀏覽器（Node worker）
-- [x] 移除 `src-tauri` 的桌面殼（Rust）：現在 `src-tauri/` 是只含 `llm-wiki-core`、`llm-wiki-server` 的 virtual workspace；CI 改成只跑 Linux，刪掉桌面版發佈流程
+- [x] 移除 `src-tauri` 的桌面殼（Rust）：現在 `src-tauri/` 是 virtual workspace（`llm-wiki-core`、`llm-wiki-llm`、`llm-wiki-server`、`llm-wiki-storage`）；CI 改成只跑 Linux，刪掉桌面版發佈流程
 - [x] 移除前端 desktop 分支：刪 `platform/tauri.ts`、`isDesktop`、自動啟動、視窗主題、開啟本機資料夾，並移除全部 `@tauri-apps/*` 套件；平台層只剩 web／worker 兩種實作，測試改為 mock `@/platform`（`no-direct-tauri-imports.test.ts` 改成全專案禁止 `@tauri-apps`）。
-  - 遺留：`general`、`api-server` 設定頁在 server 版本來就隱藏，但頁面、`generalConfig`／`apiConfig` store 和 `README`／`START.md` 的桌面版說明還在；`lib/tauri-fetch.ts` 名稱沿用；`vite.config.ts` 還有 Tauri 時代的註解。這幾項跟著階段 2 的設定頁整理一起清
+  - 遺留：`api-server` 設定頁與文件的桌面版說明已清掉；`general` 設定頁和 `generalConfig` store 還在（server 版本來就隱藏）；`lib/tauri-fetch.ts` 名稱沿用；`vite.config.ts` 還有 Tauri 時代的註解。跟著階段 2 的設定頁整理一起清
   - 既有問題（`main` 上就失敗，與本分支無關）：`embedding.real-llm.test.ts`、`llm-client.real-llm.test.ts` 共 6 個測試會失敗（Origin 標頭預期是桌面版行為）
 - [x] 刪除 CLI transport（`claude_cli`、`codex_cli`、`cli_resolver`）：後端、前端 provider／設定 UI／聊天的 CLI 專用 fallback 路徑都已移除
 - [x] 刪除 `clip_server`：連同全域「目前專案」註冊表（`current_project_path`、`all_projects`）、`current` 別名、Web Clipper 瀏覽器擴充套件、前端 clip watcher 一起拿掉；`api_server` 和 agent 的專案查詢現在只認明確的 Project id／路徑。副作用：`mcp-server/` 預設用 `current`，現在必須先 `llm_wiki_set_project`；它跟著 `api_server.rs` 在階段 3 改成遠端 MCP 時一起處理
 - [x] 刪除 `file_sync` 與資料夾監控：Rust `file_sync.rs`（約 1950 行）、`fs.rs` 的 `mark_app_write_path`、`CoreContext.file_sync`、7 個 dispatch 分支、`/sources/rescan` 路由和 MCP 的 `llm_wiki_rescan_sources`；前端的 `project-file-sync`、排程匯入（`scheduled-import`）、活動面板的檔案同步區塊、兩個設定頁及其 store 欄位與 i18n 鍵都已移除。「來源」頁的重新整理現在只重新載入清單
   - 保留：`SourceWatchConfig`／`source-watch-config.ts` 其實同時是匯入篩選設定（副檔名、大小上限、`persistExtractedMarkdown`、ingest 並行數），明確匯入和 ingest 還在用，暫不改名；使用者已無法在 UI 編輯，只讀預設或舊值。階段 2 整理設定頁時改名成匯入設定
-- [ ] core 依領域拆 crate：storage、retrieval、agent、parsing、llm；server 改名為 api（碰到哪裡才拆哪裡，不一次大改）
+- [ ] core 依領域拆 crate：storage（已拆）、llm（已拆）、parsing、ingest（新）、retrieval、agent；server 改名為 api（碰到哪裡才拆哪裡，不一次大改）。因為第二位 Rust 開發者將加入，順序改為先拆 parsing 並建 ingest 空骨架，見「接下來」
 - [x] 設計 Postgres schema：Project、頁面、頁面歷史、wikilink 邊、操作紀錄、對話、Review Item、ingest 快取與狀態、outbox，另含 embedding 分表與 lint／dedup／圖片說明快取。SQL 在 `src-tauri/crates/storage/migrations/`，設計說明在 `plans/schema.md`；已在 k3d 套用並跑過冒煙測試
 - [x] 盤點直接碰檔案系統的呼叫點（`plans/inventory/fs-callsites.md`）：約 300 處、26 個檔案；發現 schema 漏掉 `agent-sessions` 與 `agent-workspace/`，已補；發現 agent skills 會讀伺服器主機的 `~/.claude`／`~/.codex`／`~/.agents`，須立刻刪
 - [ ] storage 頁面儲存介面：fs RPC 依路徑分流，`wiki/` 存 PG、`raw/` 存 MinIO，`.llm-wiki/*.json` 逐一換成資料表；TS worker 和前端看到的路徑語意不變
@@ -147,20 +177,21 @@ Python Extension Point（同事負責）
   - [x] B 類改走儲存層：`ProjectFiles` 新增 `read_tree`（整棵目錄一次讀完，Postgres 版一個查詢）；`search_project`、`get_page_links` 改成「載入頁面」與「計分」兩段，平台版只換載入；agent 的 `wiki.write_page`（仍是 create-only，寫入後讀回驗證，不符就還原）、`wiki.read_page`、`workspace.write_file`／`append_file`、`source.search`、`graph.search` 在平台模式下走 `agent/tools/on_platform.rs`，`shell.exec` 直接拒絕；agent 的專案概覽與 `@` 附件也從儲存層讀。`/rpc` 在平台模式只放行白名單內的命令（已轉換或不碰檔案的），其餘回「尚未提供」，新增的命令預設關閉。`api_server.rs` 在網頁伺服器上根本不會啟動，留待階段 3 與 MCP 一起重寫，不在這次轉換範圍
   - [x] 使用者與專案層（提前自階段 2 做完能用的部分）：`Accounts`（帳密、session、偏好）、`Projects`（建立、成員、角色）、migration 0007；伺服器的登入頁、`Principal`（使用者／維運 token／worker）、`authz.rs` 與 `accounts_rpc.rs`（`whoami`、`list_projects`、`create_project`、成員與使用者管理等命令）。新專案會帶 schema、purpose、index、log、overview。刪專案會先刪物件儲存裡的檔案再刪資料列。設定檔分成個人（上次開的專案、縮放、語言）與組織（模型、端點；所有人可讀、只有 Platform Admin 能改）。前端：歡迎畫面列出自己的專案（只有 Platform Admin 看得到「新增專案」，沒有「開啟專案」）、新增專案不必選資料夾、設定頁多了「帳號」「專案成員」「使用者」三頁、平台伺服器不再問 GitHub 有沒有新版。`make platform-dev` 在 k3d 上啟動，`make e2e-accounts` 用 4 種角色驗 70 項權限
   - [x] ingest 在伺服器端跑（過渡版）：Node worker 認得平台專案（專案路徑 `/projects/<id>`、模型走閘道、換專案時重新讀模型清單）。`ingest_command` 在平台模式要帶 `projectId`，看佇列要 viewer、改佇列要 editor；worker 同時只服務一個專案，其他專案的分頁不能暫停或取消它的工作。`make platform-dev` 預設啟動 worker。這不是 PLAN 原訂的 NATS＋Rust ingest：多個專案同時 ingest、worker 重啟後接手、水平擴展都要等階段 3
-  - [ ] LLM 閘道還沒做的：(1) ~~agent 的 LLM 呼叫沒進 `llm_usage`~~ 已解決，見下方 `llm` crate：伺服器自己發出的呼叫（agent 回合、搜尋與 `embedding_fetch` 的 embedding）現在也記進 `llm_usage`，但只有次數、狀態與耗時，沒有 token 數（串流回應沒有統一取出）；(2) 外部網頁搜尋、MinerU、AnyTXT 的 key 還沒搬到伺服器（平台模式下這幾項等於不能用）；(3) 依專案限制可用模型、速率限制與重試；(4) 設定頁的「連線測試」沒有對應功能；(5) 設定頁的模型清單是 JSON 編輯器，還不是表單
-  - [ ] 使用者與專案層還沒做的：(1) 組織層的設定（模型端點含 API key）目前所有成員都讀得到，因為瀏覽器還在自己呼叫 LLM，要等「LLM 呼叫移到伺服器」；(2) ingest worker 還不認得平台專案（平台模式先用 `--no-worker`，由瀏覽器分頁跑 ingest）；(3) 建立專案時的「內容全員可見」提醒、專案設定頁（改名、刪除）、Platform Admin 的專案總覽頁；(4) 登入失敗的限制只做到單一帳號，還沒有依來源 IP 的限制；(5) 沒有「忘記密碼」流程（由 Platform Admin 重設）
-  - [ ] 平台模式還不能對外開放，在下列完成前只限開發使用：(1) agent 會話目前只放記憶體（要做 `agent_sessions` repository）；(2) 檔案歷史、專案建立／匯出入、`rebuild_wiki_index`、圖片抽取命令、`apply_text_selection_edit`、`create_missing_wiki_page`、`find_related_wiki_pages` 還沒轉換；(3) `.uploads/` 暫存檔沒有清理工作，`GET /files` 還不支援 Range
+  - [ ] LLM 閘道還沒做的：(1) ~~agent 的 LLM 呼叫沒進 `llm_usage`~~ 已解決，見 `llm` crate 那一項：伺服器自己發出的呼叫（agent 回合、搜尋與 `embedding_fetch` 的 embedding）現在也記進 `llm_usage`，但只有次數、狀態與耗時，沒有 token 數（串流回應沒有統一取出）；(2) 外部網頁搜尋、MinerU、AnyTXT 的 key 還沒搬到伺服器（平台模式下這幾項等於不能用）；(3) 依專案限制可用模型、速率限制與重試；(4) 設定頁的「連線測試」沒有對應功能；(5) 設定頁的模型清單是 JSON 編輯器，還不是表單
+  - [ ] 使用者與專案層還沒做的：(1) 組織層的設定（模型端點含 API key）目前所有成員都讀得到，因為瀏覽器還在自己呼叫 LLM，要等「LLM 呼叫移到伺服器」；(2) ~~ingest worker 不認得平台專案~~ 已解決（見上方 ingest 過渡版）；(3) 建立專案時的「內容全員可見」提醒、專案設定頁（改名、刪除）、Platform Admin 的專案總覽頁；(4) 登入失敗的限制只做到單一帳號，還沒有依來源 IP 的限制；(5) 沒有「忘記密碼」流程（由 Platform Admin 重設）
+  - [ ] 平台模式還不能對外開放，在下列完成前只限開發使用：(1) agent 會話目前只放記憶體（要做 `agent_sessions` repository）；(2) 檔案歷史（改用 `page_versions` 做）、專案匯出入、`rebuild_wiki_index`、圖片抽取命令、`apply_text_selection_edit`、`create_missing_wiki_page` 還沒有平台版（舊的資料夾實作已刪，指令回「尚未提供」）；review inbox 要等 `review_items` 表；(3) `.uploads/` 暫存檔沒有清理工作，`GET /files` 還不支援 Range
   - [x] 頁面寫入時一併重建 `page_links`、`page_sources`，並解析 frontmatter 填 `title`／`page_type`：`storage/src/derive.rs` 把文字解析成 frontmatter（YAML → jsonb，壞掉的 YAML 留空但連結照抓，並修補 `related: [[a]], [[b]]`）、標題（frontmatter → 第一個 `# ` → 檔名）、`type`、`[[連結]]`（含 `related:`，去掉 `#錨點`）與 `sources:`。寫入、刪除、改名都在同一個交易裡更新 `pages` 欄位、`page_versions.frontmatter`、`page_links`、`page_sources`，並重新解析受影響的連結（目標頁後來才出現、被刪或搬走都會對）；只有 `wiki/**.md` 進連結圖。解析規則與桌面版連結面板相同：路徑形的連結要完全相符，單名的連結比對檔名，多個同名取路徑排序第一個。`pages.derived_rev` 記錄用哪一版規則算的，伺服器啟動時 `reindex_stale` 補算舊頁面（也是日後改規則的升級路徑）。`ProjectFiles::page_links` 與 `pages_citing` 是讀取介面（Postgres 版查表，`MemoryStore` 用同一套規則在記憶體裡算，兩者跑同一組一致性測試）。`get_page_links` 與 `find_related_wiki_pages`（刪來源前找受影響的頁面）在平台模式改用這兩個查詢，不再掃整個 wiki；`find_related_wiki_pages` 也加進 `/rpc` 白名單（Viewer 可查）。後者只算 `sources:` 有列出該來源的頁面加上 `wiki/sources/` 下的摘要頁，不再算「內文提到檔名」的頁面（桌面版那種寬鬆比對交給前端的刪除判斷擋，平台版直接不產生）。圖譜（`graph.search` 與前端圖譜）仍是掃頁面，還沒改用連結表。`page_sources.blob_id` 不使用，來源比對靠 `source_ref`（路徑或檔名，有無 `raw/sources/` 前綴皆可）
   - [x] `.llm-wiki/*` 狀態檔的轉接層：`PgState` 把這些路徑存進 `state_files` 表（migration 0006），以文件為單位，語意跟頁面一致（樂觀鎖版本號、隱含目錄、檔案不能蓋住目錄、子樹刪除與改名），但沒有歷史、刪除就真的刪。這是過渡做法：TS 的 ingest worker 和前端還是整份 JSON 讀寫，所以先讓它們原封不動能跑；各檔案等到有型別化的資料表與 repository、讀寫它的程式碼也改寫後，再逐一搬出去。平台不保留的路徑會拒絕寫入：`page-history/`、`history/`（由 `page_versions` 取代）、`lancedb/`、`embedding-revisions/`、`skills/`（各有自己的歸宿），以及資料夾監控與舊版聊天紀錄的檔案。`PgState` 跑同一組一致性測試，並經 `RoutedFiles` 再跑一次
   - [ ] 狀態檔逐一搬到型別化資料表（過渡期結束的條件）：`review.json` → `review_items`、`conversations.json` 與 `chats/*` → `conversations`／`chat_messages`、`ingest-cache.json` → `ingest_cache`、`image-caption-cache.json` → `image_captions`、`dedup-*` → `dedup_tasks`／`dedup_exclusions`、`lint.json` → `lint_findings`、`ingest-queue.json` 隨 ingest 改走 JetStream 後刪除。agent 會話（`agent/session.rs`）目前平台模式只放記憶體，它是 Rust 內部呼叫、有現成的 `agent_sessions` 表，應直接做 repository 而不是走 `state_files`
   - [x] 大檔案串流：`BlobStreams`（`put_stream`／`get_stream`，8 MiB 分段上傳，邊傳邊算 SHA-256）。API 的上傳／下載端點還沒接
 - [ ] 所有索引、快取、檢索介面都以 Project 為鍵；檢索介面接受 Project 清單（先只傳一個），為跨 Project 檢索預留
 - [x] 拆 crate，第 1 個：`llm-wiki-llm`（`src-tauri/crates/llm`）。把各家模型的呼叫與串流（原 `agent/provider.rs`）、embedding 呼叫（原 `search.rs`）、HTTP 客戶端與 proxy 設定（原 `proxy.rs`）、`AgentImage` 搬出 `core`，約 2.4K 行，測試 53 個跟著搬（core 239 → 186，加起來不變）。它不認識 Project、頁面或 agent，之後 Rust 版 ingest 可以只依賴它。新增 `UsageSink`：伺服器在替人發出的模型呼叫設定裡放 `usage` 標籤（誰、哪個 Project、哪個模型），呼叫結束時客戶端回報給安裝好的 sink，伺服器把它寫進 `llm_usage`；標籤只由伺服器設定，瀏覽器送來的一律丟掉。接下來依序：`parsing`（等階段 3 改寫 ingest）、`ingest` 空骨架、`retrieval`；`server` 改名 `api` 最後
-- [x] 拆資料夾模式，第 1 步（已做）：刪掉本機 HTTP API（`core/api_server.rs`、`cors.rs`、`server_bind.rs`，連 `tiny_http` 依賴）、設定頁的 API Server 區塊與 `api_server_*` 指令、伺服器啟動時從桌面版匯入設定的 `desktop_settings.rs` 與 `--no-desktop-settings`。`mcp-server/` 的程式碼保留（它靠本機 API，在階段 3 改成遠端 MCP 前無法使用）。尚未做：單人 token 登入與 `AllowedRoots`、`app-state.json`、`--allow-shell`、文件與部署
-- [x] 拆資料夾模式，第 3 步（伺服器，已做）：`llm-wiki-server` 一定要有 `--database-url` 與 `--s3-*` 才能啟動，不再有資料夾模式。刪掉單人 token 登入頁與 cookie（瀏覽器只用帳號登入；`LLM_WIKI_TOKEN` 只剩給腳本與 ingest worker 的 operator token）、`AllowedRoots` 與 `paths.rs` 的磁碟路徑檢查（只留專案路徑檢查）、`AppStore`／`app-state.json`（機構共用的設定改存 `server_settings`，鍵名 `app:<store>:<key>`，只有 Platform Admin 能改；個人設定仍在使用者偏好）、`--allow-root`、`--allow-shell`、上傳的磁碟暫存區（上傳直接串流進物件儲存）、`/files` 的磁碟分支、`review_inbox_*`（原本寫 `.llm-wiki/review-inbox.json`，在平台上本來就寫不進去；review 項目要等 `review_items` 表）。啟動時不再讀 `app-state.json` 的 proxy 設定（用環境變數 `HTTP_PROXY` 等）。部署與文件已跟上：`Makefile` 只留 k3d／`make platform-dev`（唯一的開發入口）／測試／`docker-build`，`docker-compose.yml`、`fly.toml` 與 `README_CN/JA/KO.md`（桌面版說明）刪除，`README.md` 與 `START.md` 重寫成平台版，`Dockerfile` 與 CI 不再裝 protoc（LanceDB 已移除）
-- [x] 拆資料夾模式，第 2 步（已做）：`core` 只剩平台版。刪掉 LanceDB（`lancedb`、`arrow-*` 依賴；`vectorstore.rs` 重寫成只轉給 pgvector，約 1400 行變 190 行）、`page_embedding.rs`（Rust 端的嵌入流程）、`file_history.rs`（由 `page_versions` 取代）、`project_maintenance.rs`（匯出入、`rebuild_wiki_index`，到時依平台重做）、`project.rs` 除了 `scaffold_files` 以外的部分，以及 `fs.rs`、`search.rs`、`agent/*` 的磁碟分支：檔案指令一律走 `platform::require()`，沒有安裝平台就報錯，不再碰主機磁碟。agent 的 `shell.exec` 與磁碟版工具一併移除，agent 會話只放記憶體；`wiki.search` 的圖譜脈絡改讀儲存層（原本在平台上其實是空的）。`apply_text_selection_edit` 與 `create_missing_wiki_page` 只留一個回「尚未提供」的空殼，等平台版。**還留著的磁碟程式**：`agent/skills.rs`（從 `.llm-wiki/skills` 資料夾讀 skill，等 skills 資料表）與 `runtime.rs` 裡讀 skill 檔的部分、`extract_images.rs`／`ebook.rs`／`fs.rs` 的解析函式（以檔案路徑為輸入，平台版先寫到暫存檔再解析，階段 3 改寫 ingest 時一併整理）。這些測試用暫存資料夾的測試跟著刪了（core 測試 356 → 242）
+- [x] 拆資料夾模式，第 1 步：刪掉本機 HTTP API（`core/api_server.rs`、`cors.rs`、`server_bind.rs`，連 `tiny_http` 依賴）、設定頁的 API Server 區塊與 `api_server_*` 指令、伺服器啟動時從桌面版匯入設定的 `desktop_settings.rs` 與 `--no-desktop-settings`。`mcp-server/` 的程式碼保留（它靠本機 API，在階段 3 改成遠端 MCP 前無法使用）
+- [x] 拆資料夾模式，第 3 步（伺服器）：`llm-wiki-server` 一定要有 `--database-url` 與 `--s3-*` 才能啟動，不再有資料夾模式。刪掉單人 token 登入頁與 cookie（瀏覽器只用帳號登入；`LLM_WIKI_TOKEN` 只剩給腳本與 ingest worker 的 operator token）、`AllowedRoots` 與 `paths.rs` 的磁碟路徑檢查（只留專案路徑檢查）、`AppStore`／`app-state.json`（機構共用的設定改存 `server_settings`，鍵名 `app:<store>:<key>`，只有 Platform Admin 能改；個人設定仍在使用者偏好）、`--allow-root`、`--allow-shell`、上傳的磁碟暫存區（上傳直接串流進物件儲存）、`/files` 的磁碟分支、`review_inbox_*`（原本寫 `.llm-wiki/review-inbox.json`，在平台上本來就寫不進去；review 項目要等 `review_items` 表）。啟動時不再讀 `app-state.json` 的 proxy 設定（用環境變數 `HTTP_PROXY` 等）
+- [x] 拆資料夾模式，第 4 步（文件與部署）：`Makefile` 只留 k3d／`make platform-dev`（唯一的開發入口）／測試／`docker-build`，`docker-compose.yml`、`fly.toml` 與 `README_CN/JA/KO.md`（桌面版說明）刪除，`README.md` 與 `START.md` 重寫成平台版，`Dockerfile` 與 CI 不再裝 protoc（LanceDB 已移除）
+- [x] 拆資料夾模式，第 2 步（core）：`core` 只剩平台版。刪掉 LanceDB（`lancedb`、`arrow-*` 依賴；`vectorstore.rs` 重寫成只轉給 pgvector，約 1400 行變 190 行）、`page_embedding.rs`（Rust 端的嵌入流程）、`file_history.rs`（由 `page_versions` 取代）、`project_maintenance.rs`（匯出入、`rebuild_wiki_index`，到時依平台重做）、`project.rs` 除了 `scaffold_files` 以外的部分，以及 `fs.rs`、`search.rs`、`agent/*` 的磁碟分支：檔案指令一律走 `platform::require()`，沒有安裝平台就報錯，不再碰主機磁碟。agent 的 `shell.exec` 與磁碟版工具一併移除，agent 會話只放記憶體；`wiki.search` 的圖譜脈絡改讀儲存層（原本在平台上其實是空的）。`apply_text_selection_edit` 與 `create_missing_wiki_page` 只留一個回「尚未提供」的空殼，等平台版。**還留著的磁碟程式**：`agent/skills.rs`（從 `.llm-wiki/skills` 資料夾讀 skill，等 skills 資料表）與 `runtime.rs` 裡讀 skill 檔的部分、`extract_images.rs`／`ebook.rs`／`fs.rs` 的解析函式（以檔案路徑為輸入，平台版先寫到暫存檔再解析，階段 3 改寫 ingest 時一併整理）。這些測試用暫存資料夾的測試跟著刪了（core 測試 356 → 242）
 - [x] 把資料夾專案搬進平台的匯入工具 `llm-wiki-import`（`server/src/bin/import.rs`）：`--dir <專案資料夾> [--name 名稱 | --into <專案 id>] --admin-user admin`，連線設定用跟伺服器相同的 `LLM_WIKI_DATABASE_URL`／`LLM_WIKI_S3_*`。頁面進 Postgres、`raw/` 與 `wiki/media/` 進物件儲存、`.llm-wiki/` 狀態進 `state_files`；用 create-only 寫入，所以重跑只會補缺的。不搬：向量索引（搬完用「重建索引」）、頁面備份、`review-inbox.json` 與平台不再使用的檔案；非 UTF-8 的文字頁與超過 512 MB 的檔案會跳過並列出。
-- [x] 向量庫從 LanceDB 換成 pgvector，embedding 依模型分表（平台模式；桌面版仍用 LanceDB，直到桌面版移除）：`storage/src/vectors.rs` 的 `ChunkVectors`（Postgres 版 `PgVectors`、測試用 `MemoryVectors`），每個 embedding 模型一張 `chunks_m<N>` 表（migration 0004 的 `register_embedding_model`，第一次寫入時依向量維度建立，維度 ≤2000 用 `vector`、≤4000 用 `halfvec`，距離用 L2，分數仍是 `1/(1+距離)`，前端不用改）。`vector_upsert_chunks`、`vector_search_chunks`、`vector_delete_page`、`vector_count_chunks`、`vector_clear_chunks` 等在平台模式改走它，進 `/rpc` 白名單：讀取（搜尋、計數）要 Viewer，寫入（寫入、刪除、清空）要 Editor。`search_project` 不再關閉向量搜尋。查詢用 HNSW 的迭代掃描（`hnsw.iterative_scan`），避免多專案共用一個索引時，過濾掉別的專案後只剩幾筆。**用哪個模型**：伺服器取模型目錄裡第一個 embedding 用途的模型（`provider/model`）；前端 `hydratePlatformModels` 也是取第一個，所以兩邊一致。換模型等於換一張空表，要用設定頁的「重建索引」重新嵌入；舊模型的表留著不刪。**還沒做**：(1) 一次只支援一個 embedding 模型，沒有依專案選；(2) Rust 端的 `embed_wiki_page`（api server／MCP 用）沒轉換；(3) `page_embedding_state` 的指紋只由 Rust 端那條路寫，前端這條（`vector_upsert_chunks`）不記，所以「內容沒變就跳過」的判斷在平台上還沒有用；(4) 沒有清掉被換掉的舊模型表的工具
+- [x] 向量庫從 LanceDB 換成 pgvector，embedding 依模型分表（LanceDB 已移除）：`storage/src/vectors.rs` 的 `ChunkVectors`（Postgres 版 `PgVectors`、測試用 `MemoryVectors`），每個 embedding 模型一張 `chunks_m<N>` 表（migration 0004 的 `register_embedding_model`，第一次寫入時依向量維度建立，維度 ≤2000 用 `vector`、≤4000 用 `halfvec`，距離用 L2，分數仍是 `1/(1+距離)`，前端不用改）。`vector_upsert_chunks`、`vector_search_chunks`、`vector_delete_page`、`vector_count_chunks`、`vector_clear_chunks` 等在平台模式改走它，進 `/rpc` 白名單：讀取（搜尋、計數）要 Viewer，寫入（寫入、刪除、清空）要 Editor。`search_project` 不再關閉向量搜尋。查詢用 HNSW 的迭代掃描（`hnsw.iterative_scan`），避免多專案共用一個索引時，過濾掉別的專案後只剩幾筆。**用哪個模型**：伺服器取模型目錄裡第一個 embedding 用途的模型（`provider/model`）；前端 `hydratePlatformModels` 也是取第一個，所以兩邊一致。換模型等於換一張空表，要用設定頁的「重建索引」重新嵌入；舊模型的表留著不刪。**還沒做**：(1) 一次只支援一個 embedding 模型，沒有依專案選；(2) Rust 端的 `embed_wiki_page`（api server／MCP 用）沒轉換；(3) `page_embedding_state` 的指紋只由 Rust 端那條路寫，前端這條（`vector_upsert_chunks`）不記，所以「內容沒變就跳過」的判斷在平台上還沒有用；(4) 沒有清掉被換掉的舊模型表的工具
 - [ ] NATS JetStream：定義 stream 與 subject（ingest 工作、頁面提交事件），outbox relay；Rust ingest-worker 角色取得工作後交給 Node 子程序，再由 Rust 回 ack
 - [ ] 檔案上傳下載一律經 API 串流轉送，不使用 presigned URL
 - [ ] api：新增以 Project 為範圍的路由；`/rpc` 保留，由路徑反推出 Project
@@ -176,7 +207,7 @@ Python Extension Point（同事負責）
 - [x] 角色：Platform Admin（管帳號、建立 Project、設定模型）、Owner、Editor、Viewer；只有 Platform Admin 能建立 Project。Viewer 可讀、搜尋、聊天；Editor 另可寫入、上傳、ingest；Owner 另可管成員與刪頁面（刪 Source 只要 Editor）。Platform Admin **預設看不到專案內容**，要先把自己加為成員（有操作紀錄）；Owner 不在時 Platform Admin 仍可管成員。專案至少保留一位 Owner，也至少保留一位啟用中的 Platform Admin
 - [x] 每條 API 路由都經過 Project 權限 middleware；retrieval、圖譜、agent 上下文、MCP 查詢只會碰到使用者所屬的 Project。目前涵蓋 `/rpc`、`GET /files`、`POST /upload`、`/events`（專案事件只發給成員，給 worker 的指令只發給 worker）；沒有權限與專案不存在回同樣的 403。Viewer 的 agent 唯讀（不能寫頁面或工作區）。MCP 要等階段 3
 - [x] 建立 Project 和加入成員時，提醒「同一個 Project 內的內容所有成員都看得到」。成員頁有這句提醒；建立專案時還沒有
-- [ ] 集中管理 LLM 呼叫：依使用者和 Project 統計成本、速率限制、重試；不設配額、不做成本門檻通知，只統計（Platform Admin 看用量儀表板；預算警示交給 LLM 供應商後台）
+- [ ] 集中管理 LLM 呼叫：依使用者和 Project 統計成本（已做，含伺服器自己發出的呼叫；token 數只有閘道的呼叫有）、速率限制、重試（未做）；不設配額、不做成本門檻通知，只統計（Platform Admin 看用量儀表板；預算警示交給 LLM 供應商後台）
 - [ ] 依 Project 設定可用模型，chat、embedding、vision 一併限制（例如敏感 Project 只能用自架模型）
 - [ ] Review Item 改存伺服器，同一個 Project 的成員共用，Editor 以上的角色可以處理，並記錄是誰處理的
 - [ ] SSE 即時更新：ingest 進度、聊天串流、資料已更新通知
@@ -258,6 +289,18 @@ Python Extension Point（同事負責）
 | 檔案存取 | 不使用 presigned URL | 上傳下載經 API 串流轉送 |
 | Web Clipper | 不保留 | 移除 `clip_server` 和瀏覽器擴充套件 |
 
+已於 2026-10-27 決定：
+
+| 項目 | 決定 | 影響 |
+| --- | --- | --- |
+| 資料夾模式 | 全部移除，伺服器一定要有資料庫與物件儲存才能啟動 | 單人 token 登入、`AllowedRoots`、`app-state.json`、LanceDB 都刪；機構共用設定存 `server_settings` |
+| 舊資料夾專案 | 提供一次性的 `llm-wiki-import`，不做常態匯入 | `projects/Lithography-wiki` 已匯入開發環境；資料夾本身仍留在 git |
+| `mcp-server/` | 程式碼保留，暫時無法使用 | 它依賴已刪的本機 API，階段 3 改寫成遠端 MCP |
+| Fly.io | 移除 | `fly.toml` 與 Makefile 的 `fly-*` 目標已刪 |
+| 語意搜尋用的 embedding 模型 | 模型目錄裡第一個 embedding 模型；一次只支援一個 | 換模型要重建索引；依專案選模型留待之後 |
+| 伺服器自己發出的 LLM 呼叫 | 也記進 `llm_usage`，標籤只由伺服器設定 | 目前沒有 token 數 |
+| 拆 crate 的順序 | 第二位 Rust 開發者將加入，所以先拆 `llm`（已做）、`parsing`，再建 `ingest` 骨架 | 他從階段 3 的 Rust ingest 開始，只碰 storage／llm／parsing |
+
 目前沒有尚待決定的事項。
 
 ## 風險與對策
@@ -266,7 +309,7 @@ Python Extension Point（同事負責）
 | --- | --- | --- |
 | 同一 Project 內的資訊外洩 | Derived Page 會綜合多份 Source；同一 Project 的所有成員都看得到 | 以 Project 切分，權限差異大的資料放不同 Project；建立 Project 和加入成員時提醒這個限制（ADR-0001） |
 | 刪除 Source 後內容殘留 | 如果刪除是因為「這份資料不該出現在這裡」，Derived Page 裡仍留有它的內容 | 產生 Review Item，由 Owner 手動處理；必要時再做「刪除後由 LLM 重新整理」 |
-| 只有一人會 Rust | 核心卡在一個人身上 | 模組化單體、少拆服務；會常變動的部分（解析、連接器、agent 工具）放到 Python Extension Point |
+| 會寫 Rust 的人少 | 目前一人，第二位將加入；兩人同時改 `runtime.rs`、`tools.rs`、`search.rs` 這類大檔案會常衝突 | 依領域拆 crate、用依賴方向檢查守住邊界；新人從 `ingest` 開始；會常變動的部分（解析、連接器、agent 工具）放到 Python Extension Point |
 | 重整 core 時把功能弄壞 | 階段 1 要拆 crate、換儲存、換 API，範圍很大 | 碰到哪裡才拆哪裡；`/rpc` 保留到階段 2；每一步都要 `cargo test` 和 `npm test` 通過 |
 | 多一套 NATS 要維運 | NATS 故障時 ingest 和事件全部停擺 | 三節點叢集、開啟持久化；監控 consumer 堆積與重送次數；Postgres outbox 保證事件不遺失，NATS 恢復後補送。k3d 的三個節點在同一台機器上，只能驗證設定 |
 | 改寫後 ingest 品質退步 | 知識庫內容變差 | 階段 3 用新舊對照，同一批文件分別跑 TS 和 Rust 版，自動比較；沒有人工基準，所以每次改 prompt 或模型都要重跑對照 |
@@ -286,7 +329,7 @@ Python Extension Point（同事負責）
 | LLM 配額 | 實際費用超出預期，或預算有硬上限；先在 Project 層級設上限，再考慮通知 |
 | Changeset 人工核准 | 自動提交的內容品質問題頻繁到要事前把關；做成依 Project 選擇 |
 | 刪除 Source 後由 LLM 重新整理 | 刪除 Source 時常需要徹底清除內容 |
-| 匯入既有資料夾 project | 有大量既有 wiki 不適合重新 ingest |
+| 常態的匯入功能 | 一次性的 `llm-wiki-import` 不夠用，例如要定期從別的來源同步 |
 | 人工基準資料集 | 新舊對照不足以判斷品質，或要頻繁調整 prompt 和模型 |
 | 跨 Project 檢索 | 使用者需要一次查多個 Project；做法是在使用者所屬的 Project 分別檢索，再合併排序 |
 | Agent 執行程式碼 | 需要對表格做資料分析、畫圖或產生檔案；優先做專用工具，必要時才開隔離沙箱 |
@@ -294,5 +337,5 @@ Python Extension Point（同事負責）
 | 引入 iii | Extension Point 超過五、六種，或同事需要自己定義新的觸發條件；先把 Rust 呼叫外掛的程式碼包在自己的介面後面，以便日後替換 |
 | 向量庫換成專用方案 | pgvector 的查詢延遲或資料量撐不住 |
 | 拆出專門的檔案服務 | 檔案上傳下載明顯拖慢 API |
-| 拆出更多服務 | 某個模組的負載特性明顯不同，或有第二位 Rust 開發者加入 |
+| 拆出更多服務 | 某個模組的負載特性明顯不同。第二位 Rust 開發者加入只影響 crate 的切法，不構成拆服務的理由 |
 | 即時協作編輯 | 使用者確實常同時編輯同一頁 |
