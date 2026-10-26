@@ -14,7 +14,6 @@
 //! src/lib/project-store.ts for the matching write site.
 
 use std::{
-    path::Path,
     sync::atomic::{AtomicBool, Ordering},
 };
 
@@ -58,15 +57,6 @@ fn default_true() -> bool {
     true
 }
 
-/// Read `proxyConfig` out of the project's `app-state.json`. Returns
-/// None if the file doesn't exist, can't be parsed, or has no proxy
-/// section — caller treats those identically to "no proxy".
-pub fn read_proxy_config_from_store(store_path: &Path) -> Option<ProxyConfig> {
-    let content = std::fs::read_to_string(store_path).ok()?;
-    let json: serde_json::Value = serde_json::from_str(&content).ok()?;
-    let proxy = json.get("proxyConfig")?;
-    serde_json::from_value(proxy.clone()).ok()
-}
 
 /// Apply a proxy config by setting the env vars reqwest reads.
 /// Returns a short human-readable summary for logging.
@@ -488,42 +478,7 @@ mod tests {
         assert!(!cfg.bypass_local);
     }
 
-    #[test]
-    fn missing_proxy_config_returns_none() {
-        let dir = tempdir_for_test();
-        let path = dir.join("missing.json");
-        assert!(read_proxy_config_from_store(&path).is_none());
-    }
 
-    #[test]
-    fn parses_proxy_config_from_store_file() {
-        let dir = tempdir_for_test();
-        let path = dir.join("app-state.json");
-        std::fs::write(
-            &path,
-            r#"{"proxyConfig": {"enabled": true, "url": "http://x:1", "bypassLocal": true}}"#,
-        )
-        .unwrap();
-        let cfg = read_proxy_config_from_store(&path).unwrap();
-        assert!(cfg.enabled);
-        assert_eq!(cfg.url, "http://x:1");
-    }
 
-    #[test]
-    fn ignores_store_file_with_no_proxy_section() {
-        let dir = tempdir_for_test();
-        let path = dir.join("app-state.json");
-        std::fs::write(&path, r#"{"otherKey": "value"}"#).unwrap();
-        assert!(read_proxy_config_from_store(&path).is_none());
-    }
 
-    fn tempdir_for_test() -> std::path::PathBuf {
-        let stamp = std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
-        let dir = std::env::temp_dir().join(format!("llm-wiki-proxy-test-{stamp}"));
-        std::fs::create_dir_all(&dir).unwrap();
-        dir
-    }
 }

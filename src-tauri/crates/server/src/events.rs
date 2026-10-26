@@ -115,11 +115,13 @@ pub async fn sse(
             }
             let mut snapshot = known.clone();
             async move {
-                let deliver = match (&platform, &principal) {
-                    (Some(platform), Some(principal)) => {
-                        may_receive(platform, principal, message.as_ref(), &mut snapshot).await
+                // Every stream belongs to a signed-in principal; one without
+                // is sent nothing.
+                let deliver = match &principal {
+                    Some(principal) => {
+                        may_receive(&platform, principal, message.as_ref(), &mut snapshot).await
                     }
-                    _ => true,
+                    None => false,
                 };
                 (deliver, message, snapshot)
             }

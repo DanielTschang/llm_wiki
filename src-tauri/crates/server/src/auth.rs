@@ -1,9 +1,9 @@
-//! Single-owner access control.
+//! Credentials of a request.
 //!
-//! Browsers sign in once with the token and get an `HttpOnly`,
-//! `SameSite=Strict` session cookie; scripts send `Authorization: Bearer`.
-//! Cookie-authenticated state-changing requests must also carry
-//! [`CLIENT_HEADER`]: a cross-site page cannot add a custom header without a
+//! Browsers sign in with an account and get an `HttpOnly`, `SameSite=Strict`
+//! session cookie (see `Accounts::create_session`); scripts and the ingest
+//! worker send `Authorization: Bearer`. Cookie-authenticated state-changing
+//! requests must also carry [`CLIENT_HEADER`]: a cross-site page cannot add a custom header without a
 //! CORS preflight, which this server never approves.
 
 use std::fs;
@@ -30,20 +30,15 @@ pub enum Credential {
 pub struct Auth {
     token_digest: [u8; 32],
     worker_token_digest: Option<[u8; 32]>,
-    session_value: String,
     secure_cookie: bool,
 }
 
 impl Auth {
     pub fn new(token: &str, secure_cookie: bool) -> Self {
         let token_digest: [u8; 32] = Sha256::digest(token.as_bytes()).into();
-        let session_value = hex(&Sha256::digest(
-            [b"llm-wiki-session:".as_slice(), token.as_bytes()].concat(),
-        ));
         Self {
             token_digest,
             worker_token_digest: None,
-            session_value,
             secure_cookie,
         }
     }
@@ -55,12 +50,10 @@ impl Auth {
         self
     }
 
-    pub fn token_matches(&self, candidate: &str) -> bool {
-        let digest: [u8; 32] = Sha256::digest(candidate.as_bytes()).into();
-        digest.ct_eq(&self.token_digest).into()
-    }
 
-    pub fn credential(&self, headers: &HeaderMap) -> Credential {
+    /// The Bearer credential, if the request carries one that matches the
+    /// operator token or the worker's.
+    pub fn bearer_credential(&self, headers: &HeaderMap) -> Credential {
         if let Some(bearer) = headers
             .get(header::AUTHORIZATION)
             .and_then(|v| v.to_str().ok())
@@ -77,30 +70,7 @@ impl Auth {
                 return Credential::Worker;
             }
         }
-        let cookie_ok = headers
-            .get_all(header::COOKIE)
-            .iter()
-            .filter_map(|v| v.to_str().ok())
-            .flat_map(|v| v.split(';'))
-            .filter_map(|pair| pair.trim().split_once('='))
-            .any(|(name, value)| {
-                name == COOKIE_NAME
-                    && bool::from(value.as_bytes().ct_eq(self.session_value.as_bytes()))
-            });
-        if cookie_ok {
-            Credential::Cookie
-        } else {
-            Credential::None
-        }
-    }
-
-    /// The Bearer credential, if the request carries one that matches. Used
-    /// by a platform server, where browsers sign in per user instead.
-    pub fn bearer_credential(&self, headers: &HeaderMap) -> Credential {
-        match self.credential(headers) {
-            credential @ (Credential::Bearer | Credential::Worker) => credential,
-            _ => Credential::None,
-        }
+        Credential::None
     }
 
     /// A session cookie carrying `value`, the per-user token of a platform
@@ -112,13 +82,6 @@ impl Auth {
         )
     }
 
-    pub fn session_cookie(&self) -> String {
-        format!(
-            "{COOKIE_NAME}={}; Path=/; HttpOnly; SameSite=Strict; Max-Age=2592000{}",
-            self.session_value,
-            if self.secure_cookie { "; Secure" } else { "" }
-        )
-    }
 
     pub fn clear_cookie(&self) -> String {
         format!("{COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0")
@@ -172,9 +135,6 @@ pub fn load_or_create_token(
     Ok((token, true))
 }
 
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|b| format!("{b:02x}")).collect()
-}
 
 #[cfg(test)]
 mod tests {
@@ -190,45 +150,19 @@ mod tests {
     }
 
     #[test]
-    fn accepts_bearer_token_and_session_cookie_only() {
-        let auth = Auth::new("s3cret", false);
-        let cookie = auth.session_cookie();
-        let cookie_pair = cookie.split(';').next().unwrap();
-
-        assert_eq!(
-            auth.credential(&headers(&[(header::AUTHORIZATION, "Bearer s3cret")])),
-            Credential::Bearer
-        );
-        assert_eq!(
-            auth.credential(&headers(&[(
-                header::COOKIE,
-                &format!("a=b; {cookie_pair}")
-            )])),
-            Credential::Cookie
-        );
-        assert_eq!(
-            auth.credential(&headers(&[(header::AUTHORIZATION, "Bearer wrong")])),
-            Credential::None
-        );
-        assert_eq!(
-            auth.credential(&headers(&[(header::COOKIE, "llm_wiki_session=s3cret")])),
-            Credential::None,
-            "the raw token is not a valid session value"
-        );
-    }
-
-    #[test]
-    fn worker_token_is_a_distinct_credential() {
+    fn accepts_the_operator_token_and_the_workers() {
         let auth = Auth::new("owner", false).with_worker_token("worker");
+        let bearer = |value: &str| {
+            auth.bearer_credential(&headers(&[(header::AUTHORIZATION, value)]))
+        };
+        assert_eq!(bearer("Bearer owner"), Credential::Bearer);
+        assert_eq!(bearer("Bearer worker"), Credential::Worker);
+        assert_eq!(bearer("Bearer wrong"), Credential::None);
         assert_eq!(
-            auth.credential(&headers(&[(header::AUTHORIZATION, "Bearer worker")])),
-            Credential::Worker
+            auth.bearer_credential(&headers(&[(header::COOKIE, "llm_wiki_session=owner")])),
+            Credential::None,
+            "a cookie is not a bearer credential"
         );
-        assert_eq!(
-            auth.credential(&headers(&[(header::AUTHORIZATION, "Bearer owner")])),
-            Credential::Bearer
-        );
-        assert!(!auth.token_matches("worker"), "worker token cannot sign in");
     }
 
     #[test]

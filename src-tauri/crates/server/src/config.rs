@@ -7,9 +7,9 @@ use clap::Parser;
 #[derive(Debug, Parser)]
 #[command(name = "llm-wiki-server", version)]
 pub struct Args {
-    /// Server state directory: app settings (`app-state.json`), the access
-    /// token, and `projects/` for wiki projects. Defaults to
-    /// `~/.llm-wiki-server`.
+    /// Server state directory: the operator token and the staging area for
+    /// uploads. Everything else is in Postgres and the object store. Defaults
+    /// to `~/.llm-wiki-server`.
     #[arg(long, env = "LLM_WIKI_DATA_DIR")]
     pub data_dir: Option<PathBuf>,
 
@@ -21,31 +21,16 @@ pub struct Args {
     #[arg(long, env = "LLM_WIKI_PORT", default_value_t = 19830)]
     pub port: u16,
 
-    /// Access token. When omitted, one is generated on first start and kept
+    /// The operator token, for scripts and the ingest worker (browsers sign in
+    /// with an account). When omitted, one is generated on first start and kept
     /// in `<data-dir>/server-token`.
     #[arg(long, env = "LLM_WIKI_TOKEN", hide_env_values = true)]
     pub token: Option<String>,
-
-    /// Extra directories (besides `<data-dir>/projects`) that projects and
-    /// imported files may live in. Every path a request names must be
-    /// inside one of them. Repeat the flag or separate with commas.
-    #[arg(
-        long = "allow-root",
-        env = "LLM_WIKI_ALLOW_ROOTS",
-        value_delimiter = ','
-    )]
-    pub allow_roots: Vec<PathBuf>,
 
     /// Built web frontend (`npm run build:web` → `dist-web/`). Defaults to
     /// `./dist-web` when it exists.
     #[arg(long, env = "LLM_WIKI_WEB_DIR")]
     pub web_dir: Option<PathBuf>,
-
-    /// Let the agent run shell commands the user approves in chat. Off by
-    /// default: on a server this is remote code execution for anyone holding
-    /// the token.
-    #[arg(long, env = "LLM_WIKI_ALLOW_SHELL")]
-    pub allow_shell: bool,
 
     /// Mark the session cookie `Secure`. Enable when served over HTTPS.
     #[arg(long, env = "LLM_WIKI_SECURE_COOKIE")]
@@ -65,16 +50,15 @@ pub struct Args {
     #[arg(long, env = "LLM_WIKI_NO_WORKER")]
     pub no_worker: bool,
 
-    /// Postgres connection string. Setting it switches the server to
-    /// platform mode: Project files live in Postgres and the S3 bucket below,
-    /// every path a request names must be `/projects/<uuid>/…`, and the host
-    /// disk is out of reach. Still under construction: commands not yet moved
-    /// onto the storage layer answer that they are unavailable.
+    /// Postgres connection string. Project files live in Postgres and the S3
+    /// bucket below, every path a request names must be `/projects/<uuid>/…`,
+    /// and the host disk is out of reach. Commands not yet moved onto the
+    /// storage layer answer that they are unavailable.
     #[arg(long, env = "LLM_WIKI_DATABASE_URL", hide_env_values = true)]
-    pub database_url: Option<String>,
+    pub database_url: String,
 
     /// Username of the first Platform Admin, created at startup when the
-    /// platform has none. Only used with `--database-url`.
+    /// platform has none.
     #[arg(long, env = "LLM_WIKI_ADMIN_USER", default_value = "admin")]
     pub admin_user: String,
 
@@ -85,37 +69,30 @@ pub struct Args {
 
     /// S3 API address of the object store, e.g. `http://minio:9000`.
     #[arg(long, env = "LLM_WIKI_S3_ENDPOINT")]
-    pub s3_endpoint: Option<String>,
+    pub s3_endpoint: String,
 
     #[arg(long, env = "LLM_WIKI_S3_BUCKET")]
-    pub s3_bucket: Option<String>,
+    pub s3_bucket: String,
 
     #[arg(long, env = "LLM_WIKI_S3_ACCESS_KEY")]
-    pub s3_access_key: Option<String>,
+    pub s3_access_key: String,
 
     #[arg(long, env = "LLM_WIKI_S3_SECRET_KEY", hide_env_values = true)]
-    pub s3_secret_key: Option<String>,
+    pub s3_secret_key: String,
 
     #[arg(long, env = "LLM_WIKI_S3_REGION", default_value = "us-east-1")]
     pub s3_region: String,
 }
 
 impl Args {
-    /// The object store settings; all of endpoint, bucket and both keys are
-    /// required together with `--database-url`.
-    pub fn s3_config(&self) -> Result<llm_wiki_storage::S3Config, String> {
-        let need = |value: &Option<String>, flag: &str| {
-            value
-                .clone()
-                .ok_or_else(|| format!("--database-url needs {flag} as well"))
-        };
-        Ok(llm_wiki_storage::S3Config {
-            endpoint: need(&self.s3_endpoint, "--s3-endpoint")?,
-            bucket: need(&self.s3_bucket, "--s3-bucket")?,
-            access_key: need(&self.s3_access_key, "--s3-access-key")?,
-            secret_key: need(&self.s3_secret_key, "--s3-secret-key")?,
+    pub fn s3_config(&self) -> llm_wiki_storage::S3Config {
+        llm_wiki_storage::S3Config {
+            endpoint: self.s3_endpoint.clone(),
+            bucket: self.s3_bucket.clone(),
+            access_key: self.s3_access_key.clone(),
+            secret_key: self.s3_secret_key.clone(),
             region: self.s3_region.clone(),
-        })
+        }
     }
 
     pub fn resolved_data_dir(&self) -> PathBuf {

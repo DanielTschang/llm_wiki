@@ -31,6 +31,16 @@ impl ServerSettings {
             .map_err(backend)
     }
 
+    /// Whether there was a value to remove.
+    pub async fn delete(&self, key: &str) -> Result<bool, StoreError> {
+        let result = sqlx::query("DELETE FROM server_settings WHERE key = $1")
+            .bind(key)
+            .execute(&self.pool)
+            .await
+            .map_err(backend)?;
+        Ok(result.rows_affected() > 0)
+    }
+
     pub async fn set(&self, key: &str, value: &Value, by: Option<Uuid>) -> Result<(), StoreError> {
         sqlx::query(
             "INSERT INTO server_settings (key, value, updated_by) VALUES ($1, $2, $3)

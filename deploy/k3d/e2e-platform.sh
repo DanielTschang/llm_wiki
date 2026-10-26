@@ -23,7 +23,7 @@ PROJECT=$("${K[@]}" exec pg-1 -c postgres -- psql -U postgres -d llm_wiki_test -
 echo "project=$PROJECT"
 
 DATA=$(mktemp -d)
-LLM_WIKI_DATA_DIR=$DATA LLM_WIKI_PORT=$APIPORT LLM_WIKI_TOKEN=$TOKEN LLM_WIKI_NO_WORKER=true LLM_WIKI_NO_DESKTOP_SETTINGS=true \
+LLM_WIKI_DATA_DIR=$DATA LLM_WIKI_PORT=$APIPORT LLM_WIKI_TOKEN=$TOKEN LLM_WIKI_NO_WORKER=true \
 LLM_WIKI_DATABASE_URL="postgres://llm_wiki:$PGPASS@127.0.0.1:$PGPORT/llm_wiki_test" \
 LLM_WIKI_S3_ENDPOINT=http://127.0.0.1:$S3PORT LLM_WIKI_S3_BUCKET=llm-wiki-test LLM_WIKI_S3_ACCESS_KEY=$S3U LLM_WIKI_S3_SECRET_KEY=$S3P \
   src-tauri/target/debug/llm-wiki-server >$S/server.log 2>&1 & SRV=$!

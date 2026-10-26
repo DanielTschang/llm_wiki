@@ -8,7 +8,6 @@
 //! Staged files older than a day are removed at startup.
 
 use std::path::{Component, Path, PathBuf};
-use std::time::{Duration, SystemTime};
 
 use axum::body::Body;
 use axum::extract::{Extension, Query, State};
@@ -18,7 +17,6 @@ use axum::Json;
 use futures::StreamExt;
 use serde::Deserialize;
 use serde_json::json;
-use tokio::io::AsyncWriteExt;
 
 use llm_wiki_core::platform::Platform;
 
@@ -27,7 +25,6 @@ use crate::{authz, AppState};
 
 pub const UPLOAD_DIR: &str = ".uploads";
 const MAX_UPLOAD_BYTES: u64 = 4 * 1024 * 1024 * 1024;
-const STALE_AFTER: Duration = Duration::from_secs(24 * 60 * 60);
 
 #[derive(Deserialize)]
 pub struct UploadQuery {
@@ -47,34 +44,32 @@ pub async fn receive(
     Query(query): Query<UploadQuery>,
     body: Body,
 ) -> Response {
-    if let Some(platform) = llm_wiki_core::platform::get() {
-        // Uploading adds Sources, which takes an editor.
-        if let (Some(accounts), Some(Extension(principal)), Some(project)) =
-            (&state.platform, principal, query.project.as_deref())
-        {
-            if let Ok(id) = uuid::Uuid::parse_str(project) {
-                let id = llm_wiki_storage::ProjectId(id);
-                if let Err(denied) =
-                    authz::require_role(accounts, &principal, id, llm_wiki_storage::Role::Editor)
-                        .await
-                {
-                    return error(denied.status, denied.message);
-                }
+    let Some(platform) = llm_wiki_core::platform::get() else {
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "the project file store is not installed".into(),
+        );
+    };
+    let Some(Extension(principal)) = principal else {
+        return error(StatusCode::UNAUTHORIZED, "Not signed in".into());
+    };
+    // Uploading adds Sources, which takes an editor.
+    if let Some(project) = query.project.as_deref() {
+        if let Ok(id) = uuid::Uuid::parse_str(project) {
+            let id = llm_wiki_storage::ProjectId(id);
+            if let Err(denied) = authz::require_role(
+                &state.platform,
+                &principal,
+                id,
+                llm_wiki_storage::Role::Editor,
+            )
+            .await
+            {
+                return error(denied.status, denied.message);
             }
         }
-        return receive_into_store(platform, &query, body).await;
     }
-    let target = match staged_path(&state.upload_root, &query.batch, &query.name) {
-        Ok(target) => target,
-        Err(message) => return error(StatusCode::BAD_REQUEST, message),
-    };
-    match write_stream(&target, body).await {
-        Ok(()) => Json(json!({ "path": target.to_string_lossy() })).into_response(),
-        Err(message) => {
-            let _ = tokio::fs::remove_file(&target).await;
-            error(StatusCode::BAD_REQUEST, message)
-        }
-    }
+    receive_into_store(platform, &query, body).await
 }
 
 /// Platform mode: the upload streams straight into the Project's object
@@ -133,11 +128,6 @@ async fn receive_into_store(platform: &Platform, query: &UploadQuery, body: Body
     }
 }
 
-/// Validates the client-chosen batch id and relative name and maps them
-/// into the staging area. Never lets either escape it.
-fn staged_path(upload_root: &Path, batch: &str, name: &str) -> Result<PathBuf, String> {
-    clean_name(batch, name).map(|relative| upload_root.join(relative))
-}
 
 /// `<batch>/<name>` after checking neither can climb out of the staging area.
 fn clean_name(batch: &str, name: &str) -> Result<PathBuf, String> {
@@ -161,49 +151,7 @@ fn clean_name(batch: &str, name: &str) -> Result<PathBuf, String> {
     Ok(PathBuf::from(batch).join(clean))
 }
 
-async fn write_stream(target: &Path, body: Body) -> Result<(), String> {
-    if let Some(parent) = target.parent() {
-        tokio::fs::create_dir_all(parent)
-            .await
-            .map_err(|e| format!("Cannot create {}: {e}", parent.display()))?;
-    }
-    let mut file = tokio::fs::File::create(target)
-        .await
-        .map_err(|e| format!("Cannot create {}: {e}", target.display()))?;
-    let mut stream = body.into_data_stream();
-    let mut written: u64 = 0;
-    while let Some(chunk) = stream.next().await {
-        let chunk = chunk.map_err(|e| format!("Upload interrupted: {e}"))?;
-        written += chunk.len() as u64;
-        if written > MAX_UPLOAD_BYTES {
-            return Err("Upload exceeds the 4 GB limit".into());
-        }
-        file.write_all(&chunk)
-            .await
-            .map_err(|e| format!("Cannot write {}: {e}", target.display()))?;
-    }
-    file.flush().await.map_err(|e| e.to_string())
-}
 
-/// Removes upload batches older than a day. Imports copy what they need,
-/// so a staged file is only useful for the few seconds of one pick.
-pub fn sweep_stale(upload_root: &Path) {
-    let Ok(entries) = std::fs::read_dir(upload_root) else {
-        return;
-    };
-    let now = SystemTime::now();
-    for entry in entries.flatten() {
-        let stale = entry
-            .metadata()
-            .and_then(|meta| meta.modified())
-            .ok()
-            .and_then(|modified| now.duration_since(modified).ok())
-            .is_some_and(|age| age > STALE_AFTER);
-        if stale {
-            let _ = std::fs::remove_dir_all(entry.path());
-        }
-    }
-}
 
 fn error(status: StatusCode, message: String) -> Response {
     (status, Json(json!({ "error": message }))).into_response()
@@ -215,20 +163,18 @@ mod tests {
 
     #[test]
     fn maps_names_into_the_batch_folder() {
-        let root = Path::new("/data/projects/.uploads");
         assert_eq!(
-            staged_path(root, "b-1", "paper.pdf").unwrap(),
-            root.join("b-1/paper.pdf")
+            clean_name("b-1", "paper.pdf").unwrap(),
+            PathBuf::from("b-1/paper.pdf")
         );
         assert_eq!(
-            staged_path(root, "b-1", "notes/2026/a.md").unwrap(),
-            root.join("b-1/notes/2026/a.md")
+            clean_name("b-1", "notes/2026/a.md").unwrap(),
+            PathBuf::from("b-1/notes/2026/a.md")
         );
     }
 
     #[test]
     fn rejects_names_and_batches_that_escape() {
-        let root = Path::new("/data/projects/.uploads");
         for name in [
             "../x",
             "/etc/passwd",
@@ -237,10 +183,10 @@ mod tests {
             "a/.git/config",
             "",
         ] {
-            assert!(staged_path(root, "b", name).is_err(), "{name}");
+            assert!(clean_name("b", name).is_err(), "{name}");
         }
         for batch in ["", "../b", "b/c", "b.c"] {
-            assert!(staged_path(root, batch, "a.md").is_err(), "{batch}");
+            assert!(clean_name(batch, "a.md").is_err(), "{batch}");
         }
     }
 }

@@ -75,7 +75,7 @@ echo
 echo "  LLM Wiki (platform) on http://localhost:$PORT"
 echo "  sign in as  $ADMIN_USER  with the password  $ADMIN_PASSWORD  (the first run creates it)"
 echo
-LLM_WIKI_DATA_DIR="$DATA" LLM_WIKI_PORT="$PORT" LLM_WIKI_NO_DESKTOP_SETTINGS=true \
+LLM_WIKI_DATA_DIR="$DATA" LLM_WIKI_PORT="$PORT" \
 LLM_WIKI_TOKEN="dev-operator-token-$PORT" \
 LLM_WIKI_ADMIN_USER="$ADMIN_USER" LLM_WIKI_ADMIN_PASSWORD="$ADMIN_PASSWORD" \
 LLM_WIKI_DATABASE_URL="postgres://llm_wiki:$PG_PASSWORD@127.0.0.1:$PG_PORT/$DB" \

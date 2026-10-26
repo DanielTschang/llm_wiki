@@ -1,9 +1,7 @@
 //! `GET /files?path=…`: the web build's `convertFileSrc`.
 
-use std::path::Path;
-
 use axum::body::Body;
-use axum::extract::{Extension, Query, Request, State};
+use axum::extract::{Extension, Query, State};
 use axum::http::{header, HeaderMap, HeaderValue, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
@@ -12,8 +10,6 @@ use llm_wiki_core::platform::Platform;
 use llm_wiki_storage::{route, Backend, EntryKind, Role, StoreError};
 use serde::Deserialize;
 use serde_json::json;
-use tower::ServiceExt;
-use tower_http::services::ServeFile;
 
 use crate::principal::Principal;
 use crate::{authz, AppState};
@@ -36,48 +32,30 @@ pub async fn serve(
     State(state): State<AppState>,
     principal: Option<Extension<Principal>>,
     Query(query): Query<FileQuery>,
-    request: Request,
 ) -> Response {
-    if let Some(platform) = llm_wiki_core::platform::get() {
-        // A platform server checks the caller's role in the file's Project
-        // before reading anything.
-        if let (Some(accounts), Some(Extension(principal))) = (&state.platform, principal) {
-            if let Ok((project, _)) = platform.locator.resolve(&query.path) {
-                if let Err(denied) =
-                    authz::require_role(accounts, &principal, project, Role::Viewer).await
-                {
-                    return (denied.status, Json(json!({ "error": denied.message })))
-                        .into_response();
-                }
-            }
+    let Some(platform) = llm_wiki_core::platform::get() else {
+        return (
+            StatusCode::SERVICE_UNAVAILABLE,
+            Json(json!({ "error": "the project file store is not installed" })),
+        )
+            .into_response();
+    };
+    // The caller needs a role in the file's Project before anything is read.
+    let Some(Extension(principal)) = principal else {
+        return (
+            StatusCode::UNAUTHORIZED,
+            Json(json!({ "error": "Not signed in" })),
+        )
+            .into_response();
+    };
+    if let Ok((project, _)) = platform.locator.resolve(&query.path) {
+        if let Err(denied) =
+            authz::require_role(&state.platform, &principal, project, Role::Viewer).await
+        {
+            return (denied.status, Json(json!({ "error": denied.message }))).into_response();
         }
-        return serve_from_store(platform, &query).await;
     }
-    let path = match state.roots.check(Path::new(&query.path)) {
-        Ok(path) => path,
-        Err(message) => {
-            return (StatusCode::FORBIDDEN, Json(json!({ "error": message }))).into_response()
-        }
-    };
-    let active = path
-        .extension()
-        .and_then(|ext| ext.to_str())
-        .is_some_and(|ext| ACTIVE_CONTENT_EXTENSIONS.contains(&ext.to_ascii_lowercase().as_str()));
-    let response = match ServeFile::new(&path).oneshot(request).await {
-        Ok(response) => response.map(Body::new),
-        Err(never) => match never {},
-    };
-    let mut response = response.into_response();
-    let name = path
-        .file_name()
-        .map(|name| name.to_string_lossy().into_owned())
-        .unwrap_or_else(|| "download".into());
-    harden(
-        response.headers_mut(),
-        active,
-        query.download.then_some(name.as_str()),
-    );
-    response
+    serve_from_store(platform, &query).await
 }
 
 /// Headers every served file gets: no content sniffing, a sandbox for

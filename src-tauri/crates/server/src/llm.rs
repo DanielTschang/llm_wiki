@@ -493,11 +493,9 @@ pub async fn relay(
     headers: HeaderMap,
     body: Body,
 ) -> Response {
-    let (Some(platform), Some(Extension(principal))) = (&state.platform, principal) else {
-        return refuse(
-            StatusCode::NOT_FOUND,
-            "the LLM gateway is only on a platform server",
-        );
+    let platform = &state.platform;
+    let Some(Extension(principal)) = principal else {
+        return refuse(StatusCode::UNAUTHORIZED, "Not signed in");
     };
     if method != Method::POST {
         return refuse(
