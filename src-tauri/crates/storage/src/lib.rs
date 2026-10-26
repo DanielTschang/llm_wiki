@@ -22,6 +22,6 @@ pub use error::StoreError;
 pub use locator::ProjectLocator;
 pub use memory::MemoryStore;
 pub use path::RelPath;
-pub use pg::{migrate, PgFiles};
+pub use pg::{migrate, PgFiles, DEFAULT_MAX_VERSIONS};
 pub use route::{route, Backend};
 pub use store::{Body, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx};

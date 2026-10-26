@@ -68,6 +68,8 @@ CREATE INDEX page_links_ref_idx ON page_links (project_id, target_ref);
 -- Binary objects in MinIO. The object key is `<project_id>/<id>`, so renaming
 -- or moving a file is a row update and deleting a Project is one prefix delete.
 -- Uploads and downloads stream through the API; no presigned URLs.
+-- Objects are immutable: the company MinIO allows at most 10 versions per key,
+-- so a changed file is a new row with a new id (new key), never a re-PUT.
 CREATE TABLE blobs (
     id           uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     project_id   uuid NOT NULL REFERENCES projects (id) ON DELETE CASCADE,

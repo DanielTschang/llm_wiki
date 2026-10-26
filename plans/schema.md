@@ -18,6 +18,7 @@ Migration 在 `src-tauri/crates/storage/migrations/`，純 SQL，依序套用：
 
 **頁面。**
 - `pages` 放目前狀態（含 `content`），讀取不用 join；`page_versions` 是 append-only 的寫入紀錄，每次寫入（含建立、刪除）都一列。同一份最新內容因此存兩次，換來歷史和還原都只查一張表；以 50–200 人的規模這個成本可以接受。
+- 每頁只保留最新 8 版（含目前版本），超過的在同一個交易裡刪除；版本號仍單調遞增，所以被修剪後的號碼不會重用。保留數是 `PgFiles::with_max_versions`，預設 `DEFAULT_MAX_VERSIONS = 8`。歷史**常駐開啟**，不再有「啟用」開關。
 - 取代 `page-history/` 與 `history/` 兩套機制（盤點裡的「待確認」）：兩者都是「寫入前的備份」，統一成版本列；`tool` 欄位標出寫入來源。
 - 刪除是軟刪除（`deleted_at`），活的路徑才有唯一性（partial unique index），所以刪掉後同一路徑可以重建，Changeset 也能還原。
 - rename 與 delete 也各寫一筆版本紀錄（`op` 為 `rename`、`delete`），且都讓 `version` 加一；因此改名後，手上拿著舊版本號的寫入者會得到版本衝突，這是刻意的。
@@ -27,7 +28,7 @@ Migration 在 `src-tauri/crates/storage/migrations/`，純 SQL，依序套用：
 
 **連結與出處。** `page_links` 存 `[[ ]]` 邊，`target_page_id` 為 NULL 就是斷鏈（lint 的來源）；`page_sources` 存 frontmatter `sources:` 對應的 Source，讓「刪這份 Source 會影響哪些頁面」是查詢而不是掃描。兩者都在寫頁面的同一個交易裡重建。其他頁面新增或刪除時要重新解析 `target_ref` 相符的邊，這段邏輯在 storage 介面實作。
 
-**Blob。** MinIO 物件鍵是 `<project_id>/<blob id>`，改名、搬移只改資料列；刪 Project 時是一次前綴刪除。上傳與下載經 API 串流，不用 presigned URL。刪除 Project 時資料庫連鎖刪除，**MinIO 物件要由程式先刪**，順序是先刪物件再刪資料列，否則會留下孤兒物件。
+**Blob。** MinIO 物件鍵是 `<project_id>/<blob id>`，改名、搬移只改資料列；刪 Project 時是一次前綴刪除。公司 MinIO 每個鍵最多 10 版，所以物件**不可變**：同一路徑重新上傳會產生新的 blob id（新鍵），舊列軟刪除後由清理工作實際刪掉舊物件，不會對同一個鍵重複寫入。上傳與下載經 API 串流，不用 presigned URL。刪除 Project 時資料庫連鎖刪除，**MinIO 物件要由程式先刪**，順序是先刪物件再刪資料列，否則會留下孤兒物件。
 
 **設定與祕密。** `project_settings`、`user_preferences`、`server_settings` 都是 key／jsonb，直接對應原本 `app_store_*` 的語意。**API key 不放資料庫**，放 k8s Secret／環境變數，`server_settings` 只放模型清單、base URL 等非機密設定。
 

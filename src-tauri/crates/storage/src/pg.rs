@@ -14,7 +14,12 @@ use crate::{RelPath, StoreError};
 #[derive(Clone)]
 pub struct PgFiles {
     pool: PgPool,
+    max_versions: u32,
 }
+
+/// Versions kept per page, current one included. Older ones are pruned in the
+/// same transaction as the write that pushes them out.
+pub const DEFAULT_MAX_VERSIONS: u32 = 8;
 
 /// Applies the schema in `migrations/`. Safe to run on every start.
 pub async fn migrate(pool: &PgPool) -> Result<(), StoreError> {
@@ -77,7 +82,16 @@ fn file_meta(path: RelPath, row: &PgRow) -> Result<Meta, StoreError> {
 
 impl PgFiles {
     pub fn new(pool: PgPool) -> Self {
-        Self { pool }
+        Self {
+            pool,
+            max_versions: DEFAULT_MAX_VERSIONS,
+        }
+    }
+
+    /// Keeps `max_versions` log rows per page (at least 1).
+    pub fn with_max_versions(mut self, max_versions: u32) -> Self {
+        self.max_versions = max_versions.max(1);
+        self
     }
 
     async fn any_live_page(
@@ -102,6 +116,7 @@ impl PgFiles {
     }
 
     async fn log_version(
+        &self,
         tx: &mut Transaction<'_, Postgres>,
         page_id: uuid::Uuid,
         version: i32,
@@ -125,6 +140,15 @@ impl PgFiles {
         .execute(&mut **tx)
         .await
         .map_err(backend)?;
+        // Every write adds exactly one row and bumps `version` by one, so the
+        // newest `max_versions` rows are those with version > current - max.
+        sqlx::query("DELETE FROM page_versions WHERE page_id = $1 AND version <= $2 - $3")
+            .bind(page_id)
+            .bind(version)
+            .bind(self.max_versions as i32)
+            .execute(&mut **tx)
+            .await
+            .map_err(backend)?;
         Ok(())
     }
 }
@@ -210,7 +234,8 @@ impl ProjectFiles for PgFiles {
         for row in &rows {
             let id = row.try_get("id").map_err(backend)?;
             let version = row.try_get("version").map_err(backend)?;
-            Self::log_version(&mut tx, id, version, "delete", None, ctx).await?;
+            self.log_version(&mut tx, id, version, "delete", None, ctx)
+                .await?;
         }
         tx.commit().await.map_err(backend)?;
         Ok(rows.len())
@@ -270,7 +295,8 @@ impl ProjectFiles for PgFiles {
             let id = row.try_get("id").map_err(backend)?;
             let version = row.try_get("version").map_err(backend)?;
             let content: String = row.try_get("content").map_err(backend)?;
-            Self::log_version(&mut tx, id, version, "rename", Some(&content), ctx).await?;
+            self.log_version(&mut tx, id, version, "rename", Some(&content), ctx)
+                .await?;
         }
         tx.commit().await.map_err(backend)?;
         Ok(())
@@ -428,7 +454,8 @@ impl PgFiles {
                 )
             }
         };
-        Self::log_version(&mut tx, id, version, op, Some(content), ctx).await?;
+        self.log_version(&mut tx, id, version, op, Some(content), ctx)
+            .await?;
         tx.commit().await?;
         Ok(Meta {
             path: path.clone(),
@@ -488,4 +515,73 @@ mod tests {
     }
 
     conformance::conformance_tests!(harness().await);
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn only_the_newest_eight_versions_of_a_page_are_kept() {
+        let Some(h) = harness().await else {
+            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
+            return;
+        };
+        let p = h.new_project().await;
+        let path = RelPath::parse("wiki/a.md").unwrap();
+        let ctx = WriteCtx::new("test");
+        for n in 1..=12 {
+            h.files
+                .write(
+                    p,
+                    &path,
+                    Body::Text(format!("v{n}")),
+                    Precondition::Any,
+                    &ctx,
+                )
+                .await
+                .unwrap();
+        }
+        let kept: Vec<i32> = sqlx::query_scalar(
+            "SELECT v.version FROM page_versions v JOIN pages g ON g.id = v.page_id
+             WHERE g.project_id = $1 AND g.path = 'wiki/a.md' ORDER BY v.version",
+        )
+        .bind(p.0)
+        .fetch_all(&h.files.pool)
+        .await
+        .unwrap();
+        assert_eq!(kept, (5..=12).collect::<Vec<_>>());
+        // The page itself is untouched by pruning.
+        assert_eq!(
+            h.files.read(p, &path).await.unwrap().0,
+            Body::Text("v12".into())
+        );
+    }
+
+    #[tokio::test(flavor = "multi_thread")]
+    async fn the_retention_limit_is_configurable_and_never_below_one() {
+        let Some(h) = harness().await else {
+            eprintln!("skipped: LLM_WIKI_TEST_DATABASE_URL is not set");
+            return;
+        };
+        let files = h.files.clone().with_max_versions(0);
+        let p = h.new_project().await;
+        let path = RelPath::parse("wiki/a.md").unwrap();
+        for n in 1..=3 {
+            files
+                .write(
+                    p,
+                    &path,
+                    Body::Text(format!("v{n}")),
+                    Precondition::Any,
+                    &WriteCtx::new("test"),
+                )
+                .await
+                .unwrap();
+        }
+        let kept: i64 = sqlx::query_scalar(
+            "SELECT count(*) FROM page_versions v JOIN pages g ON g.id = v.page_id
+             WHERE g.project_id = $1",
+        )
+        .bind(p.0)
+        .fetch_one(&files.pool)
+        .await
+        .unwrap();
+        assert_eq!(kept, 1);
+    }
 }
