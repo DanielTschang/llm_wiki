@@ -1,10 +1,13 @@
 # syntax=docker/dockerfile:1
 #
-# Self-hosted LLM Wiki: web frontend + llm-wiki-server in one image.
-# See plans/web-server-mode.md and docker-compose.yml.
+# LLM Wiki: web frontend + llm-wiki-server in one image.
 #
 #   docker build -t llm-wiki-server .
-#   docker run -p 127.0.0.1:19830:19830 -v llm-wiki-data:/data llm-wiki-server
+#
+# The server needs Postgres (with pgvector) and an S3 bucket. Pass them as
+# LLM_WIKI_DATABASE_URL and LLM_WIKI_S3_ENDPOINT / _BUCKET / _ACCESS_KEY /
+# _SECRET_KEY (see `llm-wiki-server --help`). /data holds only the operator
+# token.
 
 # ── Web frontend + ingest worker ───────────────────────────────────────
 FROM node:22-bookworm-slim AS web
@@ -18,17 +21,10 @@ RUN npm run build:web && npm run build:worker
 
 # ── Server binary ──────────────────────────────────────────────────────
 FROM rust:1-bookworm AS server
-# lancedb's protobuf code generation needs protoc and the well-known
-# types (google/protobuf/*.proto) from libprotobuf-dev.
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends protobuf-compiler libprotobuf-dev \
-    && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
-# The whole workspace manifest is needed to resolve the lockfile, and core
-# embeds src/lib/source-watch-defaults.json at compile time.
+# The whole workspace manifest is needed to resolve the lockfile.
 COPY src-tauri/Cargo.toml src-tauri/Cargo.lock ./src-tauri/
 COPY src-tauri/crates ./src-tauri/crates
-COPY src/lib/source-watch-defaults.json ./src/lib/source-watch-defaults.json
 WORKDIR /app/src-tauri
 # The workspace release profile (fat LTO, one codegen unit, size-optimized)
 # favours binary size; for the server it mostly costs build time and memory.
@@ -40,7 +36,7 @@ RUN --mount=type=cache,target=/usr/local/cargo/registry \
     cargo build --release --locked -p llm-wiki-server \
     && cp target/release/llm-wiki-server /usr/local/bin/llm-wiki-server
 
-# ── PDFium for the target architecture (same binaries the desktop ships) ──
+# ── PDFium for the target architecture  ──
 FROM debian:bookworm-slim AS pdfium
 ARG TARGETARCH
 COPY src-tauri/pdfium/libpdfium.so src-tauri/pdfium/libpdfium-arm64.so /pdfium/
@@ -70,8 +66,7 @@ COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 # Starts as root only to take ownership of a root-owned volume,
 # then runs the server as `llmwiki` (docker/entrypoint.sh).
 # Inside the container the server must listen on all interfaces; keep it
-# private with the host port mapping (docker-compose.yml publishes to
-# 127.0.0.1 only).
+# private with the port mapping or the cluster network policy.
 ENV HOME=/home/llmwiki \
     LLM_WIKI_DATA_DIR=/data \
     LLM_WIKI_BIND=0.0.0.0 \
