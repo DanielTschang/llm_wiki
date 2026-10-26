@@ -3,7 +3,8 @@ use std::sync::Arc;
 use sqlx::postgres::PgPoolOptions;
 
 use crate::{
-    migrate, Accounts, PgBlobs, PgFiles, PgState, Projects, RoutedFiles, S3Config, StoreError,
+    migrate, Accounts, LlmUsage, PgBlobs, PgFiles, PgState, Projects, RoutedFiles, S3Config,
+    ServerSettings, StoreError,
 };
 
 /// Everything a platform server needs from the database and the object store.
@@ -16,6 +17,8 @@ pub struct Services {
     pub blobs: Arc<PgBlobs>,
     pub accounts: Accounts,
     pub projects: Projects,
+    pub settings: ServerSettings,
+    pub usage: LlmUsage,
 }
 
 /// Connects to Postgres, applies the schema, and puts blob contents in the S3
@@ -39,7 +42,9 @@ pub async fn open_services(
         files: Arc::new(files),
         blobs,
         accounts: Accounts::new(pool.clone()),
-        projects: Projects::new(pool),
+        projects: Projects::new(pool.clone()),
+        settings: ServerSettings::new(pool.clone()),
+        usage: LlmUsage::new(pool),
     })
 }
 

@@ -121,7 +121,13 @@ async fn call(
         {
             return reply.map_err(|denied| DispatchError::Status(denied.status, denied.message));
         }
+        if let Some(reply) = crate::llm::handle_rpc(platform, principal, command, &args).await {
+            return reply.map_err(|denied| DispatchError::Status(denied.status, denied.message));
+        }
         authz::authorize_rpc(platform, principal, command, &mut args)
+            .await
+            .map_err(|denied| DispatchError::Status(denied.status, denied.message))?;
+        crate::llm::apply_models(platform, command, &mut args)
             .await
             .map_err(|denied| DispatchError::Status(denied.status, denied.message))?;
     }
@@ -304,6 +310,21 @@ const PER_USER_KEYS: &[&str] = &[
     "generalConfig",
 ];
 
+/// Settings that carry API keys or tokens. On a platform server the models
+/// and their keys belong to the server, so none of these is stored in, or read
+/// from, the settings store.
+const SERVER_OWNED_KEYS: &[&str] = &[
+    "llmConfig",
+    "providerConfigs",
+    "customLlmPresets",
+    "embeddingConfig",
+    "multimodalConfig",
+    "searchApiConfig",
+    "mineruConfig",
+    "apiConfig",
+    "proxyConfig",
+];
+
 /// A signed-in user's own copy of a personal setting, in their preferences.
 async fn user_setting(
     platform: &crate::principal::PlatformState,
@@ -348,6 +369,17 @@ async fn app_store(
     // A person's own settings live in their preferences. The organisation's
     // are read by everyone and changed only by a Platform Admin.
     if let (Some(platform), Some(principal)) = (&state.platform, principal) {
+        if SERVER_OWNED_KEYS.contains(&args.key.as_str()) {
+            return match command {
+                "app_store_get" => Ok(Value::Null),
+                "app_store_delete" => Ok(Value::Bool(false)),
+                _ => Err(DispatchError::Status(
+                    StatusCode::FORBIDDEN,
+                    "model and search settings are kept on the server; an administrator sets them in Settings → Models"
+                        .into(),
+                )),
+            };
+        }
         if let Principal::User(user) = principal {
             if PER_USER_KEYS.contains(&args.key.as_str()) {
                 return user_setting(platform, user, command, args).await;

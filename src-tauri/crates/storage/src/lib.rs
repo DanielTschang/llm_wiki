@@ -19,6 +19,7 @@ mod pg;
 mod projects;
 mod route;
 mod routed;
+mod settings;
 mod sql;
 mod state;
 mod store;
@@ -38,6 +39,7 @@ pub use pg::{migrate, PgFiles, DEFAULT_MAX_VERSIONS};
 pub use projects::{Member, ProjectInfo, Projects, Role};
 pub use route::{blob_kind, route, Backend};
 pub use routed::RoutedFiles;
+pub use settings::{LlmUsage, ServerSettings, UsageRecord, UsageTotal, LLM_MODELS_KEY};
 pub use state::{PgState, MAX_STATE_BYTES};
 pub use store::{
     BlobStreams, Body, ByteStream, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx,

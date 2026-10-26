@@ -583,6 +583,7 @@ pub async fn dispatch(
                 project_id: String,
                 request: core::agent::AgentChatRequest,
                 llm_config: Option<core::agent::provider::LlmConfig>,
+                embedding_config: Option<llm_wiki_core::commands::search::SearchEmbeddingConfig>,
             }
             let a: RpcArgs = rpc_args(args)?;
             let ctx = Arc::clone(ctx);
@@ -592,6 +593,7 @@ pub async fn dispatch(
                     a.project_id,
                     a.request,
                     a.llm_config,
+                    a.embedding_config,
                 )
                 .await,
             )
@@ -605,6 +607,7 @@ pub async fn dispatch(
                 project_id: String,
                 request: core::agent::AgentChatRequest,
                 llm_config: Option<core::agent::provider::LlmConfig>,
+                embedding_config: Option<llm_wiki_core::commands::search::SearchEmbeddingConfig>,
             }
             let a: RpcArgs = rpc_args(args)?;
             let ctx = Arc::clone(ctx);
@@ -614,6 +617,7 @@ pub async fn dispatch(
                     a.project_id,
                     a.request,
                     a.llm_config,
+                    a.embedding_config,
                 )
                 .await,
             )

@@ -30,6 +30,7 @@ pub async fn agent_start_turn(
     project_id: String,
     mut request: crate::agent::AgentChatRequest,
     llm_config: Option<crate::agent::provider::LlmConfig>,
+    embedding_config: Option<crate::commands::search::SearchEmbeddingConfig>,
 ) -> Result<crate::agent::types::AgentChatResponse, String> {
     let project = resolve_agent_project(ctx, &project_id)?;
     if request
@@ -67,6 +68,7 @@ pub async fn agent_start_turn(
     }
     let mut runtime_config = load_agent_runtime_config(ctx);
     runtime_config.llm = llm_config.or(runtime_config.llm);
+    runtime_config.embedding = embedding_config.or(runtime_config.embedding);
     let runtime = crate::agent::AgentRuntime::new(
         project.id.clone(),
         project.path.clone(),
@@ -116,6 +118,7 @@ pub async fn agent_start_turn_stream(
     project_id: String,
     mut request: crate::agent::AgentChatRequest,
     llm_config: Option<crate::agent::provider::LlmConfig>,
+    embedding_config: Option<crate::commands::search::SearchEmbeddingConfig>,
 ) -> Result<String, String> {
     let project = resolve_agent_project(&ctx, &project_id)?;
     if request
@@ -151,6 +154,7 @@ pub async fn agent_start_turn_stream(
     }
     let mut runtime_config = load_agent_runtime_config(&ctx);
     runtime_config.llm = llm_config.or(runtime_config.llm);
+    runtime_config.embedding = embedding_config.or(runtime_config.embedding);
     let runtime = crate::agent::AgentRuntime::new(
         project.id.clone(),
         project.path.clone(),
@@ -339,6 +343,11 @@ fn load_agent_app_state(ctx: &CoreContext) -> Option<Value> {
 }
 
 fn load_agent_runtime_config(ctx: &CoreContext) -> AgentRuntimeConfig {
+    // On a platform server the models and their keys belong to the server and
+    // arrive with the request; nothing is read from the settings file.
+    if crate::platform::get().is_some() {
+        return AgentRuntimeConfig::default();
+    }
     let Some(parsed) = load_agent_app_state(ctx) else {
         return AgentRuntimeConfig::default();
     };

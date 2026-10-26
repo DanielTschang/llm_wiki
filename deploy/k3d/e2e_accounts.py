@@ -11,6 +11,9 @@ import urllib.error
 import urllib.request
 import uuid
 
+import http.server
+import threading
+
 BASE = os.environ["BASE"]
 OPERATOR_TOKEN = os.environ["OPERATOR_TOKEN"]
 failures = []
@@ -63,12 +66,48 @@ class Client:
         except ValueError:
             return status, body.decode(errors="replace")
 
+    def raw(self, method, path, data=None, headers=None):
+        return self._send(self._request(method, path, data, headers))
+
     def get(self, path):
         return self._send(self._request("GET", path))
 
     def upload(self, project, batch, name, data):
         query = urllib.parse.urlencode({"batch": batch, "name": name, "project": project})
         return self._send(self._request("POST", f"/upload?{query}", data))
+
+
+class Upstream(http.server.BaseHTTPRequestHandler):
+    """A stand-in model server that records what it was sent."""
+    seen = []
+
+    def log_message(self, *args):
+        pass
+
+    def do_POST(self):
+        length = int(self.headers.get("Content-Length") or 0)
+        body = self.rfile.read(length)
+        Upstream.seen.append({"path": self.path, "headers": {k.lower(): v for k, v in self.headers.items()}, "body": body})
+        if self.path.endswith("/embeddings"):
+            payload = json.dumps({"data": [{"embedding": [0.25, 0.5, 0.75]}]}).encode()
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+            return
+        self.send_response(200)
+        self.send_header("Content-Type", "text/event-stream")
+        self.end_headers()
+        for piece in ["Hel", "lo ", "there"]:
+            self.wfile.write(f'data: {{"choices":[{{"delta":{{"content":"{piece}"}}}}]}}\n\n'.encode())
+            self.wfile.flush()
+        self.wfile.write(b'data: {"usage":{"prompt_tokens":11,"completion_tokens":5}}\n\ndata: [DONE]\n\n')
+
+
+upstream = http.server.ThreadingHTTPServer(("127.0.0.1", 0), Upstream)
+threading.Thread(target=upstream.serve_forever, daemon=True).start()
+UPSTREAM = f"http://127.0.0.1:{upstream.server_port}"
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
@@ -177,10 +216,78 @@ print("settings")
 check("a user keeps their own last project", alice2.rpc("app_store_set", {"store": "app-state.json", "key": "lastProject", "value": {"path": base}})[0] == 200)
 check("another user does not see it", carol.rpc("app_store_get", {"store": "app-state.json", "key": "lastProject"})[1] is None)
 check("and gets it back themselves", alice2.rpc("app_store_get", {"store": "app-state.json", "key": "lastProject"})[1]["path"] == base)
-check("a user cannot change organisation settings", alice2.rpc("app_store_set", {"store": "app-state.json", "key": "llmConfig", "value": {"model": "x"}})[0] == 403)
-check("an administrator can", admin.rpc("app_store_set", {"store": "app-state.json", "key": "llmConfig", "value": {"model": "m1"}})[0] == 200)
-check("and everyone reads them", carol.rpc("app_store_get", {"store": "app-state.json", "key": "llmConfig"})[1]["model"] == "m1")
+check("a user cannot change organisation settings", alice2.rpc("app_store_set", {"store": "app-state.json", "key": "taskModelRouting", "value": {"chat": "x"}})[0] == 403)
+check("an administrator can", admin.rpc("app_store_set", {"store": "app-state.json", "key": "taskModelRouting", "value": {"chat": "m1"}})[0] == 200)
+check("and everyone reads them", carol.rpc("app_store_get", {"store": "app-state.json", "key": "taskModelRouting"})[1]["chat"] == "m1")
 check("a user cannot change the proxy", alice2.rpc("set_proxy_env", {})[0] == 403)
+
+status, second = admin.rpc("create_project", {"name": f"Gateway {tag}"})
+pid2 = second["id"]
+admin.rpc("add_project_member", {"projectId": pid2, "userId": users["alice"]["id"], "role": "viewer"})
+print("llm gateway")
+models = [
+    {"id": "stub-chat", "label": "Stub chat", "provider": "custom", "model": "stub-1",
+     "baseUrl": UPSTREAM + "/v1", "apiKeyEnv": "LLM_WIKI_KEY_STUB", "default": True},
+    {"id": "stub-embed", "label": "Stub embeddings", "purpose": "embedding", "provider": "custom",
+     "model": "embed-1", "baseUrl": UPSTREAM + "/v1/embeddings", "apiKeyEnv": "LLM_WIKI_KEY_STUB",
+     "outputDimensionality": 3, "default": True},
+    {"id": "no-key", "label": "Key missing", "provider": "custom", "model": "x",
+     "baseUrl": UPSTREAM + "/other", "apiKeyEnv": "LLM_WIKI_KEY_NOT_SET"},
+]
+check("a user cannot change the models", alice2.rpc("set_llm_models", {"models": models})[0] == 403)
+check("a bad key variable is refused", admin.rpc("set_llm_models", {"models": [{**models[0], "apiKeyEnv": "DATABASE_URL"}]})[0] == 400)
+check("a built-in provider cannot be pointed elsewhere", admin.rpc("set_llm_models", {"models": [{"id": "x", "label": "x", "provider": "openai", "model": "m", "baseUrl": "https://evil.example"}]})[0] == 400)
+check("the administrator sets the models", admin.rpc("set_llm_models", {"models": models})[0] == 200)
+status, listed = alice2.rpc("list_llm_models")
+check("a member lists them without the key variable", status == 200 and len(listed) == 3 and all("apiKeyEnv" not in m for m in listed), listed)
+check("the administrator also sees how each key is found", all("apiKeyEnv" in m for m in admin.rpc("list_llm_models")[1]))
+check("the administrator sees which keys the server has",
+      {m["id"]: m["keyConfigured"] for m in admin.rpc("list_llm_models")[1]} == {"stub-chat": True, "stub-embed": True, "no-key": False})
+
+relay_headers = {
+    "Content-Type": "application/json",
+    "Authorization": "Bearer placeholder",
+    "X-LLM-Target": UPSTREAM + "/v1/chat/completions",
+    "X-LLM-Project": pid2,
+}
+Upstream.seen.clear()
+status, body = alice2.raw("POST", "/llm/relay/stub-chat", json.dumps({"messages": [{"role": "user", "content": "hi"}]}).encode(), relay_headers)
+check("a member's request is relayed and streams back", status == 200 and b"Hel" in body and b"there" in body and b"[DONE]" in body, (status, body[:80]))
+seen = Upstream.seen[-1] if Upstream.seen else {"headers": {}, "body": b"", "path": ""}
+check("the server's key went upstream, not the browser's", seen["headers"].get("authorization") == "Bearer sk-stub-secret", seen["headers"])
+check("nothing of the session went upstream", "cookie" not in seen["headers"] and "x-llm-project" not in seen["headers"] and "x-llm-target" not in seen["headers"])
+check("the request body arrived unchanged", json.loads(seen["body"])["messages"][0]["content"] == "hi")
+
+def relay(client, model, target, **extra):
+    h = {"Content-Type": "application/json", "Authorization": "Bearer placeholder", "X-LLM-Target": target, **extra}
+    return client.raw("POST", f"/llm/relay/{model}", b"{}", h)[0]
+
+check("a target outside the model's address is refused", relay(alice2, "stub-chat", "http://127.0.0.1:1/v1/chat/completions") == 403)
+check("so is another path on the same server", relay(alice2, "stub-chat", UPSTREAM + "/admin") == 403)
+check("so is a lookalike host", relay(alice2, "stub-chat", "http://127.0.0.1.evil.example/v1/chat") == 403)
+check("an unknown model is not found", relay(alice2, "nope", UPSTREAM + "/v1/chat") == 404)
+check("a model whose key is missing says so", relay(alice2, "no-key", UPSTREAM + "/other/chat") == 503)
+check("only POST is relayed", alice2.raw("GET", "/llm/relay/stub-chat")[0] == 405)
+check("a project the caller is not in is refused", relay(carol, "stub-chat", UPSTREAM + "/v1/chat/completions", **{"X-LLM-Project": pid2}) == 403)
+check("a stranger is not signed in", Client().raw("POST", "/llm/relay/stub-chat", b"{}")[0] == 401)
+check("members cannot use the open proxy", alice2.raw("POST", "/proxy?url=" + urllib.parse.quote(UPSTREAM + "/v1/chat"), b"{}", {"Content-Type": "application/json"})[0] == 403)
+
+import time
+time.sleep(0.5)
+status, usage = admin.rpc("llm_usage_summary", {"days": 1})
+mine = [u for u in usage if u["modelId"] == "stub-chat" and u["displayName"] and u["displayName"].lower().startswith("alice")]
+check("the call is counted with the tokens the model reported",
+      status == 200 and mine and mine[0]["calls"] >= 1 and mine[0]["inputTokens"] == 11 and mine[0]["outputTokens"] == 5, usage)
+check("only an administrator sees usage", alice2.rpc("llm_usage_summary")[0] == 403)
+
+print("keys stay on the server")
+check("model settings read as empty", alice2.rpc("app_store_get", {"store": "app-state.json", "key": "llmConfig"})[1] is None)
+check("and cannot be stored in the settings", admin.rpc("app_store_set", {"store": "app-state.json", "key": "llmConfig", "value": {"apiKey": "sk-leak"}})[0] == 403)
+Upstream.seen.clear()
+check("an embedding request must name a server model", alice2.rpc("embedding_fetch", {"text": "hi", "cfg": {"enabled": True, "endpoint": UPSTREAM, "apiKey": "sk-mine", "model": "m"}})[0] == 400)
+status, vector = alice2.rpc("embedding_fetch", {"text": "hi", "cfg": {"enabled": True, "endpoint": "http://evil.example", "apiKey": "sk-mine", "model": "m", "serverModelId": "stub-embed"}})
+check("a named embedding model is called with the server's key and address",
+      status == 200 and vector == [0.25, 0.5, 0.75] and Upstream.seen and Upstream.seen[-1]["headers"].get("authorization") == "Bearer sk-stub-secret", (status, vector))
 
 print("operator token")
 operator = Client(bearer=OPERATOR_TOKEN)

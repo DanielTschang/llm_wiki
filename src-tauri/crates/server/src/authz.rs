@@ -240,7 +240,11 @@ mod tests {
 
     #[test]
     fn a_readers_agent_turn_is_forced_read_only_whatever_the_browser_sent() {
-        for sent in [json!({}), json!({ "readOnly": false }), json!({ "readOnly": true })] {
+        for sent in [
+            json!({}),
+            json!({ "readOnly": false }),
+            json!({ "readOnly": true }),
+        ] {
             let mut args = json!({ "projectId": "p", "request": sent });
             force_read_only(&mut args);
             assert_eq!(args["request"]["readOnly"], true);

@@ -8,6 +8,7 @@ mod desktop_settings;
 mod dispatch;
 mod events;
 mod files;
+mod llm;
 mod paths;
 mod principal;
 mod proxy;
@@ -251,6 +252,7 @@ fn router(state: AppState, web_dir: Option<PathBuf>) -> Router {
         .route("/events", get(events::sse))
         .route("/files", get(files::serve))
         .route("/proxy", any(proxy::forward))
+        .route("/llm/relay/{model_id}", any(llm::relay))
         .layer(DefaultBodyLimit::max(MAX_RPC_BODY_BYTES))
         // Streams to disk with its own size check.
         .route("/upload", post(upload::receive));
@@ -323,7 +325,8 @@ async fn require_auth(State(state): State<AppState>, mut request: Request, next:
         || matches!(
             path,
             "/events" | "/files" | "/proxy" | "/upload" | "/logout"
-        );
+        )
+        || path.starts_with("/llm/");
     let credential = match &state.platform {
         Some(platform) => {
             match platform_principal(platform, &state.auth, request.headers()).await {
@@ -341,8 +344,10 @@ async fn require_auth(State(state): State<AppState>, mut request: Request, next:
         Credential::Bearer | Credential::Worker => next.run(request).await,
         Credential::Cookie => {
             let changes_state = request.method() != Method::GET && request.method() != Method::HEAD;
-            let needs_client_header =
-                path.starts_with("/rpc/") || path == "/proxy" || changes_state;
+            let needs_client_header = path.starts_with("/rpc/")
+                || path.starts_with("/llm/")
+                || path == "/proxy"
+                || changes_state;
             if needs_client_header && !request.headers().contains_key(CLIENT_HEADER) {
                 return (
                     StatusCode::FORBIDDEN,

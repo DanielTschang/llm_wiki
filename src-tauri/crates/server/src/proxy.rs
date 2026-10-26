@@ -4,7 +4,7 @@
 //! the user's proxy settings apply.
 
 use axum::body::{to_bytes, Body};
-use axum::extract::Query;
+use axum::extract::{Extension, Query, State};
 use axum::http::{HeaderMap, HeaderName, Method, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
@@ -12,6 +12,8 @@ use serde::Deserialize;
 use serde_json::json;
 
 use crate::auth::CLIENT_HEADER;
+use crate::principal::Principal;
+use crate::AppState;
 
 pub const MAX_PROXY_BODY_BYTES: usize = 64 * 1024 * 1024;
 
@@ -44,11 +46,25 @@ fn is_local_header(name: &HeaderName) -> bool {
 }
 
 pub async fn forward(
+    State(state): State<AppState>,
+    principal: Option<Extension<Principal>>,
     Query(query): Query<ProxyQuery>,
     method: Method,
     headers: HeaderMap,
     body: Body,
 ) -> Response {
+    // On a platform server calls to models go through the gateway, which
+    // checks where they are going. An open relay to any address would let a
+    // member reach the server's own network, so only administrators keep it.
+    if state.platform.is_some() {
+        let allowed = principal.is_some_and(|Extension(principal)| principal.is_platform_admin());
+        if !allowed {
+            return error(
+                StatusCode::FORBIDDEN,
+                "this server does not relay requests; models are called through the gateway".into(),
+            );
+        }
+    }
     let url = match reqwest::Url::parse(&query.url) {
         Ok(url) if matches!(url.scheme(), "http" | "https") => url,
         _ => {
