@@ -12,6 +12,12 @@ pub enum StoreError {
     VersionConflict { path: String, current: u32 },
     #[error("invalid path {path:?}: {reason}")]
     InvalidPath { path: String, reason: &'static str },
+    /// The caller is known but not allowed to do this.
+    #[error("not allowed: {0}")]
+    Forbidden(String),
+    /// The input is not acceptable (a bad name, a weak password, ...).
+    #[error("invalid: {0}")]
+    Invalid(String),
     #[error("{0}")]
     Backend(String),
 }

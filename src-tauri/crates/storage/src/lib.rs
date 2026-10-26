@@ -6,6 +6,7 @@
 //! blobs in MinIO, `.llm-wiki/*` state in tables) is decided by [`route`], not
 //! by callers.
 
+mod accounts;
 mod blobs;
 mod connect;
 mod error;
@@ -15,6 +16,7 @@ mod memory;
 mod objects;
 mod path;
 mod pg;
+mod projects;
 mod route;
 mod routed;
 mod sql;
@@ -24,6 +26,7 @@ mod store;
 #[cfg(test)]
 mod conformance;
 
+pub use accounts::{check_password, normalize_username, Accounts, AuthError, NewUser, User};
 pub use blobs::PgBlobs;
 pub use connect::open_store;
 pub use error::StoreError;
@@ -32,6 +35,7 @@ pub use memory::MemoryStore;
 pub use objects::S3Config;
 pub use path::RelPath;
 pub use pg::{migrate, PgFiles, DEFAULT_MAX_VERSIONS};
+pub use projects::{Member, ProjectInfo, Projects, Role};
 pub use route::{blob_kind, route, Backend};
 pub use routed::RoutedFiles;
 pub use state::{PgState, MAX_STATE_BYTES};
