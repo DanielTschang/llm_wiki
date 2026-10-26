@@ -133,7 +133,7 @@ Python Extension Point（同事負責）
 - [x] 刪除 `file_sync` 與資料夾監控：Rust `file_sync.rs`（約 1950 行）、`fs.rs` 的 `mark_app_write_path`、`CoreContext.file_sync`、7 個 dispatch 分支、`/sources/rescan` 路由和 MCP 的 `llm_wiki_rescan_sources`；前端的 `project-file-sync`、排程匯入（`scheduled-import`）、活動面板的檔案同步區塊、兩個設定頁及其 store 欄位與 i18n 鍵都已移除。「來源」頁的重新整理現在只重新載入清單
   - 保留：`SourceWatchConfig`／`source-watch-config.ts` 其實同時是匯入篩選設定（副檔名、大小上限、`persistExtractedMarkdown`、ingest 並行數），明確匯入和 ingest 還在用，暫不改名；使用者已無法在 UI 編輯，只讀預設或舊值。階段 2 整理設定頁時改名成匯入設定
 - [ ] core 依領域拆 crate：storage、retrieval、agent、parsing、llm；server 改名為 api（碰到哪裡才拆哪裡，不一次大改）
-- [ ] 設計 Postgres schema：Project、頁面、頁面歷史、wikilink 邊、操作紀錄、對話、Review Item、ingest 快取與狀態、outbox
+- [x] 設計 Postgres schema：Project、頁面、頁面歷史、wikilink 邊、操作紀錄、對話、Review Item、ingest 快取與狀態、outbox，另含 embedding 分表與 lint／dedup／圖片說明快取。SQL 在 `src-tauri/crates/storage/migrations/`，設計說明在 `plans/schema.md`；已在 k3d 套用並跑過冒煙測試
 - [ ] storage 頁面儲存介面：fs RPC 依路徑分流，`wiki/` 存 PG、`raw/` 存 MinIO，`.llm-wiki/*.json` 逐一換成資料表；TS worker 和前端看到的路徑語意不變
 - [ ] 所有索引、快取、檢索介面都以 Project 為鍵；檢索介面接受 Project 清單（先只傳一個），為跨 Project 檢索預留
 - [ ] 向量庫從 LanceDB 換成 pgvector，embedding 依模型分表
