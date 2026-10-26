@@ -34,11 +34,11 @@ fn content_hash(content: &str) -> Vec<u8> {
     Sha256::digest(content.as_bytes()).to_vec()
 }
 
-fn rel_from_row(row: &PgRow) -> Result<RelPath, StoreError> {
+pub(crate) fn rel_from_row(row: &PgRow) -> Result<RelPath, StoreError> {
     RelPath::parse(&row.try_get::<String, _>("path").map_err(backend)?)
 }
 
-fn file_meta(path: RelPath, row: &PgRow) -> Result<Meta, StoreError> {
+pub(crate) fn file_meta(path: RelPath, row: &PgRow) -> Result<Meta, StoreError> {
     Ok(Meta {
         path,
         kind: EntryKind::File,

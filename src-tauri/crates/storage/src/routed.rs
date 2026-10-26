@@ -440,7 +440,7 @@ mod tests {
 
     use super::*;
     use crate::conformance::{self, Harness};
-    use crate::{MemoryStore, PgBlobs, PgFiles};
+    use crate::{MemoryStore, PgBlobs, PgFiles, PgState};
 
     fn rel(path: &str) -> RelPath {
         if path.is_empty() {
@@ -847,7 +847,8 @@ mod tests {
 
     fn memory_harness(root: &'static str) -> Option<RoutedHarness> {
         Some(RoutedHarness {
-            routed: RoutedFiles::new(Arc::new(MemoryStore::new()), Arc::new(MemoryStore::new())),
+            routed: RoutedFiles::new(Arc::new(MemoryStore::new()), Arc::new(MemoryStore::new()))
+                .with_state(Arc::new(MemoryStore::new())),
             root,
             versioned: true,
             pool: None,
@@ -878,9 +879,11 @@ mod tests {
         let blobs = Arc::new(PgBlobs::new(pool.clone(), objects));
         Some(RoutedHarness {
             routed: RoutedFiles::new(Arc::new(PgFiles::new(pool.clone())), blobs.clone())
+                .with_state(Arc::new(PgState::new(pool.clone())))
                 .with_blob_streams(blobs),
             root,
-            versioned: root == "wiki",
+            // Pages and state files carry versions; blobs do not.
+            versioned: !matches!(root, "raw/sources" | "wiki/media"),
             pool: Some(pool),
         })
     }
@@ -898,6 +901,16 @@ mod tests {
     mod postgres_wiki {
         use super::*;
         conformance::conformance_tests!(pg_harness("wiki").await);
+    }
+
+    mod memory_state {
+        use super::*;
+        conformance::conformance_tests!(memory_harness(".llm-wiki/data"));
+    }
+
+    mod postgres_state {
+        use super::*;
+        conformance::conformance_tests!(pg_harness(".llm-wiki/data").await);
     }
 
     mod postgres_raw {

@@ -18,6 +18,7 @@ mod pg;
 mod route;
 mod routed;
 mod sql;
+mod state;
 mod store;
 
 #[cfg(test)]
@@ -33,6 +34,7 @@ pub use path::RelPath;
 pub use pg::{migrate, PgFiles, DEFAULT_MAX_VERSIONS};
 pub use route::{blob_kind, route, Backend};
 pub use routed::RoutedFiles;
+pub use state::{PgState, MAX_STATE_BYTES};
 pub use store::{
     BlobStreams, Body, ByteStream, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx,
 };

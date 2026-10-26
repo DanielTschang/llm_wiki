@@ -9,6 +9,7 @@ Migration 在 `src-tauri/crates/storage/migrations/`，純 SQL，依序套用：
 | `0003_ingest_and_review.sql` | `agent_sessions`、`ingest_jobs`、`ingest_events`、`ingest_cache`、`image_captions`、`dedup_tasks`、`dedup_exclusions`、`review_items`、`lint_findings`、`conversations`、`chat_messages` |
 | `0004_embeddings.sql` | `embedding_models`、`page_embedding_state`、`register_embedding_model()`（每個模型一張 `chunks_m<id>`） |
 | `0005_outbox.sql` | `outbox` |
+| `0006_state_files.sql` | `state_files`（`.llm-wiki/*` 狀態檔的過渡存放，見下） |
 
 已在 k3d 的 Postgres 17 + pgvector 0.8.7 上套用並跑過冒煙測試（路徑唯一性、軟刪除後路徑可重用、樂觀鎖、同一 Source 只能有一個進行中 job、Review Item 重複寫入冪等、模型註冊與維度衝突、依 Project 過濾的向量查詢、刪除 Project 的連鎖刪除）。之後由 storage crate 的整合測試接手。
 
@@ -43,6 +44,8 @@ Migration 在 `src-tauri/crates/storage/migrations/`，純 SQL，依序套用：
 **Outbox。** 狀態變更與事件在同一個交易寫入，relay 用 `FOR UPDATE SKIP LOCKED` 取未發布的列。`msg_id` 當作 `Nats-Msg-Id`，relay 重送時由 stream 去重。已發布的列由定期工作清掉。
 
 **操作紀錄。** `activity_log` 記成員異動、上傳、刪除、設定變更等「誰做了什麼」；頁面內容的歷史在 `page_versions`，兩者不重複。
+
+**`state_files`（過渡）。** ingest worker 和前端還是整份 JSON 讀寫 `.llm-wiki/*`，所以 `.llm-wiki/**` 的路徑先存成文件：`(project_id, path)` 為主鍵，`content` 是原文，`version` 供樂觀鎖。沒有歷史，刪除就是刪列；頁面備份由 `page_versions` 取代，所以 `page-history/` 等路徑拒絕寫入。每個檔案等它的型別化資料表（0003）有 repository、寫它的程式碼也改完之後就搬出這張表，全部搬完這張表就刪掉。
 
 ## 刻意沒做
 
