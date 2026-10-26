@@ -27,13 +27,14 @@ S3P=$("${K[@]}" get secret minio -o jsonpath='{.data.MINIO_ROOT_PASSWORD}' | bas
 
 DATA=$(mktemp -d)
 export OPERATOR_TOKEN=e2e-operator-$RANDOM$RANDOM ADMIN_USER=admin ADMIN_PASSWORD=e2e-admin-$RANDOM$RANDOM
-LLM_WIKI_DATA_DIR=$DATA LLM_WIKI_PORT=$APIPORT LLM_WIKI_TOKEN=$OPERATOR_TOKEN LLM_WIKI_NO_WORKER=true LLM_WIKI_NO_DESKTOP_SETTINGS=true \
+LLM_WIKI_DATA_DIR=$DATA LLM_WIKI_PORT=$APIPORT LLM_WIKI_TOKEN=$OPERATOR_TOKEN LLM_WIKI_NO_DESKTOP_SETTINGS=true \
 LLM_WIKI_ADMIN_USER=$ADMIN_USER LLM_WIKI_ADMIN_PASSWORD=$ADMIN_PASSWORD LLM_WIKI_KEY_STUB=sk-stub-secret \
 LLM_WIKI_DATABASE_URL="postgres://llm_wiki:$PGPASS@127.0.0.1:$PGPORT/$DB" \
 LLM_WIKI_S3_ENDPOINT=http://127.0.0.1:$S3PORT LLM_WIKI_S3_BUCKET=llm-wiki-test LLM_WIKI_S3_ACCESS_KEY=$S3U LLM_WIKI_S3_SECRET_KEY=$S3P \
   src-tauri/target/debug/llm-wiki-server >"$DATA/server.log" 2>&1 & SRV=$!
 for _ in $(seq 1 100); do curl -s -o /dev/null http://127.0.0.1:$APIPORT/healthz && break; sleep 0.3; done
 
+[ -f dist-worker/ingest-worker.mjs ] || echo "note: dist-worker/ is missing (make worker); the ingest checks will fail" >&2
 BASE=http://127.0.0.1:$APIPORT python3 deploy/k3d/e2e_accounts.py
 status=$?
 [ $status -ne 0 ] && { echo "--- server log"; tail -20 "$DATA/server.log"; }

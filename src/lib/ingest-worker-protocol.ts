@@ -20,4 +20,6 @@ export interface IngestWorkerCommand {
   op: string
   /** Positional arguments of the ingest-queue function named by `op`. */
   args: unknown[]
+  /** The project the asking tab has open (platform server). */
+  projectId?: string
 }

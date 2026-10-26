@@ -61,7 +61,7 @@ impl WorkerBridge {
     }
 
     /// Runs a queue operation in the worker and waits for its result.
-    pub async fn command(&self, op: &str, args: Value) -> Reply {
+    pub async fn command(&self, op: &str, args: Value, project: Option<&str>) -> Reply {
         if !self.is_alive() {
             return Err("The ingest worker is not running on the server".into());
         }
@@ -71,9 +71,10 @@ impl WorkerBridge {
             .lock()
             .map_err(|_| "worker bridge poisoned")?
             .insert(id.clone(), sender);
-        let _ = self
-            .events
-            .emit_value(COMMAND_EVENT, json!({ "id": id, "op": op, "args": args }));
+        let _ = self.events.emit_value(
+            COMMAND_EVENT,
+            json!({ "id": id, "op": op, "args": args, "projectId": project }),
+        );
         let outcome = tokio::time::timeout(COMMAND_TIMEOUT, receiver).await;
         if let Ok(mut pending) = self.pending.lock() {
             pending.remove(&id);
@@ -169,7 +170,7 @@ mod tests {
         };
 
         assert_eq!(
-            bridge.command("getQueue", json!({})).await,
+            bridge.command("getQueue", json!({}), None).await,
             Ok(json!(["task"]))
         );
         worker.await.unwrap();
@@ -178,7 +179,10 @@ mod tests {
     #[tokio::test]
     async fn command_fails_fast_without_a_live_worker() {
         let bridge = WorkerBridge::new(EventHub::new());
-        let err = bridge.command("getQueue", json!({})).await.unwrap_err();
+        let err = bridge
+            .command("getQueue", json!({}), None)
+            .await
+            .unwrap_err();
         assert!(err.contains("not running"), "{err}");
     }
 }

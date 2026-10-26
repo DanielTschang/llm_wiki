@@ -33,8 +33,10 @@ export const PROVIDERS_WITHOUT_KEY: ReadonlySet<LlmProvider> = new Set<LlmProvid
  * land in exactly one bucket and don't slip through.
  */
 export function hasUsableLlm(
-  cfg: Pick<LlmConfig, "provider" | "apiKey">,
+  cfg: Pick<LlmConfig, "provider" | "apiKey"> & { serverModelId?: string },
 ): boolean {
+  // A platform server's model: the server holds the key.
+  if (cfg.serverModelId) return true
   if (PROVIDERS_WITHOUT_KEY.has(cfg.provider)) return true
   return (cfg.apiKey ?? "").trim().length > 0
 }

@@ -38,7 +38,7 @@ let subscription: Promise<void> | null = null
 
 function command<T>(op: string, ...args: unknown[]): Promise<T> {
   ensureSubscribed()
-  return invoke<T>("ingest_command", { op, args })
+  return invoke<T>("ingest_command", { op, args, projectId: useWikiStore.getState().project?.id })
 }
 
 function ensureSubscribed(): void {
@@ -49,7 +49,11 @@ function ensureSubscribed(): void {
     await listen<{ projectPath: string }>("ingest://review-inbox", (event) => {
       void adoptReviewInbox(event.payload.projectPath)
     })
-    applySnapshot(await invoke<IngestQueueSnapshot>("ingest_command", { op: "snapshot", args: [] }))
+    applySnapshot(await invoke<IngestQueueSnapshot>("ingest_command", {
+        op: "snapshot",
+        args: [],
+        projectId: useWikiStore.getState().project?.id,
+      }))
   })().catch((err) => {
     subscription = null
     console.warn("[ingest] cannot reach the server's ingest worker:", err)

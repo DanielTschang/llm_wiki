@@ -289,6 +289,30 @@ status, vector = alice2.rpc("embedding_fetch", {"text": "hi", "cfg": {"enabled":
 check("a named embedding model is called with the server's key and address",
       status == 200 and vector == [0.25, 0.5, 0.75] and Upstream.seen and Upstream.seen[-1]["headers"].get("authorization") == "Bearer sk-stub-secret", (status, vector))
 
+print("ingest on the server")
+src = f"{base}/raw/sources/note.md"
+alice2.rpc("write_file", {"path": src, "contents": "# Note\nExtreme ultraviolet lithography uses 13.5 nm light."})
+def ingest(client, op, args, project=pid):
+    body = {"op": op, "args": args}
+    if project is not None:
+        body["projectId"] = project
+    return client.rpc("ingest_command", body)
+check("a command must say which project", ingest(alice2, "snapshot", [], None)[0] == 400)
+check("an outsider cannot use the queue", ingest(carol, "snapshot", [])[0] == 403)
+check("a viewer can look at the queue", ingest(dana, "snapshot", [])[0] == 200)
+check("a viewer cannot change it", ingest(dana, "enqueueIngest", [pid, "raw/sources/note.md", ""])[0] == 403)
+check("an editor takes the queue over", ingest(alice2, "restoreQueue", [pid, base])[0] == 200)
+Upstream.seen.clear()
+check("an editor queues a source", ingest(alice2, "enqueueIngest", [pid, "raw/sources/note.md", ""])[0] == 200)
+deadline = time.time() + 40
+while time.time() < deadline and not Upstream.seen:
+    time.sleep(0.5)
+check("the worker called the model with the server's key",
+      bool(Upstream.seen) and Upstream.seen[0]["headers"].get("authorization") == "Bearer sk-stub-secret",
+      Upstream.seen[0]["headers"] if Upstream.seen else "no call within 40 s")
+status, snap = ingest(alice2, "snapshot", [])
+check("the queue reports the task", status == 200 and snap["projectId"] == pid and len(snap["tasks"]) >= 1, snap)
+
 print("operator token")
 operator = Client(bearer=OPERATOR_TOKEN)
 check("the operator needs an owner to create a project", operator.rpc("create_project", {"name": "Ops"})[0] == 400)

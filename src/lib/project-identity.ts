@@ -1,3 +1,4 @@
+import { getWhoAmI } from "@/lib/platform-api"
 /**
  * Project identity: stable UUID per project + global registry mapping
  * `UUID → current filesystem path`.
@@ -113,7 +114,12 @@ export async function upsertProjectInfo(
  */
 export async function getProjectPathById(id: string): Promise<string | null> {
   const registry = await loadRegistry()
-  return registry[id]?.path ?? null
+  if (registry[id]) return registry[id].path
+  // A platform server keeps projects itself: a project is its id.
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id) && (await getWhoAmI())) {
+    return `/projects/${id.toLowerCase()}`
+  }
+  return null
 }
 
 /**

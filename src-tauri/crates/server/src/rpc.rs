@@ -138,7 +138,7 @@ async fn call(
         "app_store_get" | "app_store_set" | "app_store_delete" => {
             app_store(state, principal.as_ref(), command, args).await
         }
-        "ingest_command" => ingest_command(state, args).await,
+        "ingest_command" => ingest_command(state, principal.as_ref(), args).await,
         // Where the web file picker may browse and stage uploads.
         "server_locations" if llm_wiki_core::platform::get().is_some() => {
             // Nothing on the host is browsable in platform mode.
@@ -161,15 +161,42 @@ struct IngestCommand {
     op: String,
     #[serde(default)]
     args: Value,
+    /// The project the caller has open. Required on a platform server.
+    #[serde(default, rename = "projectId")]
+    project_id: Option<String>,
 }
 
 /// A browser tab's call into the ingest queue, which lives in the worker.
-async fn ingest_command(state: &AppState, args: Value) -> Result<Value, DispatchError> {
+async fn ingest_command(
+    state: &AppState,
+    principal: Option<&Principal>,
+    args: Value,
+) -> Result<Value, DispatchError> {
     let command: IngestCommand = serde_json::from_value(args)
         .map_err(|e| DispatchError::Failed(format!("Invalid arguments: {e}")))?;
+    // On a platform server the queue acts on a Project's files, so the caller
+    // must be able to change them there; looking at the queue takes a viewer.
+    if let (Some(platform), Some(principal)) = (&state.platform, principal) {
+        if !matches!(principal, Principal::Worker) {
+            let project = command
+                .project_id
+                .as_deref()
+                .and_then(|id| uuid::Uuid::parse_str(id).ok())
+                .map(llm_wiki_storage::ProjectId)
+                .ok_or_else(|| DispatchError::Failed("`projectId` is required".into()))?;
+            let need = if command.op == "snapshot" {
+                llm_wiki_storage::Role::Viewer
+            } else {
+                llm_wiki_storage::Role::Editor
+            };
+            authz::require_role(platform, principal, project, need)
+                .await
+                .map_err(|denied| DispatchError::Status(denied.status, denied.message))?;
+        }
+    }
     state
         .worker
-        .command(&command.op, command.args)
+        .command(&command.op, command.args, command.project_id.as_deref())
         .await
         .map_err(DispatchError::Failed)
 }

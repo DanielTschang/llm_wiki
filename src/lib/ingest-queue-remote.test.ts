@@ -48,6 +48,8 @@ describe("remote ingest queue", () => {
     expect(invoke).toHaveBeenCalledWith("ingest_command", {
       op: "enqueueIngest",
       args: ["p1", "raw/sources/a.pdf", "papers"],
+      // The tab says which project it has open, so the server can check its role.
+      projectId: PROJECT.id,
     })
   })
 

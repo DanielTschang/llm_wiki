@@ -11,7 +11,7 @@
  */
 import { invoke, listen } from "@/platform"
 import * as queue from "@/lib/ingest-queue"
-import { hydrateModelSettings, hydrateProjectModelSettings } from "@/lib/settings-hydration"
+import { hydrateModelSettings, hydratePlatformModels, hydrateProjectModelSettings } from "@/lib/settings-hydration"
 import { getLastProject, loadSourceWatchConfig } from "@/lib/project-store"
 import { DEFAULT_SOURCE_WATCH_CONFIG } from "@/lib/source-watch-config"
 import { useActivityStore } from "@/stores/activity-store"
@@ -66,6 +66,9 @@ async function activateProject(projectId: string, projectPath: string): Promise<
   const name = projectPath.split("/").filter(Boolean).pop() ?? projectPath
   const project: WikiProject = { id: projectId, name, path: projectPath }
   useWikiStore.getState().setProject(project)
+  // On a platform server the administrator may have changed the models since
+  // the worker started.
+  await hydratePlatformModels()
   await hydrateProjectModelSettings(projectId)
   try {
     const config = await loadSourceWatchConfig(projectId)
@@ -94,10 +97,19 @@ function publish(event: string, payload: unknown): void {
   )
 }
 
+/** Operations that are not about the project the queue is working on. */
+const ANY_PROJECT_OPS = new Set(["restoreQueue", "snapshot", "setIngestWorkerLimit"])
+
 async function handleCommand(command: IngestWorkerCommand): Promise<void> {
   const operation = OPERATIONS[command.op]
   try {
     if (!operation) throw new Error(`Unknown ingest operation: ${command.op}`)
+    // One queue serves one project at a time. A tab on another project must
+    // not pause, cancel or retry the work of the project that has it.
+    const active = useWikiStore.getState().project?.id
+    if (command.projectId && active && command.projectId !== active && !ANY_PROJECT_OPS.has(command.op)) {
+      throw new Error("The ingest queue is working on another project; open this project to take it over")
+    }
     const result = await operation(...(command.args as never[]))
     await invoke("worker_reply", { id: command.id, result: result ?? null })
   } catch (err) {
@@ -136,7 +148,10 @@ function forwardActivity(): void {
     timer = setTimeout(() => {
       timer = null
       trimFinishedActivity()
-      publish("ingest://activity", { items: useActivityStore.getState().items })
+      publish("ingest://activity", {
+        projectId: useWikiStore.getState().project?.id ?? "",
+        items: useActivityStore.getState().items,
+      })
     }, ACTIVITY_PUBLISH_DELAY_MS)
   })
 }
