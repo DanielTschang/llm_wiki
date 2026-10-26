@@ -10,8 +10,6 @@ import {
   Network,
   History,
   Wrench,
-  Clock,
-  FolderSync,
   Server,
   Settings,
   FileText,
@@ -26,16 +24,12 @@ import { useUpdateStore, hasAvailableUpdate } from "@/stores/update-store"
 import { useZoomStore } from "@/stores/zoom-store"
 import { clampUserConcurrency } from "@/lib/concurrency-limits"
 import {
-  loadSourceWatchAllProjects,
-  loadSourceWatchConfig,
   saveLanguage,
   saveTheme,
   loadTheme,
 } from "@/lib/project-store"
 import { applyTheme, type AppTheme } from "@/lib/theme"
 import type { SettingsDraft, DraftSetter } from "./settings-types"
-import { normalizeSourceWatchConfig } from "@/lib/source-watch-config"
-import { setIngestWorkerLimit } from "@/lib/ingest-queue"
 import { LlmProviderSection } from "./sections/llm-provider-section"
 import { EmbeddingSection } from "./sections/embedding-section"
 import { MultimodalSection } from "./sections/multimodal-section"
@@ -43,8 +37,6 @@ import { WebSearchSection } from "./sections/web-search-section"
 import { OutputSection } from "./sections/output-section"
 import { InterfaceSection } from "./sections/interface-section"
 import { NetworkSection } from "./sections/network-section"
-import { ScheduledImportSection } from "./sections/scheduled-import-section"
-import { SourceWatchSection } from "./sections/source-watch-section"
 import { MineruSection } from "./sections/mineru-section"
 import { ApiServerSection } from "./sections/api-server-section"
 import { GeneralSection } from "./sections/general-section"
@@ -59,8 +51,6 @@ type CategoryId =
   | "multimodal"
   | "web-search"
   | "network"
-  | "source-watch"
-  | "scheduled-import"
   | "mineru"
   | "api-server"
   | "output"
@@ -85,8 +75,6 @@ const CATEGORIES: Category[] = [
   { id: "multimodal", labelKey: "settings.categories.multimodal", icon: ImageIcon },
   { id: "web-search", labelKey: "settings.categories.webSearch", icon: Globe },
   { id: "network", labelKey: "settings.categories.network", icon: Network },
-  { id: "source-watch", labelKey: "settings.categories.sourceWatch", icon: FolderSync },
-  { id: "scheduled-import", labelKey: "settings.categories.scheduledImport", icon: Clock },
   { id: "mineru", labelKey: "settings.categories.mineru", icon: FileText },
   { id: "api-server", labelKey: "settings.categories.apiServer", icon: Server },
   { id: "output", labelKey: "settings.categories.output", icon: Languages },
@@ -107,29 +95,14 @@ function initialDraft(
   multimodal: ReturnType<typeof useWikiStore.getState>["multimodalConfig"],
   outputLanguage: ReturnType<typeof useWikiStore.getState>["outputLanguage"],
   proxy: ReturnType<typeof useWikiStore.getState>["proxyConfig"],
-  scheduledImport: ReturnType<typeof useWikiStore.getState>["scheduledImportConfig"],
-  sourceWatch: ReturnType<typeof useWikiStore.getState>["sourceWatchConfig"],
-  sourceWatchAllProjects: boolean,
   mineru: ReturnType<typeof useWikiStore.getState>["mineruConfig"],
   apiConfig: ReturnType<typeof useWikiStore.getState>["apiConfig"],
   generalConfig: ReturnType<typeof useWikiStore.getState>["generalConfig"],
   maxHistoryMessages: number,
   uiLanguage: string,
-  projectPath?: string,
   theme?: AppTheme,
   zoomLevel?: number,
 ): SettingsDraft {
-  // Show absolute path: if stored path is empty, show default using project path
-  // If stored path is relative (legacy), prepend project path
-  // If stored path is absolute, show as-is
-  let displayPath = scheduledImport.path || ""
-  if (!displayPath && projectPath) {
-    displayPath = `${projectPath}/raw/sources`
-  } else if (displayPath && projectPath && !displayPath.startsWith("/") && !displayPath.match(/^[a-zA-Z]:[/\\]/)) {
-    // Legacy relative path - prepend project path for display
-    displayPath = `${projectPath}/${displayPath}`
-  }
-
   return {
     provider: llm.provider,
     apiKey: llm.apiKey,
@@ -169,11 +142,6 @@ function initialDraft(
     proxyUrl: proxy.url,
     proxyBypassLocal: proxy.bypassLocal,
     proxyAcceptInvalidCerts: proxy.acceptInvalidCerts === true,
-    scheduledImportEnabled: scheduledImport.enabled,
-    scheduledImportPath: displayPath,
-    scheduledImportInterval: scheduledImport.interval,
-    sourceWatchConfig: normalizeSourceWatchConfig(sourceWatch),
-    sourceWatchAllProjects,
     mineruEnabled: mineru.enabled,
     mineruBackend: mineru.backend || "cloud",
     mineruLocalEndpoint:
@@ -215,12 +183,6 @@ export function SettingsView() {
   const setOutputLanguage = useWikiStore((s) => s.setOutputLanguage)
   const proxyConfig = useWikiStore((s) => s.proxyConfig)
   const setProxyConfig = useWikiStore((s) => s.setProxyConfig)
-  const scheduledImportConfig = useWikiStore((s) => s.scheduledImportConfig)
-  const setScheduledImportConfig = useWikiStore((s) => s.setScheduledImportConfig)
-  const sourceWatchConfig = useWikiStore((s) => s.sourceWatchConfig)
-  const setSourceWatchConfig = useWikiStore((s) => s.setSourceWatchConfig)
-  const sourceWatchAllProjects = useWikiStore((s) => s.sourceWatchAllProjects)
-  const setSourceWatchAllProjects = useWikiStore((s) => s.setSourceWatchAllProjects)
   const mineruConfig = useWikiStore((s) => s.mineruConfig)
   const setMineruConfig = useWikiStore((s) => s.setMineruConfig)
   const apiConfig = useWikiStore((s) => s.apiConfig)
@@ -250,15 +212,11 @@ export function SettingsView() {
       multimodalConfig,
       outputLanguage,
       proxyConfig,
-      scheduledImportConfig,
-      sourceWatchConfig,
-      sourceWatchAllProjects,
       mineruConfig,
       apiConfig,
       generalConfig,
       maxHistoryMessages,
       i18n.language,
-      project?.path,
     ),
   )
 
@@ -271,34 +229,6 @@ export function SettingsView() {
       }
     }).catch(() => {})
   }, [])
-
-  useEffect(() => {
-    let cancelled = false
-    Promise.allSettled([
-      loadSourceWatchConfig(project?.id),
-      loadSourceWatchAllProjects(),
-    ]).then(([configResult, allProjectsResult]) => {
-      if (cancelled) return
-      const config = configResult.status === "fulfilled"
-        ? configResult.value
-        : normalizeSourceWatchConfig()
-      const allProjects = allProjectsResult.status === "fulfilled"
-        ? allProjectsResult.value
-        : false
-      const normalized = normalizeSourceWatchConfig(config)
-      setSourceWatchConfig(normalized)
-      setSourceWatchAllProjects(allProjects)
-      setIngestWorkerLimit(normalized.ingestConcurrency)
-      setDraftState((prev) => ({
-        ...prev,
-        sourceWatchConfig: normalized,
-        sourceWatchAllProjects: allProjects,
-      }))
-    })
-    return () => {
-      cancelled = true
-    }
-  }, [project?.id, setSourceWatchAllProjects, setSourceWatchConfig])
 
   // Resync draft from store if it changes out-of-band (e.g. project switch).
   // IMPORTANT: keep the current draft.uiLanguage instead of re-reading
@@ -318,15 +248,11 @@ export function SettingsView() {
         multimodalConfig,
         outputLanguage,
         proxyConfig,
-        scheduledImportConfig,
-        sourceWatchConfig,
-        sourceWatchAllProjects,
         mineruConfig,
         apiConfig,
         generalConfig,
         maxHistoryMessages,
         prev.uiLanguage,
-        project?.path,
         prev.theme,
         prev.zoomLevel,
       ),
@@ -337,9 +263,6 @@ export function SettingsView() {
     multimodalConfig,
     outputLanguage,
     proxyConfig,
-    scheduledImportConfig,
-    sourceWatchConfig,
-    sourceWatchAllProjects,
     mineruConfig,
     apiConfig,
     generalConfig,
@@ -369,10 +292,6 @@ export function SettingsView() {
       loadOutputLanguage,
       saveProxyConfig,
       loadProxyConfig,
-      saveScheduledImportConfig,
-      loadScheduledImportConfig,
-      saveSourceWatchConfig,
-      saveSourceWatchAllProjects,
       saveMineruConfig,
       loadMineruConfig,
       saveApiConfig,
@@ -429,13 +348,6 @@ export function SettingsView() {
       bypassLocal: draft.proxyBypassLocal,
       acceptInvalidCerts: draft.proxyAcceptInvalidCerts,
     }
-    const newSourceWatch = normalizeSourceWatchConfig(draft.sourceWatchConfig)
-    const newScheduledImport = {
-      enabled: draft.scheduledImportEnabled,
-      path: draft.scheduledImportPath,
-      interval: Math.max(1, Math.min(1440, draft.scheduledImportInterval || 60)),
-      lastScan: scheduledImportConfig.lastScan,
-    }
     const newMineruConfig = {
       enabled: draft.mineruEnabled,
       backend: draft.mineruBackend,
@@ -473,10 +385,6 @@ export function SettingsView() {
     setMultimodalConfig(newMultimodal)
     setOutputLanguage(draft.outputLanguage as typeof outputLanguage)
     setProxyConfig(newProxy)
-    setSourceWatchConfig(newSourceWatch)
-    setSourceWatchAllProjects(draft.sourceWatchAllProjects)
-    setIngestWorkerLimit(newSourceWatch.ingestConcurrency)
-    setScheduledImportConfig(newScheduledImport)
     setMaxHistoryMessages(draft.maxHistoryMessages)
     setMineruConfig(newMineruConfig)
     setApiConfig(newApiConfig)
@@ -488,28 +396,6 @@ export function SettingsView() {
       await saveMultimodalConfig(newMultimodal)
       await saveOutputLanguage(draft.outputLanguage as typeof outputLanguage, project?.id)
       await saveProxyConfig(newProxy)
-      await saveSourceWatchConfig(newSourceWatch, project?.id)
-      await saveSourceWatchAllProjects(draft.sourceWatchAllProjects)
-      if (project) {
-        const {
-          startAllProjectFileSync,
-          startProjectFileSync,
-          stopAllProjectFileSync,
-          stopProjectFileSync,
-        } = await import("@/lib/project-file-sync")
-        if (newSourceWatch.enabled) {
-          await startProjectFileSync(project, newSourceWatch).catch((err) =>
-            console.error("Failed to start project file sync:", err)
-          )
-        } else {
-          await stopProjectFileSync()
-        }
-        if (draft.sourceWatchAllProjects) {
-          startAllProjectFileSync(project)
-        } else {
-          stopAllProjectFileSync()
-        }
-      }
       // Apply the proxy env vars LIVE so the next outbound request
       // picks them up — no app restart needed. tauri-plugin-http
       // builds a fresh reqwest client per fetch and reqwest reads
@@ -518,14 +404,6 @@ export function SettingsView() {
         await invoke<string>("set_proxy_env", { config: newProxy })
       } catch (err) {
         console.warn("[proxy] live update failed; restart will still apply:", err)
-      }
-
-      if (project) {
-        await saveScheduledImportConfig(project.path, newScheduledImport)
-        const { startScheduledImport } = await import("@/lib/scheduled-import")
-        // Keep the cross-project scheduler alive even if the current
-        // project's own monitor was just disabled.
-        startScheduledImport(project, newScheduledImport)
       }
 
       await saveMineruConfig(newMineruConfig)
@@ -574,9 +452,6 @@ export function SettingsView() {
           persistedMultimodal,
           persistedOutputLanguage,
           persistedProxy,
-          persistedSourceWatch,
-          persistedSourceWatchAllProjects,
-          persistedScheduledImport,
           persistedMineru,
           persistedApi,
           persistedGeneral,
@@ -587,9 +462,6 @@ export function SettingsView() {
           loadMultimodalConfig(),
           loadOutputLanguage(project?.id),
           loadProxyConfig(),
-          loadSourceWatchConfig(project?.id),
-          loadSourceWatchAllProjects(),
-          project ? loadScheduledImportConfig(project.path) : Promise.resolve(null),
           loadMineruConfig(),
           loadApiConfig(),
           loadGeneralConfig(),
@@ -600,11 +472,6 @@ export function SettingsView() {
         setMultimodalConfig(resultValue(persistedMultimodal, null) ?? multimodalConfig)
         setOutputLanguage((resultValue(persistedOutputLanguage, null) ?? outputLanguage) as typeof outputLanguage)
         setProxyConfig(resultValue(persistedProxy, null) ?? proxyConfig)
-        setSourceWatchConfig(resultValue(persistedSourceWatch, sourceWatchConfig))
-        setSourceWatchAllProjects(
-          resultValue(persistedSourceWatchAllProjects, sourceWatchAllProjects),
-        )
-        setScheduledImportConfig(resultValue(persistedScheduledImport, null) ?? scheduledImportConfig)
         setMaxHistoryMessages(maxHistoryMessages)
         setMineruConfig(resultValue(persistedMineru, null) ?? mineruConfig)
         setApiConfig(resultValue(persistedApi, null) ?? apiConfig)
@@ -623,9 +490,6 @@ export function SettingsView() {
     multimodalConfig,
     outputLanguage,
     proxyConfig,
-    sourceWatchConfig,
-    sourceWatchAllProjects,
-    scheduledImportConfig,
     mineruConfig,
     apiConfig,
     generalConfig,
@@ -635,9 +499,6 @@ export function SettingsView() {
     setMultimodalConfig,
     setOutputLanguage,
     setProxyConfig,
-    setScheduledImportConfig,
-    setSourceWatchConfig,
-    setSourceWatchAllProjects,
     setMineruConfig,
     setApiConfig,
     setGeneralConfig,
@@ -662,10 +523,6 @@ export function SettingsView() {
         return <WebSearchSection />
       case "network":
         return <NetworkSection draft={draft} setDraft={setDraft} />
-      case "source-watch":
-        return <SourceWatchSection draft={draft} setDraft={setDraft} projectReady={!!project} />
-      case "scheduled-import":
-        return <ScheduledImportSection draft={draft} setDraft={setDraft} />
       case "mineru":
         return <MineruSection draft={draft} setDraft={setDraft} />
       case "api-server":

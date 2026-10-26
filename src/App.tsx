@@ -7,7 +7,7 @@ import { useLintStore } from "@/stores/lint-store"
 import { useChatStore } from "@/stores/chat-store"
 import { BASE_FONT_SIZE_PX, useZoomStore } from "@/stores/zoom-store"
 import { openProject } from "@/commands/fs"
-import { getLastProject, saveLastProject, loadLanguage, loadScheduledImportConfig, saveScheduledImportConfig, loadSourceWatchAllProjects, loadSourceWatchConfig, loadApiConfig, loadGeneralConfig, loadZoomLevel } from "@/lib/project-store"
+import { getLastProject, saveLastProject, loadLanguage, loadSourceWatchConfig, loadApiConfig, loadGeneralConfig, loadZoomLevel } from "@/lib/project-store"
 import { loadReviewItems, loadLintItems, loadChatHistory, loadChatPreferences } from "@/lib/persist"
 import { setupAutoSave } from "@/lib/auto-save"
 import { hydrateModelSettings, hydrateProjectModelSettings } from "@/lib/settings-hydration"
@@ -90,48 +90,6 @@ function App() {
       }
     } catch (err) {
       console.warn("[startup] failed to load lint items:", err)
-    }
-  }
-
-  async function hydrateScheduledImportAfterOpen(proj: WikiProject): Promise<void> {
-    try {
-      let savedScheduledImport = null
-      try {
-        savedScheduledImport = await loadScheduledImportConfig(proj.path)
-      } catch (err) {
-        // A damaged config for the active project must not disable monitors
-        // belonging to every other recent project.
-        console.warn("[startup] failed to load current scheduled import config:", err)
-      }
-      if (!isCurrentProject(proj)) return
-      if (savedScheduledImport) {
-        // Migrate relative path to absolute (backward compatibility)
-        let path = savedScheduledImport.path
-        if (path && !path.startsWith("/") && !path.match(/^[a-zA-Z]:[/\\]/)) {
-          path = `${proj.path}/${path}`
-        }
-        useWikiStore.getState().setScheduledImportConfig({
-          ...savedScheduledImport,
-          path,
-        })
-      } else {
-        useWikiStore.getState().setScheduledImportConfig({
-          enabled: false,
-          path: "",
-          interval: 60,
-          lastScan: null,
-        })
-      }
-
-      const scheduledImportConfig = useWikiStore.getState().scheduledImportConfig
-      if (!isCurrentProject(proj)) return
-      const { startScheduledImport } = await import("@/lib/scheduled-import")
-      if (!isCurrentProject(proj)) return
-      // Start the global sweep even when this project's own schedule is off;
-      // recently opened projects may still have active folder monitors.
-      startScheduledImport(proj, scheduledImportConfig)
-    } catch (err) {
-      console.warn("[startup] failed to hydrate scheduled import:", err)
     }
   }
 
@@ -373,12 +331,6 @@ function App() {
       setSelectedFile(null)
       setFileTree([])
       setActiveView("wiki")
-      useWikiStore.getState().setScheduledImportConfig({
-        enabled: false,
-        path: `${proj.path}/raw/sources`,
-        interval: 60,
-        lastScan: null,
-      })
       // Bump data version so any cached graphs/views invalidate
       useWikiStore.getState().bumpDataVersion()
       await saveLastProject(proj)
@@ -401,8 +353,6 @@ function App() {
       // Restore ingest queue (resume interrupted tasks). Keyed by the
       // project's stable UUID so the queue still finds the right project
       // even if the filesystem path changed since the task was enqueued.
-      // Await this before starting file sync: watcher events for raw/sources
-      // may enqueue ingest tasks and require an active project queue.
       try {
         const { restoreQueue } = await import("@/lib/ingest-queue")
         await restoreQueue(proj.id, proj.path)
@@ -415,45 +365,6 @@ function App() {
           console.error("Failed to restore dedup queue:", err)
         )
       })
-      // Start project source watch if enabled
-      import("@/lib/project-file-sync").then(async ({
-        startAllProjectFileSync,
-        startProjectFileSync,
-        stopAllProjectFileSync,
-        stopProjectFileSync,
-      }) => {
-        const [configResult, allProjectsResult] = await Promise.allSettled([
-          loadSourceWatchConfig(proj.id),
-          loadSourceWatchAllProjects(),
-        ])
-        const config = configResult.status === "fulfilled"
-          ? configResult.value
-          : DEFAULT_SOURCE_WATCH_CONFIG
-        const allProjects = allProjectsResult.status === "fulfilled"
-          ? allProjectsResult.value
-          : false
-        if (configResult.status === "rejected") {
-          console.error("Failed to load project source watch config:", configResult.reason)
-        }
-        if (allProjectsResult.status === "rejected") {
-          console.error("Failed to load all-project source watch setting:", allProjectsResult.reason)
-        }
-        if (!isCurrentProject(proj)) return
-        useWikiStore.getState().setSourceWatchConfig(config)
-        useWikiStore.getState().setSourceWatchAllProjects(allProjects)
-        if (config.enabled) {
-          startProjectFileSync(proj, config).catch((err) =>
-            console.error("Failed to start project file sync:", err)
-          )
-        } else {
-          stopProjectFileSync().catch(() => {})
-        }
-        if (allProjects) {
-          startAllProjectFileSync(proj)
-        } else {
-          stopAllProjectFileSync()
-        }
-      }).catch((err) => console.error("Failed to configure project file sync:", err))
       // Load lightweight chat preferences before first paint so the chat
       // controls reflect the user's saved tool toggles. The heavier per-
       // conversation history load is deferred below.
@@ -479,7 +390,6 @@ function App() {
       setFileTree([])
       setSelectedFile(null)
     })
-    void hydrateScheduledImportAfterOpen(proj)
     // Heavy side-store hydration happens after the project shell is allowed
     // to render. Each write has a stale-project guard so a fast project switch
     // cannot apply old review/lint/chat state to the new project.
@@ -511,21 +421,6 @@ function App() {
   }
 
   async function handleSwitchProject() {
-    import("@/lib/project-file-sync").then(({ stopAllProjectFileSync }) => {
-      stopAllProjectFileSync()
-    }).catch(() => {})
-    // Stop scheduled import before switching projects
-    import("@/lib/scheduled-import").then(({ stopScheduledImport }) => {
-      stopScheduledImport()
-    }).catch(() => {})
-
-    // Save current project's scheduled import config before clearing
-    const currentProject = useWikiStore.getState().project
-    if (currentProject) {
-      const currentConfig = useWikiStore.getState().scheduledImportConfig
-      saveScheduledImportConfig(currentProject.path, currentConfig).catch(() => {})
-    }
-
     // Flush outgoing project's review/lint/chat to disk and suspend auto-save
     // before reset empties the stores. resumeAutoSave() runs when the next
     // project opens via handleProjectOpened.

@@ -371,9 +371,6 @@ fn handle_request(
         }
         (&Method::Post, ["projects", project_id, "search"]) => handle_search(app, project_id, body),
         (&Method::Get, ["projects", project_id, "graph"]) => handle_graph(app, project_id, query),
-        (&Method::Post, ["projects", project_id, "sources", "rescan"]) => {
-            handle_rescan(app, project_id)
-        }
         (&Method::Post, ["projects", project_id, "pages", "embed"]) => {
             handle_embed_page(app, project_id, body)
         }
@@ -2811,65 +2808,6 @@ fn resolve_link(raw: &str, aliases: &GraphAliases) -> Option<String> {
     None
 }
 
-fn invalidate_graph_cache(project_path: &str) {
-    if let Some(cache) = GRAPH_CACHE.get() {
-        if let Ok(mut cache) = cache.lock() {
-            cache.remove(project_path);
-        }
-    }
-}
-
-fn handle_rescan(app: &Arc<CoreContext>, project_id: &str) -> ApiResponse {
-    let project = match resolve_project(app, project_id) {
-        Ok(project) => project,
-        Err(e) => return err(404, e),
-    };
-    invalidate_graph_cache(&project.path);
-    let source_watch_config = load_source_watch_config(app, &project.id);
-    match commands::file_sync::rescan_project_files(
-        app.events().clone(),
-        project.id.clone(),
-        project.path.clone(),
-        source_watch_config,
-        None,
-    ) {
-        Ok(result) => ok(json!({ "ok": true, "projectId": project.id, "result": result })),
-        Err(e) => err(500, e),
-    }
-}
-
-fn load_source_watch_config(
-    app: &Arc<CoreContext>,
-    project_id: &str,
-) -> Option<commands::file_sync::SourceWatchConfig> {
-    let parsed = load_app_state(app)?;
-    let settings = parsed.get("sourceWatchConfig").and_then(Value::as_object);
-    if let Some(value) = settings
-        .and_then(|s| s.get(project_id).or_else(|| s.get("default")))
-        .cloned()
-    {
-        if let Ok(config) = serde_json::from_value::<commands::file_sync::SourceWatchConfig>(value)
-        {
-            return Some(config);
-        }
-    }
-    let legacy_enabled = parsed
-        .get("projectFileSyncEnabled")
-        .and_then(Value::as_object)
-        .and_then(|settings| {
-            settings
-                .get(project_id)
-                .or_else(|| settings.get("default"))
-                .and_then(Value::as_bool)
-        });
-    legacy_enabled.and_then(|enabled| {
-        serde_json::from_value::<commands::file_sync::SourceWatchConfig>(
-            json!({ "enabled": enabled }),
-        )
-        .ok()
-    })
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -3108,6 +3046,17 @@ mod tests {
         assert!(page.edges.is_empty());
     }
 
+    /// Ages the cached entry past its TTL so the next load re-checks the fingerprint.
+    fn expire_graph_cache(project_path: &str) {
+        let mut cache = GRAPH_CACHE.get().unwrap().lock().unwrap();
+        let entry = cache.get(project_path).unwrap();
+        let mut aged = (**entry).clone();
+        aged.loaded_at = Instant::now()
+            .checked_sub(GRAPH_CACHE_TTL + Duration::from_secs(1))
+            .unwrap();
+        cache.insert(project_path.to_string(), Arc::new(aged));
+    }
+
     #[test]
     fn graph_cache_invalidates_when_a_page_changes() {
         let root = test_project_dir();
@@ -3119,7 +3068,7 @@ mod tests {
         assert!(Arc::ptr_eq(&before, &cached));
 
         fs::write(&page, "# After with a different length").unwrap();
-        invalidate_graph_cache(root.to_string_lossy().as_ref());
+        expire_graph_cache(root.to_string_lossy().as_ref());
         let after = load_graph(root.to_string_lossy().as_ref()).unwrap();
         assert_eq!(after.nodes[0].label, "After with a different length");
         assert!(!Arc::ptr_eq(&before, &after));

@@ -162,17 +162,6 @@ server.setRequestHandler(ListToolsRequestSchema, async () => ({
       },
     },
     {
-      name: "llm_wiki_rescan_sources",
-      description: "Trigger the desktop app's source folder rescan for a project, using the user's Source Watch rules.",
-      inputSchema: {
-        type: "object",
-        properties: {
-          project_id: { type: "string", description: "Project UUID, project path, or 'current'. Defaults to current." },
-        },
-        additionalProperties: false,
-      },
-    },
-    {
       name: "llm_wiki_embed_page",
       description: "Create or replace the vector index for one existing Markdown page under a project's wiki/ directory.",
       inputSchema: {
@@ -298,11 +287,6 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
             : (args.offset !== undefined ? "filtered" : "page"),
         })
         return textResult(withActiveProject(formatGraph(graph), scope.project, scope.id))
-      }
-      case "llm_wiki_rescan_sources": {
-        await assertMcpEnabled()
-        const scope = await resolveProjectScope(args)
-        return textResult(withActiveProject(JSON.stringify(await client.rescan(scope.id), null, 2), scope.project, scope.id))
       }
       case "llm_wiki_embed_page": {
         await assertMcpEnabled()

@@ -194,13 +194,6 @@ interface ProxyConfig {
   acceptInvalidCerts?: boolean
 }
 
-interface ScheduledImportConfig {
-  enabled: boolean
-  path: string // 监控目录的相对路径（相对于项目根目录），空字符串表示使用默认的 "raw"
-  interval: number // 扫描间隔（分钟）
-  lastScan: number | null // 上次扫描时间戳
-}
-
 /**
  * Local HTTP API server config. Read by the Rust `api_server` module on
  * every request via `load_app_state` (5s cache). The Rust side is the
@@ -433,9 +426,7 @@ interface WikiState {
   multimodalConfig: MultimodalConfig
   outputLanguage: OutputLanguage
   proxyConfig: ProxyConfig
-  scheduledImportConfig: ScheduledImportConfig
   sourceWatchConfig: SourceWatchConfig
-  sourceWatchAllProjects: boolean
   mineruConfig: MineruConfig
   apiConfig: ApiConfig
   generalConfig: GeneralConfig
@@ -466,9 +457,7 @@ interface WikiState {
   setMultimodalConfig: (config: MultimodalConfig) => void
   setOutputLanguage: (lang: OutputLanguage) => void
   setProxyConfig: (config: ProxyConfig) => void
-  setScheduledImportConfig: (config: ScheduledImportConfig) => void
   setSourceWatchConfig: (config: SourceWatchConfig) => void
-  setSourceWatchAllProjects: (enabled: boolean) => void
   setMineruConfig: (config: MineruConfig) => void
   setApiConfig: (config: ApiConfig) => void
   setGeneralConfig: (config: GeneralConfig) => void
@@ -621,15 +610,8 @@ export const useWikiStore = create<WikiState>((set) => ({
     acceptInvalidCerts: false,
   },
 
-  scheduledImportConfig: {
-    enabled: false,
-    path: "",
-    interval: 60,
-    lastScan: null,
-  },
 
   sourceWatchConfig: DEFAULT_SOURCE_WATCH_CONFIG,
-  sourceWatchAllProjects: false,
   mineruConfig: {
     enabled: false,
     backend: "cloud",
@@ -678,9 +660,7 @@ export const useWikiStore = create<WikiState>((set) => ({
   setMultimodalConfig: (multimodalConfig) => set({ multimodalConfig }),
   setOutputLanguage: (outputLanguage) => set({ outputLanguage }),
   setProxyConfig: (proxyConfig) => set({ proxyConfig }),
-  setScheduledImportConfig: (scheduledImportConfig) => set({ scheduledImportConfig }),
   setSourceWatchConfig: (sourceWatchConfig) => set({ sourceWatchConfig }),
-  setSourceWatchAllProjects: (sourceWatchAllProjects) => set({ sourceWatchAllProjects }),
   setMineruConfig: (mineruConfig) => set({ mineruConfig }),
   setApiConfig: (apiConfig) => set({ apiConfig }),
   setGeneralConfig: (generalConfig) => set({ generalConfig }),
@@ -694,4 +674,4 @@ export const useWikiStore = create<WikiState>((set) => ({
   bumpDataVersion: () => set((state) => ({ dataVersion: state.dataVersion + 1 })),
 }))
 
-export type { WikiState, LlmConfig, SearchApiConfig, EmbeddingConfig, MultimodalConfig, OutputLanguage, ProxyConfig, ScheduledImportConfig, SourceWatchConfig, ApiConfig }
+export type { WikiState, LlmConfig, SearchApiConfig, EmbeddingConfig, MultimodalConfig, OutputLanguage, ProxyConfig, SourceWatchConfig, ApiConfig }

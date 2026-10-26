@@ -338,12 +338,6 @@ export class LlmWikiApiClient {
     }
   }
 
-  async rescan(projectId = "current"): Promise<Record<string, unknown>> {
-    return this.request(`/projects/${encodeURIComponent(projectId)}/sources/rescan`, {
-      method: "POST",
-    })
-  }
-
   async embedPage(path: string, projectId = "current", force = false): Promise<ApiPageEmbeddingResult> {
     const json = await this.request(`/projects/${encodeURIComponent(projectId)}/pages/embed`, {
       method: "POST",

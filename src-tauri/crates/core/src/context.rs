@@ -10,7 +10,6 @@ use serde_json::Value;
 
 use crate::agent::cancel::AgentCancellationRegistry;
 use crate::agent::session::AgentSessionStore;
-use crate::commands::file_sync::FileSyncState;
 
 /// Delivers a named event to every connected UI (Tauri webview events on
 /// desktop, the SSE stream in server mode).
@@ -48,7 +47,6 @@ pub struct CoreContext {
     app_data_dir: Option<PathBuf>,
     app_version: String,
     events: EventEmitter,
-    pub file_sync: FileSyncState,
     pub agent_sessions: AgentSessionStore,
     pub agent_cancellation: AgentCancellationRegistry,
 }
@@ -65,7 +63,6 @@ impl CoreContext {
             app_data_dir,
             app_version: app_version.into(),
             events,
-            file_sync: FileSyncState::default(),
             agent_sessions: AgentSessionStore::default(),
             agent_cancellation: AgentCancellationRegistry::default(),
         }

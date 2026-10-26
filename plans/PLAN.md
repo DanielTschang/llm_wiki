@@ -130,7 +130,8 @@ Python Extension Point（同事負責）
   - 既有問題（`main` 上就失敗，與本分支無關）：`embedding.real-llm.test.ts`、`llm-client.real-llm.test.ts` 共 6 個測試會失敗（Origin 標頭預期是桌面版行為）
 - [x] 刪除 CLI transport（`claude_cli`、`codex_cli`、`cli_resolver`）：後端、前端 provider／設定 UI／聊天的 CLI 專用 fallback 路徑都已移除
 - [x] 刪除 `clip_server`：連同全域「目前專案」註冊表（`current_project_path`、`all_projects`）、`current` 別名、Web Clipper 瀏覽器擴充套件、前端 clip watcher 一起拿掉；`api_server` 和 agent 的專案查詢現在只認明確的 Project id／路徑。副作用：`mcp-server/` 預設用 `current`，現在必須先 `llm_wiki_set_project`；它跟著 `api_server.rs` 在階段 3 改成遠端 MCP 時一起處理
-- [ ] 刪除 `file_sync`：不再被專案註冊表擋住，剩下 `fs.rs` 約 25 處 `mark_app_write_path`、`CoreContext.file_sync`、`api_server.rs` 的 rescan／SourceWatchConfig、`dispatch.rs` 的 7 個 file-sync 分支，以及前端對應的 `startProjectFileSync` 等
+- [x] 刪除 `file_sync` 與資料夾監控：Rust `file_sync.rs`（約 1950 行）、`fs.rs` 的 `mark_app_write_path`、`CoreContext.file_sync`、7 個 dispatch 分支、`/sources/rescan` 路由和 MCP 的 `llm_wiki_rescan_sources`；前端的 `project-file-sync`、排程匯入（`scheduled-import`）、活動面板的檔案同步區塊、兩個設定頁及其 store 欄位與 i18n 鍵都已移除。「來源」頁的重新整理現在只重新載入清單
+  - 保留：`SourceWatchConfig`／`source-watch-config.ts` 其實同時是匯入篩選設定（副檔名、大小上限、`persistExtractedMarkdown`、ingest 並行數），明確匯入和 ingest 還在用，暫不改名；使用者已無法在 UI 編輯，只讀預設或舊值。階段 2 整理設定頁時改名成匯入設定
 - [ ] core 依領域拆 crate：storage、retrieval、agent、parsing、llm；server 改名為 api（碰到哪裡才拆哪裡，不一次大改）
 - [ ] 設計 Postgres schema：Project、頁面、頁面歷史、wikilink 邊、操作紀錄、對話、Review Item、ingest 快取與狀態、outbox
 - [ ] storage 頁面儲存介面：fs RPC 依路徑分流，`wiki/` 存 PG、`raw/` 存 MinIO，`.llm-wiki/*.json` 逐一換成資料表；TS worker 和前端看到的路徑語意不變

@@ -7,7 +7,6 @@ use std::time::Duration;
 use calamine::{open_workbook_auto, Data, ExcelDateTime, Reader};
 use office_oxide::Document;
 
-use crate::commands::file_sync;
 use crate::panic_guard::run_guarded;
 use crate::types::wiki::FileNode;
 
@@ -216,7 +215,6 @@ fn write_cache(original: &Path, text: &str) -> Result<(), String> {
         fs::create_dir_all(parent)
             .map_err(|e| format!("Failed to create preprocessing cache directory: {e}"))?;
     }
-    crate::commands::file_sync::mark_app_write_path(&cache_path);
     let format_path = cache_format_path_for(original);
     if uses_anydoc_cache(original) {
         // Remove the validity marker before replacing content. A crash or I/O
@@ -225,7 +223,6 @@ fn write_cache(original: &Path, text: &str) -> Result<(), String> {
     }
     fs::write(&cache_path, text).map_err(|e| format!("Failed to write cache: {e}"))?;
     if uses_anydoc_cache(original) {
-        crate::commands::file_sync::mark_app_write_path(&format_path);
         fs::write(&format_path, OFFICE_CACHE_FORMAT)
             .map_err(|e| format!("Failed to write preprocessing cache format marker: {e}"))?;
     }
@@ -1246,7 +1243,6 @@ pub async fn write_file(path: String, contents: String) -> Result<(), String> {
                 fs::create_dir_all(parent)
                     .map_err(|e| format!("Failed to create parent dirs for '{}': {}", path, e))?;
             }
-            file_sync::mark_app_write_path(p);
             crate::commands::file_history::record_file_version(
                 p,
                 "baseline",
@@ -1255,7 +1251,6 @@ pub async fn write_file(path: String, contents: String) -> Result<(), String> {
             fs::write(&path, contents)
                 .map_err(|e| format!("Failed to write file '{}': {}", path, e))?;
             crate::commands::file_history::record_file_version(p, "human", "ui.write_file");
-            file_sync::mark_app_write_path(p);
             Ok(())
         })
     })
@@ -1277,10 +1272,8 @@ pub async fn write_file_base64(path: String, base64: String) -> Result<(), Strin
                 fs::create_dir_all(parent)
                     .map_err(|e| format!("Failed to create parent dirs for '{}': {}", path, e))?;
             }
-            file_sync::mark_app_write_path(p);
             fs::write(&path, bytes)
                 .map_err(|e| format!("Failed to write binary file '{}': {}", path, e))?;
-            file_sync::mark_app_write_path(p);
             Ok(())
         })
     })
@@ -1309,8 +1302,6 @@ pub async fn write_file_atomic(path: String, contents: String) -> Result<(), Str
                     .unwrap_or_else(|| chrono::Utc::now().timestamp_millis())
             ));
 
-            file_sync::mark_app_write_path(&tmp_path);
-            file_sync::mark_app_write_path(p);
             crate::commands::file_history::record_file_version(
                 p,
                 "baseline",
@@ -1330,7 +1321,6 @@ pub async fn write_file_atomic(path: String, contents: String) -> Result<(), Str
                 )
             })?;
             crate::commands::file_history::record_file_version(p, "human", "ui.write_file_atomic");
-            file_sync::mark_app_write_path(p);
             Ok(())
         })
     })
@@ -1365,7 +1355,6 @@ fn apply_text_selection_edit_inner(
         );
     }
     let updated = format!("{prefix}{replacement}{suffix}");
-    file_sync::mark_app_write_path(&file);
     crate::commands::file_history::record_file_version(
         &file,
         "baseline",
@@ -1374,7 +1363,6 @@ fn apply_text_selection_edit_inner(
     fs::write(&file, &updated)
         .map_err(|err| format!("Failed to apply Agent selection edit: {err}"))?;
     crate::commands::file_history::record_file_version(&file, "agent", "agent.selection_edit");
-    file_sync::mark_app_write_path(&file);
     Ok(updated)
 }
 
@@ -1463,7 +1451,6 @@ fn create_missing_wiki_page_inner(
     let body = content
         .filter(|value| !value.trim().is_empty())
         .unwrap_or(&default_content);
-    file_sync::mark_app_write_path(&target);
     use std::io::Write as _;
     let mut output = fs::OpenOptions::new()
         .write(true)
@@ -1480,7 +1467,6 @@ fn create_missing_wiki_page_inner(
         "agent",
         "wiki.missing_link.create",
     );
-    file_sync::mark_app_write_path(&target);
     target
         .strip_prefix(&project)
         .map(|path| path.to_string_lossy().replace('\\', "/"))
@@ -1656,10 +1642,8 @@ pub async fn copy_file(source: String, destination: String) -> Result<(), String
                 fs::create_dir_all(parent)
                     .map_err(|e| format!("Failed to create parent dirs: {}", e))?;
             }
-            file_sync::mark_app_write_path(dest);
             fs::copy(&source, &destination)
                 .map_err(|e| format!("Failed to copy '{}' to '{}': {}", source, destination, e))?;
-            file_sync::mark_app_write_path(dest);
             Ok(())
         })
     })
@@ -1674,7 +1658,6 @@ pub async fn copy_directory(source: String, destination: String) -> Result<Vec<S
         run_guarded("copy_directory", || {
             let src = Path::new(&source);
             let dest = Path::new(&destination);
-            file_sync::mark_app_write_path(dest);
 
             if !src.is_dir() {
                 return Err(format!("'{}' is not a directory", source));
@@ -1708,7 +1691,6 @@ pub async fn copy_directory(source: String, destination: String) -> Result<Vec<S
                     } else {
                         fs::copy(&path, &dest_path)
                             .map_err(|e| format!("Failed to copy '{}': {}", path.display(), e))?;
-                        file_sync::mark_app_write_path(&dest_path);
                         files.push(dest_path.to_string_lossy().replace('\\', "/"));
                     }
                 }
@@ -1727,7 +1709,6 @@ pub async fn delete_file(path: String) -> Result<(), String> {
     tokio::task::spawn_blocking(move || {
         run_guarded("delete_file", || {
             let p = Path::new(&path);
-            file_sync::mark_app_write_path(p);
             if p.is_dir() {
                 remove_path_with_retry(&path, true)
                     .map_err(|e| format!("Failed to delete directory '{}': {}", path, e))?;
@@ -1735,7 +1716,6 @@ pub async fn delete_file(path: String) -> Result<(), String> {
                 remove_path_with_retry(&path, false)
                     .map_err(|e| format!("Failed to delete file '{}': {}", path, e))?;
             }
-            file_sync::mark_app_write_path(p);
             Ok(())
         })
     })

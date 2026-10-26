@@ -40,7 +40,6 @@ image = { version = "0.25", default-features = false, features = ["png"] }
 base64 = "0.22"
 sha2 = "0.10"
 md-5 = "0.10"
-notify = "8"
 walkdir = "2"
 epub = "2.1.5"
 mobi = "0.8"

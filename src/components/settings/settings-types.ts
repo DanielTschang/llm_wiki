@@ -1,5 +1,5 @@
 import type { CustomApiMode } from "./llm-presets"
-import type { AzureModelFamily, CloseBehavior, MineruEffort, MineruLocalBackend, MineruModelVersion, MineruParseMethod, ReasoningConfig, SourceWatchConfig } from "@/stores/wiki-store"
+import type { AzureModelFamily, CloseBehavior, MineruEffort, MineruLocalBackend, MineruModelVersion, MineruParseMethod, ReasoningConfig } from "@/stores/wiki-store"
 
 /**
  * Shape of the draft state each section reads from and writes into.
@@ -65,9 +65,6 @@ export interface SettingsDraft {
   proxyAcceptInvalidCerts: boolean
 
   // Scheduled Import
-  scheduledImportEnabled: boolean
-  scheduledImportPath: string
-  scheduledImportInterval: number // minutes
 
   // UI
   uiLanguage: string
@@ -79,8 +76,6 @@ export interface SettingsDraft {
   closeBehavior: CloseBehavior
 
   // Source folder auto watch
-  sourceWatchConfig: SourceWatchConfig
-  sourceWatchAllProjects: boolean
 
   // MinerU PDF parsing
   mineruEnabled: boolean

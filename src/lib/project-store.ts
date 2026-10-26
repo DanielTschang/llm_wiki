@@ -1,8 +1,7 @@
 import { loadStore } from "@/platform"
 import type { WikiProject } from "@/types/wiki"
-import type { ApiConfig, CustomLlmPreset, GeneralConfig, LlmConfig, SearchApiConfig, EmbeddingConfig, MineruConfig, MultimodalConfig, OutputLanguage, ProjectLlmOverride, ProviderConfigs, ProxyConfig, ScheduledImportConfig, SourceWatchConfig, TaskModelRoutingConfig } from "@/stores/wiki-store"
+import type { ApiConfig, CustomLlmPreset, GeneralConfig, LlmConfig, SearchApiConfig, EmbeddingConfig, MineruConfig, MultimodalConfig, OutputLanguage, ProjectLlmOverride, ProviderConfigs, ProxyConfig, SourceWatchConfig, TaskModelRoutingConfig } from "@/stores/wiki-store"
 import { normalizeSourceWatchConfig } from "@/lib/source-watch-config"
-import { normalizePath } from "@/lib/path-utils"
 import { DEFAULT_ZOOM_LEVEL, clampZoomLevel } from "@/stores/zoom-store"
 
 const STORE_NAME = "app-state.json"
@@ -332,35 +331,6 @@ export async function loadGeneralConfig(): Promise<GeneralConfig> {
   return normalizeGeneralConfig(config)
 }
 
-const SCHEDULED_IMPORT_KEY_PREFIX = "scheduledImportConfig:"
-
-function scheduledImportKey(projectPath: string): string {
-  return `${SCHEDULED_IMPORT_KEY_PREFIX}${normalizePath(projectPath)}`
-}
-
-const SCHEDULED_IMPORT_GLOBAL_KEY = "scheduledImportConfig"
-
-export async function saveScheduledImportConfig(projectPath: string, config: ScheduledImportConfig): Promise<void> {
-  const store = await getStore()
-  await store.set(scheduledImportKey(projectPath), config)
-  await store.save()
-}
-
-export async function loadScheduledImportConfig(projectPath: string): Promise<ScheduledImportConfig | null> {
-  const store = await getStore()
-  const perProject = await store.get<ScheduledImportConfig>(scheduledImportKey(projectPath))
-  if (perProject) return perProject
-  // Migrate from legacy global key (pre-0.4.8)
-  const legacy = await store.get<ScheduledImportConfig>(SCHEDULED_IMPORT_GLOBAL_KEY)
-  if (legacy) {
-    await store.set(scheduledImportKey(projectPath), legacy)
-    await store.delete(SCHEDULED_IMPORT_GLOBAL_KEY)
-    await store.save()
-    return legacy
-  }
-  return null
-}
-
 export async function removeFromRecentProjects(
   path: string
 ): Promise<void> {
@@ -406,9 +376,7 @@ export async function loadTheme(): Promise<"light" | "dark" | "system" | null> {
 
 const OUTPUT_LANGUAGE_KEY = "outputLanguage"
 const PROJECT_OUTPUT_LANGUAGE_KEY = "projectOutputLanguages"
-const PROJECT_FILE_SYNC_KEY = "projectFileSyncEnabled"
 const SOURCE_WATCH_CONFIG_KEY = "sourceWatchConfig"
-const SOURCE_WATCH_ALL_PROJECTS_KEY = "sourceWatchAllProjects"
 
 export async function saveOutputLanguage(lang: OutputLanguage, projectId?: string): Promise<void> {
   const store = await getStore()
@@ -428,40 +396,6 @@ export async function loadOutputLanguage(projectId?: string): Promise<OutputLang
   return (await store.get<OutputLanguage>(OUTPUT_LANGUAGE_KEY)) ?? null
 }
 
-export async function saveProjectFileSyncEnabled(enabled: boolean, projectId?: string): Promise<void> {
-  const store = await getStore()
-  if (projectId) {
-    const existing = (await store.get<Record<string, boolean>>(PROJECT_FILE_SYNC_KEY)) ?? {}
-    await store.set(PROJECT_FILE_SYNC_KEY, { ...existing, [projectId]: enabled })
-    return
-  }
-  const existing = (await store.get<Record<string, boolean>>(PROJECT_FILE_SYNC_KEY)) ?? {}
-  await store.set(PROJECT_FILE_SYNC_KEY, { ...existing, default: enabled })
-}
-
-export async function loadProjectFileSyncEnabled(projectId?: string): Promise<boolean> {
-  const store = await getStore()
-  const settings = await store.get<Record<string, boolean>>(PROJECT_FILE_SYNC_KEY)
-  if (projectId && settings && typeof settings[projectId] === "boolean") {
-    return settings[projectId]
-  }
-  if (settings && typeof settings.default === "boolean") {
-    return settings.default
-  }
-  return true
-}
-
-export async function saveSourceWatchConfig(config: SourceWatchConfig, projectId?: string): Promise<void> {
-  const store = await getStore()
-  const normalized = normalizeSourceWatchConfig(config)
-  const existing = (await store.get<Record<string, SourceWatchConfig>>(SOURCE_WATCH_CONFIG_KEY)) ?? {}
-  await store.set(SOURCE_WATCH_CONFIG_KEY, {
-    ...existing,
-    [projectId ?? "default"]: normalized,
-  })
-  await store.save()
-}
-
 export async function loadSourceWatchConfig(projectId?: string): Promise<SourceWatchConfig> {
   const store = await getStore()
   const settings = await store.get<Record<string, SourceWatchConfig>>(SOURCE_WATCH_CONFIG_KEY)
@@ -469,19 +403,7 @@ export async function loadSourceWatchConfig(projectId?: string): Promise<SourceW
   if (config) return normalizeSourceWatchConfig(config)
   if (settings?.default) return normalizeSourceWatchConfig(settings.default)
 
-  const legacyEnabled = await loadProjectFileSyncEnabled(projectId)
-  return normalizeSourceWatchConfig({ enabled: legacyEnabled })
-}
-
-export async function saveSourceWatchAllProjects(enabled: boolean): Promise<void> {
-  const store = await getStore()
-  await store.set(SOURCE_WATCH_ALL_PROJECTS_KEY, enabled)
-  await store.save()
-}
-
-export async function loadSourceWatchAllProjects(): Promise<boolean> {
-  const store = await getStore()
-  return (await store.get<boolean>(SOURCE_WATCH_ALL_PROJECTS_KEY)) === true
+  return normalizeSourceWatchConfig()
 }
 
 // ── Update-check persistence ──────────────────────────────────────────────

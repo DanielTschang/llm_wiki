@@ -12,7 +12,6 @@ import { useTranslation } from "react-i18next"
 import { useAppDialog } from "@/stores/app-dialog-store"
 import { normalizePath } from "@/lib/path-utils"
 import { decideDeleteClick } from "@/lib/sources-tree-delete"
-import { rescanProjectFileSync } from "@/lib/project-file-sync"
 import { sortFileNodes } from "@/lib/file-tree-order"
 import {
   deleteSourceFile,
@@ -153,13 +152,12 @@ export function SourcesView() {
     if (!project || refreshing) return
     setRefreshing(true)
     try {
-      await rescanProjectFileSync(project, useWikiStore.getState().sourceWatchConfig)
       setRefreshError(null)
+      await loadSources()
     } catch (err) {
-      console.warn("[sources] failed to rescan project files:", err)
+      console.warn("[sources] failed to reload sources:", err)
       setRefreshError(String(err))
     } finally {
-      await loadSources()
       setRefreshing(false)
     }
   }
