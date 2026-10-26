@@ -2,6 +2,8 @@
 # Run the Postgres-backed tests against the k3d cluster's Postgres.
 # Creates the throwaway `llm_wiki_test` database on first use, forwards the
 # port for the duration of the run, and never touches other kube contexts.
+# Set RESET_TEST_DB=1 to drop and recreate the database first, which is needed
+# after a migration that has already been applied is edited.
 # Extra arguments go to `cargo test`, e.g. `deploy/k3d/test-pg.sh -p llm-wiki-storage`.
 set -euo pipefail
 cd "$(dirname "$0")/../.."
@@ -12,6 +14,10 @@ K=(kubectl --context "$CTX" -n "$NS")
 PORT="${TEST_PG_PORT:-55432}"
 DB=llm_wiki_test
 
+if [ "${RESET_TEST_DB:-}" = 1 ]; then
+  "${K[@]}" exec pg-1 -c postgres -- psql -U postgres -d postgres -c \
+    "DROP DATABASE IF EXISTS $DB WITH (FORCE)" >/dev/null
+fi
 "${K[@]}" exec pg-1 -c postgres -- psql -U postgres -d postgres -Atc \
   "SELECT 1 FROM pg_database WHERE datname = '$DB'" | grep -q 1 ||
   "${K[@]}" exec pg-1 -c postgres -- psql -U postgres -d postgres -c \

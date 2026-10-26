@@ -5,6 +5,7 @@ use sqlx::postgres::PgRow;
 use sqlx::{PgPool, Postgres, Row, Transaction};
 
 use crate::listing::{dir_meta, list_entries, FileInfo};
+use crate::sql::{any_live, backend, below, collides, is_unique_violation, WriteFailure};
 use crate::store::{Body, EntryKind, Meta, Precondition, ProjectFiles, ProjectId, WriteCtx};
 use crate::{RelPath, StoreError};
 
@@ -27,37 +28,6 @@ pub async fn migrate(pool: &PgPool) -> Result<(), StoreError> {
         .run(pool)
         .await
         .map_err(backend)
-}
-
-fn backend(error: impl std::fmt::Display) -> StoreError {
-    StoreError::Backend(error.to_string())
-}
-
-/// `LIKE` treats `\`, `%` and `_` specially; in a path they are plain characters.
-fn like_escape(raw: &str) -> String {
-    let mut out = String::with_capacity(raw.len());
-    for ch in raw.chars() {
-        if matches!(ch, '\\' | '%' | '_') {
-            out.push('\\');
-        }
-        out.push(ch);
-    }
-    out
-}
-
-/// Matches everything strictly beneath `dir` (`dir/%`), or everything for the root.
-fn below(dir: &RelPath) -> String {
-    if dir.is_root() {
-        "%".to_string()
-    } else {
-        format!("{}/%", like_escape(dir.as_str()))
-    }
-}
-
-fn is_unique_violation(error: &sqlx::Error) -> bool {
-    error
-        .as_database_error()
-        .is_some_and(|db| db.code().as_deref() == Some("23505"))
 }
 
 fn content_hash(content: &str) -> Vec<u8> {
@@ -92,27 +62,6 @@ impl PgFiles {
     pub fn with_max_versions(mut self, max_versions: u32) -> Self {
         self.max_versions = max_versions.max(1);
         self
-    }
-
-    async fn any_live_page(
-        tx: &mut Transaction<'_, Postgres>,
-        project: ProjectId,
-        exact: &[String],
-        below_pattern: Option<&str>,
-    ) -> Result<bool, StoreError> {
-        let found = sqlx::query(
-            "SELECT 1 FROM pages
-             WHERE project_id = $1 AND deleted_at IS NULL
-               AND (path = ANY($2) OR ($3::text IS NOT NULL AND path LIKE $3 ESCAPE '\\'))
-             LIMIT 1",
-        )
-        .bind(project.0)
-        .bind(exact)
-        .bind(below_pattern)
-        .fetch_optional(&mut **tx)
-        .await
-        .map_err(backend)?;
-        Ok(found.is_some())
     }
 
     async fn log_version(
@@ -272,7 +221,7 @@ impl ProjectFiles for PgFiles {
         }
         let mut occupied: Vec<String> = to.ancestors().iter().map(ToString::to_string).collect();
         occupied.push(to.to_string());
-        if Self::any_live_page(&mut tx, project, &occupied, Some(&below(to))).await? {
+        if any_live(&mut tx, "pages", project, &occupied, Some(&below(to))).await? {
             return Err(StoreError::already_exists(to));
         }
         let ids: Vec<uuid::Uuid> = moving
@@ -361,23 +310,6 @@ impl ProjectFiles for PgFiles {
     }
 }
 
-enum WriteFailure {
-    Db(sqlx::Error),
-    Store(StoreError),
-}
-
-impl From<sqlx::Error> for WriteFailure {
-    fn from(error: sqlx::Error) -> Self {
-        Self::Db(error)
-    }
-}
-
-impl From<StoreError> for WriteFailure {
-    fn from(error: StoreError) -> Self {
-        Self::Store(error)
-    }
-}
-
 impl PgFiles {
     async fn write_tx(
         &self,
@@ -389,8 +321,7 @@ impl PgFiles {
     ) -> Result<Meta, WriteFailure> {
         let mut tx = self.pool.begin().await?;
         // A file cannot sit beneath a file, or take the place of a directory.
-        let ancestors: Vec<String> = path.ancestors().iter().map(ToString::to_string).collect();
-        if Self::any_live_page(&mut tx, project, &ancestors, Some(&below(path))).await? {
+        if collides(&mut tx, "pages", project, path).await? {
             return Err(StoreError::already_exists(path).into());
         }
         let current: Option<(uuid::Uuid, i32)> = sqlx::query_as(
@@ -493,6 +424,14 @@ mod tests {
             .await
             .unwrap();
             ProjectId(id)
+        }
+
+        fn root(&self) -> &'static str {
+            "wiki"
+        }
+
+        fn versioned(&self) -> bool {
+            true
         }
     }
 

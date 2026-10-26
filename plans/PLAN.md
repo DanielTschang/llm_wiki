@@ -140,10 +140,11 @@ Python Extension Point（同事負責）
   - [ ] B 類呼叫點改走 `ProjectFiles`（見 `plans/inventory/fs-callsites.md`）
   - [x] `PgFiles`（頁面部分）：`pages`＋`page_versions` 的 Postgres 實作；`MemoryStore` 與 `PgFiles` 跑同一組 13 個一致性測試（`conformance.rs`），`make test-pg` 在 k3d 上實跑。rename 與 delete 也各寫一筆版本紀錄，rename 會讓版本加一
   - [x] 頁面歷史每頁只留 8 版（常駐開啟，取代 `file_history` 的選擇性開關）
-  - [ ] MinIO 實作（blobs）：物件不可變、每次寫入用新鍵（公司 MinIO 每鍵最多 10 版）；`fs.rs` 接上介面
+  - [x] `PgBlobs`（blobs 部分）：後端是 `object_store::ObjectStore`（測試用 `InMemory`），物件不可變、每次寫入用新鍵（公司 MinIO 每鍵最多 10 版）；舊列軟刪除，`purge_deleted`／`purge_project` 事後清掉舊物件。跑同一組一致性測試，另有 7 個 blob 專屬測試
+  - [ ] `RoutedFiles`：依 `route()` 合併 `PgFiles`、`PgBlobs` 與 State 轉接層（list 合併、跨後端的子樹刪除與 rename）；連到 k3d 的真 MinIO（`AmazonS3Builder`、path-style、allow_http）；`fs.rs` 接上介面
   - [ ] 頁面寫入時一併重建 `page_links`、`page_sources`，並解析 frontmatter 填 `title`／`page_type`
   - [ ] `.llm-wiki/*` 狀態檔的轉接層（`route()` 回傳 State 的路徑，讀寫轉成對應資料表）
-  - [ ] 大檔案串流（目前 `Body` 整份放記憶體，上傳／下載需要另一組串流方法）
+  - [x] 大檔案串流：`BlobStreams`（`put_stream`／`get_stream`，8 MiB 分段上傳，邊傳邊算 SHA-256）。API 的上傳／下載端點還沒接
 - [ ] 所有索引、快取、檢索介面都以 Project 為鍵；檢索介面接受 Project 清單（先只傳一個），為跨 Project 檢索預留
 - [ ] 向量庫從 LanceDB 換成 pgvector，embedding 依模型分表
 - [ ] NATS JetStream：定義 stream 與 subject（ingest 工作、頁面提交事件），outbox relay；Rust ingest-worker 角色取得工作後交給 Node 子程序，再由 Rust 回 ack

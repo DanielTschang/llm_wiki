@@ -26,6 +26,20 @@ pub fn route(path: &RelPath) -> Backend {
     }
 }
 
+/// The `blobs.kind` for a path that [`route`] sent to [`Backend::Blobs`].
+pub fn blob_kind(path: &RelPath) -> &'static str {
+    let in_cache = path.as_str().split('/').any(|segment| segment == ".cache");
+    if in_cache || path.is_within(&RelPath::parse("raw/parsed").expect("literal is a valid path")) {
+        "extracted"
+    } else if path.top_level() == "agent-workspace" {
+        "workspace"
+    } else if path.top_level() == "raw" {
+        "source"
+    } else {
+        "asset"
+    }
+}
+
 fn is_text(path: &RelPath, extensions: &[&str]) -> bool {
     path.extension()
         .is_some_and(|ext| extensions.iter().any(|t| ext.eq_ignore_ascii_case(t)))
@@ -70,6 +84,16 @@ mod tests {
         ] {
             assert_eq!(backend(path), Backend::Blobs, "{path}");
         }
+    }
+
+    #[test]
+    fn blob_kinds_follow_the_folder_layout() {
+        let kind = |p: &str| blob_kind(&RelPath::parse(p).unwrap());
+        assert_eq!(kind("raw/sources/a/report.pdf"), "source");
+        assert_eq!(kind("raw/sources/a/.cache/report.pdf"), "extracted");
+        assert_eq!(kind("raw/parsed/a/report.pdf.md"), "extracted");
+        assert_eq!(kind("wiki/media/fig/1.png"), "asset");
+        assert_eq!(kind("agent-workspace/deck/index.html"), "workspace");
     }
 
     #[test]

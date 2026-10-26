@@ -1,5 +1,7 @@
 use async_trait::async_trait;
+use bytes::Bytes;
 use chrono::{DateTime, Utc};
+use futures::stream::BoxStream;
 use uuid::Uuid;
 
 use crate::{RelPath, StoreError};
@@ -15,6 +17,21 @@ pub enum Body {
 }
 
 impl Body {
+    /// The content as text: always for `Text`, and for `Bytes` when valid UTF-8.
+    pub fn as_text(&self) -> Option<&str> {
+        match self {
+            Body::Text(text) => Some(text),
+            Body::Bytes(bytes) => std::str::from_utf8(bytes).ok(),
+        }
+    }
+
+    pub fn into_bytes(self) -> Vec<u8> {
+        match self {
+            Body::Text(text) => text.into_bytes(),
+            Body::Bytes(bytes) => bytes,
+        }
+    }
+
     pub fn len(&self) -> usize {
         match self {
             Body::Text(text) => text.len(),
@@ -121,4 +138,27 @@ pub trait ProjectFiles: Send + Sync {
         dir: &RelPath,
         recursive: bool,
     ) -> Result<Vec<Meta>, StoreError>;
+}
+
+/// A body delivered in pieces, so large files never have to fit in memory.
+pub type ByteStream = BoxStream<'static, Result<Bytes, StoreError>>;
+
+/// Streaming access for stores of large files. Uploads and downloads pass
+/// through the API this way; there are no presigned URLs.
+#[async_trait]
+pub trait BlobStreams: Send + Sync {
+    async fn put_stream(
+        &self,
+        project: ProjectId,
+        path: &RelPath,
+        body: ByteStream,
+        precondition: Precondition,
+        ctx: &WriteCtx,
+    ) -> Result<Meta, StoreError>;
+
+    async fn get_stream(
+        &self,
+        project: ProjectId,
+        path: &RelPath,
+    ) -> Result<(ByteStream, Meta), StoreError>;
 }

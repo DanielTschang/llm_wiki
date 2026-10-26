@@ -8,7 +8,10 @@ publish = false
 
 [dependencies]
 async-trait = "0.1"
+bytes = "1"
 chrono = { version = "0.4", features = ["clock"] }
+futures = "0.3"
+object_store = { version = "0.12", default-features = false, features = ["aws"] }
 sha2 = "0.10"
 sqlx = { version = "0.8", default-features = false, features = ["runtime-tokio", "tls-rustls-ring-webpki", "postgres", "uuid", "chrono", "json", "migrate", "macros"] }
 thiserror = "2"

@@ -231,6 +231,14 @@ mod tests {
         async fn new_project(&self) -> ProjectId {
             ProjectId(uuid::Uuid::new_v4())
         }
+
+        fn root(&self) -> &'static str {
+            "wiki"
+        }
+
+        fn versioned(&self) -> bool {
+            true
+        }
     }
 
     conformance::conformance_tests!(Some(MemoryHarness(MemoryStore::new())));
