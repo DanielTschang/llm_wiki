@@ -547,7 +547,7 @@ pub async fn relay(
             )
         }
     };
-    let client = match llm_wiki_core::proxy::configure_http_client(
+    let client = match llm_wiki_llm::proxy::configure_http_client(
         reqwest::Client::builder().connect_timeout(std::time::Duration::from_secs(30)),
     )
     .build()
@@ -711,6 +711,33 @@ async fn usage_summary(platform: &PlatformState, principal: &Principal, args: &V
     ))
 }
 
+/// Writes the model calls the server makes itself (agent turns, searches) to
+/// the usage table, next to the ones the gateway relays.
+struct UsageToTable(llm_wiki_storage::LlmUsage);
+
+impl llm_wiki_llm::UsageSink for UsageToTable {
+    fn record(&self, call: llm_wiki_llm::LlmCall) {
+        let usage = self.0.clone();
+        let record = UsageRecord {
+            user_id: call.tag.user_id.as_deref().and_then(|id| id.parse().ok()),
+            project_id: call.tag.project_id.as_deref().and_then(|id| id.parse().ok()),
+            model_id: call.tag.model_id,
+            status: if call.ok { 200 } else { 502 },
+            duration_ms: call.duration.as_millis() as u64,
+            ..UsageRecord::default()
+        };
+        tokio::spawn(async move {
+            if let Err(error) = usage.record(&record).await {
+                eprintln!("[usage] could not record a model call: {error}");
+            }
+        });
+    }
+}
+
+pub fn install_usage_sink(usage: llm_wiki_storage::LlmUsage) -> Result<(), String> {
+    llm_wiki_llm::install_sink(std::sync::Arc::new(UsageToTable(usage)))
+}
+
 /// The chat configuration the agent runs with: the browser's reasoning and
 /// token limits, on the model the catalogue says, with the server's key.
 fn chat_config(entry: &ModelEntry, key: Option<String>, browser: Option<&Value>) -> Value {
@@ -725,6 +752,7 @@ fn chat_config(entry: &ModelEntry, key: Option<String>, browser: Option<&Value>)
         "customEndpoint",
         "customHeaders",
         "serverModelId",
+        "usage",
     ] {
         config.remove(stale);
     }
@@ -777,7 +805,7 @@ fn embedding_config(entry: &ModelEntry, key: Option<String>, browser: Option<&Va
         .and_then(Value::as_object)
         .cloned()
         .unwrap_or_default();
-    for stale in ["apiKey", "endpoint", "extraHeaders", "serverModelId"] {
+    for stale in ["apiKey", "endpoint", "extraHeaders", "serverModelId", "usage"] {
         config.remove(stale);
     }
     config.insert("enabled".into(), json!(true));
@@ -798,6 +826,7 @@ fn embedding_config(entry: &ModelEntry, key: Option<String>, browser: Option<&Va
 /// address and a key: this swaps the model's real settings into the request.
 pub async fn apply_models(
     platform: &PlatformState,
+    principal: &Principal,
     command: &str,
     args: &mut Value,
 ) -> Result<(), Denied> {
@@ -810,6 +839,24 @@ pub async fn apply_models(
     let catalog = load_catalog(platform)
         .await
         .map_err(|m| problem(StatusCode::INTERNAL_SERVER_ERROR, m))?;
+    // Calls the server makes for a person are charged to them, in the Project
+    // the command names.
+    let project_id = args
+        .get("projectId")
+        .and_then(Value::as_str)
+        .map(str::to_string)
+        .or_else(|| {
+            let path = args.get("projectPath").and_then(Value::as_str)?;
+            let (project, _) = llm_wiki_core::platform::get()?.locator.resolve(path).ok()?;
+            Some(project.0.to_string())
+        });
+    let tag = |entry: &ModelEntry| {
+        json!({
+            "userId": principal.actor().map(|user| user.id.to_string()),
+            "projectId": project_id,
+            "modelId": entry.id,
+        })
+    };
     let Some(object) = args.as_object_mut() else {
         return Ok(());
     };
@@ -836,7 +883,8 @@ pub async fn apply_models(
                 "the server has no chat model configured",
             )
         })?;
-        let config = chat_config(entry, key_of(entry)?, browser.as_ref());
+        let mut config = chat_config(entry, key_of(entry)?, browser.as_ref());
+        config["usage"] = tag(entry);
         object.insert("llmConfig".into(), config);
     }
 
@@ -857,7 +905,8 @@ pub async fn apply_models(
                             format!("no embedding model \"{id}\" is offered"),
                         )
                     })?;
-                let config = embedding_config(entry, key_of(entry)?, browser.as_ref());
+                let mut config = embedding_config(entry, key_of(entry)?, browser.as_ref());
+                config["usage"] = tag(entry);
                 object.insert(name.into(), config);
             }
             None if embedding_required => {
@@ -1146,6 +1195,17 @@ data: {"type":"message_start","message":{"usage":{"input_tokens": 25,"output_tok
         assert_eq!(ollama["ollamaUrl"], "http://localhost:11434");
         assert_eq!(ollama["customEndpoint"], "");
         assert_eq!(ollama["apiKey"], "");
+    }
+
+    #[test]
+    fn a_usage_tag_from_the_browser_is_discarded() {
+        let browser = json!({ "usage": { "userId": "someone-else", "modelId": "free" }, "serverModelId": "m1" });
+        let chat = chat_config(&entry("openai", None), None, Some(&browser));
+        assert!(chat.get("usage").is_none(), "{chat}");
+        let mut embedding = entry("custom", Some("https://gw.example/v1/embeddings"));
+        embedding.purpose = Purpose::Embedding;
+        let config = embedding_config(&embedding, None, Some(&browser));
+        assert!(config.get("usage").is_none(), "{config}");
     }
 
     #[test]

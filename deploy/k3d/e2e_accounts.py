@@ -301,6 +301,15 @@ status, vector = alice2.rpc("embedding_fetch", {"text": "hi", "cfg": {"enabled":
 check("a named embedding model is called with the server's key and address",
       status == 200 and vector == [0.25, 0.5, 0.75] and Upstream.seen and Upstream.seen[-1]["headers"].get("authorization") == "Bearer sk-stub-secret", (status, vector))
 
+def embed_calls():
+    _, rows = admin.rpc("llm_usage_summary", {"days": 1})
+    return sum(r["calls"] for r in rows if r["modelId"] == "stub-embed" and (r["displayName"] or "").lower().startswith("alice"))
+time.sleep(0.5)
+before = embed_calls()
+alice2.rpc("embedding_fetch", {"text": "again", "cfg": {"enabled": True, "model": "m", "serverModelId": "stub-embed"}})
+time.sleep(0.5)
+check("a model call the server makes for a person is counted", before >= 1 and embed_calls() == before + 1, (before, embed_calls()))
+
 print("semantic search")
 for name in ("near", "far"):
     alice2.rpc("write_file", {"path": f"{base}/wiki/vec/{name}.md", "contents": f"# {name.title()}\nunrelated words"})

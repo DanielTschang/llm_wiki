@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 use llm_wiki_core as core;
 use llm_wiki_core::CoreContext;
+use llm_wiki_llm::SearchEmbeddingConfig;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
@@ -392,7 +393,7 @@ pub async fn dispatch(
             #[allow(unused_imports)]
             use llm_wiki_core::commands::app::*;
             #[allow(unused_imports)]
-            use llm_wiki_core::proxy;
+            use llm_wiki_llm::proxy;
             #[derive(Deserialize)]
             #[serde(rename_all = "camelCase")]
             struct RpcArgs {
@@ -409,8 +410,8 @@ pub async fn dispatch(
             struct RpcArgs {
                 project_id: String,
                 request: core::agent::AgentChatRequest,
-                llm_config: Option<core::agent::provider::LlmConfig>,
-                embedding_config: Option<llm_wiki_core::commands::search::SearchEmbeddingConfig>,
+                llm_config: Option<llm_wiki_llm::provider::LlmConfig>,
+                embedding_config: Option<llm_wiki_llm::SearchEmbeddingConfig>,
             }
             let a: RpcArgs = rpc_args(args)?;
             let ctx = Arc::clone(ctx);
@@ -433,8 +434,8 @@ pub async fn dispatch(
             struct RpcArgs {
                 project_id: String,
                 request: core::agent::AgentChatRequest,
-                llm_config: Option<core::agent::provider::LlmConfig>,
-                embedding_config: Option<llm_wiki_core::commands::search::SearchEmbeddingConfig>,
+                llm_config: Option<llm_wiki_llm::provider::LlmConfig>,
+                embedding_config: Option<llm_wiki_llm::SearchEmbeddingConfig>,
             }
             let a: RpcArgs = rpc_args(args)?;
             let ctx = Arc::clone(ctx);

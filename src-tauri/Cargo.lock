@@ -1791,6 +1791,7 @@ dependencies = [
  "futures",
  "html2text",
  "image",
+ "llm-wiki-llm",
  "llm-wiki-storage",
  "md-5",
  "mobi",
@@ -1807,6 +1808,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "llm-wiki-llm"
+version = "0.1.0"
+dependencies = [
+ "futures",
+ "reqwest",
+ "serde",
+ "serde_json",
+ "tokio",
+]
+
+[[package]]
 name = "llm-wiki-server"
 version = "0.1.0"
 dependencies = [
@@ -1817,6 +1829,7 @@ dependencies = [
  "futures",
  "http-body-util",
  "llm-wiki-core",
+ "llm-wiki-llm",
  "llm-wiki-storage",
  "reqwest",
  "serde",

@@ -1,4 +1,4 @@
-//! Backend Agent substrate shared by the desktop UI, local HTTP API, and MCP.
+//! The agent: routing, retrieval, tool execution, context assembly, sessions.
 //!
 //! Keep routing, retrieval, tool execution, context assembly, sessions, and
 //! cancellation in this Rust module. The React/TypeScript side may render UI
@@ -10,7 +10,6 @@ pub mod commands;
 pub mod context;
 pub mod events;
 pub mod permissions;
-pub mod provider;
 pub mod router;
 pub mod runtime;
 pub mod session;

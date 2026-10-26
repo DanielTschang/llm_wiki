@@ -1,3 +1,4 @@
+pub use llm_wiki_llm::AgentImage;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Copy, Serialize, Deserialize, PartialEq, Eq)]
@@ -176,12 +177,6 @@ impl Default for AgentChatRequest {
     }
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
-#[serde(rename_all = "camelCase")]
-pub struct AgentImage {
-    pub media_type: String,
-    pub data_base64: String,
-}
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "camelCase")]

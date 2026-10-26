@@ -79,6 +79,7 @@ async fn run(args: config::Args) -> Result<(), String> {
         Some(services.vectors.clone()),
     )?;
     bootstrap_admin(&services, &args).await?;
+    llm::install_usage_sink(services.usage.clone())?;
     let operator = services
         .accounts
         .operator_user()

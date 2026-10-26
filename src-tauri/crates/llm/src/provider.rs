@@ -8,7 +8,7 @@ use reqwest::header::{HeaderMap, HeaderName, HeaderValue, AUTHORIZATION};
 use serde::Deserialize;
 use serde_json::{json, Value};
 
-use super::types::AgentImage;
+use crate::AgentImage;
 
 const REQUEST_TIMEOUT_SECS: u64 = 180;
 const DEFAULT_MAX_TOKENS: u32 = 2048;
@@ -58,6 +58,9 @@ pub struct LlmConfig {
     /// Missing keeps the historical streaming behavior for existing configs.
     #[serde(default)]
     pub streaming_enabled: Option<bool>,
+    /// Whom the server charges this model's calls to. See [`crate::usage`].
+    #[serde(default)]
+    pub usage: Option<crate::UsageTag>,
 }
 
 impl LlmConfig {
@@ -148,6 +151,23 @@ impl LlmClient {
         user: &str,
         images: &[AgentImage],
     ) -> Result<String, String> {
+        let started = std::time::Instant::now();
+        let result = self.generate_text_untracked(system, user, images).await;
+        crate::usage::report(
+            self.config.usage.as_ref(),
+            crate::CallKind::Chat,
+            result.is_ok(),
+            started.elapsed(),
+        );
+        result
+    }
+
+    async fn generate_text_untracked(
+        &self,
+        system: &str,
+        user: &str,
+        images: &[AgentImage],
+    ) -> Result<String, String> {
         match self.config.provider.as_str() {
             "openai" => {
                 self.generate_openai_like(
@@ -213,13 +233,36 @@ impl LlmClient {
         system: &str,
         user: &str,
         images: &[AgentImage],
+        on_delta: F,
+    ) -> Result<String, String>
+    where
+        F: FnMut(&str) + Send,
+    {
+        let started = std::time::Instant::now();
+        let result = self
+            .generate_text_stream_untracked(system, user, images, on_delta)
+            .await;
+        crate::usage::report(
+            self.config.usage.as_ref(),
+            crate::CallKind::Chat,
+            result.is_ok(),
+            started.elapsed(),
+        );
+        result
+    }
+
+    async fn generate_text_stream_untracked<F>(
+        &self,
+        system: &str,
+        user: &str,
+        images: &[AgentImage],
         mut on_delta: F,
     ) -> Result<String, String>
     where
         F: FnMut(&str) + Send,
     {
         if self.config.streaming_enabled == Some(false) {
-            let text = self.generate_text(system, user, images).await?;
+            let text = self.generate_text_untracked(system, user, images).await?;
             on_delta(&text);
             return Ok(text);
         }
@@ -1157,6 +1200,7 @@ mod tests {
             max_context_size: None,
             custom_headers: BTreeMap::new(),
             streaming_enabled: None,
+            usage: None,
         }
     }
 

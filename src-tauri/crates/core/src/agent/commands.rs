@@ -17,8 +17,8 @@ pub struct AgentProjectEntry {
 
 #[derive(Debug, Clone, Default)]
 struct AgentRuntimeConfig {
-    embedding: Option<crate::commands::search::SearchEmbeddingConfig>,
-    llm: Option<crate::agent::provider::LlmConfig>,
+    embedding: Option<llm_wiki_llm::SearchEmbeddingConfig>,
+    llm: Option<llm_wiki_llm::provider::LlmConfig>,
     web_search: Option<crate::agent::tools::WebSearchConfig>,
     anytxt: Option<crate::agent::tools::AnyTxtConfig>,
 }
@@ -27,8 +27,8 @@ pub async fn agent_start_turn(
     ctx: &CoreContext,
     project_id: String,
     mut request: crate::agent::AgentChatRequest,
-    llm_config: Option<crate::agent::provider::LlmConfig>,
-    embedding_config: Option<crate::commands::search::SearchEmbeddingConfig>,
+    llm_config: Option<llm_wiki_llm::provider::LlmConfig>,
+    embedding_config: Option<llm_wiki_llm::SearchEmbeddingConfig>,
 ) -> Result<crate::agent::types::AgentChatResponse, String> {
     let project = resolve_agent_project(ctx, &project_id)?;
     if request
@@ -115,8 +115,8 @@ pub async fn agent_start_turn_stream(
     ctx: Arc<CoreContext>,
     project_id: String,
     mut request: crate::agent::AgentChatRequest,
-    llm_config: Option<crate::agent::provider::LlmConfig>,
-    embedding_config: Option<crate::commands::search::SearchEmbeddingConfig>,
+    llm_config: Option<llm_wiki_llm::provider::LlmConfig>,
+    embedding_config: Option<llm_wiki_llm::SearchEmbeddingConfig>,
 ) -> Result<String, String> {
     let project = resolve_agent_project(&ctx, &project_id)?;
     if request

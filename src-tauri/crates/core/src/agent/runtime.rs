@@ -8,7 +8,7 @@ use serde::Deserialize;
 use serde_json::Value;
 use uuid::Uuid;
 
-use crate::commands::search::SearchEmbeddingConfig;
+use llm_wiki_llm::SearchEmbeddingConfig;
 
 use super::cancel::AgentCancellationToken;
 use super::context::{
@@ -17,7 +17,7 @@ use super::context::{
 };
 use super::events::AgentEvent;
 use super::permissions::{AgentCapability, PermissionPolicy};
-use super::provider::{AgentLlmProvider, LlmClient, LlmConfig};
+use llm_wiki_llm::provider::{AgentLlmProvider, LlmClient, LlmConfig};
 use super::router::route_query;
 use super::skills::{load_project_skills, AgentSkill};
 use super::tools::{self, AnyTxtConfig, ToolRegistry, WebSearchConfig};
@@ -4258,6 +4258,7 @@ mod tests {
             max_context_size: Some(8_000),
             custom_headers: Default::default(),
             streaming_enabled: None,
+            usage: None,
         };
         let fitted = fit_context_to_model(context, Some(&config));
         assert!(fitted.system.contains("system"));
@@ -4285,6 +4286,7 @@ mod tests {
             max_context_size: Some(8_000),
             custom_headers: Default::default(),
             streaming_enabled: None,
+            usage: None,
         };
 
         let fitted = fit_context_to_model(context, Some(&config));

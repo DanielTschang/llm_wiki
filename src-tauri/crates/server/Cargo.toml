@@ -16,6 +16,7 @@ path = "src/bin/import.rs"
 
 [dependencies]
 llm-wiki-core = { path = "../core" }
+llm-wiki-llm = { path = "../llm" }
 llm-wiki-storage = { path = "../storage" }
 bytes = "1"
 chrono = { version = "0.4", default-features = false, features = ["clock"] }

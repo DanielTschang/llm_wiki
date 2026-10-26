@@ -130,7 +130,7 @@ async fn call(
         authz::authorize_rpc(platform, principal, command, &mut args)
             .await
             .map_err(|denied| DispatchError::Status(denied.status, denied.message))?;
-        crate::llm::apply_models(platform, command, &mut args)
+        crate::llm::apply_models(platform, principal, command, &mut args)
             .await
             .map_err(|denied| DispatchError::Status(denied.status, denied.message))?;
     }

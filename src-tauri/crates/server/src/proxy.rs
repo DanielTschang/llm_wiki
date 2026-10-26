@@ -83,7 +83,7 @@ pub async fn forward(
     };
     // Built per request: proxy settings can change at runtime (set_proxy_env).
     let client =
-        match llm_wiki_core::proxy::configure_http_client(reqwest::Client::builder()).build() {
+        match llm_wiki_llm::proxy::configure_http_client(reqwest::Client::builder()).build() {
             Ok(client) => client,
             Err(e) => {
                 return error(

@@ -1,6 +1,6 @@
 //! App-level status and settings commands.
 
-use crate::proxy;
+use llm_wiki_llm::proxy;
 
 /// Apply a proxy configuration to the process env immediately, so the
 /// next outbound HTTP request picks it up without needing the user to
