@@ -22,7 +22,7 @@ export const PROVIDERS_WITHOUT_KEY: ReadonlySet<LlmProvider> = new Set<LlmProvid
  * Single source of truth for "is the user's LLM configuration good
  * enough to make calls?" Replaces ad-hoc `apiKey || provider ===
  * "ollama" || …` checks scattered across ingest, sweep, lint,
- * chat, and clip-watcher — every one of which had to be edited
+ * and chat — every one of which had to be edited
  * by hand whenever a new no-key provider was added, and at least
  * three of which were silently out of date when the
  * Claude Code CLI provider shipped.

@@ -966,7 +966,6 @@
         "title": "Informazioni",
         "description": "Informazioni sulla build e stato di esecuzione.",
         "version": "Versione",
-        "clipServer": "Server Clip",
         "apiServer": "Server API",
         "apiDisabled": "disattivato",
         "apiOpen": "in esecuzione (senza autenticazione)",

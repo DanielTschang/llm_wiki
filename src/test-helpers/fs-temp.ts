@@ -93,7 +93,6 @@ export const realFs = {
   openProject: async () => {
     throw new Error("openProject not supported in tests")
   },
-  clipServerStatus: async (): Promise<string> => "ok",
 }
 
 /**

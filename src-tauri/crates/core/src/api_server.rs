@@ -18,7 +18,7 @@ use uuid::Uuid;
 use walkdir::WalkDir;
 
 use crate::cors::{local_cors_headers, request_origin};
-use crate::{agent, clip_server, commands, server_bind};
+use crate::{agent, commands, server_bind};
 
 const PORT: u16 = 19828;
 const API_PREFIX: &str = "/api/v1";
@@ -751,21 +751,17 @@ struct ProjectEntry {
     id: String,
     name: String,
     path: String,
-    current: bool,
 }
 
 fn handle_projects(app: &Arc<CoreContext>) -> ApiResponse {
     let projects = load_projects(app);
-    let current_project = projects.iter().find(|project| project.current).cloned();
     ok(json!({
         "ok": true,
         "projects": projects,
-        "currentProject": current_project,
     }))
 }
 
 fn load_projects(app: &Arc<CoreContext>) -> Vec<ProjectEntry> {
-    let current = normalize_path(&clip_server::current_project_path());
     let mut by_path: BTreeMap<String, ProjectEntry> = BTreeMap::new();
 
     if let Some(parsed) = load_app_state(app) {
@@ -786,7 +782,6 @@ fn load_projects(app: &Arc<CoreContext>) -> Vec<ProjectEntry> {
                     ProjectEntry {
                         id: id.clone(),
                         name,
-                        current: path == current,
                         path,
                     },
                 );
@@ -809,7 +804,6 @@ fn load_projects(app: &Arc<CoreContext>) -> Vec<ProjectEntry> {
                     ProjectEntry {
                         id,
                         name,
-                        current: path == current,
                         path,
                     }
                 });
@@ -817,43 +811,15 @@ fn load_projects(app: &Arc<CoreContext>) -> Vec<ProjectEntry> {
         }
     }
 
-    for (name, path) in clip_server::all_projects() {
-        let path = normalize_path(&path);
-        by_path.entry(path.clone()).or_insert_with(|| ProjectEntry {
-            id: read_project_id(&path).unwrap_or_else(|| path.clone()),
-            name: if name.is_empty() {
-                project_name_from_path(&path)
-            } else {
-                name
-            },
-            current: path == current,
-            path,
-        });
-    }
-
-    if !current.is_empty() {
-        by_path
-            .entry(current.clone())
-            .or_insert_with(|| ProjectEntry {
-                id: read_project_id(&current).unwrap_or_else(|| current.clone()),
-                name: project_name_from_path(&current),
-                current: true,
-                path: current.clone(),
-            });
-    }
-
     by_path.into_values().collect()
 }
 
 fn resolve_project(app: &Arc<CoreContext>, project_id: &str) -> Result<ProjectEntry, String> {
     let project_id = percent_decode(project_id);
-    let wants_current = project_id.eq_ignore_ascii_case("current");
     load_projects(app)
         .into_iter()
         .find(|p| {
-            p.id == project_id
-                || project_path_matches(&p.path, &project_id)
-                || (wants_current && p.current)
+            p.id == project_id || project_path_matches(&p.path, &project_id)
         })
         .ok_or_else(|| format!("Unknown project: {project_id}"))
 }

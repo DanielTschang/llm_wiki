@@ -545,13 +545,6 @@ pub async fn dispatch(
                     .await,
             )
         }
-        "clip_server_status" => {
-            #[allow(unused_imports)]
-            use llm_wiki_core::commands::app::*;
-            #[allow(unused_imports)]
-            use llm_wiki_core::proxy;
-            rpc_value(rpc_blocking(core::commands::app::clip_server_status).await?)
-        }
         "api_server_status" => {
             #[allow(unused_imports)]
             use llm_wiki_core::commands::app::*;

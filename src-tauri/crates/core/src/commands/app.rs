@@ -1,14 +1,7 @@
 //! App-level status and settings commands.
 
 use crate::panic_guard::run_guarded;
-use crate::{api_server, clip_server, proxy};
-
-pub fn clip_server_status() -> String {
-    run_guarded("clip_server_status", || {
-        Ok(clip_server::get_daemon_status().to_string())
-    })
-    .unwrap_or_else(|e| format!("error: {e}"))
-}
+use crate::{api_server, proxy};
 
 pub fn api_server_status() -> String {
     run_guarded("api_server_status", || {

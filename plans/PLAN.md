@@ -127,7 +127,8 @@ Python Extension Point（同事負責）
 - [x] 移除 `src-tauri` 的桌面殼（Rust）：現在 `src-tauri/` 是只含 `llm-wiki-core`、`llm-wiki-server` 的 virtual workspace；CI 改成只跑 Linux，刪掉桌面版發佈流程
 - [ ] 移除前端 `src/platform/` 的 desktop 分支：刪 `tauri.ts`、`isDesktop` 及其分支（約 12 個檔案，含 `App.tsx`、設定頁、`file-tree.tsx`），再移除 `@tauri-apps/*` 套件
 - [x] 刪除 CLI transport（`claude_cli`、`codex_cli`、`cli_resolver`）：後端、前端 provider／設定 UI／聊天的 CLI 專用 fallback 路徑都已移除
-- [ ] 刪除 `clip_server` 和 `file_sync`：**比預期難**。`clip_server` 同時是全域「目前專案」註冊表（`current_project_path`、`all_projects`），`agent/commands.rs` 和 `api_server.rs` 都在用；`file_sync::mark_app_write_path` 在 `fs.rs` 有約 25 處呼叫。要先把專案註冊表換成 Project 範圍的參數，再拆
+- [x] 刪除 `clip_server`：連同全域「目前專案」註冊表（`current_project_path`、`all_projects`）、`current` 別名、Web Clipper 瀏覽器擴充套件、前端 clip watcher 一起拿掉；`api_server` 和 agent 的專案查詢現在只認明確的 Project id／路徑。副作用：`mcp-server/` 預設用 `current`，現在必須先 `llm_wiki_set_project`；它跟著 `api_server.rs` 在階段 3 改成遠端 MCP 時一起處理
+- [ ] 刪除 `file_sync`：不再被專案註冊表擋住，剩下 `fs.rs` 約 25 處 `mark_app_write_path`、`CoreContext.file_sync`、`api_server.rs` 的 rescan／SourceWatchConfig、`dispatch.rs` 的 7 個 file-sync 分支，以及前端對應的 `startProjectFileSync` 等
 - [ ] core 依領域拆 crate：storage、retrieval、agent、parsing、llm；server 改名為 api（碰到哪裡才拆哪裡，不一次大改）
 - [ ] 設計 Postgres schema：Project、頁面、頁面歷史、wikilink 邊、操作紀錄、對話、Review Item、ingest 快取與狀態、outbox
 - [ ] storage 頁面儲存介面：fs RPC 依路徑分流，`wiki/` 存 PG、`raw/` 存 MinIO，`.llm-wiki/*.json` 逐一換成資料表；TS worker 和前端看到的路徑語意不變

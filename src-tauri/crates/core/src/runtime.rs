@@ -1,5 +1,5 @@
 //! Tokio runtime access for code that runs outside an async context
-//! (the `tiny_http` API/clip server threads).
+//! (the `tiny_http` API server threads).
 //!
 //! The host installs its own runtime handle at startup so the desktop app
 //! keeps a single runtime (Tauri's). Without one — the headless server or

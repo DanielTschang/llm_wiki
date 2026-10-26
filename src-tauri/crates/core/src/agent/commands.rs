@@ -15,7 +15,6 @@ pub struct AgentProjectEntry {
     id: String,
     name: String,
     path: String,
-    current: bool,
 }
 
 #[derive(Debug, Clone, Default)]
@@ -241,19 +240,15 @@ pub fn agent_list_sessions(
 
 fn resolve_agent_project(ctx: &CoreContext, project_id: &str) -> Result<AgentProjectEntry, String> {
     let decoded = percent_decode(project_id);
-    let wants_current = decoded.eq_ignore_ascii_case("current");
     load_agent_projects(ctx)
         .into_iter()
         .find(|project| {
-            project.id == decoded
-                || project_path_matches(&project.path, &decoded)
-                || (wants_current && project.current)
+            project.id == decoded || project_path_matches(&project.path, &decoded)
         })
         .ok_or_else(|| format!("Unknown project: {decoded}"))
 }
 
 fn load_agent_projects(ctx: &CoreContext) -> Vec<AgentProjectEntry> {
-    let current = normalize_path(&crate::clip_server::current_project_path());
     let mut projects = Vec::new();
     if let Some(parsed) = load_agent_app_state(ctx) {
         if let Some(registry) = parsed.get("projectRegistry").and_then(Value::as_object) {
@@ -271,7 +266,6 @@ fn load_agent_projects(ctx: &CoreContext) -> Vec<AgentProjectEntry> {
                 projects.push(AgentProjectEntry {
                     id: id.clone(),
                     name,
-                    current: path == current,
                     path,
                 });
             }
@@ -294,19 +288,10 @@ fn load_agent_projects(ctx: &CoreContext) -> Vec<AgentProjectEntry> {
                 projects.push(AgentProjectEntry {
                     id: read_project_id(&path).unwrap_or_else(|| path.clone()),
                     name,
-                    current: path == current,
                     path,
                 });
             }
         }
-    }
-    if !current.is_empty() && !projects.iter().any(|project| project.path == current) {
-        projects.push(AgentProjectEntry {
-            id: read_project_id(&current).unwrap_or_else(|| current.clone()),
-            name: project_name_from_path(&current),
-            current: true,
-            path: current,
-        });
     }
     projects
 }

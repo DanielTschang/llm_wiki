@@ -5,7 +5,6 @@
 
 pub mod agent;
 pub mod api_server;
-pub mod clip_server;
 pub mod commands;
 pub mod context;
 pub mod cors;
