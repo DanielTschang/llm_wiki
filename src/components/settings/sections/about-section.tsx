@@ -1,50 +1,16 @@
-import { useEffect, useState, useCallback } from "react"
+import { useCallback } from "react"
 import { Download, RefreshCw, CheckCircle2, Sparkles } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { isDesktop, openUrl } from "@/platform"
-import { apiServerStatus } from "@/commands/fs"
+import { openUrl } from "@/platform"
 import { Button } from "@/components/ui/button"
-import { API_SERVER_HEALTH_URL, API_SERVER_PORT } from "@/lib/api-server-constants"
 import { useUpdateStore, hasAvailableUpdate } from "@/stores/update-store"
 import { checkForUpdates, toLatestReleaseUrl } from "@/lib/update-check"
 import { saveUpdateCheckState } from "@/lib/project-store"
 import { useAppDialog } from "@/stores/app-dialog-store"
 
-interface ApiHealth {
-  enabled?: boolean
-  authConfigured?: boolean
-  allowUnauthenticated?: boolean
-}
-
 export function AboutSection() {
   const { t } = useTranslation()
-  const [apiStatus, setApiStatus] = useState<string>("...")
-  const [apiHealth, setApiHealth] = useState<ApiHealth | null>(null)
   const updateStore = useUpdateStore()
-
-  useEffect(() => {
-    // The local API (127.0.0.1) exists only in the desktop app.
-    if (!isDesktop) return
-    let alive = true
-    apiServerStatus()
-      .then((s) => {
-        if (alive) setApiStatus(s)
-      })
-      .catch(() => {
-        if (alive) setApiStatus("unknown")
-      })
-    fetch(API_SERVER_HEALTH_URL)
-      .then((res) => res.json() as Promise<ApiHealth>)
-      .then((value) => {
-        if (alive) setApiHealth(value)
-      })
-      .catch(() => {
-        if (alive) setApiHealth(null)
-      })
-    return () => {
-      alive = false
-    }
-  }, [])
 
   const handleCheckNow = useCallback(async () => {
     useUpdateStore.getState().setChecking(true)
@@ -86,25 +52,8 @@ export function AboutSection() {
     })
   }, [])
 
-  const apiStatusDisplay = (() => {
-    if (apiStatus === "running" && apiHealth?.enabled === false) {
-      return t("settings.sections.about.apiDisabled")
-    }
-    if (apiStatus === "running" && apiHealth?.allowUnauthenticated) {
-      return t("settings.sections.about.apiOpen")
-    }
-    if (apiStatus === "running" && apiHealth?.authConfigured === false) {
-      return t("settings.sections.about.apiNoToken")
-    }
-    return apiStatus
-  })()
   const rows: Array<{ label: string; value: string; mono?: boolean }> = [
     { label: t("settings.sections.about.version"), value: `v${__APP_VERSION__}`, mono: true },
-    ...(isDesktop
-      ? [
-          { label: t("settings.sections.about.apiServer"), value: `${apiStatusDisplay}  @  127.0.0.1:${API_SERVER_PORT}`, mono: true },
-        ]
-      : []),
   ]
 
   // About panel = user-initiated navigation. They came here on

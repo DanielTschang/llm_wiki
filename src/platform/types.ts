@@ -1,12 +1,11 @@
 /**
- * The shell-facing surface the frontend is allowed to use. Everything
- * that needs the desktop runtime (Tauri IPC, native dialogs, the asset
- * protocol, plugin-store, …) goes through this interface so the same
- * React build can run inside the Tauri webview or in a plain browser
- * talking to the self-hosted server. See plans/web-server-mode.md.
+ * The shell-facing surface the frontend uses to reach the server: RPC,
+ * server events, file URLs, dialogs and the key-value store. The browser
+ * build talks to the API role over HTTP; the ingest worker build talks to
+ * it with a bearer token.
  */
 
-export type PlatformKind = "desktop" | "web"
+export type PlatformKind = "web"
 
 export type UnlistenFn = () => void
 
@@ -33,12 +32,12 @@ export interface OpenDialogOptions {
    * Web build: also offer uploading from the browser's device. Uploads are
    * staged on the server and removed after a day, so only set this when the
    * caller copies the picked files (imports), never for a location the app
-   * keeps using (opening or creating a project). Ignored on desktop.
+   * keeps using (opening or creating a project).
    */
   allowUpload?: boolean
 }
 
-/** Mirrors plugin-dialog: `multiple: true` yields an array. */
+/** `multiple: true` yields an array. */
 export type OpenDialogResult<T extends OpenDialogOptions> = T["multiple"] extends true
   ? string[] | null
   : string | null
@@ -54,7 +53,7 @@ export interface MessageDialogOptions {
   kind?: "info" | "warning" | "error"
 }
 
-/** Subset of plugin-store's `Store` the app actually uses. */
+/** The key-value store surface the app uses; backed by the server. */
 export interface KeyValueStore {
   get<T>(key: string): Promise<T | undefined>
   set(key: string, value: unknown): Promise<void>
@@ -66,7 +65,7 @@ export interface Platform {
   kind: PlatformKind
   invoke<T>(command: string, args?: Record<string, unknown>): Promise<T>
   listen<T>(event: string, handler: EventHandler<T>): Promise<UnlistenFn>
-  /** URL the webview/browser can load to display a local file. */
+  /** URL the browser can load to display a file on the server. */
   convertFileSrc(path: string): string
   /** fetch() that is not subject to browser CORS for user-configured endpoints. */
   createHttpFetch(): Promise<typeof globalThis.fetch>
@@ -76,7 +75,4 @@ export interface Platform {
   messageDialog(message: string, options?: MessageDialogOptions): Promise<void>
   openUrl(url: string): Promise<void>
   openPath(path: string): Promise<void>
-  isAutostartEnabled(): Promise<boolean>
-  setAutostart(enabled: boolean): Promise<void>
-  setWindowTheme(theme: "light" | "dark", background: string): void
 }

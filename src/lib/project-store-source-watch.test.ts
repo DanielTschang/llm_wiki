@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from "vitest"
 const storage = vi.hoisted(() => new Map<string, unknown>())
 const save = vi.hoisted(() => vi.fn(async () => undefined))
 
-vi.mock("@tauri-apps/plugin-store", () => ({
-  load: vi.fn(async () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
+  loadStore: vi.fn(async () => ({
     get: async <T>(key: string) => storage.get(key) as T | undefined,
     set: async (key: string, value: unknown) => {
       storage.set(key, value)

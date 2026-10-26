@@ -176,8 +176,5 @@ export function createWebPlatform(deps: WebPlatformDeps): Platform {
     openPath: async (path) => {
       window.open(fileSrc(path), "_blank", "noopener,noreferrer")
     },
-    isAutostartEnabled: async () => false,
-    setAutostart: async () => {},
-    setWindowTheme: () => {},
   }
 }

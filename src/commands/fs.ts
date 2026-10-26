@@ -1,4 +1,4 @@
-import { invoke, isDesktop, openPath } from "@/platform"
+import { invoke, openPath } from "@/platform"
 import type { FileNode, WikiProject } from "@/types/wiki"
 import { ensureProjectId, upsertProjectInfo } from "@/lib/project-identity"
 import { isAbsolutePath } from "@/lib/path-utils"
@@ -262,17 +262,10 @@ export async function openProject(path: string): Promise<WikiProject> {
   return { id, name: raw.name, path: raw.path }
 }
 
-export async function openProjectFolder(path: string): Promise<void> {
-  return invoke<void>("open_project_folder", { path })
-}
-
+/** The server's file manager is not reachable from the browser; show the file in a new tab. */
 export async function openPathInProject(projectPath: string, targetPath: string): Promise<void> {
-  if (!isDesktop) {
-    // No server-side file manager to hand it to: show the file in a new tab.
-    const absolute = targetPath.startsWith("/") ? targetPath : `${projectPath.replace(/\/+$/, "")}/${targetPath}`
-    return openPath(absolute)
-  }
-  return invoke<void>("open_path_in_project", { projectPath, targetPath })
+  const absolute = targetPath.startsWith("/") ? targetPath : `${projectPath.replace(/\/+$/, "")}/${targetPath}`
+  return openPath(absolute)
 }
 
 export async function apiServerStatus(): Promise<string> {

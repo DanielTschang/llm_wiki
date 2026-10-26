@@ -123,7 +123,8 @@ const mocks = vi.hoisted(() => {
   }
 })
 
-vi.mock("@tauri-apps/api/event", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   listen: mocks.listen,
 }))
 

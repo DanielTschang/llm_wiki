@@ -11,7 +11,8 @@ import {
 const invokeMock = vi.hoisted(() => vi.fn())
 const streamChatMock = vi.hoisted(() => vi.fn())
 
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   invoke: invokeMock,
 }))
 

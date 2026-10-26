@@ -4,7 +4,8 @@ const mocks = vi.hoisted(() => ({
   invoke: vi.fn(),
 }))
 
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   invoke: mocks.invoke,
 }))
 

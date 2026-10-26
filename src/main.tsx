@@ -6,23 +6,13 @@ import "@/i18n";
 import { loadAndApplyTheme, watchSystemTheme } from "@/lib/theme";
 import { AppDialogHost } from "@/components/app-dialog-host";
 import { ServerPathPickerHost } from "@/components/server-path-picker";
-import { isDesktop } from "@/platform";
 import { installStaleBuildReload } from "@/lib/stale-build-reload";
-
-function applyPlatformClass() {
-  const isTauri = "__TAURI_INTERNALS__" in window || "__TAURI__" in window;
-  if (isTauri && navigator.userAgent.includes("Mac OS X")) {
-    document.documentElement.classList.add("platform-macos");
-  }
-}
 
 // Apply theme before render to avoid flash
 async function initApp() {
   try {
-    applyPlatformClass();
-    // The desktop bundle never changes under a running window; a web tab can
-    // outlive a server update.
-    if (!isDesktop) installStaleBuildReload();
+    // A browser tab can outlive a server update.
+    installStaleBuildReload();
     await loadAndApplyTheme();
     watchSystemTheme();
 
@@ -30,7 +20,7 @@ async function initApp() {
       <React.StrictMode>
         <App />
         <AppDialogHost />
-        {!isDesktop && <ServerPathPickerHost />}
+        <ServerPathPickerHost />
       </React.StrictMode>
     );
   } catch (err) {

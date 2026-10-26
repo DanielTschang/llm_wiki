@@ -33,7 +33,8 @@ import type { AddressInfo } from "node:net"
 // implementation of vector_search_chunks so we can exercise
 // searchByEmbedding end-to-end without a real LanceDB instance.
 const mockInvoke = vi.fn<(cmd: string, args?: unknown) => Promise<unknown>>()
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   invoke: (cmd: string, args?: unknown) => mockInvoke(cmd, args),
 }))
 

@@ -13,7 +13,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 // chunk-search response without touching real LanceDB.
 const mockInvoke = vi.fn<(cmd: string, args?: unknown) => Promise<unknown>>()
 const mockEmbeddingFetchInvoke = vi.fn<(args?: unknown) => Promise<unknown>>()
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   invoke: (cmd: string, args?: unknown) =>
     cmd === "embedding_fetch" ? mockEmbeddingFetchInvoke(args) : mockInvoke(cmd, args),
 }))

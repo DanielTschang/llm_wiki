@@ -9,7 +9,8 @@ import { useWikiStore } from "@/stores/wiki-store"
 
 const mockInvoke = vi.fn()
 
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   invoke: (...args: unknown[]) => mockInvoke(...args),
 }))
 

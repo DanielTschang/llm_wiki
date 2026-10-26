@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
 import { useAppDialog } from "@/stores/app-dialog-store"
-import { invoke, isDesktop, openDialog, saveDialog } from "@/platform"
+import { invoke, openDialog } from "@/platform"
 import { downloadUrl } from "@/lib/server-upload"
 import {
   Wrench,
@@ -207,29 +207,19 @@ export function MaintenanceSection() {
   const handleExportProject = useCallback(async () => {
     if (!project) return
     const fileName = `${project.name}.llmwiki.zip`
-    if (!isDesktop) {
-      // Web: export into the server's staging area, then download it.
-      setProjectToolBusy(true)
-      try {
-        const { uploads } = await invoke<{ uploads: string }>("server_locations")
-        const folder = `${uploads}/export-${crypto.randomUUID()}`
-        await invoke("create_directory", { path: folder })
-        const destination = `${folder}/${fileName}`
-        await invoke("export_project_archive", { projectPath: project.path, destination })
-        const link = document.createElement("a")
-        link.href = downloadUrl(destination)
-        link.download = fileName
-        link.click()
-        setProjectToolStatus(t("settings.sections.maintenance.projectData.exported", { path: fileName }))
-      } catch (error) { setProjectToolStatus(String(error)) } finally { setProjectToolBusy(false) }
-      return
-    }
-    const destination = await saveDialog({ defaultPath: fileName, filters: [{ name: "LLM Wiki project", extensions: ["zip"] }] })
-    if (!destination) return
+    // Export into the server's staging area, then download it.
     setProjectToolBusy(true)
     try {
+      const { uploads } = await invoke<{ uploads: string }>("server_locations")
+      const folder = `${uploads}/export-${crypto.randomUUID()}`
+      await invoke("create_directory", { path: folder })
+      const destination = `${folder}/${fileName}`
       await invoke("export_project_archive", { projectPath: project.path, destination })
-      setProjectToolStatus(t("settings.sections.maintenance.projectData.exported", { path: destination }))
+      const link = document.createElement("a")
+      link.href = downloadUrl(destination)
+      link.download = fileName
+      link.click()
+      setProjectToolStatus(t("settings.sections.maintenance.projectData.exported", { path: fileName }))
     } catch (error) { setProjectToolStatus(String(error)) } finally { setProjectToolBusy(false) }
   }, [project, t])
 

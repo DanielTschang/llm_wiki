@@ -7,7 +7,10 @@ const mocks = vi.hoisted(() => ({
   invoke: vi.fn(),
 }))
 
-vi.mock("@tauri-apps/api/core", () => ({ invoke: mocks.invoke }))
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
+  invoke: mocks.invoke
+}))
 vi.mock("@/commands/fs", () => ({
   copyFile: mocks.copyFile,
   createDirectory: mocks.createDirectory,

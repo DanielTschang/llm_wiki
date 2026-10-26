@@ -17,7 +17,7 @@ import {
   FileText,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
-import { invoke, isDesktop, setAutostart } from "@/platform"
+import { invoke } from "@/platform"
 import i18n from "@/i18n"
 import { Button } from "@/components/ui/button"
 import { useWikiStore } from "@/stores/wiki-store"
@@ -97,11 +97,9 @@ const CATEGORIES: Category[] = [
 ]
 
 /** Desktop shell features (window/startup behavior, the local HTTP API on
- *  127.0.0.1:19828) that the self-hosted web edition does not have. */
+ *  127.0.0.1:19828) that the server edition does not have. */
 const DESKTOP_ONLY_CATEGORIES = new Set<CategoryId>(["general", "api-server"])
-const VISIBLE_CATEGORIES = isDesktop
-  ? CATEGORIES
-  : CATEGORIES.filter((category) => !DESKTOP_ONLY_CATEGORIES.has(category.id))
+const VISIBLE_CATEGORIES = CATEGORIES.filter((category) => !DESKTOP_ONLY_CATEGORIES.has(category.id))
 
 function initialDraft(
   llm: ReturnType<typeof useWikiStore.getState>["llmConfig"],
@@ -544,18 +542,6 @@ export function SettingsView() {
       }
 
       await saveGeneralConfig(newGeneralConfig)
-      try {
-        await setAutostart(newGeneralConfig.autostart)
-      } catch (err) {
-        console.warn("[general] failed to update autostart:", err)
-      }
-      if (isDesktop) {
-        try {
-          await invoke<string>("set_close_behavior", { value: newGeneralConfig.closeBehavior })
-        } catch (err) {
-          console.warn("[general] failed to update close behavior:", err)
-        }
-      }
 
       if (draft.uiLanguage !== i18n.language) {
         await i18n.changeLanguage(draft.uiLanguage)

@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { invoke, isAutostartEnabled, isDesktop, openDialog, setAutostart } from "@/platform"
+import { openDialog } from "@/platform"
 import i18n from "@/i18n"
 import { useWikiStore } from "@/stores/wiki-store"
 import { useReviewStore } from "@/stores/review-store"
@@ -332,21 +332,6 @@ function App() {
         }
         const savedGeneral = await loadGeneralConfig()
         useWikiStore.getState().setGeneralConfig(savedGeneral)
-        if (isDesktop) {
-          try {
-            await invoke<string>("set_close_behavior", { value: savedGeneral.closeBehavior })
-          } catch (err) {
-            console.warn("[general] failed to hydrate close behavior:", err)
-          }
-        }
-        try {
-          const currentAutostart = await isAutostartEnabled()
-          if (Boolean(savedGeneral.autostart) !== currentAutostart) {
-            await setAutostart(Boolean(savedGeneral.autostart))
-          }
-        } catch (err) {
-          console.warn("[general] failed to sync autostart:", err)
-        }
         const savedLang = await loadLanguage()
         if (savedLang) {
           await i18n.changeLanguage(savedLang)

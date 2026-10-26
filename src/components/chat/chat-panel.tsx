@@ -1,6 +1,6 @@
 import { useRef, useEffect, useCallback, useMemo, useState } from "react"
 import { useTranslation } from "react-i18next"
-import { convertFileSrc, invoke, isDesktop, listen } from "@/platform"
+import { convertFileSrc, invoke, listen } from "@/platform"
 import { BookOpen, Plus, Trash2, MessageSquare, X, Maximize2, FolderOpen, FileText, ListTree, ChevronDown, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { ChatMessage, StreamingMessage, useSourceFiles, type ChatReferencePreview } from "./chat-message"
@@ -10,7 +10,7 @@ import { useWikiStore } from "@/stores/wiki-store"
 import { resolveTaskLlmConfig } from "@/lib/llm-task-routing"
 import { supportsImageInput } from "@/lib/llm-providers"
 import { executeIngestWrites } from "@/lib/ingest"
-import { deleteFile, openPathInProject, readFile } from "@/commands/fs"
+import { deleteFile, readFile } from "@/commands/fs"
 import { getFileName, isAbsolutePath, normalizePath } from "@/lib/path-utils"
 import { hasConfiguredAnyTxt } from "@/lib/anytxt-search"
 import type { ChatAgentEvent, ChatAgentFileChange, ChatAgentStep, ChatUserInputRequest } from "@/lib/chat-agent-types"
@@ -106,33 +106,6 @@ async function readAgentActivitySnapshot(path: string): Promise<string | null> {
   } catch {
     return null
   }
-}
-
-function parentDirectory(path: string): string {
-  const normalized = normalizePath(path).replace(/\/+$/g, "")
-  const idx = normalized.lastIndexOf("/")
-  if (idx <= 0) return normalized
-  return normalized.slice(0, idx)
-}
-
-function commonDirectory(paths: string[]): string | null {
-  const directories = paths
-    .map(parentDirectory)
-    .filter((dir) => dir.trim().length > 0)
-  if (directories.length === 0) return null
-  const firstParts = directories[0].split("/")
-  let commonLength = firstParts.length
-  for (const dir of directories.slice(1)) {
-    const parts = dir.split("/")
-    commonLength = Math.min(commonLength, parts.length)
-    for (let i = 0; i < commonLength; i += 1) {
-      if (firstParts[i] !== parts[i]) {
-        commonLength = i
-        break
-      }
-    }
-  }
-  return firstParts.slice(0, commonLength).join("/") || null
 }
 
 function agentStreamIdleTimeoutMs(options: ChatSendOptions, skillCount: number): number {
@@ -642,15 +615,6 @@ export function ChatPanel() {
     setGeneratedOutputPreviews([])
     setGeneratedOutputPreview(null)
   }, [activeConversationId, generatedOutputPreviews])
-
-  const openGeneratedOutputDirectory = useCallback(() => {
-    if (!project) return
-    const directory = commonDirectory(generatedOutputPreviews.map((preview) => preview.path))
-    if (!directory) return
-    void openPathInProject(project.path, directory).catch((err) => {
-      console.error("[chat] failed to open generated output directory:", err)
-    })
-  }, [generatedOutputPreviews, project])
 
   const handleOpenReferencePreview = useCallback((preview: ChatReferencePreview, relatedPreviews?: ChatReferencePreview[]) => {
     setContextDetailReferences(null)
@@ -1325,7 +1289,6 @@ export function ChatPanel() {
           outputs={generatedOutputPreviews}
           onOpen={openGeneratedOutputModal}
           // Revealing a folder needs the desktop's file manager.
-          onOpenDirectory={project && isDesktop ? openGeneratedOutputDirectory : undefined}
           onClose={closeGeneratedOutputsPanel}
         />
       )}
@@ -1342,12 +1305,10 @@ export function ChatPanel() {
 function GeneratedOutputsPanel({
   outputs,
   onOpen,
-  onOpenDirectory,
   onClose,
 }: {
   outputs: ChatReferencePreview[]
   onOpen: (preview: ChatReferencePreview) => void
-  onOpenDirectory?: () => void
   onClose: () => void
 }) {
   const { t } = useTranslation()
@@ -1361,17 +1322,6 @@ function GeneratedOutputsPanel({
             {t("chat.generatedOutputCount", { count: outputs.length })}
           </div>
         </div>
-        {onOpenDirectory && (
-          <button
-            type="button"
-            onClick={onOpenDirectory}
-            className="shrink-0 rounded p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-            title={t("chat.openGeneratedOutputFolder", { defaultValue: "Open output folder" })}
-            aria-label={t("chat.openGeneratedOutputFolder", { defaultValue: "Open output folder" })}
-          >
-            <FolderOpen className="h-3.5 w-3.5" />
-          </button>
-        )}
         <button
           type="button"
           onClick={onClose}

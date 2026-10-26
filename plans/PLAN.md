@@ -125,7 +125,9 @@ Python Extension Point（同事負責）
 - [x] core 去除 Tauri 依賴（`llm-wiki-core`）
 - [x] ingest 能在伺服器端執行，不需要開著瀏覽器（Node worker）
 - [x] 移除 `src-tauri` 的桌面殼（Rust）：現在 `src-tauri/` 是只含 `llm-wiki-core`、`llm-wiki-server` 的 virtual workspace；CI 改成只跑 Linux，刪掉桌面版發佈流程
-- [ ] 移除前端 `src/platform/` 的 desktop 分支：刪 `tauri.ts`、`isDesktop` 及其分支（約 12 個檔案，含 `App.tsx`、設定頁、`file-tree.tsx`），再移除 `@tauri-apps/*` 套件
+- [x] 移除前端 desktop 分支：刪 `platform/tauri.ts`、`isDesktop`、自動啟動、視窗主題、開啟本機資料夾，並移除全部 `@tauri-apps/*` 套件；平台層只剩 web／worker 兩種實作，測試改為 mock `@/platform`（`no-direct-tauri-imports.test.ts` 改成全專案禁止 `@tauri-apps`）。
+  - 遺留：`general`、`api-server` 設定頁在 server 版本來就隱藏，但頁面、`generalConfig`／`apiConfig` store 和 `README`／`START.md` 的桌面版說明還在；`lib/tauri-fetch.ts` 名稱沿用；`vite.config.ts` 還有 Tauri 時代的註解。這幾項跟著階段 2 的設定頁整理一起清
+  - 既有問題（`main` 上就失敗，與本分支無關）：`embedding.real-llm.test.ts`、`llm-client.real-llm.test.ts` 共 6 個測試會失敗（Origin 標頭預期是桌面版行為）
 - [x] 刪除 CLI transport（`claude_cli`、`codex_cli`、`cli_resolver`）：後端、前端 provider／設定 UI／聊天的 CLI 專用 fallback 路徑都已移除
 - [x] 刪除 `clip_server`：連同全域「目前專案」註冊表（`current_project_path`、`all_projects`）、`current` 別名、Web Clipper 瀏覽器擴充套件、前端 clip watcher 一起拿掉；`api_server` 和 agent 的專案查詢現在只認明確的 Project id／路徑。副作用：`mcp-server/` 預設用 `current`，現在必須先 `llm_wiki_set_project`；它跟著 `api_server.rs` 在階段 3 改成遠端 MCP 時一起處理
 - [ ] 刪除 `file_sync`：不再被專案註冊表擋住，剩下 `fs.rs` 約 25 處 `mark_app_write_path`、`CoreContext.file_sync`、`api_server.rs` 的 rescan／SourceWatchConfig、`dispatch.rs` 的 7 個 file-sync 分支，以及前端對應的 `startProjectFileSync` 等

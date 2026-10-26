@@ -11,7 +11,8 @@ import { describe, it, expect, vi } from "vitest"
 // Hoisted mock — all calls to convertFileSrc return `tauri-asset:<path>`
 // so tests can assert the input path was assembled correctly without
 // caring about Tauri's per-platform URL scheme.
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   convertFileSrc: (path: string) => `tauri-asset:${path}`,
 }))
 

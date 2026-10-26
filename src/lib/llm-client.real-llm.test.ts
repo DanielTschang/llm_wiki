@@ -32,7 +32,8 @@ import type { AddressInfo } from "node:net"
 
 // streamChat doesn't touch Tauri commands or fs, but the module graph
 // pulls them in transitively. Stub for sanity.
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   invoke: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock("@/commands/fs", () => ({

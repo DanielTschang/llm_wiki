@@ -1,5 +1,4 @@
 import { loadTheme } from "@/lib/project-store"
-import { setWindowTheme } from "@/platform"
 
 export type AppTheme = "light" | "dark" | "system"
 
@@ -23,7 +22,6 @@ export function applyTheme(theme: AppTheme): void {
   root.classList.remove("light", "dark")
   root.classList.add(resolved)
   root.dataset.theme = theme
-  setWindowTheme(resolved, resolved === "dark" ? "#27282b" : "#ffffff")
 }
 
 export function watchSystemTheme(): void {

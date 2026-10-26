@@ -1,11 +1,10 @@
 import { useEffect, useRef, useState } from "react"
-import { ChevronRight, ChevronDown, File, Folder, FolderOpen } from "lucide-react"
-import { isDesktop, messageDialog } from "@/platform"
+import { ChevronRight, ChevronDown, File, Folder } from "lucide-react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { useWikiStore } from "@/stores/wiki-store"
 import type { FileNode } from "@/types/wiki"
 import { useTranslation } from "react-i18next"
-import { listDirectory, openProjectFolder } from "@/commands/fs"
+import { listDirectory } from "@/commands/fs"
 import { replaceNodeChildren } from "./file-tree-utils"
 
 function TreeNode({
@@ -100,27 +99,6 @@ export function FileTree() {
     loadingPaths.current.clear()
   }, [project?.id])
 
-  const handleOpenProjectFolder = async () => {
-    if (!project) return
-
-    try {
-      await openProjectFolder(project.path)
-    } catch (err) {
-      console.error("[FileTree] open project folder failed:", err)
-      await messageDialog(
-        t("fileTree.openProjectFolderFailed", {
-          defaultValue: "Failed to open the project folder.",
-        }),
-        {
-          title: t("fileTree.openProjectFolder", {
-            defaultValue: "Open project folder",
-          }),
-          kind: "error",
-        },
-      )
-    }
-  }
-
   const handleLoadChildren = async (node: FileNode) => {
     if (!project) return
     if (loadedPaths.current.has(node.path) || loadingPaths.current.has(node.path)) return
@@ -168,22 +146,6 @@ export function FileTree() {
           ))}
         </div>
       </ScrollArea>
-      {/* Revealing the folder needs the desktop's file manager. */}
-      {isDesktop && (
-        <div className="shrink-0 border-t p-2">
-          <button
-            type="button"
-            onClick={() => void handleOpenProjectFolder()}
-            className="flex w-full items-center justify-center gap-1.5 rounded-md px-2 py-1.5 text-xs text-muted-foreground transition-colors hover:bg-accent/50 hover:text-accent-foreground"
-            title={project.path}
-          >
-            <FolderOpen className="h-3.5 w-3.5 shrink-0" />
-            <span className="truncate">
-              {t("fileTree.openProjectFolder", { defaultValue: "Open project folder" })}
-            </span>
-          </button>
-        </div>
-      )}
     </div>
   )
 }

@@ -31,7 +31,8 @@ import { describe, it, expect, vi } from "vitest"
 
 // Same module-graph stubs as llm-client.real-llm.test.ts — streamChat
 // transitively imports stores that touch Tauri commands during init.
-vi.mock("@tauri-apps/api/core", () => ({
+vi.mock("@/platform", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("@/platform")>()),
   invoke: vi.fn().mockResolvedValue(undefined),
 }))
 vi.mock("@/commands/fs", () => ({
