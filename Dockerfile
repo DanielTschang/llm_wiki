@@ -67,7 +67,7 @@ COPY --from=web /usr/local/bin/node /usr/local/bin/node
 COPY --from=web /app/dist-worker /opt/llm-wiki/worker
 COPY docker/entrypoint.sh /usr/local/bin/docker-entrypoint
 
-# Starts as root only to take ownership of a root-owned volume (Fly.io),
+# Starts as root only to take ownership of a root-owned volume,
 # then runs the server as `llmwiki` (docker/entrypoint.sh).
 # Inside the container the server must listen on all interfaces; keep it
 # private with the host port mapping (docker-compose.yml publishes to

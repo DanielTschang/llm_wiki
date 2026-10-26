@@ -1,7 +1,7 @@
 #!/bin/sh
 # Container entrypoint for llm-wiki-server.
 #
-# Hosts such as Fly.io mount volumes owned by root, which the unprivileged
+# Hosts may mount volumes owned by root, which the unprivileged
 # server user cannot write. When started as root, hand the data directory
 # to that user, then drop privileges before running the server.
 set -e

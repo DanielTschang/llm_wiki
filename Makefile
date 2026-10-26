@@ -3,7 +3,6 @@
 #   make help            list targets
 #   make server          self-hosted web edition on http://127.0.0.1:19830
 #   make docker-up       web edition in Docker
-#   make fly-deploy      deploy the current commit to Fly.io
 #   make k3d-up          k3d dev cluster (Postgres, NATS, MinIO, OTel)
 
 SHELL := /bin/bash
@@ -88,40 +87,6 @@ docker-logs: ## Follow the container logs
 .PHONY: docker-token
 docker-token: ## Print the access token stored in the Docker volume
 	@docker compose exec llm-wiki cat /data/server-token; echo
-
-# ── Fly.io ───────────────────────────────────────────────────────────────
-
-# `fly deploy` uploads the working tree, not a commit. Refuse to deploy
-# uncommitted changes so what runs on Fly always matches a git commit;
-# `make fly-deploy FORCE=1` skips the guard.
-FORCE ?=
-GIT_SHA = $(shell git rev-parse --short HEAD)
-
-.PHONY: fly-deploy
-fly-deploy: check ## Type-check, then build and deploy the current commit to Fly.io
-	@if [ -z "$(FORCE)" ] && [ -n "$$(git status --porcelain)" ]; then \
-		echo "Uncommitted changes — commit first, or run 'make fly-deploy FORCE=1'."; \
-		git status --short; \
-		exit 1; \
-	fi
-	fly deploy --remote-only --image-label $(GIT_SHA)$(if $(FORCE),-dirty)
-
-.PHONY: fly-status
-fly-status: ## Show the Fly app, machine and release status
-	fly status
-	fly releases --image | head -n 6
-
-.PHONY: fly-logs
-fly-logs: ## Follow the Fly app logs
-	fly logs
-
-.PHONY: fly-ssh
-fly-ssh: ## Open a shell on the Fly machine
-	fly ssh console
-
-.PHONY: fly-token
-fly-token: ## Print the access token stored on the Fly volume
-	@fly ssh console -q -C "cat /data/server-token"; echo
 
 # ── k3d dev cluster (deploy/k3d, plans/PLAN.md 階段 0) ─────────────────
 
