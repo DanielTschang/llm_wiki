@@ -53,9 +53,7 @@ fn list_available_skills(project_path: &str) -> Vec<AvailableAgentSkill> {
             };
             // `id` is the path slug used for loading. `name` is display-only
             // metadata from frontmatter and may contain spaces or punctuation.
-            // Roots are ordered from most specific to least specific. Keep the
-            // first occurrence so project-local skills can override user-level
-            // skills with the same id.
+            // Keep the first occurrence if two skill folders share an id.
             skills
                 .entry(candidate.id.clone())
                 .or_insert(AvailableAgentSkill {
@@ -76,45 +74,12 @@ struct SkillRoot {
 }
 
 fn skill_roots(project_path: &str) -> Vec<SkillRoot> {
-    let mut roots = vec![SkillRoot {
+    // Only the Project's own skills. The server host's home directory belongs
+    // to whoever runs the server, not to the people using it.
+    vec![SkillRoot {
         path: Path::new(project_path).join(".llm-wiki").join("skills"),
         source: "project".to_string(),
-    }];
-    if let Some(home) = home_dir() {
-        roots.push(SkillRoot {
-            path: home.join(".claude").join("skills"),
-            source: "claude".to_string(),
-        });
-        roots.push(SkillRoot {
-            path: home.join(".codex").join("skills"),
-            source: "codex".to_string(),
-        });
-        roots.push(SkillRoot {
-            path: home.join(".agents").join("skills"),
-            source: "agents".to_string(),
-        });
-    }
-    roots
-}
-
-fn home_dir() -> Option<PathBuf> {
-    #[cfg(windows)]
-    {
-        std::env::var_os("USERPROFILE")
-            .or_else(|| {
-                let drive = std::env::var_os("HOMEDRIVE")?;
-                let path = std::env::var_os("HOMEPATH")?;
-                let mut home = PathBuf::from(drive);
-                home.push(path);
-                Some(home.into_os_string())
-            })
-            .or_else(|| std::env::var_os("HOME"))
-            .map(PathBuf::from)
-    }
-    #[cfg(not(windows))]
-    {
-        std::env::var_os("HOME").map(PathBuf::from)
-    }
+    }]
 }
 
 fn load_one_skill_from_roots(roots: &[SkillRoot], name: &str) -> Option<AgentSkill> {
@@ -694,5 +659,12 @@ mod tests {
         let loaded = load_project_skills(root.to_str().unwrap(), &[article.id.clone()]);
         assert_eq!(loaded[0].name, "Article Illustrator");
         let _ = fs::remove_dir_all(root);
+    }
+
+    #[test]
+    fn skill_roots_never_include_the_server_hosts_home_directory() {
+        let roots = skill_roots("/projects/p1");
+        assert_eq!(roots.len(), 1);
+        assert_eq!(roots[0].source, "project");
     }
 }
