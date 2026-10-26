@@ -6,7 +6,7 @@ Migration 在 `src-tauri/crates/storage/migrations/`，純 SQL，依序套用：
 | --- | --- |
 | `0001_identity.sql` | `users`、`projects`、`project_members`、`project_settings`、`user_preferences`、`server_settings`、`activity_log` |
 | `0002_content.sql` | `pages`、`page_versions`、`page_links`、`blobs`、`page_sources` |
-| `0003_ingest_and_review.sql` | `ingest_jobs`、`ingest_events`、`ingest_cache`、`image_captions`、`dedup_tasks`、`dedup_exclusions`、`review_items`、`lint_findings`、`conversations`、`chat_messages` |
+| `0003_ingest_and_review.sql` | `agent_sessions`、`ingest_jobs`、`ingest_events`、`ingest_cache`、`image_captions`、`dedup_tasks`、`dedup_exclusions`、`review_items`、`lint_findings`、`conversations`、`chat_messages` |
 | `0004_embeddings.sql` | `embedding_models`、`page_embedding_state`、`register_embedding_model()`（每個模型一張 `chunks_m<id>`） |
 | `0005_outbox.sql` | `outbox` |
 
@@ -44,7 +44,7 @@ Migration 在 `src-tauri/crates/storage/migrations/`，純 SQL，依序套用：
 
 ## 刻意沒做
 
-- **`changesets`、`skills`、`plugins`、`service account 的憑證`、`llm_usage`**：各自屬於階段 2–4，到時候加 migration。`users.kind = 'service'` 先把 Service Account 的身分位置留好。
+- **`changesets`、`skills`、`plugins`、`service account 的憑證`、`llm_usage`（只統計，不做成本門檻通知）**：各自屬於階段 2–4，到時候加 migration。`users.kind = 'service'` 先把 Service Account 的身分位置留好。
 - **Row-level security**：Project 權限在 API middleware 檢查。RLS 可以日後加成第二道防線，現在不加，免得每個連線都要設定使用者 context。
 - **全文檢索**：搜尋要等階段 3 的 tantivy，PG 不放分詞索引。
 

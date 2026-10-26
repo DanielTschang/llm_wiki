@@ -71,8 +71,9 @@ CREATE TABLE blobs (
     project_id   uuid NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
     path         text NOT NULL CHECK (path !~ '(^/|\.\./|//)'),
     -- 'source' = user upload (a Source), 'extracted' = parsed markdown of a
-    -- Source, 'asset' = image extracted from a Source or under wiki/media.
-    kind         text NOT NULL CHECK (kind IN ('source', 'extracted', 'asset')),
+    -- Source, 'asset' = image extracted from a Source or under wiki/media,
+    -- 'workspace' = artifact the agent generated under agent-workspace/.
+    kind         text NOT NULL CHECK (kind IN ('source', 'extracted', 'asset', 'workspace')),
     size_bytes   bigint NOT NULL,
     sha256       bytea NOT NULL,
     mime_type    text,

@@ -134,6 +134,7 @@ Python Extension Point（同事負責）
   - 保留：`SourceWatchConfig`／`source-watch-config.ts` 其實同時是匯入篩選設定（副檔名、大小上限、`persistExtractedMarkdown`、ingest 並行數），明確匯入和 ingest 還在用，暫不改名；使用者已無法在 UI 編輯，只讀預設或舊值。階段 2 整理設定頁時改名成匯入設定
 - [ ] core 依領域拆 crate：storage、retrieval、agent、parsing、llm；server 改名為 api（碰到哪裡才拆哪裡，不一次大改）
 - [x] 設計 Postgres schema：Project、頁面、頁面歷史、wikilink 邊、操作紀錄、對話、Review Item、ingest 快取與狀態、outbox，另含 embedding 分表與 lint／dedup／圖片說明快取。SQL 在 `src-tauri/crates/storage/migrations/`，設計說明在 `plans/schema.md`；已在 k3d 套用並跑過冒煙測試
+- [x] 盤點直接碰檔案系統的呼叫點（`plans/inventory/fs-callsites.md`）：約 300 處、26 個檔案；發現 schema 漏掉 `agent-sessions` 與 `agent-workspace/`，已補；發現 agent skills 會讀伺服器主機的 `~/.claude`／`~/.codex`／`~/.agents`，須立刻刪
 - [ ] storage 頁面儲存介面：fs RPC 依路徑分流，`wiki/` 存 PG、`raw/` 存 MinIO，`.llm-wiki/*.json` 逐一換成資料表；TS worker 和前端看到的路徑語意不變
 - [ ] 所有索引、快取、檢索介面都以 Project 為鍵；檢索介面接受 Project 清單（先只傳一個），為跨 Project 檢索預留
 - [ ] 向量庫從 LanceDB 換成 pgvector，embedding 依模型分表
@@ -152,7 +153,7 @@ Python Extension Point（同事負責）
 - [ ] 角色：Platform Admin（管帳號、建立 Project、設定模型）、Owner、Editor、Viewer；只有 Platform Admin 能建立 Project
 - [ ] 每條 API 路由都經過 Project 權限 middleware；retrieval、圖譜、agent 上下文、MCP 查詢只會碰到使用者所屬的 Project
 - [ ] 建立 Project 和加入成員時，提醒「同一個 Project 內的內容所有成員都看得到」
-- [ ] 集中管理 LLM 呼叫：依使用者和 Project 統計成本、速率限制、重試；不設配額，成本超過門檻時通知 Platform Admin
+- [ ] 集中管理 LLM 呼叫：依使用者和 Project 統計成本、速率限制、重試；不設配額、不做成本門檻通知，只統計（Platform Admin 看用量儀表板；預算警示交給 LLM 供應商後台）
 - [ ] 依 Project 設定可用模型，chat、embedding、vision 一併限制（例如敏感 Project 只能用自架模型）
 - [ ] Review Item 改存伺服器，同一個 Project 的成員共用，Editor 以上的角色可以處理，並記錄是誰處理的
 - [ ] SSE 即時更新：ingest 進度、聊天串流、資料已更新通知
@@ -227,7 +228,7 @@ Python Extension Point（同事負責）
 | 部署 | 公司內部自架 k8s；開發用 k3d；物件儲存用 MinIO | 所有元件自己架 |
 | Agent 執行程式碼 | 先不提供 | 移除 shell；有需求時再評估隔離沙箱或專用工具 |
 | LLM 供應商 | Claude、DeepSeek、自架模型（OpenAI 相容 API） | 依 Project 限制 chat、embedding、vision 可用的模型 |
-| LLM 配額 | 不設配額，只統計 | 成本超過門檻時通知 Platform Admin |
+| LLM 配額 | 不設配額，只統計 | 不做成本門檻通知（已決定）；日後要加，`llm_usage` 表不用改 |
 | API key | 組織統一一把 | 成本仍依使用者和 Project 統計 |
 | Plugin | Platform Admin 登記、在個別 Project 啟用、寫回用 Service Account、呼叫 LLM 走平台 | 階段 4 |
 | 登入 | 先用帳號密碼，之後導入 SSO | 預留 OIDC 介面 |
@@ -248,7 +249,7 @@ Python Extension Point（同事負責）
 | 改寫後 ingest 品質退步 | 知識庫內容變差 | 階段 3 用新舊對照，同一批文件分別跑 TS 和 Rust 版，自動比較；沒有人工基準，所以每次改 prompt 或模型都要重跑對照 |
 | 長期分叉後錯過上游改進 | nashsu 的新功能和 prompt 改進不會自動進來 | 定期瀏覽上游 release notes，有價值的改進手動評估移植 |
 | 平行 ingest 寫入衝突 | 頁面內容被覆蓋 | Changeset + Postgres advisory lock 確保每個 Project 單一提交 + 樂觀鎖；entity 頁面合併而非覆寫 |
-| LLM 成本失控 | 多人共用一把 key 又沒有配額，費用可能暴增 | 集中管理 LLM 呼叫，依使用者和 Project 統計，超過門檻時通知 Platform Admin；SHA256 增量快取；overview.md 延遲更新 |
+| LLM 成本失控 | 多人共用一把 key 又沒有配額，費用可能暴增 | 集中管理 LLM 呼叫，依使用者和 Project 統計，由管理員看儀表板與供應商帳單警示；SHA256 增量快取；overview.md 延遲更新 |
 | 敏感資料送到外部 LLM | 不符合公司規範 | 依 Project 限制可用模型，chat、embedding、vision 一併限制；Plugin 呼叫 LLM 也只能經過平台 |
 | 帳號密碼被破解 | 未授權存取 | Argon2 雜湊、登入失敗限制、密碼強度要求；盡早導入 SSO |
 | 檔案經 API 轉送造成負載 | 大檔案上傳下載佔用 API 資源 | 串流處理，不整個載入記憶體；限制檔案大小；必要時拆出專門的檔案服務 |
@@ -259,7 +260,7 @@ Python Extension Point（同事負責）
 | 選項 | 什麼時候重新考慮 |
 | --- | --- |
 | 頁面層級權限 | 確實有「同一主題但權限不同」的資料無法拆成不同 Project；這是架構調整，不只是加功能（ADR-0001） |
-| LLM 配額 | 成本通知頻繁觸發，或預算有硬上限；先在 Project 層級設上限 |
+| LLM 配額 | 實際費用超出預期，或預算有硬上限；先在 Project 層級設上限，再考慮通知 |
 | Changeset 人工核准 | 自動提交的內容品質問題頻繁到要事前把關；做成依 Project 選擇 |
 | 刪除 Source 後由 LLM 重新整理 | 刪除 Source 時常需要徹底清除內容 |
 | 匯入既有資料夾 project | 有大量既有 wiki 不適合重新 ingest |

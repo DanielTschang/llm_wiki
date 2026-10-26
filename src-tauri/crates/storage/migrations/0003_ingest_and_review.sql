@@ -170,3 +170,16 @@ CREATE TABLE chat_messages (
         REFERENCES conversations (project_id, id) ON DELETE CASCADE
 );
 CREATE INDEX chat_messages_order_idx ON chat_messages (project_id, conversation_id, seq);
+
+-- Replaces `.llm-wiki/agent-sessions/<id>.json`: the agent's short-term memory
+-- across turns. The message list is small and always read and written whole,
+-- so it stays one jsonb document.
+CREATE TABLE agent_sessions (
+    project_id uuid NOT NULL REFERENCES projects (id) ON DELETE CASCADE,
+    id         text NOT NULL,
+    user_id    uuid REFERENCES users (id) ON DELETE CASCADE,
+    messages   jsonb NOT NULL DEFAULT '[]',
+    updated_at timestamptz NOT NULL DEFAULT now(),
+    PRIMARY KEY (project_id, id)
+);
+CREATE INDEX agent_sessions_user_idx ON agent_sessions (project_id, user_id, updated_at DESC);
