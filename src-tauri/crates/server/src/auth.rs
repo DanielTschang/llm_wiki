@@ -94,6 +94,24 @@ impl Auth {
         }
     }
 
+    /// The Bearer credential, if the request carries one that matches. Used
+    /// by a platform server, where browsers sign in per user instead.
+    pub fn bearer_credential(&self, headers: &HeaderMap) -> Credential {
+        match self.credential(headers) {
+            credential @ (Credential::Bearer | Credential::Worker) => credential,
+            _ => Credential::None,
+        }
+    }
+
+    /// A session cookie carrying `value`, the per-user token of a platform
+    /// server.
+    pub fn cookie_for(&self, value: &str) -> String {
+        format!(
+            "{COOKIE_NAME}={value}; Path=/; HttpOnly; SameSite=Strict; Max-Age=2592000{}",
+            if self.secure_cookie { "; Secure" } else { "" }
+        )
+    }
+
     pub fn session_cookie(&self) -> String {
         format!(
             "{COOKIE_NAME}={}; Path=/; HttpOnly; SameSite=Strict; Max-Age=2592000{}",
@@ -105,6 +123,18 @@ impl Auth {
     pub fn clear_cookie(&self) -> String {
         format!("{COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0")
     }
+}
+
+/// The value of the session cookie, if the request has one.
+pub fn session_cookie_value(headers: &HeaderMap) -> Option<String> {
+    headers
+        .get_all(header::COOKIE)
+        .iter()
+        .filter_map(|v| v.to_str().ok())
+        .flat_map(|v| v.split(';'))
+        .filter_map(|pair| pair.trim().split_once('='))
+        .find(|(name, _)| *name == COOKIE_NAME)
+        .map(|(_, value)| value.to_string())
 }
 
 /// Returns the configured token, or the persisted/generated one and

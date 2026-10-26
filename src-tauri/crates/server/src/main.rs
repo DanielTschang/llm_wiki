@@ -7,6 +7,7 @@ mod dispatch;
 mod events;
 mod files;
 mod paths;
+mod principal;
 mod proxy;
 mod rpc;
 mod store;
@@ -25,7 +26,9 @@ use axum::routing::{any, get, post};
 use axum::{Form, Json, Router};
 use clap::Parser;
 use llm_wiki_core::{CoreContext, EventEmitter};
-use serde::Deserialize;
+use llm_wiki_storage::{AuthError, Services};
+
+use crate::principal::Principal;
 use serde_json::json;
 use tower::ServiceExt;
 use tower_http::services::{ServeDir, ServeFile};
@@ -51,6 +54,8 @@ pub struct AppState {
     inbox_lock: Arc<Mutex<()>>,
     /// Staging area for files uploaded from the browser's device.
     upload_root: Arc<PathBuf>,
+    /// Present on a platform server: accounts, projects, and the stores.
+    platform: Option<Services>,
 }
 
 #[tokio::main]
@@ -100,18 +105,22 @@ async fn run(args: config::Args) -> Result<(), String> {
     }
     llm_wiki_core::runtime::install(tokio::runtime::Handle::current());
 
-    if let Some(database_url) = &args.database_url {
-        let store = llm_wiki_storage::open_store(database_url, &args.s3_config()?, 10)
-            .await
-            .map_err(|e| format!("Cannot open the project file store: {e}"))?;
-        let store = Arc::new(store);
-        llm_wiki_core::platform::install(
-            store.clone(),
-            Some(store),
-            llm_wiki_storage::ProjectLocator::default(),
-        )?;
-        eprintln!("[platform] Project files are in Postgres and the S3 bucket");
-    }
+    let platform = match &args.database_url {
+        Some(database_url) => {
+            let services = llm_wiki_storage::open_services(database_url, &args.s3_config()?, 10)
+                .await
+                .map_err(|e| format!("Cannot open the project file store: {e}"))?;
+            llm_wiki_core::platform::install(
+                services.files.clone(),
+                Some(services.files.clone()),
+                llm_wiki_storage::ProjectLocator::default(),
+            )?;
+            bootstrap_admin(&services, &args).await?;
+            eprintln!("[platform] Project files are in Postgres and the S3 bucket");
+            Some(services)
+        }
+        None => None,
+    };
 
     let events = EventHub::new();
     let worker_token = uuid::Uuid::new_v4().simple().to_string();
@@ -128,6 +137,7 @@ async fn run(args: config::Args) -> Result<(), String> {
         worker: Arc::new(WorkerBridge::new(events.clone())),
         inbox_lock: Arc::new(Mutex::new(())),
         upload_root: Arc::new(upload_root),
+        platform,
         events,
     };
 
@@ -195,6 +205,34 @@ async fn run(args: config::Args) -> Result<(), String> {
         })
         .await
         .map_err(|e| e.to_string())
+}
+
+/// Creates the first Platform Admin when the platform has none, so there is
+/// someone who can sign in and create everyone else.
+async fn bootstrap_admin(services: &Services, args: &config::Args) -> Result<(), String> {
+    let generated = args.admin_password.is_none();
+    let password = args.admin_password.clone().unwrap_or_else(|| {
+        let raw = uuid::Uuid::new_v4().simple().to_string();
+        raw[..20].to_string()
+    });
+    match services
+        .accounts
+        .ensure_bootstrap_admin(&args.admin_user, &password)
+        .await
+        .map_err(|e| format!("Cannot create the first administrator: {e}"))?
+    {
+        Some(user) if generated => eprintln!(
+            "[platform] Created Platform Admin '{}' with password '{password}'. \
+             This is shown once; change it after signing in.",
+            user.username.unwrap_or_default()
+        ),
+        Some(user) => eprintln!(
+            "[platform] Created Platform Admin '{}'.",
+            user.username.unwrap_or_default()
+        ),
+        None => {}
+    }
+    Ok(())
 }
 
 fn router(state: AppState, web_dir: Option<PathBuf>) -> Router {
@@ -276,7 +314,16 @@ async fn require_auth(State(state): State<AppState>, mut request: Request, next:
             path,
             "/events" | "/files" | "/proxy" | "/upload" | "/logout"
         );
-    let credential = state.auth.credential(request.headers());
+    let credential = match &state.platform {
+        Some(platform) => match platform_principal(platform, &state.auth, request.headers()).await {
+            Some((credential, principal)) => {
+                request.extensions_mut().insert(principal);
+                credential
+            }
+            None => Credential::None,
+        },
+        None => state.auth.credential(request.headers()),
+    };
     request.extensions_mut().insert(credential);
     match credential {
         Credential::Bearer | Credential::Worker => next.run(request).await,
@@ -302,31 +349,88 @@ async fn require_auth(State(state): State<AppState>, mut request: Request, next:
     }
 }
 
-#[derive(Deserialize)]
-struct LoginForm {
-    token: String,
-}
-
-async fn login_page() -> Html<String> {
-    Html(login_html(None))
-}
-
-async fn login(State(state): State<AppState>, Form(form): Form<LoginForm>) -> Response {
-    if !state.auth.token_matches(form.token.trim()) {
-        return (
-            StatusCode::UNAUTHORIZED,
-            Html(login_html(Some("Wrong token."))),
-        )
-            .into_response();
+/// Who a platform request is from: the server token, the worker's token, or a
+/// signed-in user's session cookie.
+async fn platform_principal(
+    platform: &Services,
+    auth: &Auth,
+    headers: &axum::http::HeaderMap,
+) -> Option<(Credential, Principal)> {
+    match auth.bearer_credential(headers) {
+        Credential::Bearer => return Some((Credential::Bearer, Principal::Operator)),
+        Credential::Worker => return Some((Credential::Worker, Principal::Worker)),
+        _ => {}
     }
+    let token = auth::session_cookie_value(headers)?;
+    let user = platform.accounts.user_for_session(&token).await.ok()??;
+    Some((Credential::Cookie, Principal::User(user)))
+}
+
+async fn login_page(State(state): State<AppState>) -> Html<String> {
+    Html(login_html(state.platform.is_some(), None))
+}
+
+async fn login(
+    State(state): State<AppState>,
+    Form(form): Form<std::collections::HashMap<String, String>>,
+) -> Response {
+    let field = |name: &str| form.get(name).map(|v| v.trim()).unwrap_or_default();
+    let fail = |status: StatusCode, message: &str| {
+        (
+            status,
+            Html(login_html(state.platform.is_some(), Some(message))),
+        )
+            .into_response()
+    };
+    let cookie = match &state.platform {
+        None => {
+            if !state.auth.token_matches(field("token")) {
+                return fail(StatusCode::UNAUTHORIZED, "Wrong token.");
+            }
+            state.auth.session_cookie()
+        }
+        Some(platform) => {
+            let password = form.get("password").map(String::as_str).unwrap_or_default();
+            let user = match platform.accounts.authenticate(field("username"), password).await {
+                Ok(user) => user,
+                Err(AuthError::InvalidCredentials) => {
+                    return fail(StatusCode::UNAUTHORIZED, "Wrong username or password.")
+                }
+                Err(AuthError::Locked { until }) => {
+                    let minutes = (until - chrono::Utc::now()).num_minutes() + 1;
+                    return fail(
+                        StatusCode::TOO_MANY_REQUESTS,
+                        &format!("Too many failed attempts. Try again in {minutes} minutes."),
+                    );
+                }
+                Err(AuthError::Disabled) => {
+                    return fail(StatusCode::FORBIDDEN, "This account is disabled.")
+                }
+                Err(AuthError::Store(error)) => {
+                    eprintln!("[login] {error}");
+                    return fail(StatusCode::INTERNAL_SERVER_ERROR, "Sign-in is unavailable.");
+                }
+            };
+            match platform.accounts.create_session(user.id).await {
+                Ok(token) => state.auth.cookie_for(&token),
+                Err(error) => {
+                    eprintln!("[login] {error}");
+                    return fail(StatusCode::INTERNAL_SERVER_ERROR, "Sign-in is unavailable.");
+                }
+            }
+        }
+    };
     let mut response = Redirect::to("/").into_response();
-    if let Ok(cookie) = HeaderValue::from_str(&state.auth.session_cookie()) {
+    if let Ok(cookie) = HeaderValue::from_str(&cookie) {
         response.headers_mut().insert(header::SET_COOKIE, cookie);
     }
     response
 }
 
-async fn logout(State(state): State<AppState>) -> Response {
+async fn logout(State(state): State<AppState>, headers: axum::http::HeaderMap) -> Response {
+    if let (Some(platform), Some(token)) = (&state.platform, auth::session_cookie_value(&headers)) {
+        let _ = platform.accounts.revoke_session(&token).await;
+    }
     let mut response = StatusCode::NO_CONTENT.into_response();
     if let Ok(cookie) = HeaderValue::from_str(&state.auth.clear_cookie()) {
         response.headers_mut().insert(header::SET_COOKIE, cookie);
@@ -334,10 +438,21 @@ async fn logout(State(state): State<AppState>) -> Response {
     response
 }
 
-fn login_html(error: Option<&str>) -> String {
+fn login_html(accounts: bool, error: Option<&str>) -> String {
     let error = error
         .map(|message| format!(r#"<p class="error">{message}</p>"#))
         .unwrap_or_default();
+    let fields = if accounts {
+        r#"<p>Sign in with your account.</p>
+  {error}
+  <input name="username" autocomplete="username" autocapitalize="none" autofocus required aria-label="Username" placeholder="Username">
+  <input name="password" type="password" autocomplete="current-password" required aria-label="Password" placeholder="Password">"#
+    } else {
+        r#"<p>Enter the server access token. It is printed when the server first starts and stored in <code>server-token</code> in the data directory.</p>
+  {error}
+  <input name="token" type="password" autocomplete="current-password" autofocus required aria-label="Access token">"#
+    }
+    .replace("{error}", &error);
     format!(
         r#"<!doctype html>
 <html lang="en">
@@ -361,9 +476,7 @@ fn login_html(error: Option<&str>) -> String {
 <body>
 <form method="post" action="/login">
   <h1>LLM Wiki</h1>
-  <p>Enter the server access token. It is printed when the server first starts and stored in <code>server-token</code> in the data directory.</p>
-  {error}
-  <input name="token" type="password" autocomplete="current-password" autofocus required aria-label="Access token">
+  {fields}
   <button type="submit">Sign in</button>
 </form>
 </body>

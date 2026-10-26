@@ -73,6 +73,16 @@ pub struct Args {
     #[arg(long, env = "LLM_WIKI_DATABASE_URL", hide_env_values = true)]
     pub database_url: Option<String>,
 
+    /// Username of the first Platform Admin, created at startup when the
+    /// platform has none. Only used with `--database-url`.
+    #[arg(long, env = "LLM_WIKI_ADMIN_USER", default_value = "admin")]
+    pub admin_user: String,
+
+    /// Password of that first Platform Admin. When omitted a random one is
+    /// generated and printed once, the first time the server starts.
+    #[arg(long, env = "LLM_WIKI_ADMIN_PASSWORD", hide_env_values = true)]
+    pub admin_password: Option<String>,
+
     /// S3 API address of the object store, e.g. `http://minio:9000`.
     #[arg(long, env = "LLM_WIKI_S3_ENDPOINT")]
     pub s3_endpoint: Option<String>,

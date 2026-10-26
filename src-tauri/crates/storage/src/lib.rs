@@ -28,7 +28,7 @@ mod conformance;
 
 pub use accounts::{check_password, normalize_username, Accounts, AuthError, NewUser, User};
 pub use blobs::PgBlobs;
-pub use connect::open_store;
+pub use connect::{open_services, open_store, Services};
 pub use error::StoreError;
 pub use locator::ProjectLocator;
 pub use memory::MemoryStore;
