@@ -41,6 +41,63 @@
     "openProject": "Open Project",
     "recentProjects": "Recent Projects"
   },
+  "platform": {
+    "welcome": {
+      "noProjects": "You are not a member of any project yet.",
+      "askAdmin": "Ask a Platform Admin to add you to one.",
+      "adminNoProjects": "There are no projects yet. Create the first one.",
+      "projects": "Your projects"
+    },
+    "roles": {
+      "owner": "Owner",
+      "editor": "Editor",
+      "viewer": "Viewer"
+    },
+    "account": {
+      "title": "Account",
+      "signedInAs": "Signed in as {{name}}",
+      "admin": "Platform Admin",
+      "changePassword": "Change password",
+      "currentPassword": "Current password",
+      "newPassword": "New password (at least 8 characters)",
+      "confirmPassword": "Repeat the new password",
+      "passwordMismatch": "The two passwords do not match.",
+      "passwordChanged": "Password changed. Other devices have been signed out.",
+      "signOut": "Sign out"
+    },
+    "members": {
+      "title": "Project members",
+      "intro": "Everyone in a project can see all of its content.",
+      "none": "Open a project to see its members.",
+      "username": "Username",
+      "role": "Role",
+      "add": "Add member",
+      "notFound": "No active account has that username.",
+      "remove": "Remove",
+      "leave": "Leave project",
+      "you": "you",
+      "readOnly": "Only an owner can change who belongs to this project.",
+      "added": "Member added."
+    },
+    "users": {
+      "title": "Users",
+      "intro": "Accounts on this server. Only Platform Admins can see this page.",
+      "create": "Create user",
+      "username": "Username",
+      "displayName": "Display name",
+      "password": "Initial password (at least 8 characters)",
+      "makeAdmin": "Platform Admin",
+      "created": "User created.",
+      "disable": "Disable",
+      "enable": "Enable",
+      "promote": "Make admin",
+      "demote": "Remove admin",
+      "setPassword": "Set password",
+      "newPassword": "New password",
+      "disabled": "disabled",
+      "admin": "admin"
+    }
+  },
   "sidebar": {
     "knowledge": "Knowledge",
     "files": "Files",
@@ -490,6 +547,9 @@
       "interface": "Interface",
       "maintenance": "Maintenance",
       "changelog": "Changelog",
+      "account": "Account",
+      "members": "Project members",
+      "users": "Users",
       "about": "About"
     },
     "sections": {

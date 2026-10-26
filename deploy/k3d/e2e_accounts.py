@@ -106,6 +106,11 @@ check("a normal user cannot create a project", alice.rpc("create_project", {"nam
 status, project = admin.rpc("create_project", {"name": f"Lithography {tag}"})
 check("a Platform Admin creates a project and owns it", status == 200 and project["role"] == "owner", project)
 pid, base = project["id"], project["path"]
+check("a new project starts with its schema, index, log and overview",
+      all(admin.rpc("file_exists", {"path": f"{base}/{rel}"})[1] is True
+          for rel in ["schema.md", "purpose.md", "wiki/index.md", "wiki/log.md", "wiki/overview.md"]))
+check("a new project starts with its schema, index, log and overview",
+      all(admin.rpc("file_exists", {"path": f"{base}/{rel}"})[1] is True for rel in ["schema.md", "purpose.md", "wiki/index.md", "wiki/log.md", "wiki/overview.md"]))
 check("alice is not a member yet", alice.rpc("open_project", {"path": base})[0] == 403)
 for name, role in [("alice", "editor"), ("bob", "viewer")]:
     check(f"admin adds {name} as {role}", admin.rpc("add_project_member", {"projectId": pid, "userId": users[name]["id"], "role": role})[0] == 200)
@@ -157,7 +162,7 @@ check("an admin who is not a member can add themselves",
 check("lookup finds a user by username", carol.rpc("lookup_user", {"username": f"ALICE-{tag}"})[1]["displayName"] == "Alice")
 
 print("accounts, continued")
-check("a wrong current password is refused", alice.rpc("change_my_password", {"currentPassword": "nope nope nope", "newPassword": "another long password"})[0] == 401)
+check("a wrong current password is refused", alice.rpc("change_my_password", {"currentPassword": "nope nope nope", "newPassword": "another long password"})[0] == 403)
 check("alice changes her password", alice.rpc("change_my_password", {"currentPassword": "a long enough password", "newPassword": "another long password"})[0] == 200)
 check("her old session is gone", alice.rpc("whoami")[0] == 401)
 check("the new password works", Client().login(f"alice-{tag}", "another long password") == 303)

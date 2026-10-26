@@ -810,11 +810,17 @@ mod tests {
 
     /// The whole tree behind one store, run through the shared suite twice:
     /// once for each folder a store serves.
+    /// One test at a time talks to the object store: the tests reach it
+    /// through a single `kubectl port-forward`, which times out when a few
+    /// dozen of them upload at once.
+    static OBJECT_STORE: tokio::sync::Mutex<()> = tokio::sync::Mutex::const_new(());
+
     struct RoutedHarness {
         routed: RoutedFiles,
         root: &'static str,
         versioned: bool,
         pool: Option<PgPool>,
+        _serial: Option<tokio::sync::MutexGuard<'static, ()>>,
     }
 
     #[async_trait]
@@ -852,6 +858,7 @@ mod tests {
             root,
             versioned: true,
             pool: None,
+            _serial: None,
         })
     }
 
@@ -862,7 +869,10 @@ mod tests {
     /// Blob contents in the MinIO bucket `make test-pg` provides.
     async fn s3_harness(root: &'static str) -> Option<RoutedHarness> {
         let config = crate::S3Config::from_env("LLM_WIKI_TEST_S3").unwrap()?;
-        pg_harness_over(root, config.build().unwrap()).await
+        let serial = OBJECT_STORE.lock().await;
+        let mut harness = pg_harness_over(root, config.build().unwrap()).await?;
+        harness._serial = Some(serial);
+        Some(harness)
     }
 
     async fn pg_harness_over(
@@ -885,6 +895,7 @@ mod tests {
             // Pages and state files carry versions; blobs do not.
             versioned: !matches!(root, "raw/sources" | "wiki/media"),
             pool: Some(pool),
+            _serial: None,
         })
     }
 

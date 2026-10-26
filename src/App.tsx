@@ -179,6 +179,10 @@ function App() {
     const timer = setTimeout(async () => {
       if (cancelled) return
       try {
+        // A platform server is upgraded by deploying a new version, not from
+        // each browser, and must not ask GitHub about a different product.
+        const { getWhoAmI } = await import("@/lib/platform-api")
+        if (await getWhoAmI()) return
         const { loadUpdateCheckState, saveUpdateCheckState } = await import(
           "@/lib/project-store"
         )

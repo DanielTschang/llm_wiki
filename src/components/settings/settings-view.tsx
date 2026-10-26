@@ -13,6 +13,9 @@ import {
   Server,
   Settings,
   FileText,
+  UserRound,
+  Users,
+  ShieldCheck,
 } from "lucide-react"
 import { useTranslation } from "react-i18next"
 import { invoke } from "@/platform"
@@ -43,8 +46,15 @@ import { GeneralSection } from "./sections/general-section"
 import { ChangelogSection } from "./sections/changelog-section"
 import { MaintenanceSection } from "./sections/maintenance-section"
 import { AboutSection } from "./sections/about-section"
+import { AccountSection } from "./sections/account-section"
+import { MembersSection } from "./sections/members-section"
+import { UsersSection } from "./sections/users-section"
+import { usePlatformInfo } from "@/hooks/use-platform-info"
 
 type CategoryId =
+  | "account"
+  | "members"
+  | "users"
   | "general"
   | "llm"
   | "embedding"
@@ -69,6 +79,9 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
+  { id: "account", labelKey: "settings.categories.account", icon: UserRound },
+  { id: "members", labelKey: "settings.categories.members", icon: Users },
+  { id: "users", labelKey: "settings.categories.users", icon: ShieldCheck },
   { id: "general", labelKey: "settings.categories.general", icon: Settings },
   { id: "llm", labelKey: "settings.categories.llm", icon: Bot },
   { id: "embedding", labelKey: "settings.categories.embedding", icon: Binary },
@@ -87,7 +100,17 @@ const CATEGORIES: Category[] = [
 /** Desktop shell features (window/startup behavior, the local HTTP API on
  *  127.0.0.1:19828) that the server edition does not have. */
 const DESKTOP_ONLY_CATEGORIES = new Set<CategoryId>(["general", "api-server"])
-const VISIBLE_CATEGORIES = CATEGORIES.filter((category) => !DESKTOP_ONLY_CATEGORIES.has(category.id))
+/** Pages that exist only where the server has accounts. */
+const PLATFORM_CATEGORIES = new Set<CategoryId>(["account", "members", "users"])
+
+function visibleCategories(platform: { isPlatform: boolean; isAdmin: boolean }): Category[] {
+  return CATEGORIES.filter((category) => {
+    if (DESKTOP_ONLY_CATEGORIES.has(category.id)) return false
+    if (!PLATFORM_CATEGORIES.has(category.id)) return true
+    if (!platform.isPlatform) return false
+    return category.id !== "users" || platform.isAdmin
+  })
+}
 
 function initialDraft(
   llm: ReturnType<typeof useWikiStore.getState>["llmConfig"],
@@ -201,6 +224,8 @@ export function SettingsView() {
   // per version.
   const updateAvailable = useUpdateStore((s) => hasAvailableUpdate(s))
 
+  const platform = usePlatformInfo()
+  const categories = useMemo(() => visibleCategories(platform), [platform.isPlatform, platform.isAdmin])
   const [active, setActive] = useState<CategoryId>("llm")
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
@@ -508,6 +533,12 @@ export function SettingsView() {
 
   const body = useMemo(() => {
     switch (active) {
+      case "account":
+        return <AccountSection />
+      case "members":
+        return <MembersSection />
+      case "users":
+        return <UsersSection />
       case "general":
         return <GeneralSection draft={draft} setDraft={setDraft} />
       case "llm":
@@ -549,7 +580,7 @@ export function SettingsView() {
           {t("settings.title")}
         </div>
         <nav className="flex-1 overflow-y-auto px-2 pb-3">
-          {VISIBLE_CATEGORIES.map((c) => {
+          {categories.map((c) => {
             const Icon = c.icon
             const isActive = c.id === active
             // Mirror the gear-icon dot inside the settings sidebar
@@ -599,8 +630,9 @@ export function SettingsView() {
 
         {/* Global Save bar hidden for sections that persist inline:
             - "llm" saves per-row on every edit (independent per-preset state)
-            - "about" has no draft-bound fields */}
-        {active !== "about" && active !== "llm" && (
+            - "about" has no draft-bound fields
+            - the account pages act on the server right away */}
+        {active !== "about" && active !== "llm" && !PLATFORM_CATEGORIES.has(active) && (
           <div className="shrink-0 border-t bg-background/80 backdrop-blur px-8 py-3">
             <div className="mx-auto flex max-w-2xl items-center justify-between gap-4">
               <p className={`text-xs ${saveError ? "text-destructive" : "text-muted-foreground"}`}>

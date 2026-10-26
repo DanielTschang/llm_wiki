@@ -10,29 +10,10 @@ pub fn create_project(name: String, path: String) -> Result<WikiProject, String>
     run_guarded("create_project", || create_project_impl(name, path))
 }
 
-fn create_project_impl(name: String, path: String) -> Result<WikiProject, String> {
-    let root = Path::new(&path).join(&name);
-
-    if root.exists() {
-        return Err(format!("Directory already exists: '{}'", root.display()));
-    }
-
-    // Create all required subdirectories
-    let dirs = [
-        "raw/sources",
-        "raw/assets",
-        "wiki/entities",
-        "wiki/concepts",
-        "wiki/sources",
-        "wiki/queries",
-        "wiki/comparisons",
-        "wiki/synthesis",
-    ];
-    for dir in &dirs {
-        fs::create_dir_all(root.join(dir))
-            .map_err(|e| format!("Failed to create directory '{}': {}", dir, e))?;
-    }
-
+/// The files a new Project starts with, as (project-relative path, content).
+/// Shared by the folder-based and the platform `create_project`.
+pub fn scaffold_files() -> Vec<(&'static str, String)> {
+    let mut files = Vec::new();
     let today = Local::now().format("%Y-%m-%d").to_string();
 
     // schema.md
@@ -113,7 +94,7 @@ When sources contradict each other:
 4. Resolve in a synthesis page once sufficient evidence exists
 "#
     );
-    write_file_inner(root.join("schema.md"), &schema_content)?;
+    files.push(("schema.md", schema_content));
 
     // purpose.md
     let purpose_content = r#"# Project Purpose
@@ -146,7 +127,7 @@ When sources contradict each other:
 
 > TBD
 "#;
-    write_file_inner(root.join("purpose.md"), purpose_content)?;
+    files.push(("purpose.md", purpose_content.to_string()));
 
     // wiki/index.md
     let index_content = r#"# Wiki Index
@@ -163,7 +144,7 @@ When sources contradict each other:
 
 ## Synthesis
 "#;
-    write_file_inner(root.join("wiki/index.md"), index_content)?;
+    files.push(("wiki/index.md", index_content.to_string()));
 
     // wiki/log.md
     let log_content = format!(
@@ -174,7 +155,7 @@ When sources contradict each other:
 - Project created
 "#
     );
-    write_file_inner(root.join("wiki/log.md"), &log_content)?;
+    files.push(("wiki/log.md", log_content));
 
     // wiki/overview.md
     let overview_content = r#"---
@@ -188,7 +169,36 @@ related: []
 
 <!-- Provide a high-level summary of what this wiki covers and its current state. Update regularly as understanding deepens. -->
 "#;
-    write_file_inner(root.join("wiki/overview.md"), overview_content)?;
+    files.push(("wiki/overview.md", overview_content.to_string()));
+    files
+}
+
+fn create_project_impl(name: String, path: String) -> Result<WikiProject, String> {
+    let root = Path::new(&path).join(&name);
+
+    if root.exists() {
+        return Err(format!("Directory already exists: '{}'", root.display()));
+    }
+
+    // Create all required subdirectories
+    let dirs = [
+        "raw/sources",
+        "raw/assets",
+        "wiki/entities",
+        "wiki/concepts",
+        "wiki/sources",
+        "wiki/queries",
+        "wiki/comparisons",
+        "wiki/synthesis",
+    ];
+    for dir in &dirs {
+        fs::create_dir_all(root.join(dir))
+            .map_err(|e| format!("Failed to create directory '{}': {}", dir, e))?;
+    }
+
+    for (rel, content) in scaffold_files() {
+        write_file_inner(root.join(rel), &content)?;
+    }
 
     // .obsidian config for Obsidian compatibility
     fs::create_dir_all(root.join(".obsidian"))

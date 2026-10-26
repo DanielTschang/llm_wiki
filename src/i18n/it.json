@@ -41,6 +41,63 @@
     "openProject": "Apri progetto",
     "recentProjects": "Progetti recenti"
   },
+  "platform": {
+    "welcome": {
+      "noProjects": "Non fai ancora parte di nessun progetto.",
+      "askAdmin": "Chiedi a un amministratore della piattaforma di aggiungerti a uno.",
+      "adminNoProjects": "Non ci sono ancora progetti. Crea il primo.",
+      "projects": "I tuoi progetti"
+    },
+    "roles": {
+      "owner": "Proprietario",
+      "editor": "Editor",
+      "viewer": "Lettore"
+    },
+    "account": {
+      "title": "Account",
+      "signedInAs": "Accesso come {{name}}",
+      "admin": "Amministratore della piattaforma",
+      "changePassword": "Cambia password",
+      "currentPassword": "Password attuale",
+      "newPassword": "Nuova password (almeno 8 caratteri)",
+      "confirmPassword": "Ripeti la nuova password",
+      "passwordMismatch": "Le due password non coincidono.",
+      "passwordChanged": "Password cambiata. Gli altri dispositivi sono stati disconnessi.",
+      "signOut": "Esci"
+    },
+    "members": {
+      "title": "Membri del progetto",
+      "intro": "Tutti i membri di un progetto vedono tutto il suo contenuto.",
+      "none": "Apri un progetto per vederne i membri.",
+      "username": "Nome utente",
+      "role": "Ruolo",
+      "add": "Aggiungi membro",
+      "notFound": "Nessun account attivo con questo nome utente.",
+      "remove": "Rimuovi",
+      "leave": "Lascia il progetto",
+      "you": "tu",
+      "readOnly": "Solo un proprietario può cambiare i membri del progetto.",
+      "added": "Membro aggiunto."
+    },
+    "users": {
+      "title": "Utenti",
+      "intro": "Gli account di questo server. Solo gli amministratori della piattaforma vedono questa pagina.",
+      "create": "Crea utente",
+      "username": "Nome utente",
+      "displayName": "Nome visualizzato",
+      "password": "Password iniziale (almeno 8 caratteri)",
+      "makeAdmin": "Amministratore della piattaforma",
+      "created": "Utente creato.",
+      "disable": "Disattiva",
+      "enable": "Attiva",
+      "promote": "Rendi amministratore",
+      "demote": "Rimuovi amministratore",
+      "setPassword": "Imposta password",
+      "newPassword": "Nuova password",
+      "disabled": "disattivato",
+      "admin": "amministratore"
+    }
+  },
   "sidebar": {
     "knowledge": "Conoscenza",
     "files": "File",
@@ -490,6 +547,9 @@
       "interface": "Interfaccia",
       "maintenance": "Manutenzione",
       "changelog": "Changelog",
+      "account": "Account",
+      "members": "Membri del progetto",
+      "users": "Utenti",
       "about": "Informazioni"
     },
     "sections": {

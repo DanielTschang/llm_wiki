@@ -145,6 +145,8 @@ Python Extension Point（同事負責）
   - [x] `S3Config`：從環境變數讀 MinIO 連線（path-style，只在 endpoint 是 `http://` 時允許明文），Debug 輸出遮掉 secret。`make test-pg` 會轉發 k3d 的 MinIO 並建 `llm-wiki-test` bucket（需要 `aws` CLI）
   - [x] `fs.rs` 接上 `RoutedFiles`（A 類）：核心新增「平台模式」（`platform.rs`），伺服器設了 `LLM_WIKI_DATABASE_URL` 與 `LLM_WIKI_S3_*` 就啟用。此時檔案命令只認 `/projects/<uuid>/…` 形式的路徑，其他路徑一律拒絕，不會碰伺服器主機的磁碟；沒啟用時行為不變。已轉換：`read_file`（含 PDF／Office／電子書抽取，在暫存目錄跑解析器，抽出的圖片傳進 `wiki/media/<名稱>`）、`preprocess_file`（文字快取存成 `raw/sources/.cache/*`）、`write_file*`、`list_directory`、`copy_*`、`delete_file`、`create_directory`、`file_exists`、大小／時間／MD5、`read_file_as_base64`。`/rpc` 的路徑檢查、`GET /files`（blob 以串流回傳）、`POST /upload`（串流進 MinIO，暫存在 `.uploads/<batch>/`，需帶 `project`）都已接上。`make e2e-k3d` 用真伺服器打 k3d 的 PG 與 MinIO 驗證
   - [x] B 類改走儲存層：`ProjectFiles` 新增 `read_tree`（整棵目錄一次讀完，Postgres 版一個查詢）；`search_project`、`get_page_links` 改成「載入頁面」與「計分」兩段，平台版只換載入；agent 的 `wiki.write_page`（仍是 create-only，寫入後讀回驗證，不符就還原）、`wiki.read_page`、`workspace.write_file`／`append_file`、`source.search`、`graph.search` 在平台模式下走 `agent/tools/on_platform.rs`，`shell.exec` 直接拒絕；agent 的專案概覽與 `@` 附件也從儲存層讀。`/rpc` 在平台模式只放行白名單內的命令（已轉換或不碰檔案的），其餘回「尚未提供」，新增的命令預設關閉。`api_server.rs` 在網頁伺服器上根本不會啟動，留待階段 3 與 MCP 一起重寫，不在這次轉換範圍
+  - [x] 使用者與專案層（提前自階段 2 做完能用的部分）：`Accounts`（帳密、session、偏好）、`Projects`（建立、成員、角色）、migration 0007；伺服器的登入頁、`Principal`（使用者／維運 token／worker）、`authz.rs` 與 `accounts_rpc.rs`（`whoami`、`list_projects`、`create_project`、成員與使用者管理等命令）。新專案會帶 schema、purpose、index、log、overview。刪專案會先刪物件儲存裡的檔案再刪資料列。設定檔分成個人（上次開的專案、縮放、語言）與組織（模型、端點；所有人可讀、只有 Platform Admin 能改）。前端：歡迎畫面列出自己的專案（只有 Platform Admin 看得到「新增專案」，沒有「開啟專案」）、新增專案不必選資料夾、設定頁多了「帳號」「專案成員」「使用者」三頁、平台伺服器不再問 GitHub 有沒有新版。`make platform-dev` 在 k3d 上啟動，`make e2e-accounts` 用 4 種角色驗 70 項權限
+  - [ ] 使用者與專案層還沒做的：(1) 組織層的設定（模型端點含 API key）目前所有成員都讀得到，因為瀏覽器還在自己呼叫 LLM，要等「LLM 呼叫移到伺服器」；(2) ingest worker 還不認得平台專案（平台模式先用 `--no-worker`，由瀏覽器分頁跑 ingest）；(3) 建立專案時的「內容全員可見」提醒、專案設定頁（改名、刪除）、Platform Admin 的專案總覽頁；(4) 登入失敗的限制只做到單一帳號，還沒有依來源 IP 的限制；(5) 沒有「忘記密碼」流程（由 Platform Admin 重設）
   - [ ] 平台模式還不能對外開放，在下列完成前只限開發使用：(1) agent 會話目前只放記憶體（要做 `agent_sessions` repository）；(2) 向量搜尋在平台模式關閉，只有關鍵字搜尋（等 pgvector）；(3) 檔案歷史、專案建立／匯出入、`rebuild_wiki_index`、圖片抽取命令、`apply_text_selection_edit`、`create_missing_wiki_page`、`find_related_wiki_pages` 還沒轉換；(4) `.uploads/` 暫存檔沒有清理工作，`GET /files` 還不支援 Range；(5) 頁面寫入還沒重建 `page_links`／`page_sources`，也沒解析 frontmatter
   - [ ] 頁面寫入時一併重建 `page_links`、`page_sources`，並解析 frontmatter 填 `title`／`page_type`
   - [x] `.llm-wiki/*` 狀態檔的轉接層：`PgState` 把這些路徑存進 `state_files` 表（migration 0006），以文件為單位，語意跟頁面一致（樂觀鎖版本號、隱含目錄、檔案不能蓋住目錄、子樹刪除與改名），但沒有歷史、刪除就真的刪。這是過渡做法：TS 的 ingest worker 和前端還是整份 JSON 讀寫，所以先讓它們原封不動能跑；各檔案等到有型別化的資料表與 repository、讀寫它的程式碼也改寫後，再逐一搬出去。平台不保留的路徑會拒絕寫入：`page-history/`、`history/`（由 `page_versions` 取代）、`lancedb/`、`embedding-revisions/`、`skills/`（各有自己的歸宿），以及資料夾監控與舊版聊天紀錄的檔案。`PgState` 跑同一組一致性測試，並經 `RoutedFiles` 再跑一次
@@ -163,10 +165,10 @@ Python Extension Point（同事負責）
 
 ### 階段 2：多人化
 
-- [ ] 帳號密碼登入：密碼用 Argon2 雜湊、登入失敗次數限制、session 管理；預留 OIDC 介面，未來導入 SSO
-- [ ] 角色：Platform Admin（管帳號、建立 Project、設定模型）、Owner、Editor、Viewer；只有 Platform Admin 能建立 Project
-- [ ] 每條 API 路由都經過 Project 權限 middleware；retrieval、圖譜、agent 上下文、MCP 查詢只會碰到使用者所屬的 Project
-- [ ] 建立 Project 和加入成員時，提醒「同一個 Project 內的內容所有成員都看得到」
+- [x] 帳號密碼登入：密碼用 Argon2 雜湊、登入失敗次數限制、session 管理；預留 OIDC 介面，未來導入 SSO。已做：Argon2id、同一帳號連錯 5 次鎖 15 分鐘、session 只存 token 雜湊且 30 天滑動過期、改密碼或停用會登出所有裝置、啟動時用 `LLM_WIKI_ADMIN_USER`／`LLM_WIKI_ADMIN_PASSWORD`（或印一次隨機密碼）建立第一位 Platform Admin。OIDC 只預留了 `users.external_subject`，介面還沒做
+- [x] 角色：Platform Admin（管帳號、建立 Project、設定模型）、Owner、Editor、Viewer；只有 Platform Admin 能建立 Project。Viewer 可讀、搜尋、聊天；Editor 另可寫入、上傳、ingest；Owner 另可管成員與刪頁面（刪 Source 只要 Editor）。Platform Admin **預設看不到專案內容**，要先把自己加為成員（有操作紀錄）；Owner 不在時 Platform Admin 仍可管成員。專案至少保留一位 Owner，也至少保留一位啟用中的 Platform Admin
+- [x] 每條 API 路由都經過 Project 權限 middleware；retrieval、圖譜、agent 上下文、MCP 查詢只會碰到使用者所屬的 Project。目前涵蓋 `/rpc`、`GET /files`、`POST /upload`、`/events`（專案事件只發給成員，給 worker 的指令只發給 worker）；沒有權限與專案不存在回同樣的 403。Viewer 的 agent 唯讀（不能寫頁面或工作區）。MCP 要等階段 3
+- [x] 建立 Project 和加入成員時，提醒「同一個 Project 內的內容所有成員都看得到」。成員頁有這句提醒；建立專案時還沒有
 - [ ] 集中管理 LLM 呼叫：依使用者和 Project 統計成本、速率限制、重試；不設配額、不做成本門檻通知，只統計（Platform Admin 看用量儀表板；預算警示交給 LLM 供應商後台）
 - [ ] 依 Project 設定可用模型，chat、embedding、vision 一併限制（例如敏感 Project 只能用自架模型）
 - [ ] Review Item 改存伺服器，同一個 Project 的成員共用，Editor 以上的角色可以處理，並記錄是誰處理的

@@ -238,7 +238,33 @@ async fn create_project(platform: &PlatformState, principal: &Principal, args: &
         .create(name, &owner)
         .await
         .map_err(denied)?;
+    // A new Project starts with the same schema, purpose, index, log and
+    // overview a folder-based one did. If that fails there is nothing worth
+    // keeping, so the half-made Project is removed.
+    if let Err(error) = seed_project(platform, project.id).await {
+        let _ = platform.projects.delete(project.id, &owner).await;
+        return Err(denied(error));
+    }
     Ok(project_json(&project))
+}
+
+async fn seed_project(platform: &PlatformState, project: ProjectId) -> Result<(), StoreError> {
+    use llm_wiki_storage::{Body, Precondition, ProjectFiles, RelPath, WriteCtx};
+
+    let ctx = WriteCtx::new("create");
+    for (path, content) in llm_wiki_core::commands::project::scaffold_files() {
+        platform
+            .files
+            .write(
+                project,
+                &RelPath::parse(path)?,
+                Body::Text(content),
+                Precondition::CreateOnly,
+                &ctx,
+            )
+            .await?;
+    }
+    Ok(())
 }
 
 async fn open_project(platform: &PlatformState, principal: &Principal, args: &Value) -> Reply {
@@ -435,7 +461,7 @@ async fn change_my_password(
         .accounts
         .authenticate(username, text(args, "currentPassword")?)
         .await
-        .map_err(|_| Denied::new(StatusCode::UNAUTHORIZED, "the current password is wrong"))?;
+        .map_err(|_| Denied::new(StatusCode::FORBIDDEN, "the current password is wrong"))?;
     platform
         .accounts
         .set_password(me.id, text(args, "newPassword")?)

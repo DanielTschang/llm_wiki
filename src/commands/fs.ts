@@ -7,6 +7,8 @@ import { isAbsolutePath } from "@/lib/path-utils"
 interface RawProject {
   name: string
   path: string
+  /** Present when the server keeps projects itself (a platform server). */
+  id?: string
 }
 
 export async function readFile(
@@ -245,19 +247,21 @@ export async function readFileAsBase64(path: string): Promise<FileBase64> {
   return invoke<FileBase64>("read_file_as_base64", { path })
 }
 
+/** `path` is the folder to create the project in; a platform server keeps
+ *  projects itself and takes only a name. */
 export async function createProject(
   name: string,
-  path: string,
+  path?: string,
 ): Promise<WikiProject> {
-  const raw = await invoke<RawProject>("create_project", { name, path })
-  const id = await ensureProjectId(raw.path)
+  const raw = await invoke<RawProject>("create_project", path === undefined ? { name } : { name, path })
+  const id = raw.id ?? (await ensureProjectId(raw.path))
   await upsertProjectInfo(id, raw.path, raw.name)
   return { id, name: raw.name, path: raw.path }
 }
 
 export async function openProject(path: string): Promise<WikiProject> {
   const raw = await invoke<RawProject>("open_project", { path })
-  const id = await ensureProjectId(raw.path)
+  const id = raw.id ?? (await ensureProjectId(raw.path))
   await upsertProjectInfo(id, raw.path, raw.name)
   return { id, name: raw.name, path: raw.path }
 }

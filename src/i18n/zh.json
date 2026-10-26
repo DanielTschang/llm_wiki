@@ -41,6 +41,63 @@
     "openProject": "打开项目",
     "recentProjects": "最近项目"
   },
+  "platform": {
+    "welcome": {
+      "noProjects": "你还不是任何项目的成员。",
+      "askAdmin": "请让平台管理员把你加入项目。",
+      "adminNoProjects": "还没有任何项目，请创建第一个。",
+      "projects": "你的项目"
+    },
+    "roles": {
+      "owner": "所有者",
+      "editor": "编辑者",
+      "viewer": "查看者"
+    },
+    "account": {
+      "title": "账号",
+      "signedInAs": "当前登录：{{name}}",
+      "admin": "平台管理员",
+      "changePassword": "修改密码",
+      "currentPassword": "当前密码",
+      "newPassword": "新密码（至少 8 个字符）",
+      "confirmPassword": "再次输入新密码",
+      "passwordMismatch": "两次输入的密码不一致。",
+      "passwordChanged": "密码已修改，其他设备已被登出。",
+      "signOut": "退出登录"
+    },
+    "members": {
+      "title": "项目成员",
+      "intro": "项目内的所有成员都能看到项目的全部内容。",
+      "none": "打开一个项目即可查看其成员。",
+      "username": "用户名",
+      "role": "角色",
+      "add": "添加成员",
+      "notFound": "没有使用该用户名的有效账号。",
+      "remove": "移除",
+      "leave": "退出项目",
+      "you": "你",
+      "readOnly": "只有所有者可以更改项目成员。",
+      "added": "已添加成员。"
+    },
+    "users": {
+      "title": "用户",
+      "intro": "本服务器上的账号。只有平台管理员能看到此页面。",
+      "create": "创建用户",
+      "username": "用户名",
+      "displayName": "显示名称",
+      "password": "初始密码（至少 8 个字符）",
+      "makeAdmin": "平台管理员",
+      "created": "用户已创建。",
+      "disable": "停用",
+      "enable": "启用",
+      "promote": "设为管理员",
+      "demote": "取消管理员",
+      "setPassword": "设置密码",
+      "newPassword": "新密码",
+      "disabled": "已停用",
+      "admin": "管理员"
+    }
+  },
   "sidebar": {
     "knowledge": "知识库",
     "files": "文件",
@@ -490,6 +547,9 @@
       "interface": "界面",
       "maintenance": "维护",
       "changelog": "更新日志",
+      "account": "账号",
+      "members": "项目成员",
+      "users": "用户",
       "about": "关于"
     },
     "sections": {

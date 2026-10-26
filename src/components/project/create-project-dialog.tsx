@@ -16,6 +16,7 @@ import { normalizePath } from "@/lib/path-utils"
 import { OUTPUT_LANGUAGE_OPTIONS } from "@/lib/output-language-options"
 import { useWikiStore, type OutputLanguage } from "@/stores/wiki-store"
 import { saveOutputLanguage } from "@/lib/project-store"
+import { usePlatformInfo } from "@/hooks/use-platform-info"
 
 interface CreateProjectDialogProps {
   open: boolean
@@ -61,7 +62,9 @@ export function CreateProjectDialog({ open: isOpen, onOpenChange, onCreated }: C
   const [hasInteracted, setHasInteracted] = useState(false)
   const [creating, setCreating] = useState(false)
   const setOutputLanguage = useWikiStore((s) => s.setOutputLanguage)
-  const formStatus = getCreateProjectFormStatus(name, path, language, error, hasInteracted)
+  // A platform server keeps projects itself, so there is no folder to choose.
+  const { isPlatform } = usePlatformInfo()
+  const formStatus = getCreateProjectFormStatus(name, isPlatform ? "server" : path, language, error, hasInteracted)
 
   function markEdited() {
     setHasInteracted(true)
@@ -99,7 +102,7 @@ export function CreateProjectDialog({ open: isOpen, onOpenChange, onCreated }: C
   async function handleCreate() {
     // Keep these guards even though the button is disabled in normal UI use:
     // keyboard/event edge cases and future callers should still fail clearly.
-    if (!name.trim() || !path.trim()) {
+    if (!name.trim() || (!isPlatform && !path.trim())) {
       setError(t("project.errorNameRequired"))
       setHasInteracted(true)
       return
@@ -112,7 +115,7 @@ export function CreateProjectDialog({ open: isOpen, onOpenChange, onCreated }: C
     setCreating(true)
     setError("")
     try {
-      const project = await createProject(name.trim(), path.trim())
+      const project = await createProject(name.trim(), isPlatform ? undefined : path.trim())
       const pp = normalizePath(project.path)
 
       const template = getTemplate(selectedTemplate)
@@ -187,6 +190,7 @@ export function CreateProjectDialog({ open: isOpen, onOpenChange, onCreated }: C
                 {t("project.aiOutputLanguageHint")}
               </p>
             </div>
+            {!isPlatform && (
             <div className="flex flex-col gap-2">
               <Label htmlFor="path">
                 {t("project.parentDir")} <span className="text-destructive">{t("project.requiredMarker")}</span>
@@ -207,6 +211,7 @@ export function CreateProjectDialog({ open: isOpen, onOpenChange, onCreated }: C
                 </Button>
               </div>
             </div>
+            )}
             <div className="flex flex-col gap-2">
               <Label>{t("project.template")}</Label>
               <TemplatePicker selected={selectedTemplate} onSelect={setSelectedTemplate} />
