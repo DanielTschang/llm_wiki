@@ -146,12 +146,31 @@ export function createWebPlatform(deps: WebPlatformDeps): Platform {
     })
   }
 
+  function createGatewayFetch(modelId: string, projectId?: string): typeof globalThis.fetch {
+    return (input, init) => {
+      const target = input instanceof Request ? input.url : String(input)
+      const { danger: _danger, ...rest } = (init ?? {}) as RequestInit & { danger?: unknown }
+      const headers = new Headers(rest.headers)
+      headers.set(CLIENT_HEADER, "web")
+      headers.set("X-LLM-Target", target)
+      if (projectId) headers.set("X-LLM-Project", projectId)
+      if (deps.authToken) headers.set("Authorization", `Bearer ${deps.authToken}`)
+      return deps.fetch(`${base}/llm/relay/${encodeURIComponent(modelId)}`, {
+        ...rest,
+        method: "POST",
+        headers,
+        credentials: "include",
+      })
+    }
+  }
+
   return {
     kind: "web",
     invoke,
     listen,
     convertFileSrc: fileSrc,
     createHttpFetch: async () => (deps.directFetch ? deps.fetch : proxiedFetch),
+    createGatewayFetch,
     loadStore,
     openDialog: async <T extends OpenDialogOptions>(options: T) => {
       if (deps.pickPath) return (await deps.pickPath({ mode: "open", ...options })) as OpenDialogResult<T>

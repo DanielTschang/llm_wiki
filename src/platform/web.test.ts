@@ -135,4 +135,42 @@ describe("web platform", () => {
       body: JSON.stringify({ store: "app-state.json", key: "lastProject", value: { path: "/p" } }),
     }))
   })
+
+  describe("gateway fetch", () => {
+    it("sends the request to the model's relay with where it was headed and which project", async () => {
+      const { platform, fetch } = setup([{ status: 200, body: "ok" }])
+      const gateway = platform.createGatewayFetch("claude/x", "proj-1")
+
+      await gateway("https://api.anthropic.com/v1/messages", {
+        method: "GET",
+        headers: { "Content-Type": "application/json", "x-api-key": "placeholder" },
+        body: JSON.stringify({ messages: [] }),
+      })
+
+      const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
+      expect(url).toBe("https://wiki.example/llm/relay/claude%2Fx")
+      expect(init.method).toBe("POST")
+      expect(init.credentials).toBe("include")
+      const headers = new Headers(init.headers)
+      expect(headers.get("X-LLM-Target")).toBe("https://api.anthropic.com/v1/messages")
+      expect(headers.get("X-LLM-Project")).toBe("proj-1")
+      expect(headers.get("X-LLM-Wiki-Client")).toBe("web")
+      expect(headers.get("Content-Type")).toBe("application/json")
+      expect(init.body).toBe(JSON.stringify({ messages: [] }))
+    })
+
+    it("names no project when there is none, and carries a worker's token", async () => {
+      const fetch = vi.fn(async () => new Response("ok"))
+      const platform = createWebPlatform({
+        baseUrl: "https://wiki.example",
+        fetch: fetch as unknown as typeof globalThis.fetch,
+        createEventSource: () => ({}) as EventSource,
+        authToken: "worker-token",
+      })
+      await platform.createGatewayFetch("m")("https://x.example/v1/chat", { body: "{}" })
+      const headers = new Headers((fetch.mock.calls[0] as unknown as [string, RequestInit])[1].headers)
+      expect(headers.has("X-LLM-Project")).toBe(false)
+      expect(headers.get("Authorization")).toBe("Bearer worker-token")
+    })
+  })
 })

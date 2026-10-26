@@ -6,6 +6,11 @@
 #   cargo build -p llm-wiki-server # in src-tauri
 #   deploy/k3d/dev-platform.sh     # then open the address it prints
 #
+# Models: the server holds the API keys. Export them before starting, under
+# the names the model list refers to, e.g.
+#   export LLM_WIKI_KEY_ANTHROPIC=sk-ant-...
+# and then, signed in as the admin, add the models in Settings → LLM Models.
+#
 # The data lives in the `llm_wiki_dev` database and the `llm-wiki-test` bucket
 # and is kept between runs. Press Ctrl-C to stop. Settings (all optional):
 #   DEV_PORT=19830  DEV_DB=llm_wiki_dev  DEV_ADMIN_USER=admin  DEV_ADMIN_PASSWORD=...

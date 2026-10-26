@@ -308,6 +308,7 @@ const PER_USER_KEYS: &[&str] = &[
     "updateCheckState",
     "outputLanguage",
     "generalConfig",
+    "activeServerModelId",
 ];
 
 /// Settings that carry API keys or tokens. On a platform server the models

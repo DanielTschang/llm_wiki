@@ -49,6 +49,7 @@ import { AboutSection } from "./sections/about-section"
 import { AccountSection } from "./sections/account-section"
 import { MembersSection } from "./sections/members-section"
 import { UsersSection } from "./sections/users-section"
+import { ModelsSection } from "./sections/models-section"
 import { usePlatformInfo } from "@/hooks/use-platform-info"
 
 type CategoryId =
@@ -103,9 +104,14 @@ const DESKTOP_ONLY_CATEGORIES = new Set<CategoryId>(["general", "api-server"])
 /** Pages that exist only where the server has accounts. */
 const PLATFORM_CATEGORIES = new Set<CategoryId>(["account", "members", "users"])
 
+/** Pages that hold API keys or addresses of the user's own. On a platform
+ *  server the models and their keys are the server's, set on the Models page. */
+const OWN_KEY_CATEGORIES = new Set<CategoryId>(["embedding", "multimodal", "web-search", "network", "mineru"])
+
 function visibleCategories(platform: { isPlatform: boolean; isAdmin: boolean }): Category[] {
   return CATEGORIES.filter((category) => {
     if (DESKTOP_ONLY_CATEGORIES.has(category.id)) return false
+    if (platform.isPlatform && OWN_KEY_CATEGORIES.has(category.id)) return false
     if (!PLATFORM_CATEGORIES.has(category.id)) return true
     if (!platform.isPlatform) return false
     return category.id !== "users" || platform.isAdmin
@@ -545,7 +551,7 @@ export function SettingsView() {
         // The LLM section manages its own store state (per-provider
         // configs + active preset) and persists directly — it bypasses
         // the shared draft / global Save button.
-        return <LlmProviderSection />
+        return platform.isPlatform ? <ModelsSection /> : <LlmProviderSection />
       case "embedding":
         return <EmbeddingSection draft={draft} setDraft={setDraft} />
       case "multimodal":
@@ -569,7 +575,7 @@ export function SettingsView() {
       case "about":
         return <AboutSection />
     }
-  }, [active, draft, setDraft])
+  }, [active, draft, setDraft, platform.isPlatform])
 
   return (
     <div className="flex h-full overflow-hidden">

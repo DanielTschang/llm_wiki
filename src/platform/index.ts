@@ -59,6 +59,8 @@ export const invoke = <T>(command: string, args?: Record<string, unknown>): Prom
 export const listen: Platform["listen"] = (event, handler) => platform.listen(event, handler)
 export const convertFileSrc = (path: string): string => platform.convertFileSrc(path)
 export const createHttpFetch: Platform["createHttpFetch"] = () => platform.createHttpFetch()
+export const createGatewayFetch: Platform["createGatewayFetch"] = (modelId, projectId) =>
+  platform.createGatewayFetch(modelId, projectId)
 export const loadStore: Platform["loadStore"] = (name) => platform.loadStore(name)
 export const openDialog: Platform["openDialog"] = (options) => platform.openDialog(options)
 export const saveDialog: Platform["saveDialog"] = (options) => platform.saveDialog(options)

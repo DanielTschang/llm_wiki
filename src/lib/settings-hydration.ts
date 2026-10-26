@@ -20,6 +20,15 @@ import {
   saveLlmConfig,
 } from "@/lib/project-store"
 import { resolveProjectLlmConfig } from "@/lib/llm-task-routing"
+import { getWhoAmI } from "@/lib/platform-api"
+import {
+  chatConfigFor,
+  embeddingConfigFor,
+  listServerModels,
+  pickModel,
+  type ServerModel,
+} from "@/lib/llm-gateway"
+import { loadActiveServerModelId } from "@/lib/project-store"
 
 export interface HydrateModelSettingsOptions {
   /**
@@ -29,8 +38,39 @@ export interface HydrateModelSettingsOptions {
   persistResolvedPreset: boolean
 }
 
+/** Points the app at the models a platform server offers: the chosen (or
+ *  default) chat model, the embedding model, captions on the chat model if it
+ *  can see. Returns false on a server that has no accounts. */
+export async function hydratePlatformModels(models?: ServerModel[]): Promise<boolean> {
+  if (!(await getWhoAmI())) return false
+  const store = useWikiStore.getState()
+  const offered = models ?? (await listServerModels().catch(() => []))
+  const chat = pickModel(offered, "chat", await loadActiveServerModelId().catch(() => null))
+  if (chat) {
+    const config = chatConfigFor(chat, store.llmConfig)
+    store.setLlmConfig(config)
+    store.setGlobalLlmConfig(config)
+  }
+  const embedding = pickModel(offered, "embedding")
+  store.setEmbeddingConfig(
+    embedding
+      ? embeddingConfigFor(embedding, store.embeddingConfig)
+      : { ...store.embeddingConfig, enabled: false, serverModelId: undefined },
+  )
+  store.setMultimodalConfig({ ...store.multimodalConfig, enabled: !!chat?.vision, useMainLlm: true })
+  return true
+}
+
 export async function hydrateModelSettings(options: HydrateModelSettingsOptions): Promise<void> {
   const store = () => useWikiStore.getState()
+
+  // On a platform server the models, and the keys behind them, are the
+  // server's; nothing about them is read from the settings store.
+  if (await hydratePlatformModels()) {
+    const savedTaskModelRouting = await loadTaskModelRouting()
+    if (savedTaskModelRouting) store().setTaskModelRouting(savedTaskModelRouting)
+    return
+  }
 
   const savedConfig = await loadLlmConfig()
   if (savedConfig) {

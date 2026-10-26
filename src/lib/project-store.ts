@@ -106,6 +106,19 @@ export async function saveActivePresetId(id: string | null): Promise<void> {
   await store.set(ACTIVE_PRESET_KEY, id)
 }
 
+const ACTIVE_SERVER_MODEL_KEY = "activeServerModelId"
+
+/** The model a user of a platform server picked, kept in their own settings. */
+export async function loadActiveServerModelId(): Promise<string | null> {
+  const store = await getStore()
+  return (await store.get<string | null>(ACTIVE_SERVER_MODEL_KEY)) ?? null
+}
+
+export async function saveActiveServerModelId(id: string): Promise<void> {
+  const store = await getStore()
+  await store.set(ACTIVE_SERVER_MODEL_KEY, id)
+}
+
 export async function loadActivePresetId(): Promise<string | null> {
   const store = await getStore()
   return (await store.get<string | null>(ACTIVE_PRESET_KEY)) ?? null

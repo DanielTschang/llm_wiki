@@ -69,6 +69,12 @@ export interface Platform {
   convertFileSrc(path: string): string
   /** fetch() that is not subject to browser CORS for user-configured endpoints. */
   createHttpFetch(): Promise<typeof globalThis.fetch>
+  /**
+   * A `fetch` that sends a request through the server's LLM gateway instead of
+   * to its address: the server checks where it is going, adds the API key it
+   * holds for `modelId`, and streams the reply back.
+   */
+  createGatewayFetch(modelId: string, projectId?: string): typeof globalThis.fetch
   loadStore(name: string): Promise<KeyValueStore>
   openDialog<T extends OpenDialogOptions>(options: T): Promise<OpenDialogResult<T>>
   saveDialog(options: SaveDialogOptions): Promise<string | null>

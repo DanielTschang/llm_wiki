@@ -2,6 +2,8 @@ import type { LlmConfig } from "@/stores/wiki-store"
 import { isAzureOpenAiEndpoint } from "@/lib/azure-openai"
 import { getProviderConfig, type RequestOverrides } from "./llm-providers"
 import { getHttpFetch, isFetchNetworkError } from "./tauri-fetch"
+import { createGatewayFetch } from "@/platform"
+import { useWikiStore } from "@/stores/wiki-store"
 import { countReasoningCharsInLine, extractReasoningTextFromLine } from "./reasoning-detector"
 
 export type { ChatMessage, ContentBlock, RequestOverrides } from "./llm-providers"
@@ -216,7 +218,11 @@ export async function streamChat(
   let response: Response
   try {
     const body = providerConfig.buildBody(messages, requestOverrides)
-    const httpFetch = await getHttpFetch()
+    // A platform server's model is called through its gateway, which holds
+    // the key; anything else goes out as before.
+    const httpFetch = config.serverModelId
+      ? createGatewayFetch(config.serverModelId, useWikiStore.getState().project?.id)
+      : await getHttpFetch()
     response = await httpFetch(providerConfig.url, {
       method: "POST",
       headers: providerConfig.headers,

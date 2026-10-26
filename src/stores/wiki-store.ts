@@ -25,6 +25,9 @@ export interface ReasoningConfig {
 }
 
 interface LlmConfig {
+  /** A platform server's model this config stands for. The server holds the
+   *  API key and decides where requests go; `apiKey` stays empty. */
+  serverModelId?: string
   provider: "openai" | "anthropic" | "google" | "azure" | "ollama" | "custom" | "minimax"
   apiKey: string
   model: string
@@ -118,6 +121,8 @@ interface SearchApiConfig {
 }
 
 interface EmbeddingConfig {
+  /** A platform server's embedding model; see `LlmConfig.serverModelId`. */
+  serverModelId?: string
   enabled: boolean
   endpoint: string // e.g. "http://127.0.0.1:1234/v1/embeddings"
   apiKey: string
